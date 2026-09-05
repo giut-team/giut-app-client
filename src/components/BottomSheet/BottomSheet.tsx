@@ -1,4 +1,4 @@
-import { useEffect, useId, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { S } from "./BottomSheet.styles";
 
 export type BottomSheetOption<T extends string> = {
@@ -35,6 +35,21 @@ export function BottomSheet({
   footer,
 }: BottomSheetProps) {
   const titleId = useId();
+  const [isRendered, setIsRendered] = useState(open);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => {
+      if (open) {
+        setIsRendered(true);
+        setIsClosing(false);
+      } else if (isRendered) {
+        setIsClosing(true);
+      }
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [isRendered, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -52,7 +67,7 @@ export function BottomSheet({
     };
   }, [onClose, open]);
 
-  if (!open) return null;
+  if (!isRendered) return null;
 
   return (
     <S.Layer>
@@ -61,6 +76,12 @@ export function BottomSheet({
         $minHeight={minHeight}
         aria-labelledby={title ? titleId : undefined}
         aria-modal="true"
+        data-state={isClosing ? "closing" : "opened"}
+        onAnimationEnd={(event) => {
+          if (event.target !== event.currentTarget || !isClosing) return;
+          setIsRendered(false);
+          setIsClosing(false);
+        }}
         role="dialog"
       >
         <S.InnerPadding>
