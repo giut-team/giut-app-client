@@ -14,6 +14,7 @@ export const tokens = {
     danger: "#ff4d4d",
     focus: "#ff4b4b",
     primary: "#2b57ff",
+    primarySurface: "#edf2ff",
   },
   motion: { overlayAnimationDuration: "180ms" },
 } as const;

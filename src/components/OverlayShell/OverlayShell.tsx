@@ -1,11 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { S } from "./OverlayShell.styles";
+import { S, type OverlayPlacement } from "./OverlayShell.styles";
 
 type OverlayShellProps = {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   minHeight?: string;
+  placement?: OverlayPlacement;
   ariaLabel?: string;
   ariaLabelledBy?: string;
 };
@@ -15,6 +16,7 @@ export function OverlayShell({
   onClose,
   children,
   minHeight,
+  placement = "bottom",
   ariaLabel = "오버레이",
   ariaLabelledBy,
 }: OverlayShellProps) {
@@ -53,10 +55,11 @@ export function OverlayShell({
   if (!isRendered) return null;
 
   return (
-    <S.Layer>
+    <S.Layer $placement={placement}>
       <S.Backdrop aria-label="닫기" onClick={onClose} type="button" />
       <S.Wrapper
         $minHeight={minHeight}
+        $placement={placement}
         aria-label={ariaLabelledBy ? undefined : ariaLabel}
         aria-labelledby={ariaLabelledBy}
         aria-modal="true"

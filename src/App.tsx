@@ -4,6 +4,7 @@ import {
   BottomSheetOptionList,
   type BottomSheetOption,
 } from "./components/BottomSheet/BottomSheet";
+import { Modal } from "./components/Modal/Modal";
 import "./App.css";
 
 type SortValue = "views" | "scraps" | "recent" | "closing";
@@ -16,31 +17,25 @@ const sortOptions: BottomSheetOption<SortValue>[] = [
 ];
 
 function App() {
-  const [sheetOpen, setSheetOpen] = useState(true);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(true);
   const [sort, setSort] = useState<SortValue>("views");
   const closeSheet = useCallback(() => setSheetOpen(false), []);
+  const closeModal = useCallback(() => setModalOpen(false), []);
 
   return (
     <main className="demo-page">
-      <div className="campaign-card">
-        <div className="campaign-meta">
-          <span>디자인</span>
-          <b>D-10</b>
-        </div>
-        <h1>디자인으로 만드는 ESG 캠페인</h1>
-        <p>한국디자인진흥원</p>
+      <div className="demo-actions">
+        <button className="open-sheet-button" onClick={() => setSheetOpen(true)} type="button">
+          정렬 열기
+        </button>
+        <button className="open-modal-button" onClick={() => setModalOpen(true)} type="button">
+          인증 안내 다시 보기
+        </button>
       </div>
 
-      <button
-        className="open-sheet-button"
-        onClick={() => setSheetOpen(true)}
-        type="button"
-      >
-        정렬 기준: {sortOptions.find((option) => option.value === sort)?.label}
-      </button>
-
       <BottomSheet
-        footer="‘인증’ 배지가 있는 공모전은 원문 링크가 확인된 항목으로, 정렬과 무관하게 표시됩니다."
+        footer="‘인증’ 배지가 있는 공모전은 원문 링크가 확인된 항목으로 표시됩니다."
         onClose={closeSheet}
         open={sheetOpen}
         title="정렬"
@@ -52,6 +47,15 @@ function App() {
           value={sort}
         />
       </BottomSheet>
+
+      <Modal
+        description="같은 학교 학생끼리 안전하게 팀을 만들기 위해, 기웃보다 팀 지원은 학교 인증을 마친 뒤 이용할 수 있어요. 1분이면 끝나요."
+        onClose={closeModal}
+        open={modalOpen}
+        primaryAction={{ label: "학교 인증하기", onClick: closeModal }}
+        secondaryAction={{ label: "다음에 하기", onClick: closeModal }}
+        title="학교 인증 후 볼 수 있어요"
+      />
     </main>
   );
 }
