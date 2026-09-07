@@ -1,4 +1,5 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import { OverlayShell } from "../OverlayShell/OverlayShell";
 import { S } from "./BottomSheet.styles";
 
 export type BottomSheetOption<T extends string> = {
@@ -10,10 +11,10 @@ type BottomSheetProps = {
   open: boolean;
   title?: string;
   eyebrow?: string;
-  showCloseButton?: boolean; //닫기 버튼 표시 여부
+  showCloseButton?: boolean;
   minHeight?: string;
   onClose: () => void;
-  children: ReactNode; // 바텀시트에 들어갈 실제 내용
+  children: ReactNode;
   footer?: ReactNode;
 };
 
@@ -35,86 +36,40 @@ export function BottomSheet({
   footer,
 }: BottomSheetProps) {
   const titleId = useId();
-  const [isRendered, setIsRendered] = useState(open);
-  const [isClosing, setIsClosing] = useState(false);
-
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => {
-      if (open) {
-        setIsRendered(true);
-        setIsClosing(false);
-      } else if (isRendered) {
-        setIsClosing(true);
-      }
-    });
-
-    return () => cancelAnimationFrame(frameId);
-  }, [isRendered, open]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden"; // 바텀시트가 열리면 뒤쪽 스크롤을 막음
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [onClose, open]);
-
-  if (!isRendered) return null;
 
   return (
-    <S.Layer>
-      <S.Backdrop aria-label="닫기" onClick={onClose} type="button" />
-      <S.Wrapper
-        $minHeight={minHeight}
-        aria-labelledby={title ? titleId : undefined}
-        aria-modal="true"
-        data-state={isClosing ? "closing" : "opened"}
-        onAnimationEnd={(event) => {
-          if (event.target !== event.currentTarget || !isClosing) return;
-          setIsRendered(false);
-          setIsClosing(false);
-        }}
-        role="dialog"
-      >
-        <S.InnerPadding>
-          <S.HandleWrapper>
-            <S.Handle />
-          </S.HandleWrapper>
-          {(title || eyebrow || showCloseButton) && (
-            <S.Header>
-              <div>
-                {eyebrow && <S.Eyebrow>{eyebrow}</S.Eyebrow>}
-                {title && <S.Title id={titleId}>{title}</S.Title>}
-              </div>
-              {showCloseButton && (
-                <S.CloseButton
-                  aria-label="닫기"
-                  onClick={onClose}
-                  type="button"
-                >
-                  x
-                </S.CloseButton>
-              )}
-            </S.Header>
-          )}
-          <S.Content>{children}</S.Content>
-          {footer && <S.Footer>{footer}</S.Footer>}
-        </S.InnerPadding>
-      </S.Wrapper>
-    </S.Layer>
+    <OverlayShell
+      ariaLabel="바텀 시트"
+      ariaLabelledBy={title ? titleId : undefined}
+      minHeight={minHeight}
+      onClose={onClose}
+      open={open}
+    >
+      <S.InnerPadding>
+        <S.HandleWrapper>
+          <S.Handle />
+        </S.HandleWrapper>
+        {(title || eyebrow || showCloseButton) && (
+          <S.Header>
+            <div>
+              {eyebrow && <S.Eyebrow>{eyebrow}</S.Eyebrow>}
+              {title && <S.Title id={titleId}>{title}</S.Title>}
+            </div>
+            {showCloseButton && (
+              <S.CloseButton aria-label="닫기" onClick={onClose} type="button">
+                ×
+              </S.CloseButton>
+            )}
+          </S.Header>
+        )}
+        <S.Content>{children}</S.Content>
+        {footer && <S.Footer>{footer}</S.Footer>}
+      </S.InnerPadding>
+    </OverlayShell>
   );
 }
 
 export function BottomSheetOptionList<T extends string>({
-  // 정렬이나 필터처럼 여러 항목 중 하나를 고르는 UI 일때
   options,
   value,
   onChange,
