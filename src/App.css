@@ -48,6 +48,21 @@
   gap: 12px;
 }
 
+.input-group {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.input-field {
+  display: grid;
+  gap: 8px;
+  color: #263247;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
 .button-group > button:nth-child(3) {
   flex-basis: 100%;
 }
