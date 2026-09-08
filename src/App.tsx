@@ -1,5 +1,6 @@
 import { Button } from "./components/Button";
 import { Input } from "./components/Input";
+import { Textarea } from "./components/Textarea";
 import "./App.css";
 
 function App() {
@@ -20,6 +21,10 @@ function App() {
           <label className="input-field">
             비활성화된 입력
             <Input disabled placeholder="입력할 수 없습니다" />
+          </label>
+          <label className="input-field">
+            자기소개
+            <Textarea placeholder="내용을 입력해주세요" />
           </label>
         </div>
 
