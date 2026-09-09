@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { S, type OverlayPlacement } from "./OverlayShell.styles";
 
+type OverlayState = "opening" | "opened" | "closing";
+
 type OverlayShellProps = {
   open: boolean;
   onClose: () => void;
@@ -9,6 +11,8 @@ type OverlayShellProps = {
   placement?: OverlayPlacement;
   ariaLabel?: string;
   ariaLabelledBy?: string;
+  dragOffset?: number;
+  isDragging?: boolean;
 };
 
 export function OverlayShell({
@@ -19,22 +23,26 @@ export function OverlayShell({
   placement = "bottom",
   ariaLabel = "오버레이",
   ariaLabelledBy,
+  dragOffset = 0,
+  isDragging = false,
 }: OverlayShellProps) {
   const [isRendered, setIsRendered] = useState(open);
-  const [isClosing, setIsClosing] = useState(false);
+  const [overlayState, setOverlayState] = useState<OverlayState>(
+    open ? "opening" : "opened",
+  );
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
       if (open) {
         setIsRendered(true);
-        setIsClosing(false);
-      } else if (isRendered) {
-        setIsClosing(true);
+        setOverlayState("opening");
+      } else {
+        setOverlayState("closing");
       }
     });
 
     return () => cancelAnimationFrame(frameId);
-  }, [isRendered, open]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -58,16 +66,25 @@ export function OverlayShell({
     <S.Layer $placement={placement}>
       <S.Backdrop aria-label="닫기" onClick={onClose} type="button" />
       <S.Wrapper
+        $dragOffset={dragOffset}
+        $isDragging={isDragging}
         $minHeight={minHeight}
         $placement={placement}
         aria-label={ariaLabelledBy ? undefined : ariaLabel}
         aria-labelledby={ariaLabelledBy}
         aria-modal="true"
-        data-state={isClosing ? "closing" : "opened"}
+        data-state={overlayState}
         onAnimationEnd={(event) => {
-          if (event.target !== event.currentTarget || !isClosing) return;
-          setIsRendered(false);
-          setIsClosing(false);
+          if (event.target !== event.currentTarget) return;
+
+          if (overlayState === "opening") {
+            setOverlayState("opened");
+            return;
+          }
+
+          if (overlayState === "closing") {
+            setIsRendered(false);
+          }
         }}
         role="dialog"
       >

@@ -131,10 +131,7 @@ function App() {
           </div>
           <div className="demo-row">
             <Button onClick={() => setIsModalOpen(true)}>Modal 열기</Button>
-            <Button
-              onClick={() => setIsBottomSheetOpen(true)}
-              tone="secondary"
-            >
+            <Button onClick={() => setIsBottomSheetOpen(true)} tone="secondary">
               BottomSheet 열기
             </Button>
           </div>
@@ -160,7 +157,6 @@ function App() {
         footer={<span>선택한 정렬 기준: {sortValue}</span>}
         onClose={() => setIsBottomSheetOpen(false)}
         open={isBottomSheetOpen}
-        showCloseButton
         title="정렬"
       >
         <BottomSheetOptionList
