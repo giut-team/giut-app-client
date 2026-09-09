@@ -14,7 +14,7 @@ const S = {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 52px;
+    height: 56px;
     padding: 0 16px;
     gap: 4px;
     box-sizing: border-box;
