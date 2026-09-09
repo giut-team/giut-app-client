@@ -12,8 +12,8 @@ export const S = {
     margin-bottom: 16px;
     place-items: center;
     border-radius: 14px;
-    background: ${tokens.color.primarySurface};
-    color: ${tokens.color.primary};
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.primary[500]};
   `,
   Title: styled.h2`
     margin: 0 0 10px;
@@ -40,14 +40,14 @@ export const S = {
     min-height: 39px;
     border: 0;
     border-radius: 12px;
-    background: ${tokens.color.primary};
+    background: ${tokens.color.primary[500]};
     color: ${tokens.color.neutral[50]};
     font: inherit;
     font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     &:focus-visible {
-      outline: 2px solid ${tokens.color.focus};
+      outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 3px;
     }
   `,
@@ -60,7 +60,7 @@ export const S = {
     font-size: 13px;
     cursor: pointer;
     &:focus-visible {
-      outline: 2px solid ${tokens.color.focus};
+      outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 3px;
     }
   `,

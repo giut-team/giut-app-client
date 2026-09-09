@@ -38,7 +38,7 @@ export const S = {
   `,
   Eyebrow: styled.p`
     margin: 0 0 8px;
-    color: ${tokens.color.primary};
+    color: ${tokens.color.primary[500]};
     font-size: 13px;
     font-weight: 800;
   `,
@@ -84,7 +84,7 @@ export const S = {
     text-align: left;
     cursor: pointer;
     &:focus-visible {
-      outline: 2px solid ${tokens.color.focus};
+      outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: -2px;
     }
   `,

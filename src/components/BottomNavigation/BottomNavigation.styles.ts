@@ -30,12 +30,12 @@ export const S = {
     gap: 3px;
     border: 0;
     background: transparent;
-    color: ${({ $active }) => $active ? tokens.color.primary : tokens.color.neutral[500]};
+    color: ${({ $active }) => $active ? tokens.color.primary[500] : tokens.color.neutral[500]};
     font: inherit;
     font-size: 10px;
     font-weight: ${({ $active }) => $active ? 800 : 500};
     cursor: pointer;
-    &:focus-visible { outline: 2px solid ${tokens.color.focus}; outline-offset: -2px; border-radius: 10px; }
+    &:focus-visible { outline: 2px solid ${tokens.color.primary[500]}; outline-offset: -2px; border-radius: 10px; }
   `,
   Badge: styled.span`
     position: absolute;

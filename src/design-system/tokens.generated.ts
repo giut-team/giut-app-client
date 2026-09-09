@@ -7,13 +7,12 @@ export const tokens = {
     neutral: {
       50: "#ffffff",
       100: "#f1f2f6",
-      300: "#dfe2e9",
+      200: "#dfe2e9",
+      300: "#edf0f5",
       500: "#7f8798",
       700: "#263247",
+      900: "#101522",
     },
-  },
-  radius: {
-    button: "12px",
-    input: "12px",
+    danger: "#ff4d4d",
   },
 } as const;

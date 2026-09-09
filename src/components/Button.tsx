@@ -54,7 +54,7 @@ const S = {
     height: 48px;
     padding: 0 20px;
     border: none;
-    border-radius: ${tokens.radius.button};
+    border-radius: 12px;
     cursor: pointer;
     transition:
       opacity 0.2s ease-in-out,

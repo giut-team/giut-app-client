@@ -8,6 +8,9 @@ const bottomEnter = keyframes`from { transform: translateY(100%); opacity: 0; } 
 const bottomExit = keyframes`from { transform: translateY(0); opacity: 1; } to { transform: translateY(100%); opacity: 0; }`;
 const centerEnter = keyframes`from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; }`;
 const centerExit = keyframes`from { transform: scale(1); opacity: 1; } to { transform: scale(.96); opacity: 0; }`;
+const overlayAnimationDuration = "240ms";
+const overlayColor = "rgba(23, 27, 38, 0.48)";
+const overlayShadow = "rgba(20, 25, 40, 0.08)";
 
 export const S = {
   Layer: styled.div<{ $placement: OverlayPlacement }>`
@@ -23,7 +26,7 @@ export const S = {
     position: absolute;
     inset: 0;
     border: 0;
-    background: ${tokens.color.overlay};
+    background: ${overlayColor};
     cursor: pointer;
   `,
   Wrapper: styled.section<{
@@ -46,19 +49,19 @@ export const S = {
       $placement === "center" ? "20px" : "28px 28px 0 0"};
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.neutral[700]};
-    box-shadow: 0 12px 40px ${tokens.color.shadow};
+    box-shadow: 0 12px 40px ${overlayShadow};
     transform: ${({ $placement }) =>
       $placement === "center" ? "scale(.96)" : "translateY(100%)"};
     opacity: 0;
     animation: ${({ $placement }) =>
         $placement === "center" ? centerEnter : bottomEnter}
-      ${tokens.motion.overlayAnimationDuration} ease both;
+      ${overlayAnimationDuration} ease both;
 
     &[data-state="closing"] {
       pointer-events: none;
       animation: ${({ $placement }) =>
           $placement === "center" ? centerExit : bottomExit}
-        ${tokens.motion.overlayAnimationDuration} ease both;
+        ${overlayAnimationDuration} ease both;
     }
   `,
 };

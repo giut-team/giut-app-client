@@ -21,7 +21,7 @@ const S = {
     height: ${({ height }) => height ?? "104px"};
     padding: 14px 15px;
     border: 1px solid ${tokens.color.neutral[300]};
-    border-radius: ${tokens.radius.input};
+    border-radius: 12px;
     outline: none;
     resize: ${({ resize }) => resize ?? "none"};
     background-color: ${tokens.color.neutral[50]};
