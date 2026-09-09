@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
 import type { ReactNode } from "react";
-import { Icon } from "./icons";
 import { tokens } from "../design-system/tokens.generated";
+import { Icon } from "./icons";
 
-type HeaderProps = {
+type PageHeaderProps = {
   title: string;
   onBack?: () => void;
   rightContent?: ReactNode;
@@ -59,7 +59,7 @@ const S = {
   `,
 };
 
-export function Header({ title, onBack, rightContent }: HeaderProps) {
+export function PageHeader({ title, onBack, rightContent }: PageHeaderProps) {
   return (
     <S.Wrapper>
       {onBack && (
