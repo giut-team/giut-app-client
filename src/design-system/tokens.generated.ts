@@ -1,20 +1,19 @@
 export const tokens = {
   color: {
+    primary: {
+      500: "#2b57ff",
+      600: "#244be3",
+    },
     neutral: {
       50: "#ffffff",
-      100: "#f5f6fa",
-      200: "#dfe2e9",
-      300: "#edf0f5",
+      100: "#f1f2f6",
+      300: "#dfe2e9",
       500: "#7f8798",
       700: "#263247",
-      900: "#101522",
     },
-    overlay: "rgba(23, 27, 38, 0.48)",
-    shadow: "rgba(20, 25, 40, 0.08)",
-    danger: "#ff4d4d",
-    focus: "#ff4b4b",
-    primary: "#2b57ff",
-    primarySurface: "#edf2ff",
   },
-  motion: { overlayAnimationDuration: "180ms" },
+  radius: {
+    button: "12px",
+    input: "12px",
+  },
 } as const;
