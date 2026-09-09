@@ -1,5 +1,6 @@
 import {
   Bell,
+  CaretLeft,
   ChatCircleDots,
   House,
   LockKey,
@@ -12,6 +13,7 @@ import {
 import type { ComponentType } from "react";
 
 export type IconName =
+  | "arrow-left"
   | "bell"
   | "chat"
   | "home"
@@ -24,6 +26,7 @@ export type IconName =
 type IconComponentProps = PhosphorIconProps & { name: IconName };
 
 const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
+  "arrow-left": CaretLeft,
   bell: Bell,
   chat: ChatCircleDots,
   home: House,

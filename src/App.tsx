@@ -8,6 +8,7 @@ import {
   BottomSheetOptionList,
 } from "./components/BottomSheet/BottomSheet";
 import { Button } from "./components/Button";
+import { Header } from "./components/Header";
 import { Icon, type IconName } from "./components/icons";
 import { Input } from "./components/Input";
 import { Modal } from "./components/Modal/Modal";
@@ -41,6 +42,7 @@ function App() {
 
   return (
     <main className="showcase-page">
+      <Header title="공모전 등록" onBack={() => undefined} />
       <div className="showcase-content">
         <header className="showcase-header">
           <p className="showcase-eyebrow">공용 UI 컴포넌트</p>
