@@ -1,13 +1,10 @@
 import { useState } from "react";
 import {
-  BottomNavigation,
-  type BottomNavigationItem,
-} from "./components/BottomNavigation/BottomNavigation";
-import {
   BottomSheet,
   BottomSheetOptionList,
 } from "./components/BottomSheet/BottomSheet";
 import { Button } from "./components/Button";
+import { BottomActionBar } from "./components/BottomActionBar/BottomActionBar";
 import { PageHeader } from "./components/PageHeader";
 import { Icon, type IconName } from "./components/icons";
 import { Input } from "./components/Input";
@@ -15,15 +12,7 @@ import { Modal } from "./components/Modal/Modal";
 import { Textarea } from "./components/Textarea";
 import "./App.css";
 
-type TabKey = "home" | "chat" | "team" | "mypage";
 type SortValue = "조회수순" | "스크랩순" | "최신순" | "마감일순";
-
-const navigationItems: BottomNavigationItem[] = [
-  { key: "home", label: "홈", icon: "home" },
-  { key: "chat", label: "채팅", icon: "chat", badge: 2 },
-  { key: "team", label: "기웃허브", icon: "users" },
-  { key: "mypage", label: "마이페이지", icon: "user" },
-];
 
 const iconNames: IconName[] = ["home", "search", "bell", "user", "lock"];
 
@@ -35,7 +24,6 @@ const sortOptions: { value: SortValue; label: string }[] = [
 ];
 
 function App() {
-  const [activeTab, setActiveTab] = useState<TabKey>("home");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [sortValue, setSortValue] = useState<SortValue>("조회수순");
@@ -140,6 +128,18 @@ function App() {
         </section>
       </div>
 
+      <BottomActionBar
+        primaryAction={{
+          label: "지금 게시하기",
+          onClick: () => undefined,
+        }}
+        secondaryAction={{
+          ariaLabel: "임시 저장",
+          label: "임시\n저장",
+          onClick: () => undefined,
+        }}
+      />
+
       <Modal
         description="공용 Modal 컴포넌트의 기본 형태와 액션 버튼을 확인할 수 있습니다."
         onClose={() => setIsModalOpen(false)}
@@ -169,11 +169,6 @@ function App() {
         />
       </BottomSheet>
 
-      <BottomNavigation
-        activeKey={activeTab}
-        items={navigationItems}
-        onChange={(key) => setActiveTab(key as TabKey)}
-      />
     </main>
   );
 }
