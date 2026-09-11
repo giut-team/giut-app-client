@@ -39,7 +39,7 @@ export const S = {
       $compact &&
       `
         padding-bottom: 12px;
-        border-bottom: 1px solid ${tokens.color.neutral[300]};
+        border-bottom: 1px solid ${tokens.color.neutral[200]};
         margin-bottom: 12px;
       `}
   `,
@@ -69,7 +69,7 @@ export const S = {
     flex: 1;
   `,
   Options: styled.div`
-    border-bottom: 1px solid ${tokens.color.neutral[300]};
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
   `,
   Option: styled.button<{ $selected: boolean; $first: boolean }>`
     display: flex;
@@ -80,7 +80,7 @@ export const S = {
     padding: 0;
     border: 0;
     border-top: ${({ $first }) =>
-      $first ? 0 : `1px solid ${tokens.color.neutral[300]}`};
+      $first ? 0 : `1px solid ${tokens.color.neutral[200]}`};
     background: transparent;
     color: ${({ $selected }) =>
       $selected ? tokens.color.neutral[900] : tokens.color.neutral[700]};
@@ -96,7 +96,7 @@ export const S = {
     }
   `,
   Check: styled.span`
-    color: ${tokens.color.danger};
+    color: ${tokens.color.danger[500]};
     font-size: 23px;
     font-weight: 700;
   `,

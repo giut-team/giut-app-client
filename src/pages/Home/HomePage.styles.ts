@@ -7,9 +7,18 @@ type BannerCirclePosition = "top" | "bottom";
 type BannerTone = "primary" | "deep";
 
 const categoryColors: Record<CategoryTone, { background: string; color: string }> = {
-  blue: { background: "#eef2ff", color: tokens.color.primary[500] },
-  orange: { background: "#fff2eb", color: "#f26f3d" },
-  purple: { background: "#f2edff", color: "#8657db" },
+  blue: {
+    background: tokens.color.primary[100],
+    color: tokens.color.primary[500],
+  },
+  orange: {
+    background: tokens.color.orange[100],
+    color: tokens.color.orange[500],
+  },
+  purple: {
+    background: tokens.color.purple[100],
+    color: tokens.color.purple[500],
+  },
 };
 
 export const S = {
@@ -75,7 +84,7 @@ export const S = {
     padding: 0 3px;
     place-items: center;
     border-radius: 999px;
-    background: ${tokens.color.danger};
+    background: ${tokens.color.danger[500]};
     color: ${tokens.color.neutral[50]};
     font-size: 8px;
     font-weight: 800;
@@ -87,7 +96,7 @@ export const S = {
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: ${tokens.color.danger};
+    background: ${tokens.color.danger[500]};
   `,
   Greeting: styled.p`
     margin: 22px 0 0;
@@ -323,7 +332,7 @@ export const S = {
     padding: 4px 7px;
     border-radius: 6px;
     background: #fff0ee;
-    color: ${tokens.color.danger};
+    color: ${tokens.color.danger[500]};
     font-size: 8px;
     font-weight: 800;
   `,

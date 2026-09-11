@@ -47,7 +47,7 @@ export const S = {
     padding: 0 3px;
     place-items: center;
     border-radius: 999px;
-    background: ${tokens.color.danger};
+    background: ${tokens.color.danger[500]};
     color: ${tokens.color.neutral[50]};
     font-size: 9px;
     font-weight: 800;

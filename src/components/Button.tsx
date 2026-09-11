@@ -86,7 +86,7 @@ const S = {
     }
 
     &:disabled {
-      background-color: ${tokens.color.neutral[300]};
+      background-color: ${tokens.color.neutral[200]};
       color: ${tokens.color.neutral[700]};
       cursor: not-allowed;
       transform: none;
