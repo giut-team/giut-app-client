@@ -2,17 +2,17 @@ import styled from "@emotion/styled";
 import { tokens } from "../../design-system/tokens.generated";
 
 export const S = {
-  InnerPadding: styled.div`
+  InnerPadding: styled.div<{ $compact: boolean }>`
     display: flex;
     min-height: 0;
     flex: 1;
     flex-direction: column;
-    padding: 17px 27px 0;
+    padding: ${({ $compact }) => ($compact ? "12px 18px 20px" : "17px 27px 0")};
   `,
-  HandleWrapper: styled.div`
+  HandleWrapper: styled.div<{ $compact: boolean }>`
     display: flex;
     justify-content: center;
-    padding-bottom: 18px;
+    padding-bottom: ${({ $compact }) => ($compact ? "10px" : "18px")};
     cursor: grab;
     touch-action: none;
     user-select: none;
@@ -24,35 +24,42 @@ export const S = {
     border-radius: 999px;
     background: ${tokens.color.neutral[200]};
   `,
-  Title: styled.h2`
+  Title: styled.h2<{ $compact: boolean }>`
     margin: 0 0 22px;
     color: ${tokens.color.neutral[900]};
-    font-size: 22px;
+    font-size: ${({ $compact }) => ($compact ? "15px" : "22px")};
     font-weight: 800;
     letter-spacing: -0.7px;
   `,
-  Header: styled.div`
+  Header: styled.div<{ $compact: boolean }>`
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    ${({ $compact }) =>
+      $compact &&
+      `
+        padding-bottom: 12px;
+        border-bottom: 1px solid ${tokens.color.neutral[300]};
+        margin-bottom: 12px;
+      `}
   `,
-  Eyebrow: styled.p`
-    margin: 0 0 8px;
+  Eyebrow: styled.p<{ $compact: boolean }>`
+    margin: ${({ $compact }) => ($compact ? "0 0 5px" : "0 0 8px")};
     color: ${tokens.color.primary[500]};
-    font-size: 13px;
+    font-size: ${({ $compact }) => ($compact ? "9px" : "13px")};
     font-weight: 800;
   `,
-  CloseButton: styled.button`
+  CloseButton: styled.button<{ $compact: boolean }>`
     display: grid;
-    width: 40px;
-    height: 40px;
+    width: ${({ $compact }) => ($compact ? "28px" : "40px")};
+    height: ${({ $compact }) => ($compact ? "28px" : "40px")};
     place-items: center;
-    margin: -2px -8px 0 16px;
+    margin: ${({ $compact }) => ($compact ? "0 -2px 0 12px" : "-2px -8px 0 16px")};
     border: 0;
     border-radius: 50%;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[700]};
-    font-size: 28px;
+    font-size: ${({ $compact }) => ($compact ? "20px" : "28px")};
     font-weight: 300;
     line-height: 1;
     cursor: pointer;
@@ -93,11 +100,13 @@ export const S = {
     font-size: 23px;
     font-weight: 700;
   `,
-  Footer: styled.div`
-    margin-top: 22px;
-    padding: 17px 16px;
+  Footer: styled.div<{ $variant: "note" | "action" }>`
+    margin-top: ${({ $variant }) => ($variant === "action" ? "14px" : "22px")};
+    padding: ${({ $variant }) =>
+      $variant === "action" ? "0" : "17px 16px"};
     border-radius: 15px;
-    background: ${tokens.color.neutral[100]};
+    background: ${({ $variant }) =>
+      $variant === "action" ? "transparent" : tokens.color.neutral[100]};
     color: ${tokens.color.neutral[500]};
     font-size: 14px;
     line-height: 1.65;

@@ -14,5 +14,9 @@ export const tokens = {
       900: "#101522",
     },
     danger: "#ff4d4d",
+    success: {
+      100: "#e3f8ef",
+      500: "#16845b",
+    },
   },
 } as const;
