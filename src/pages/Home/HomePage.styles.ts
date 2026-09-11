@@ -86,8 +86,9 @@ export const S = {
     border-radius: 999px;
     background: ${tokens.color.danger[500]};
     color: ${tokens.color.neutral[50]};
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
+    line-height: 1;
   `,
   NotificationDot: styled.span`
     position: absolute;
@@ -102,7 +103,8 @@ export const S = {
     margin: 22px 0 0;
     color: ${tokens.color.neutral[500]};
     font-size: 10px;
-    letter-spacing: -0.3px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
   `,
   Title: styled.h1`
     margin: 7px 0 0;
@@ -156,8 +158,9 @@ export const S = {
     padding: 0 8px;
     border-radius: 999px;
     background: rgb(255 255 255 / 18%);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
+    letter-spacing: -0.1px;
     line-height: 1;
   `,
   BannerTitle: styled.h2`
@@ -175,7 +178,7 @@ export const S = {
     border-radius: 999px;
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.primary[500]};
-    font-size: 9px;
+    font-size: 10px;
 
     &:hover:not(:disabled) {
       background: ${tokens.color.neutral[50]};
@@ -262,6 +265,7 @@ export const S = {
     border-radius: 10px;
     background: ${tokens.color.neutral[100]};
     font-size: 16px;
+    line-height: 1;
   `,
   ShortcutText: styled.span`
     display: grid;
@@ -275,7 +279,9 @@ export const S = {
   `,
   ShortcutDescription: styled.span`
     color: ${tokens.color.neutral[500]};
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
   `,
   Caret: styled.span`
     margin-left: auto;
@@ -301,7 +307,9 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[500]};
     font: inherit;
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
     cursor: pointer;
   `,
   ContestList: styled.div`
@@ -325,16 +333,23 @@ export const S = {
     border-radius: 6px;
     background: ${({ $tone }) => categoryColors[$tone].background};
     color: ${({ $tone }) => categoryColors[$tone].color};
-    font-size: 8px;
-    font-weight: 800;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: -0.1px;
   `,
   DDay: styled.span`
-    padding: 4px 7px;
-    border-radius: 6px;
-    background: #fff0ee;
+    min-width: 34px;
+    padding: 4px 8px;
+    border: 1px solid color-mix(in srgb, ${tokens.color.danger[500]} 18%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, ${tokens.color.danger[500]} 9%, ${tokens.color.neutral[50]});
     color: ${tokens.color.danger[500]};
-    font-size: 8px;
+    text-align: center;
+    font-size: 10px;
     font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    line-height: 1;
   `,
   ContestTitle: styled.h3`
     margin: 8px 0 3px;
@@ -345,6 +360,8 @@ export const S = {
   ContestOrganization: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: -0.1px;
   `,
 };
