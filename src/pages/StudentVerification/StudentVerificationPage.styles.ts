@@ -3,9 +3,6 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { tokens } from "../../design-system/tokens.generated";
 
-const successSurface = "#e3f8ef";
-const successText = "#16845b";
-
 export const S = {
   Page: styled.main`
     display: flex;
@@ -45,8 +42,8 @@ export const S = {
     margin-top: 16px;
     padding: 0 12px;
     border-radius: 10px;
-    background: ${successSurface};
-    color: ${successText};
+    background: ${tokens.color.success[100]};
+    color: ${tokens.color.success[500]};
     font-size: 10px;
     letter-spacing: -0.25px;
     line-height: 1.4;
