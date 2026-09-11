@@ -1,4 +1,5 @@
 import {
+  AppleLogo,
   Bell,
   BookmarkSimple,
   CaretLeft,
@@ -14,6 +15,7 @@ import {
 import type { ComponentType } from "react";
 
 export type IconName =
+  | "apple"
   | "arrow-left"
   | "bell"
   | "bookmark"
@@ -28,6 +30,7 @@ export type IconName =
 type IconComponentProps = PhosphorIconProps & { name: IconName };
 
 const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
+  apple: AppleLogo,
   "arrow-left": CaretLeft,
   bell: Bell,
   bookmark: BookmarkSimple,
