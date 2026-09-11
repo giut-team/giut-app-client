@@ -11,6 +11,9 @@ import { S } from "./BottomSheet.styles";
 
 const DRAG_CLOSE_THRESHOLD = 120; // 바텀 시트를 120px 아래로 드래그하면 닫히도록 설정
 
+export type BottomSheetVariant = "default" | "compact";
+export type BottomSheetFooterVariant = "note" | "action";
+
 export type BottomSheetOption<T extends string> = {
   value: T;
   label: string;
@@ -21,6 +24,8 @@ type BottomSheetProps = {
   title?: string;
   eyebrow?: string;
   showCloseButton?: boolean; // 닫기 버튼 표시 여부
+  variant?: BottomSheetVariant;
+  footerVariant?: BottomSheetFooterVariant;
   minHeight?: string;
   onClose: () => void;
   children: ReactNode; // 바텀 시트의 내용
@@ -39,6 +44,8 @@ export function BottomSheet({
   title,
   eyebrow,
   showCloseButton = false,
+  variant = "default",
+  footerVariant = "note",
   minHeight,
   onClose,
   children,
@@ -126,8 +133,8 @@ export function BottomSheet({
       dragOffset={dragOffset}
       isDragging={isDragging}
     >
-      <S.InnerPadding>
-        <S.HandleWrapper
+      <S.InnerPadding $compact={variant === "compact"}>
+        <S.HandleWrapper $compact={variant === "compact"}
           onPointerCancel={resetDrag}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -136,20 +143,33 @@ export function BottomSheet({
           <S.Handle />
         </S.HandleWrapper>
         {(title || eyebrow || showCloseButton) && (
-          <S.Header>
+            <S.Header $compact={variant === "compact"}>
             <div>
-              {eyebrow && <S.Eyebrow>{eyebrow}</S.Eyebrow>}
-              {title && <S.Title id={titleId}>{title}</S.Title>}
+              {eyebrow && (
+                <S.Eyebrow $compact={variant === "compact"}>
+                  {eyebrow}
+                </S.Eyebrow>
+              )}
+              {title && (
+                <S.Title $compact={variant === "compact"} id={titleId}>
+                  {title}
+                </S.Title>
+              )}
             </div>
             {showCloseButton && (
-              <S.CloseButton aria-label="닫기" onClick={onClose} type="button">
+              <S.CloseButton
+                $compact={variant === "compact"}
+                aria-label="닫기"
+                onClick={onClose}
+                type="button"
+              >
                 ×
               </S.CloseButton>
             )}
           </S.Header>
         )}
         <S.Content>{children}</S.Content>
-        {footer && <S.Footer>{footer}</S.Footer>}
+        {footer && <S.Footer $variant={footerVariant}>{footer}</S.Footer>}
       </S.InnerPadding>
     </OverlayShell>
   );

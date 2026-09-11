@@ -7,10 +7,12 @@ type PageHeaderProps = {
   title: string;
   onBack?: () => void;
   rightContent?: ReactNode;
+  centerTitle?: boolean;
 };
 
 const S = {
   Wrapper: styled.header`
+    position: relative;
     display: flex;
     align-items: center;
     width: 100%;
@@ -40,17 +42,24 @@ const S = {
       border-radius: 8px;
     }
   `,
-  Title: styled.h1`
+  Title: styled.h1<{ $centered: boolean }>`
     min-width: 0;
     margin: 0;
     overflow: hidden;
     color: ${tokens.color.neutral[900]};
-    font-size: 16px;
+    font-size: ${({ $centered }) => ($centered ? "14px" : "16px")};
     font-weight: 700;
     letter-spacing: -0.4px;
     line-height: 1;
     text-overflow: ellipsis;
     white-space: nowrap;
+    ${({ $centered }) =>
+      $centered &&
+      `
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      `}
   `,
   RightContent: styled.div`
     display: flex;
@@ -59,7 +68,12 @@ const S = {
   `,
 };
 
-export function PageHeader({ title, onBack, rightContent }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  onBack,
+  rightContent,
+  centerTitle = false,
+}: PageHeaderProps) {
   return (
     <S.Wrapper>
       {onBack && (
@@ -67,7 +81,7 @@ export function PageHeader({ title, onBack, rightContent }: PageHeaderProps) {
           <Icon name="arrow-left" size={20} weight="regular" />
         </S.BackButton>
       )}
-      <S.Title>{title}</S.Title>
+      <S.Title $centered={centerTitle}>{title}</S.Title>
       {rightContent && <S.RightContent>{rightContent}</S.RightContent>}
     </S.Wrapper>
   );

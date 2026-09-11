@@ -3,7 +3,10 @@ import {
   Bell,
   BookmarkSimple,
   CaretLeft,
+  CaretRight,
   ChatCircleDots,
+  Eye,
+  EyeSlash,
   House,
   LockKey,
   MagnifyingGlass,
@@ -19,7 +22,10 @@ export type IconName =
   | "arrow-left"
   | "bell"
   | "bookmark"
+  | "caret-right"
   | "chat"
+  | "eye"
+  | "eye-slash"
   | "home"
   | "lock"
   | "search"
@@ -34,7 +40,10 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "arrow-left": CaretLeft,
   bell: Bell,
   bookmark: BookmarkSimple,
+  "caret-right": CaretRight,
   chat: ChatCircleDots,
+  eye: Eye,
+  "eye-slash": EyeSlash,
   home: House,
   lock: LockKey,
   search: MagnifyingGlass,
