@@ -13,6 +13,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@phosphor-icons/react": "^2.1.10",
+    "@sun-typeface/suit": "^2.0.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-icons": "^5.7.0",
