@@ -67,27 +67,6 @@ export const S = {
     border-radius: 11px;
     font-size: 12px;
   `,
-  SchoolButton: styled(Button)`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 40px;
-    padding: 0 12px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 11px;
-    background: ${tokens.color.neutral[50]};
-    color: ${tokens.color.neutral[900]};
-    font: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    text-align: left;
-
-    &:hover:not(:disabled) {
-      opacity: 1;
-      background: ${tokens.color.neutral[100]};
-    }
-  `,
   PasswordField: styled.div`
     position: relative;
   `,

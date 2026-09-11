@@ -36,14 +36,6 @@ export function StudentVerificationPage() {
 
         <S.Form onSubmit={(event) => event.preventDefault()}>
           <S.Field>
-            학교
-            <S.SchoolButton tone="secondary" type="button">
-              <span>서울시립대학교</span>
-              <Icon name="caret-right" size={14} weight="bold" />
-            </S.SchoolButton>
-          </S.Field>
-
-          <S.Field>
             포털 아이디
             <S.FieldInput
               onChange={(event) => setPortalId(event.target.value)}
