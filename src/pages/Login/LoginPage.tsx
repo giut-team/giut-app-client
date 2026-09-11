@@ -7,8 +7,18 @@ export function LoginPage() {
     <S.Page>
       <S.Logo aria-label="기웃">
         <span>기웃</span>
-        <S.LogoDot />
-        <S.LogoDot />
+        <S.LogoMark aria-hidden="true" viewBox="0 0 160 130">
+          <circle cx="50" cy="26" r="15" fill="currentColor" />
+          <circle cx="126" cy="26" r="15" fill="currentColor" />
+          <path
+            d="M22 112V93c0-18 12-31 29-31 11 0 20 5 28 14l9 10 9-10c8-9 17-14 28-14 17 0 31 13 31 31v19"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="19"
+          />
+        </S.LogoMark>
       </S.Logo>
 
       <S.Message>

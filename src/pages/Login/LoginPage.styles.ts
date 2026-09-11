@@ -70,12 +70,12 @@ export const S = {
     letter-spacing: -1.6px;
     line-height: 1;
   `,
-  LogoDot: styled.span`
+  LogoMark: styled.svg`
     display: block;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: currentColor;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 30px;
+    overflow: visible;
   `,
   Message: styled.section`
     margin-top: 22px;
