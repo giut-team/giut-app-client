@@ -5,6 +5,8 @@ import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
 import { S } from "./StudentVerificationPage.styles";
 
+const MIN_PORTAL_PASSWORD_LENGTH = 9;
+
 export function StudentVerificationPage() {
   const navigate = useNavigate();
   const [portalId, setPortalId] = useState("");
@@ -14,7 +16,9 @@ export function StudentVerificationPage() {
   const [isTermsOpen, setIsTermsOpen] = useState(false);
 
   const canSubmit =
-    portalId.trim().length > 0 && portalPassword.trim().length > 0 && isAgreed;
+    portalId.trim().length > 0 &&
+    portalPassword.length >= MIN_PORTAL_PASSWORD_LENGTH &&
+    isAgreed;
 
   return (
     <S.Page>

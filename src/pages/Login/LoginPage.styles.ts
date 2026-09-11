@@ -70,7 +70,7 @@ export const S = {
     letter-spacing: -1.6px;
     line-height: 1;
   `,
-  LogoMark: styled.svg`
+  LogoMark: styled.img`
     display: block;
     flex: 0 0 auto;
     width: 36px;
