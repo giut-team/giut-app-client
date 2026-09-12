@@ -7,6 +7,7 @@ import {
   ChatCircleDots,
   Eye,
   EyeSlash,
+  Heart,
   House,
   LockKey,
   MagnifyingGlass,
@@ -28,6 +29,7 @@ export type IconName =
   | "eye"
   | "eye-slash"
   | "home"
+  | "heart"
   | "lock"
   | "plus"
   | "search"
@@ -47,6 +49,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   eye: Eye,
   "eye-slash": EyeSlash,
   home: House,
+  heart: Heart,
   lock: LockKey,
   plus: Plus,
   search: MagnifyingGlass,

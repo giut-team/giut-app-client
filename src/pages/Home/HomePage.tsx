@@ -99,7 +99,7 @@ export function HomePage() {
 
         <S.HeroViewport>
           <S.HeroTrack $active={activeBanner} $count={banners.length}>
-            {banners.map((banner) => (
+            {banners.map((banner, index) => (
               <S.HeroBanner
                 $slideCount={banners.length}
                 $tone={banner.tone}
@@ -111,6 +111,9 @@ export function HomePage() {
                   <S.BannerEyebrow>{banner.eyebrow}</S.BannerEyebrow>
                   <S.BannerTitle>{banner.title}</S.BannerTitle>
                   <S.BannerButton
+                    onClick={
+                      index === 1 ? () => navigate("/position-teams") : undefined
+                    }
                     tone="secondary"
                     type="button"
                     width="fit-content"
