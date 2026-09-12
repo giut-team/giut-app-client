@@ -31,6 +31,12 @@ export const S = {
     min-height: 100svh;
     margin: 0 auto;
     padding: 18px 13px 88px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  TopArea: styled.section`
+    margin: -18px -13px 0;
+    padding: 18px 13px 8px;
+    background: ${tokens.color.neutral[50]};
   `,
   Header: styled.header`
     display: flex;
@@ -117,7 +123,7 @@ export const S = {
   HeroViewport: styled.div`
     position: relative;
     min-height: 118px;
-    margin-top: 24px;
+    margin-top: 8px;
     overflow: hidden;
     border-radius: 15px;
     background: ${tokens.color.primary[500]};

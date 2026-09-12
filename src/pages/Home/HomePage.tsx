@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import giutLogo from "../../assets/giut-logo.svg";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
@@ -41,6 +42,7 @@ const navigationItems = [
 ];
 
 export function HomePage() {
+  const navigate = useNavigate();
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [activeBanner, setActiveBanner] = useState(0);
   const banners = [
@@ -62,13 +64,18 @@ export function HomePage() {
   return (
     <S.Page>
       <S.Content>
+        <S.TopArea>
         <S.Header>
           <S.Brand aria-label="기웃">
             <span>기웃</span>
             <S.BrandMark alt="" aria-hidden="true" src={giutLogo} />
           </S.Brand>
           <S.HeaderActions>
-            <S.HeaderButton aria-label="친구 찾기" type="button">
+            <S.HeaderButton
+              aria-label="팀 페이지로 이동"
+              onClick={() => navigate("/my-team")}
+              type="button"
+            >
               <Icon name="users" size={16} weight="regular" />
               <S.HeaderBadge>3</S.HeaderBadge>
             </S.HeaderButton>
@@ -88,6 +95,7 @@ export function HomePage() {
           <br />
           어떤 프로젝트를 할까요?
         </S.Title>
+        </S.TopArea>
 
         <S.HeroViewport>
           <S.HeroTrack $active={activeBanner} $count={banners.length}>
