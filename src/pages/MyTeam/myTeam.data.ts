@@ -1,6 +1,8 @@
 export type ApplicantTone = "blue" | "purple" | "success";
 
 export type Applicant = {
+  id: string;
+  teamId: string;
   initial: string;
   name: string;
   role: string;
@@ -15,11 +17,13 @@ export type Applicant = {
 
 export const applicants: Applicant[] = [
   {
+    id: "kim-hyeonjin",
+    teamId: "data-seoul",
     initial: "김",
     name: "김현진",
     role: "백엔드 개발자",
     filter: "백엔드 개발자",
-    school: "컴퓨터과학과 3학년",
+    school: "서울시립대 컴퓨터과학부 3학년",
     message: "Spring · PostgreSQL로 공공데이터 API 2개 만들어봤어요.",
     reason: "이 팀에 지원한 이유",
     answer: "서울시 교통 공공데이터를 다루는 경험이 있어서 이번 공모전 주제와 잘 맞을 것 같아 지원했습니다.",
@@ -27,6 +31,8 @@ export const applicants: Applicant[] = [
     tone: "blue",
   },
   {
+    id: "park-seojun",
+    teamId: "data-seoul",
     initial: "박",
     name: "박서준",
     role: "데이터 분석",
@@ -39,6 +45,8 @@ export const applicants: Applicant[] = [
     tone: "purple",
   },
   {
+    id: "choi-yuna",
+    teamId: "data-seoul",
     initial: "최",
     name: "최유나",
     role: "UI 디자이너",

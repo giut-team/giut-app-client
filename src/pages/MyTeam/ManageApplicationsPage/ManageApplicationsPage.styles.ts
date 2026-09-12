@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { Button } from "../../components/Button";
-import { tokens } from "../../design-system/tokens.generated";
-import type { ApplicantTone } from "./myTeam.data";
+import { Button } from "../../../components/Button";
+import { tokens } from "../../../design-system/tokens.generated";
+import type { ApplicantTone } from "../myTeam.data";
 
 const colorMix = (color: string, amount: number) =>
   `color-mix(in srgb, ${color} ${amount}%, ${tokens.color.neutral[50]})`;
@@ -200,10 +200,28 @@ export const S = {
     font-size: 9px;
     font-weight: 700;
   `,
-  DetailIcon: styled.span`
+  DetailButton: styled.button`
+    display: grid;
     position: absolute;
     top: 73px;
     right: 8px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
     color: ${tokens.color.neutral[500]};
+    cursor: pointer;
+
+    &:hover {
+      background: ${tokens.color.neutral[100]};
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
   `,
 };

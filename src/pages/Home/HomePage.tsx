@@ -48,7 +48,7 @@ export function HomePage() {
   const banners = [
     {
       eyebrow: "마감 임박",
-      title: "이번 주 마감 공모전 3건\n놓치기 전에 필터링",
+      title: "이번 주 마감 공모전 \n놓치기 전에 팀 꾸리기",
       tone: "primary" as const,
     },
     {
@@ -65,36 +65,36 @@ export function HomePage() {
     <S.Page>
       <S.Content>
         <S.TopArea>
-        <S.Header>
-          <S.Brand aria-label="기웃">
-            <span>기웃</span>
-            <S.BrandMark alt="" aria-hidden="true" src={giutLogo} />
-          </S.Brand>
-          <S.HeaderActions>
-            <S.HeaderButton
-              aria-label="팀 페이지로 이동"
-              onClick={() => navigate("/my-team")}
-              type="button"
-            >
-              <Icon name="users" size={16} weight="regular" />
-              <S.HeaderBadge>3</S.HeaderBadge>
-            </S.HeaderButton>
-            <S.HeaderButton aria-label="검색" type="button">
-              <Icon name="search" size={16} weight="regular" />
-            </S.HeaderButton>
-            <S.HeaderButton aria-label="알림" type="button">
-              <Icon name="bell" size={16} weight="regular" />
-              <S.NotificationDot />
-            </S.HeaderButton>
-          </S.HeaderActions>
-        </S.Header>
+          <S.Header>
+            <S.Brand aria-label="기웃">
+              <span>기웃</span>
+              <S.BrandMark alt="" aria-hidden="true" src={giutLogo} />
+            </S.Brand>
+            <S.HeaderActions>
+              <S.HeaderButton
+                aria-label="팀 페이지로 이동"
+                onClick={() => navigate("/my-team")}
+                type="button"
+              >
+                <Icon name="users" size={16} weight="regular" />
+                <S.HeaderBadge>3</S.HeaderBadge>
+              </S.HeaderButton>
+              <S.HeaderButton aria-label="검색" type="button">
+                <Icon name="search" size={16} weight="regular" />
+              </S.HeaderButton>
+              <S.HeaderButton aria-label="알림" type="button">
+                <Icon name="bell" size={16} weight="regular" />
+                <S.NotificationDot />
+              </S.HeaderButton>
+            </S.HeaderActions>
+          </S.Header>
 
-        <S.Greeting>이루매님, 안녕하세요</S.Greeting>
-        <S.Title>
-          이번 방학엔
-          <br />
-          어떤 프로젝트를 할까요?
-        </S.Title>
+          <S.Greeting>이루매님, 안녕하세요</S.Greeting>
+          <S.Title>
+            이번 방학엔
+            <br />
+            어떤 프로젝트를 할까요?
+          </S.Title>
         </S.TopArea>
 
         <S.HeroViewport>

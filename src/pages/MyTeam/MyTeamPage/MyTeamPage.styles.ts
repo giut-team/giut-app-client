@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import { Button } from "../../components/Button";
-import { tokens } from "../../design-system/tokens.generated";
+import { Button } from "../../../components/Button";
+import { tokens } from "../../../design-system/tokens.generated";
 
 type TeamTone = "primary" | "success";
 type ApplicantTone = "blue" | "purple" | "success";
@@ -28,8 +28,10 @@ const applicantColors: Record<
 
 export const S = {
   Page: styled.main`
+    width: min(100%, 480px);
     min-height: 100svh;
-    background: ${tokens.color.neutral[100]};
+    margin: 0 auto;
+    background: ${tokens.color.neutral[50]};
   `,
   TopArea: styled.section`
     width: min(100%, 480px);
@@ -166,21 +168,32 @@ export const S = {
       display: none;
     }
   `,
-  TeamCard: styled.article`
+  TeamCard: styled.button<{ $selected: boolean }>`
     flex: 0 0 204px;
     min-height: 128px;
     padding: 14px 12px 12px;
-    border: 1px solid ${tokens.color.neutral[200]};
+    border: 1px solid
+      ${({ $selected }) =>
+        $selected
+          ? tokens.color.primary[500]
+          : tokens.color.neutral[200]};
     border-radius: 14px;
     background: ${tokens.color.neutral[50]};
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
     scroll-snap-align: start;
 
-    &:first-child {
-      border-color: color-mix(
-        in srgb,
-        ${tokens.color.primary[500]} 24%,
-        transparent
-      );
+    ${({ $selected }) =>
+      $selected &&
+      `
+        box-shadow: 0 0 0 2px color-mix(in srgb, ${tokens.color.primary[500]} 12%, transparent);
+      `}
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
     }
   `,
   TeamBadges: styled.div`
@@ -274,6 +287,149 @@ export const S = {
     padding: 13px 16px 88px;
     background: ${tokens.color.neutral[50]};
   `,
+  MemberApplicationSection: styled.section`
+    width: min(100%, 480px);
+    margin: 0 auto;
+    padding: 16px 8px 88px;
+    background: ${tokens.color.neutral[100]};
+  `,
+  MemberSectionTitle: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -0.25px;
+  `,
+  MemberSectionSubtitle: styled.p`
+    margin: 5px 0 11px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    line-height: 1.4;
+  `,
+  MemberApplicationCard: styled.article`
+    padding: 13px 12px 11px;
+    border-radius: 14px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  MemberApplicationHeader: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  `,
+  MemberStatus: styled.span`
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: ${colorMix(tokens.color.success[500], 12)};
+    color: ${tokens.color.success[500]};
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+  `,
+  MemberRole: styled.span`
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: ${tokens.color.purple[100]};
+    color: ${tokens.color.purple[500]};
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+  `,
+  MemberReceivedAt: styled.time`
+    margin-left: auto;
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+  `,
+  MemberProfile: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 10px;
+  `,
+  MemberAvatar: styled.span`
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border-radius: 50%;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font-size: 12px;
+    font-weight: 800;
+  `,
+  MemberIdentity: styled.div`
+    display: grid;
+    gap: 3px;
+  `,
+  MemberName: styled.strong`
+    color: ${tokens.color.neutral[900]};
+    font-size: 10px;
+    font-weight: 800;
+  `,
+  MemberSchool: styled.span`
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+  `,
+  MemberQuestion: styled.section`
+    margin-top: 11px;
+  `,
+  MemberQuestionTitle: styled.h3`
+    margin: 0;
+    color: ${tokens.color.primary[500]};
+    font-size: 8px;
+    font-weight: 800;
+  `,
+  MemberAnswer: styled.p`
+    margin: 4px 0 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    line-height: 1.55;
+  `,
+  AttachmentList: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  `,
+  Attachment: styled.span`
+    padding: 5px 7px;
+    border-radius: 6px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    font-weight: 600;
+  `,
+  MemberOriginalLink: styled.button`
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 0 0;
+    border-top: 1px solid ${tokens.color.neutral[200]};
+    background: transparent;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    color: ${tokens.color.primary[500]};
+    font: inherit;
+    font-size: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  `,
+  MemberChatButton: styled(Button)`
+    height: 36px;
+    margin-top: 9px;
+    border-radius: 10px;
+    gap: 5px;
+    font-size: 10px;
+  `,
+  MemberInfoNote: styled.p`
+    margin: 9px 0 0;
+    padding: 12px;
+    border-radius: 10px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    line-height: 1.5;
+  `,
   ApplicationHeader: styled.div`
     padding: 0 1px 10px;
   `,
@@ -288,7 +444,18 @@ export const S = {
     display: grid;
     gap: 8px;
   `,
+  EmptyApplications: styled.p`
+    margin: 0;
+    padding: 24px 16px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 14px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 11px;
+    text-align: center;
+  `,
   ApplicantCard: styled.article`
+    position: relative;
     padding: 14px 13px 12px;
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 14px;
@@ -383,6 +550,31 @@ export const S = {
     padding: 0;
     border-radius: 8px;
     font-size: 10px;
+  `,
+  DetailButton: styled.button`
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: ${tokens.color.neutral[500]};
+    transform: translateY(-50%);
+    cursor: pointer;
+
+    &:hover {
+      background: ${tokens.color.neutral[100]};
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
   `,
   ManageButton: styled(Button)`
     height: 38px;

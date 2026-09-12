@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Icon } from "../../components/icons";
-import { PageHeader } from "../../components/PageHeader";
-import { applicants, type Applicant } from "./myTeam.data";
+import { Icon } from "../../../components/icons";
+import { PageHeader } from "../../../components/PageHeader";
+import { applicants, type Applicant } from "../myTeam.data";
 import { S } from "./ManageApplicationsPage.styles";
 
 type ApplicantFilter = "전체" | Applicant["filter"];
@@ -102,9 +102,15 @@ export function ManageApplicationsPage() {
                     </S.AcceptButton>
                   </S.ApplicantActions>
                 )}
-                <S.DetailIcon aria-hidden="true">
+                <S.DetailButton
+                  aria-label={`${applicant.name} 지원서 상세보기`}
+                  onClick={() =>
+                    navigate(`/my-team/applications/${applicant.id}`)
+                  }
+                  type="button"
+                >
                   <Icon name="caret-right" size={13} weight="bold" />
-                </S.DetailIcon>
+                </S.DetailButton>
               </S.ApplicantCard>
             );
           })}
