@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import giutLogo from "../../../assets/giut-logo.svg";
 import { BottomNavigation } from "../../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../../components/icons";
+import { PillButton } from "../../../components/PillButton";
 import { S } from "./PositionTeamsPage.styles";
 
 type PositionFilter = "백엔드 개발자" | "데이터 엔지니어" | "전체 포지션";
@@ -131,15 +132,15 @@ export function PositionTeamsPage() {
 
           <S.FilterList aria-label="포지션 필터">
             {filters.map((filter) => (
-              <S.FilterButton
-                $active={activeFilter === filter}
+              <PillButton
+                active={activeFilter === filter}
                 aria-pressed={activeFilter === filter}
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 type="button"
               >
                 {filter}
-              </S.FilterButton>
+              </PillButton>
             ))}
           </S.FilterList>
 

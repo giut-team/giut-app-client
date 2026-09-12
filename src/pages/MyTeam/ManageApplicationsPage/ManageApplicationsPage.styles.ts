@@ -54,31 +54,6 @@ export const S = {
       display: none;
     }
   `,
-  FilterButton: styled.button<{ $active: boolean }>`
-    flex: 0 0 auto;
-    height: 25px;
-    padding: 0 9px;
-    border: 1px solid
-      ${({ $active }) =>
-        $active
-          ? tokens.color.primary[500]
-          : tokens.color.neutral[200]};
-    border-radius: 999px;
-    background: ${({ $active }) =>
-      $active ? tokens.color.primary[500] : tokens.color.neutral[50]};
-    color: ${({ $active }) =>
-      $active ? tokens.color.neutral[50] : tokens.color.neutral[700]};
-    font: inherit;
-    font-size: 9px;
-    font-weight: ${({ $active }) => ($active ? 800 : 500)};
-    white-space: nowrap;
-    cursor: pointer;
-
-    &:focus-visible {
-      outline: 2px solid ${tokens.color.primary[500]};
-      outline-offset: 2px;
-    }
-  `,
   ApplicantList: styled.div`
     display: grid;
     gap: 8px;

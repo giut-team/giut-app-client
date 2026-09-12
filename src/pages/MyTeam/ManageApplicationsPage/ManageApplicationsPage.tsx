@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
+import { PillButton } from "../../../components/PillButton";
 import { applicants, type Applicant } from "../myTeam.data";
 import { S } from "./ManageApplicationsPage.styles";
 
@@ -45,15 +46,16 @@ export function ManageApplicationsPage() {
 
         <S.FilterList aria-label="지원자 직군 필터">
           {filters.map((filter) => (
-            <S.FilterButton
-              $active={activeFilter === filter.label}
+            <PillButton
+              active={activeFilter === filter.label}
+              tone="dark"
               aria-pressed={activeFilter === filter.label}
               key={filter.label}
               onClick={() => setActiveFilter(filter.label)}
               type="button"
             >
               {filter.label} {filter.count}
-            </S.FilterButton>
+            </PillButton>
           ))}
         </S.FilterList>
 
