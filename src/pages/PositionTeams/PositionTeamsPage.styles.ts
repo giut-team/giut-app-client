@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import { Button } from "../../../components/Button";
-import { tokens } from "../../../design-system/tokens.generated";
+import { Button } from "../../components/Button";
+import { tokens } from "../../design-system/tokens.generated";
 
 export const S = {
   Page: styled.main`

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { tokens } from "../../../design-system/tokens.generated";
+import { tokens } from "../../design-system/tokens.generated";
 
 type NotificationTone = "blue" | "yellow" | "red" | "green" | "sky";
 

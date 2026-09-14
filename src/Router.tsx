@@ -5,8 +5,8 @@ import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/Appl
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
 import { ManageApplicationsPage } from "./pages/MyTeam/ManageApplicationsPage/ManageApplicationsPage";
 import { MyApplicationPage } from "./pages/MyTeam/MyApplicationPage/MyApplicationPage";
-import { NotificationsPage } from "./pages/Notifications/NotificationsPage/NotificationsPage";
-import { PositionTeamsPage } from "./pages/PositionTeams/PositionTeamsPage/PositionTeamsPage";
+import { NotificationsPage } from "./pages/Notifications/NotificationsPage";
+import { PositionTeamsPage } from "./pages/PositionTeams/PositionTeamsPage";
 import { StudentVerificationPage } from "./pages/StudentVerification/StudentVerificationPage";
 
 export function AppRouter() {

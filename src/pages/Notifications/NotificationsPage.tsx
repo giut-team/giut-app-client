@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import alarmIcon from "../../../assets/notifications/alarm.svg";
-import checkIcon from "../../../assets/notifications/check.svg";
-import confettiIcon from "../../../assets/notifications/confetti.svg";
-import envelopeIcon from "../../../assets/notifications/envelope.svg";
-import newspaperIcon from "../../../assets/notifications/newspaper.svg";
-import { PageHeader } from "../../../components/PageHeader";
+import alarmIcon from "../../assets/notifications/alarm.svg";
+import checkIcon from "../../assets/notifications/check.svg";
+import confettiIcon from "../../assets/notifications/confetti.svg";
+import envelopeIcon from "../../assets/notifications/envelope.svg";
+import newspaperIcon from "../../assets/notifications/newspaper.svg";
+import { PageHeader } from "../../components/PageHeader";
 import { S } from "./NotificationsPage.styles";
 
 type NotificationTone = "blue" | "yellow" | "red" | "green" | "sky";

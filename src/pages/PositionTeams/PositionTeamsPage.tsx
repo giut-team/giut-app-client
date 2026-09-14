@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import giutLogo from "../../../assets/giut-logo.svg";
-import { BottomNavigation } from "../../../components/BottomNavigation/BottomNavigation";
-import { Icon } from "../../../components/icons";
-import { PillButton } from "../../../components/PillButton";
+import giutLogo from "../../assets/giut-logo.svg";
+import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
+import { Icon } from "../../components/icons";
+import { PillButton } from "../../components/PillButton";
 import { S } from "./PositionTeamsPage.styles";
 
 type PositionFilter = "백엔드 개발자" | "데이터 엔지니어" | "전체 포지션";
