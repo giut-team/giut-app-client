@@ -42,7 +42,7 @@ export const S = {
     margin-top: 16px;
     padding: 0 12px;
     border-radius: 10px;
-    background: ${tokens.color.success[100]};
+    background: color-mix(in srgb, ${tokens.color.success[500]} 12%, transparent);
     color: ${tokens.color.success[500]};
     font-size: 10px;
     letter-spacing: -0.25px;
@@ -174,7 +174,7 @@ export const S = {
   `,
   TermsSection: styled.section`
     padding-bottom: 12px;
-    border-bottom: 1px solid ${tokens.color.neutral[300]};
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
   `,
   TermsHeading: styled.h3`
     margin: 0 0 6px;

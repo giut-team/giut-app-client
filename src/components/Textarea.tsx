@@ -20,7 +20,7 @@ const S = {
     width: ${({ width }) => width ?? "100%"};
     height: ${({ height }) => height ?? "104px"};
     padding: 14px 15px;
-    border: 1px solid ${tokens.color.neutral[300]};
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 12px;
     outline: none;
     resize: ${({ resize }) => resize ?? "none"};

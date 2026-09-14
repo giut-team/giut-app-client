@@ -13,7 +13,7 @@ const S = {
     width: ${({ width }) => width ?? "100%"};
     height: 48px;
     padding: 0 16px;
-    border: 1px solid ${tokens.color.neutral[300]};
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 12px;
     outline: none;
     background-color: ${tokens.color.neutral[50]};

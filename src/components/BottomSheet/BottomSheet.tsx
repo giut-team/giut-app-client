@@ -7,12 +7,15 @@ import {
   type ReactNode,
 } from "react";
 import { OverlayShell } from "../OverlayShell/OverlayShell";
+import { Icon } from "../icons";
 import { S } from "./BottomSheet.styles";
 
 const DRAG_CLOSE_THRESHOLD = 120; // 바텀 시트를 120px 아래로 드래그하면 닫히도록 설정
 
 export type BottomSheetVariant = "default" | "compact";
 export type BottomSheetFooterVariant = "note" | "action";
+export type DecisionMode = "accept" | "reject";
+export type ApplicationCancelState = "confirm" | "complete";
 
 export type BottomSheetOption<T extends string> = {
   value: T;
@@ -28,8 +31,17 @@ type BottomSheetProps = {
   footerVariant?: BottomSheetFooterVariant;
   minHeight?: string;
   onClose: () => void;
-  children: ReactNode; // 바텀 시트의 내용
+  children?: ReactNode; // 바텀 시트의 내용
   footer?: ReactNode;
+  decisionMode?: DecisionMode;
+  applicantName?: string;
+  applicantRole?: string;
+  onDecisionConfirm?: () => void;
+  applicationCancelState?: ApplicationCancelState;
+  applicationTeamName?: string;
+  applicationPosition?: string;
+  onApplicationCancelConfirm?: () => void;
+  onApplicationCancelComplete?: () => void;
 };
 
 type BottomSheetOptionListProps<T extends string> = {
@@ -38,6 +50,174 @@ type BottomSheetOptionListProps<T extends string> = {
   onChange: (value: T) => void;
   ariaLabel?: string;
 };
+
+const rejectReasons = [
+  "이미 인원이 찼어요",
+  "포지션이 맞지 않아요",
+  "활동 시간이 안 맞아요",
+  "직접 입력",
+];
+
+function DecisionContent({
+  applicantName,
+  applicantRole,
+  mode,
+  completed,
+}: {
+  applicantName: string;
+  applicantRole: string;
+  mode: DecisionMode;
+  completed: boolean;
+}) {
+  const [selectedRole, setSelectedRole] = useState(applicantRole);
+  const [selectedReason, setSelectedReason] = useState("");
+  const isAccepting = mode === "accept";
+
+  if (completed) {
+    return (
+      <>
+        <S.DecisionIcon $mode={mode}>
+          <Icon name={isAccepting ? "check" : "x"} size={22} weight="bold" />
+        </S.DecisionIcon>
+        <S.DecisionTitle>
+          {isAccepting
+            ? `${applicantName}님을\n수락했습니다`
+            : `${applicantName}님의 지원을\n거절했습니다`}
+        </S.DecisionTitle>
+        <S.DecisionDescription>
+          {isAccepting
+            ? `${applicantRole} 포지션으로 수락했고, 지원자에게 결과 알림을 보냈습니다.`
+            : "지원자에게 결과 알림을 보냈습니다."}
+        </S.DecisionDescription>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <S.DecisionIcon $mode={mode}>
+        <Icon name={isAccepting ? "check" : "x"} size={22} weight="bold" />
+      </S.DecisionIcon>
+      <S.DecisionTitle>{`${applicantName}님을\n${
+        isAccepting
+          ? `${applicantRole}로 수락할까요?`
+          : "지원자의 지원을 거절할까요?"
+      }`}</S.DecisionTitle>
+      <S.DecisionDescription>
+        {isAccepting
+          ? `${applicantName}님은 ${applicantRole} 포지션에 지원했어요. 선택한 포지션으로 합류합니다.`
+          : "거절하면 목록에서 사라지고 다시 되돌릴 수 없어요. 지원자에게는 결과만 전달되고, 사유는 선택해도 매칭에 전달되지 않습니다."}
+      </S.DecisionDescription>
+
+      {isAccepting ? (
+        <>
+          <S.DecisionFieldHeader>
+            <S.DecisionFieldLabel>포지션 선택</S.DecisionFieldLabel>
+            <S.DecisionFieldHint>2개 지원</S.DecisionFieldHint>
+          </S.DecisionFieldHeader>
+          <S.DecisionOptionGroup aria-label="수락 포지션 선택">
+            {[applicantRole, "프론트엔드 개발자"].map((role) => (
+              <S.DecisionOptionButton
+                $selected={selectedRole === role}
+                aria-pressed={selectedRole === role}
+                key={role}
+                onClick={() => setSelectedRole(role)}
+                type="button"
+              >
+                {selectedRole === role && (
+                  <Icon name="check" size={12} weight="bold" />
+                )}
+                {role}
+              </S.DecisionOptionButton>
+            ))}
+          </S.DecisionOptionGroup>
+          <S.DecisionSummary>
+            <S.DecisionSummaryRow>
+              <span>팀 인원</span>
+              <strong>3명 → 4명</strong>
+            </S.DecisionSummaryRow>
+            <S.DecisionSummaryRow>
+              <span>남은 자리</span>
+              <strong>2건</strong>
+            </S.DecisionSummaryRow>
+          </S.DecisionSummary>
+        </>
+      ) : (
+        <>
+          <S.DecisionFieldHeader>
+            <S.DecisionFieldLabel>거절 사유 · 선택</S.DecisionFieldLabel>
+          </S.DecisionFieldHeader>
+          <S.DecisionReasonList aria-label="거절 사유 선택">
+            {rejectReasons.map((reason) => (
+              <S.DecisionReasonButton
+                $selected={selectedReason === reason}
+                aria-pressed={selectedReason === reason}
+                key={reason}
+                onClick={() => setSelectedReason(reason)}
+                type="button"
+              >
+                {reason}
+              </S.DecisionReasonButton>
+            ))}
+          </S.DecisionReasonList>
+        </>
+      )}
+    </>
+  );
+}
+
+function ApplicationCancelContent({
+  state,
+  teamName,
+  position,
+}: {
+  state: ApplicationCancelState;
+  teamName: string;
+  position: string;
+}) {
+  const isComplete = state === "complete";
+
+  return (
+    <>
+      <S.ApplicationCancelIcon $complete={isComplete}>
+        <Icon name={isComplete ? "check" : "x"} size={22} weight="bold" />
+      </S.ApplicationCancelIcon>
+      <S.ApplicationCancelTitle>
+        {isComplete ? "지원을 취소했어요" : "이 팀 지원을\n취소할까요?"}
+      </S.ApplicationCancelTitle>
+      <S.ApplicationCancelDescription>
+        {isComplete
+          ? "이 팀은 다시 팀 지원하기로 돌아갔어요. 모집 마감 전까지는 언제든 다시 지원할 수 있어요."
+          : "취소하면 팀장에게 전달된 지원서가 사라지고, 작성한 답변도 저장되지 않아요. 더는 지원하려면 처음부터 작성해야 해요."}
+      </S.ApplicationCancelDescription>
+
+      {!isComplete && (
+        <>
+          <S.ApplicationCancelDetails>
+            <S.ApplicationCancelDetailRow>
+              <span>지원 팀</span>
+              <strong>{teamName}</strong>
+            </S.ApplicationCancelDetailRow>
+            <S.ApplicationCancelDetailRow>
+              <span>지원 포지션</span>
+              <strong>{position}</strong>
+            </S.ApplicationCancelDetailRow>
+            <S.ApplicationCancelDetailRow>
+              <span>진행 상태</span>
+              <S.ApplicationCancelPending>
+                팀장 검토 중
+              </S.ApplicationCancelPending>
+            </S.ApplicationCancelDetailRow>
+          </S.ApplicationCancelDetails>
+          <S.ApplicationCancelNotice>
+            취소 사유를 팀장에게 따로 알리지 않고, 지원 목록에서 사라져요.
+            모집이 열려 있으면 나중에 다시 지원할 수 있어요.
+          </S.ApplicationCancelNotice>
+        </>
+      )}
+    </>
+  );
+}
 
 export function BottomSheet({
   open,
@@ -50,6 +230,15 @@ export function BottomSheet({
   onClose,
   children,
   footer,
+  decisionMode,
+  applicantName,
+  applicantRole,
+  onDecisionConfirm,
+  applicationCancelState,
+  applicationTeamName,
+  applicationPosition,
+  onApplicationCancelConfirm,
+  onApplicationCancelComplete,
 }: BottomSheetProps) {
   const titleId = useId();
   const dragStartY = useRef<number | null>(null); // 드래그를 시작한 시점의 y 좌표 저장
@@ -57,6 +246,7 @@ export function BottomSheet({
   const isClosingByDrag = useRef(false); // 드래그로 닫히는 중인지 구분함
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDecisionComplete, setIsDecisionComplete] = useState(false);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -68,11 +258,23 @@ export function BottomSheet({
       setDragOffset(0);
       setIsDragging(false);
 
-      if (open) isClosingByDrag.current = false;
+      if (open) {
+        isClosingByDrag.current = false;
+        setIsDecisionComplete(false);
+      }
     });
 
     return () => cancelAnimationFrame(frameId);
-  }, [open]);
+  }, [open, decisionMode]);
+
+  const handleDecisionConfirm = () => {
+    setIsDecisionComplete(true);
+  };
+
+  const handleDecisionComplete = () => {
+    onDecisionConfirm?.();
+    onClose();
+  };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -134,7 +336,8 @@ export function BottomSheet({
       isDragging={isDragging}
     >
       <S.InnerPadding $compact={variant === "compact"}>
-        <S.HandleWrapper $compact={variant === "compact"}
+        <S.HandleWrapper
+          $compact={variant === "compact"}
           onPointerCancel={resetDrag}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -143,7 +346,7 @@ export function BottomSheet({
           <S.Handle />
         </S.HandleWrapper>
         {(title || eyebrow || showCloseButton) && (
-            <S.Header $compact={variant === "compact"}>
+          <S.Header $compact={variant === "compact"}>
             <div>
               {eyebrow && (
                 <S.Eyebrow $compact={variant === "compact"}>
@@ -168,8 +371,89 @@ export function BottomSheet({
             )}
           </S.Header>
         )}
-        <S.Content>{children}</S.Content>
-        {footer && <S.Footer $variant={footerVariant}>{footer}</S.Footer>}
+        <S.Content>
+          {decisionMode && applicantName && applicantRole ? (
+            <DecisionContent
+              applicantName={applicantName}
+              applicantRole={applicantRole}
+              completed={isDecisionComplete}
+              mode={decisionMode}
+            />
+          ) : applicationCancelState &&
+            applicationTeamName &&
+            applicationPosition ? (
+            <ApplicationCancelContent
+              position={applicationPosition}
+              state={applicationCancelState}
+              teamName={applicationTeamName}
+            />
+          ) : (
+            children
+          )}
+        </S.Content>
+        {decisionMode && applicantName && applicantRole ? (
+          <S.Footer $variant="action">
+            {isDecisionComplete ? (
+              <S.DecisionCompleteButton
+                $mode={decisionMode}
+                onClick={handleDecisionComplete}
+                type="button"
+              >
+                확인
+              </S.DecisionCompleteButton>
+            ) : (
+              <S.DecisionFooterActions>
+                <S.DecisionConfirmButton
+                  $mode={decisionMode}
+                  onClick={handleDecisionConfirm}
+                  type="button"
+                >
+                  {decisionMode === "accept" ? "수락하기" : "거절하기"}
+                </S.DecisionConfirmButton>
+                <S.DecisionCancelButton
+                  onClick={onClose}
+                  tone="secondary"
+                  type="button"
+                >
+                  취소
+                </S.DecisionCancelButton>
+              </S.DecisionFooterActions>
+            )}
+          </S.Footer>
+        ) : applicationCancelState &&
+          applicationTeamName &&
+          applicationPosition ? (
+          <S.Footer $variant="action">
+            <S.DecisionFooterActions>
+              <S.DecisionConfirmButton
+                $mode={applicationCancelState === "complete" ? "accept" : "reject"}
+                onClick={
+                  applicationCancelState === "complete"
+                    ? (onApplicationCancelComplete ?? onClose)
+                    : onApplicationCancelConfirm
+                }
+                type="button"
+              >
+                {applicationCancelState === "complete"
+                  ? "다른 팀 보기"
+                  : "지원 취소하기"}
+              </S.DecisionConfirmButton>
+              <S.DecisionCancelButton
+                onClick={
+                  applicationCancelState === "complete"
+                    ? (onApplicationCancelComplete ?? onClose)
+                    : onClose
+                }
+                tone="secondary"
+                type="button"
+              >
+                {applicationCancelState === "complete" ? "닫기" : "그대로 두기"}
+              </S.DecisionCancelButton>
+            </S.DecisionFooterActions>
+          </S.Footer>
+        ) : (
+          footer && <S.Footer $variant={footerVariant}>{footer}</S.Footer>
+        )}
       </S.InnerPadding>
     </OverlayShell>
   );
