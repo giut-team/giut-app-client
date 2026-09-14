@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../../components/BottomNavigation/BottomNavigation";
 import {
   BottomSheet,
+  type ApplicationCancelState,
   type DecisionMode,
 } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
@@ -10,9 +11,33 @@ import giutLogo from "../../../assets/giut-logo.svg";
 import { applicants, type Applicant } from "../myTeam.data";
 import { S } from "./MyTeamPage.styles";
 
-const teams = [
+type TeamKind = "leader" | "member" | "pending";
+
+type Team = {
+  id: string;
+  kind: TeamKind;
+  status: string;
+  title: string;
+  description: string;
+  tone: "primary" | "success" | "pending";
+  progress?: number;
+  newApplications?: string;
+  elapsed?: string;
+};
+
+const teams: Team[] = [
+  {
+    id: "pending-esg",
+    kind: "pending",
+    status: "지원 대기",
+    elapsed: "3일 경과",
+    title: "ESG 임팩트 캠페인",
+    description: "한국디자인진흥원 · 4/4명 · 모집 중",
+    tone: "pending",
+  },
   {
     id: "data-seoul",
+    kind: "leader",
     status: "팀장",
     newApplications: "새 지원 3",
     title: "데이터로 서울을",
@@ -22,6 +47,7 @@ const teams = [
   },
   {
     id: "esg-campaign",
+    kind: "member",
     status: "팀원",
     title: "ESG 캠페인 프로젝트",
     description: "한국디자인진흥원 · 4/4명 · 진행 중",
@@ -40,17 +66,25 @@ const navigationItems = [
 export function MyTeamPage() {
   const navigate = useNavigate();
   const [activeNavigation, setActiveNavigation] = useState("home");
-  const [selectedTeamId, setSelectedTeamId] = useState("data-seoul");
+  const [selectedTeamId, setSelectedTeamId] = useState("pending-esg");
+  const [hasPendingApplication, setHasPendingApplication] = useState(true);
+  const [applicationCancelState, setApplicationCancelState] =
+    useState<ApplicationCancelState | null>(null);
   const [decisionRequest, setDecisionRequest] = useState<{
     mode: DecisionMode;
     applicant: Applicant;
   } | null>(null);
+  const visibleTeams = teams.filter(
+    (team) => team.kind !== "pending" || hasPendingApplication,
+  );
   const selectedTeam =
-    teams.find((team) => team.id === selectedTeamId) ?? teams[0];
+    visibleTeams.find((team) => team.id === selectedTeamId) ?? visibleTeams[0];
   const selectedApplicants = applicants.filter(
     (applicant) => applicant.teamId === selectedTeam.id,
   );
-  const isMemberTeam = selectedTeam.id === "esg-campaign";
+  const isMemberTeam = selectedTeam.kind === "member";
+  const isPendingTeam = selectedTeam.kind === "pending";
+  const teamCount = visibleTeams.filter((team) => team.kind !== "pending").length;
 
   return (
     <S.Page>
@@ -80,7 +114,13 @@ export function MyTeamPage() {
         </S.Header>
 
         <S.Greeting>이루매님, 안녕하세요</S.Greeting>
-        {isMemberTeam ? (
+        {isPendingTeam ? (
+          <S.Title>
+            보낸 지원 1건이
+            <br />
+            검토를 기다리고 있어요
+          </S.Title>
+        ) : isMemberTeam ? (
           <S.Title>
             ESG 캠페인 프로젝트가
             <br />
@@ -97,12 +137,17 @@ export function MyTeamPage() {
 
       <S.TeamSection>
         <S.SectionHeader>
-          <S.SectionTitle>내 팀 2</S.SectionTitle>
+          <S.SectionTitle>
+            내 팀 {teamCount}
+            {hasPendingApplication && " · 지원 대기 1"}
+          </S.SectionTitle>
+          <S.ViewAll type="button">전체보기 ›</S.ViewAll>
         </S.SectionHeader>
 
         <S.TeamScroller aria-label="내 팀 목록">
-          {teams.map((team) => (
+          {visibleTeams.map((team) => (
             <S.TeamCard
+              $pending={team.kind === "pending"}
               $selected={team.id === selectedTeam.id}
               aria-pressed={team.id === selectedTeam.id}
               key={team.id}
@@ -114,12 +159,20 @@ export function MyTeamPage() {
                 {team.newApplications && (
                   <S.NewApplications>{team.newApplications}</S.NewApplications>
                 )}
+                {team.elapsed && <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>}
               </S.TeamBadges>
               <S.TeamTitle>{team.title}</S.TeamTitle>
               <S.TeamDescription>{team.description}</S.TeamDescription>
-              <S.ProgressTrack>
-                <S.ProgressBar $progress={team.progress} $tone={team.tone} />
-              </S.ProgressTrack>
+              {team.kind === "pending" ? (
+                <S.PendingMessage>팀장이 마지막 확인 중이에요</S.PendingMessage>
+              ) : (
+                <S.ProgressTrack>
+                  <S.ProgressBar
+                    $progress={team.progress ?? 0}
+                    $tone={team.tone}
+                  />
+                </S.ProgressTrack>
+              )}
             </S.TeamCard>
           ))}
           <S.CreateTeamCard type="button">
@@ -129,18 +182,43 @@ export function MyTeamPage() {
         </S.TeamScroller>
       </S.TeamSection>
 
-      {isMemberTeam ? (
-        <S.MemberApplicationSection>
+      {isMemberTeam || isPendingTeam ? (
+        <S.MemberApplicationSection $pending={isPendingTeam}>
           <S.MemberSectionTitle>
-            ESG 캠페인 프로젝트 · 내가 쓴 지원서
+            {selectedTeam.title} · 내가 쓴 지원서
           </S.MemberSectionTitle>
           <S.MemberSectionSubtitle>
-            2월 15일에 보낸 지원서예요 · 팀장이 수락해 팀에 합류했어요
+            {isPendingTeam
+              ? "2월 15일에 보냈어요 · 팀장이 2월 16일에 열람했습니다"
+              : "2월 15일에 보낸 지원서예요 · 팀장이 수락해 팀에 합류했어요"}
           </S.MemberSectionSubtitle>
+
+          {isPendingTeam && (
+            <S.MemberTimeline aria-label="지원 진행 상태">
+              <S.MemberTimelineStep $state="complete">
+                <S.MemberTimelineDot />
+                제출 2/15
+              </S.MemberTimelineStep>
+              <S.MemberTimelineLine />
+              <S.MemberTimelineStep $state="complete">
+                <S.MemberTimelineDot />
+                열람 2/16
+              </S.MemberTimelineStep>
+              <S.MemberTimelineLine />
+              <S.MemberTimelineStep $state="pending">
+                <S.MemberTimelineDot />
+                결과 대기
+              </S.MemberTimelineStep>
+            </S.MemberTimeline>
+          )}
 
           <S.MemberApplicationCard>
             <S.MemberApplicationHeader>
-              <S.MemberStatus>수락됨</S.MemberStatus>
+              {isPendingTeam ? (
+                <S.PendingStatus>대기 중</S.PendingStatus>
+              ) : (
+                <S.MemberStatus>수락됨</S.MemberStatus>
+              )}
               <S.MemberRole>데이터 시각화</S.MemberRole>
               <S.MemberReceivedAt>2월 15일 지원</S.MemberReceivedAt>
             </S.MemberApplicationHeader>
@@ -181,19 +259,36 @@ export function MyTeamPage() {
             </S.MemberQuestion>
 
             <S.MemberOriginalLink
-              onClick={() => navigate("/my-team/my-application")}
+              onClick={() =>
+                navigate(
+                  isPendingTeam
+                    ? "/my-team/my-application/pending"
+                    : "/my-team/my-application",
+                )
+              }
               type="button"
             >
               지원서 원본 보기 ›
             </S.MemberOriginalLink>
           </S.MemberApplicationCard>
 
-          <S.MemberChatButton type="button" width="100%">
-            <Icon name="chat" size={14} weight="fill" />
-            팀장님에게 대화하러 가기
-          </S.MemberChatButton>
+          {isPendingTeam ? (
+            <S.MemberCancelButton
+              onClick={() => setApplicationCancelState("confirm")}
+              type="button"
+            >
+              지원 취소하기
+            </S.MemberCancelButton>
+          ) : (
+            <S.MemberChatButton type="button" width="100%">
+              <Icon name="chat" size={14} weight="fill" />
+              팀장님에게 대화하러 가기
+            </S.MemberChatButton>
+          )}
           <S.MemberInfoNote>
-            팀원으로 합류한 팀에서는 내가 보낸 지원서를 확인할 수 있어요.
+            {isPendingTeam
+              ? "팀장이 수락하면 알림으로 알려드립니다."
+              : "팀원으로 합류한 팀에서는 내가 보낸 지원서를 확인할 수 있어요."}
           </S.MemberInfoNote>
         </S.MemberApplicationSection>
       ) : (
@@ -277,6 +372,27 @@ export function MyTeamPage() {
           decisionMode={decisionRequest.mode}
           onClose={() => setDecisionRequest(null)}
           onDecisionConfirm={() => setDecisionRequest(null)}
+          open
+        />
+      )}
+
+      {applicationCancelState && (
+        <BottomSheet
+          applicationCancelState={applicationCancelState}
+          applicationPosition="데이터 시각화"
+          applicationTeamName="ESG 임팩트 캠페인"
+          onApplicationCancelComplete={() => {
+            setApplicationCancelState(null);
+            setSelectedTeamId("data-seoul");
+          }}
+          onApplicationCancelConfirm={() => {
+            setHasPendingApplication(false);
+            setApplicationCancelState("complete");
+          }}
+          onClose={() => {
+            setApplicationCancelState(null);
+            if (!hasPendingApplication) setSelectedTeamId("data-seoul");
+          }}
           open
         />
       )}

@@ -17,7 +17,10 @@ export function AppRouter() {
         <Route element={<HomePage />} path="/home" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />
         <Route element={<MyTeamPage />} path="/my-team" />
-        <Route element={<MyApplicationPage />} path="/my-team/my-application" />
+        <Route
+          element={<MyApplicationPage />}
+          path="/my-team/my-application/:applicationStatus?"
+        />
         <Route
           element={<ManageApplicationsPage />}
           path="/my-team/applications"

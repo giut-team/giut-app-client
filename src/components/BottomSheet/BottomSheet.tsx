@@ -15,6 +15,7 @@ const DRAG_CLOSE_THRESHOLD = 120; // 바텀 시트를 120px 아래로 드래그�
 export type BottomSheetVariant = "default" | "compact";
 export type BottomSheetFooterVariant = "note" | "action";
 export type DecisionMode = "accept" | "reject";
+export type ApplicationCancelState = "confirm" | "complete";
 
 export type BottomSheetOption<T extends string> = {
   value: T;
@@ -36,6 +37,11 @@ type BottomSheetProps = {
   applicantName?: string;
   applicantRole?: string;
   onDecisionConfirm?: () => void;
+  applicationCancelState?: ApplicationCancelState;
+  applicationTeamName?: string;
+  applicationPosition?: string;
+  onApplicationCancelConfirm?: () => void;
+  onApplicationCancelComplete?: () => void;
 };
 
 type BottomSheetOptionListProps<T extends string> = {
@@ -142,6 +148,66 @@ function DecisionContent({
   );
 }
 
+function ApplicationCancelContent({
+  state,
+  teamName,
+  position,
+}: {
+  state: ApplicationCancelState;
+  teamName: string;
+  position: string;
+}) {
+  const isComplete = state === "complete";
+
+  return (
+    <>
+      <S.ApplicationCancelIcon $complete={isComplete}>
+        <Icon name={isComplete ? "check" : "x"} size={22} weight="bold" />
+      </S.ApplicationCancelIcon>
+      <S.ApplicationCancelTitle>
+        {isComplete ? "지원을 취소했어요" : "이 팀 지원을\n취소할까요?"}
+      </S.ApplicationCancelTitle>
+      <S.ApplicationCancelDescription>
+        {isComplete
+          ? "이 팀은 다시 팀 지원하기로 돌아갔어요. 모집 마감 전까지는 언제든 다시 지원할 수 있어요."
+          : "취소하면 팀장에게 전달된 지원서가 사라지고, 작성한 답변도 저장되지 않아요. 더는 지원하려면 처음부터 작성해야 해요."}
+      </S.ApplicationCancelDescription>
+
+      {isComplete ? (
+        <S.ApplicationCancelSummary>
+          <S.ApplicationCancelAvatar>서</S.ApplicationCancelAvatar>
+          <S.ApplicationCancelSummaryText>
+            <strong>{teamName}</strong>
+            <span>데이터 시각화 모집 중 · 3/5명</span>
+          </S.ApplicationCancelSummaryText>
+          <S.ApplicationCancelLink>다시 지원</S.ApplicationCancelLink>
+        </S.ApplicationCancelSummary>
+      ) : (
+        <>
+          <S.ApplicationCancelDetails>
+            <S.ApplicationCancelDetailRow>
+              <span>지원 팀</span>
+              <strong>{teamName}</strong>
+            </S.ApplicationCancelDetailRow>
+            <S.ApplicationCancelDetailRow>
+              <span>지원 포지션</span>
+              <strong>{position}</strong>
+            </S.ApplicationCancelDetailRow>
+            <S.ApplicationCancelDetailRow>
+              <span>진행 상태</span>
+              <S.ApplicationCancelPending>팀장 검토 중</S.ApplicationCancelPending>
+            </S.ApplicationCancelDetailRow>
+          </S.ApplicationCancelDetails>
+          <S.ApplicationCancelNotice>
+            취소 사유를 팀장에게 따로 알리지 않고, 지원 목록에서 사라져요. 모집이
+            열려 있으면 나중에 다시 지원할 수 있어요.
+          </S.ApplicationCancelNotice>
+        </>
+      )}
+    </>
+  );
+}
+
 export function BottomSheet({
   open,
   title,
@@ -157,6 +223,11 @@ export function BottomSheet({
   applicantName,
   applicantRole,
   onDecisionConfirm,
+  applicationCancelState,
+  applicationTeamName,
+  applicationPosition,
+  onApplicationCancelConfirm,
+  onApplicationCancelComplete,
 }: BottomSheetProps) {
   const titleId = useId();
   const dragStartY = useRef<number | null>(null); // 드래그를 시작한 시점의 y 좌표 저장
@@ -282,6 +353,12 @@ export function BottomSheet({
               applicantRole={applicantRole}
               mode={decisionMode}
             />
+          ) : applicationCancelState && applicationTeamName && applicationPosition ? (
+            <ApplicationCancelContent
+              position={applicationPosition}
+              state={applicationCancelState}
+              teamName={applicationTeamName}
+            />
           ) : (
             children
           )}
@@ -302,6 +379,35 @@ export function BottomSheet({
                 type="button"
               >
                 {decisionMode === "accept" ? "수락하기" : "거절하기"}
+              </S.DecisionConfirmButton>
+            </S.DecisionFooterActions>
+          </S.Footer>
+        ) : applicationCancelState && applicationTeamName && applicationPosition ? (
+          <S.Footer $variant="action">
+            <S.DecisionFooterActions>
+              <S.DecisionCancelButton
+                onClick={
+                  applicationCancelState === "complete"
+                    ? onApplicationCancelComplete ?? onClose
+                    : onClose
+                }
+                tone="secondary"
+                type="button"
+              >
+                {applicationCancelState === "complete" ? "닫기" : "그대로 두기"}
+              </S.DecisionCancelButton>
+              <S.DecisionConfirmButton
+                $mode="reject"
+                onClick={
+                  applicationCancelState === "complete"
+                    ? onApplicationCancelComplete ?? onClose
+                    : onApplicationCancelConfirm
+                }
+                type="button"
+              >
+                {applicationCancelState === "complete"
+                  ? "다른 팀 보기"
+                  : "지원 취소하기"}
               </S.DecisionConfirmButton>
             </S.DecisionFooterActions>
           </S.Footer>

@@ -2,7 +2,8 @@ import styled from "@emotion/styled";
 import { Button } from "../../../components/Button";
 import { tokens } from "../../../design-system/tokens.generated";
 
-type TeamTone = "primary" | "success";
+type TeamTone = "primary" | "success" | "pending";
+type TimelineState = "complete" | "pending";
 type ApplicantTone = "blue" | "purple" | "success";
 
 const colorMix = (color: string, amount: number) =>
@@ -168,15 +169,18 @@ export const S = {
       display: none;
     }
   `,
-  TeamCard: styled.button<{ $selected: boolean }>`
+  TeamCard: styled.button<{ $selected: boolean; $pending: boolean }>`
     flex: 0 0 204px;
     min-height: 128px;
     padding: 14px 12px 12px;
     border: 1px solid
-      ${({ $selected }) =>
-        $selected
+      ${({ $pending, $selected }) =>
+        $pending
+          ? colorMix(tokens.color.warning[500], 45)
+          : $selected
           ? tokens.color.primary[500]
           : tokens.color.neutral[200]};
+    border-style: ${({ $pending }) => ($pending ? "dashed" : "solid")};
     border-radius: 14px;
     background: ${tokens.color.neutral[50]};
     color: inherit;
@@ -185,8 +189,9 @@ export const S = {
     cursor: pointer;
     scroll-snap-align: start;
 
-    ${({ $selected }) =>
+    ${({ $pending, $selected }) =>
       $selected &&
+      !$pending &&
       `
         box-shadow: 0 0 0 2px color-mix(in srgb, ${tokens.color.primary[500]} 12%, transparent);
       `}
@@ -207,10 +212,14 @@ export const S = {
     background: ${({ $tone }) =>
       $tone === "success"
         ? colorMix(tokens.color.success[500], 12)
+        : $tone === "pending"
+          ? tokens.color.warning[100]
         : tokens.color.primary[100]};
     color: ${({ $tone }) =>
       $tone === "success"
         ? tokens.color.success[500]
+        : $tone === "pending"
+          ? tokens.color.warning[500]
         : tokens.color.primary[500]};
     font-size: 9px;
     font-weight: 700;
@@ -223,6 +232,15 @@ export const S = {
     color: ${tokens.color.danger[500]};
     font-size: 9px;
     font-weight: 800;
+    line-height: 1;
+  `,
+  ElapsedBadge: styled.span`
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 9px;
+    font-weight: 700;
     line-height: 1;
   `,
   TeamTitle: styled.h3`
@@ -256,6 +274,12 @@ export const S = {
         ? tokens.color.success[500]
         : tokens.color.primary[500]};
   `,
+  PendingMessage: styled.p`
+    margin: 13px 0 0;
+    color: ${tokens.color.warning[500]};
+    font-size: 9px;
+    font-weight: 600;
+  `,
   CreateTeamCard: styled.button`
     display: flex;
     flex: 0 0 98px;
@@ -287,11 +311,12 @@ export const S = {
     padding: 13px 16px 88px;
     background: ${tokens.color.neutral[50]};
   `,
-  MemberApplicationSection: styled.section`
+  MemberApplicationSection: styled.section<{ $pending: boolean }>`
     width: min(100%, 480px);
     margin: 0 auto;
     padding: 16px 8px 88px;
-    background: ${tokens.color.neutral[50]};
+    background: ${({ $pending }) =>
+      $pending ? tokens.color.neutral[100] : tokens.color.neutral[50]};
   `,
   MemberSectionTitle: styled.h2`
     margin: 0;
@@ -305,6 +330,38 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     font-size: 8px;
     line-height: 1.4;
+  `,
+  MemberTimeline: styled.div`
+    display: flex;
+    align-items: center;
+    margin: 0 0 9px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  MemberTimelineStep: styled.span<{ $state: TimelineState }>`
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    color: ${({ $state }) =>
+      $state === "pending" ? tokens.color.warning[500] : tokens.color.primary[500]};
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  `,
+  MemberTimelineDot: styled.span`
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  `,
+  MemberTimelineLine: styled.span`
+    flex: 1;
+    height: 1px;
+    margin: 0 7px;
+    background: ${tokens.color.neutral[200]};
   `,
   MemberApplicationCard: styled.article`
     padding: 13px 12px 11px;
@@ -321,6 +378,15 @@ export const S = {
     border-radius: 5px;
     background: ${colorMix(tokens.color.success[500], 12)};
     color: ${tokens.color.success[500]};
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+  `,
+  PendingStatus: styled.span`
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: ${tokens.color.warning[100]};
+    color: ${tokens.color.warning[500]};
     font-size: 8px;
     font-weight: 800;
     line-height: 1;
@@ -384,20 +450,6 @@ export const S = {
     font-size: 8px;
     line-height: 1.55;
   `,
-  AttachmentList: styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 10px;
-  `,
-  Attachment: styled.span`
-    padding: 5px 7px;
-    border-radius: 6px;
-    background: ${tokens.color.neutral[100]};
-    color: ${tokens.color.neutral[500]};
-    font-size: 8px;
-    font-weight: 600;
-  `,
   MemberOriginalLink: styled.button`
     display: block;
     width: 100%;
@@ -420,6 +472,24 @@ export const S = {
     border-radius: 10px;
     gap: 5px;
     font-size: 10px;
+  `,
+  MemberCancelButton: styled.button`
+    width: 100%;
+    height: 36px;
+    margin-top: 9px;
+    padding: 0;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      background: ${tokens.color.neutral[100]};
+    }
   `,
   MemberInfoNote: styled.p`
     margin: 9px 0 0;

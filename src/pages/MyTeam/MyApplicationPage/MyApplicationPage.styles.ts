@@ -2,10 +2,14 @@ import styled from "@emotion/styled";
 import { Button } from "../../../components/Button";
 import { tokens } from "../../../design-system/tokens.generated";
 
-type TimelineState = "complete" | "accepted";
+type TimelineState = "complete" | "accepted" | "pending";
 
 const stateColor = (state: TimelineState) =>
-  state === "accepted" ? tokens.color.success[500] : tokens.color.primary[500];
+  state === "accepted"
+    ? tokens.color.success[500]
+    : state === "pending"
+      ? tokens.color.warning[500]
+      : tokens.color.primary[500];
 
 export const S = {
   Page: styled.main`
@@ -16,15 +20,15 @@ export const S = {
     margin: 0 auto;
     background: ${tokens.color.neutral[100]};
   `,
-  AcceptedBadge: styled.span`
+  StatusBadge: styled.span<{ $pending: boolean }>`
     padding: 5px 7px;
     border-radius: 6px;
-    background: color-mix(
-      in srgb,
-      ${tokens.color.success[500]} 12%,
-      ${tokens.color.neutral[50]}
-    );
-    color: ${tokens.color.success[500]};
+    background: ${({ $pending }) =>
+      $pending
+        ? tokens.color.warning[100]
+        : `color-mix(in srgb, ${tokens.color.success[500]} 12%, ${tokens.color.neutral[50]})`};
+    color: ${({ $pending }) =>
+      $pending ? tokens.color.warning[500] : tokens.color.success[500]};
     font-size: 9px;
     font-weight: 800;
     line-height: 1;
@@ -185,5 +189,18 @@ export const S = {
     border-radius: 10px;
     gap: 6px;
     font-size: 10px;
+  `,
+  CancelButton: styled.button`
+    width: 100%;
+    height: 38px;
+    padding: 0;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
   `,
 };

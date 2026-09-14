@@ -146,6 +146,110 @@ export const S = {
     font-size: 10px;
     line-height: 1.55;
   `,
+  ApplicationCancelIcon: styled.div<{ $complete: boolean }>`
+    display: grid;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 15px;
+    place-items: center;
+    border-radius: 12px;
+    background: ${({ $complete }) =>
+      $complete
+        ? tokens.color.primary[100]
+        : `color-mix(in srgb, ${tokens.color.danger[500]} 10%, ${tokens.color.neutral[50]})`};
+    color: ${({ $complete }) =>
+      $complete ? tokens.color.primary[500] : tokens.color.danger[500]};
+  `,
+  ApplicationCancelTitle: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.55px;
+    line-height: 1.35;
+    white-space: pre-line;
+  `,
+  ApplicationCancelDescription: styled.p`
+    margin: 9px 0 14px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 10px;
+    line-height: 1.55;
+  `,
+  ApplicationCancelDetails: styled.div`
+    display: grid;
+    gap: 9px;
+    padding: 11px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+  `,
+  ApplicationCancelDetailRow: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 9px;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-weight: 800;
+    }
+  `,
+  ApplicationCancelPending: styled.strong`
+    color: ${tokens.color.warning[500]};
+    font-size: 9px;
+    font-weight: 800;
+  `,
+  ApplicationCancelNotice: styled.p`
+    margin: 10px 0 0;
+    padding: 10px 11px;
+    border-radius: 10px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 9px;
+    line-height: 1.5;
+  `,
+  ApplicationCancelSummary: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+  `,
+  ApplicationCancelAvatar: styled.span`
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 9px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 800;
+  `,
+  ApplicationCancelSummaryText: styled.div`
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    span {
+      color: ${tokens.color.neutral[500]};
+      font-size: 8px;
+    }
+  `,
+  ApplicationCancelLink: styled.span`
+    margin-left: auto;
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 800;
+  `,
   DecisionFieldHeader: styled.div`
     display: flex;
     align-items: center;

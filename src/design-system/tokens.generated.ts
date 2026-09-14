@@ -17,6 +17,10 @@ export const tokens = {
       100: "#fff2eb",
       500: "#f26f3d",
     },
+    warning: {
+      100: "#fff8df",
+      500: "#c88a08",
+    },
     purple: {
       100: "#f2edff",
       500: "#8657db",
