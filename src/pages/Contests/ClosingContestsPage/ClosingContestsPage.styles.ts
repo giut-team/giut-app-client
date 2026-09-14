@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { tokens } from "../../design-system/tokens.generated";
+import { tokens } from "../../../design-system/tokens.generated";
 
 type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow";
 

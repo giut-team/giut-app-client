@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
-import { Icon } from "../../components/icons";
-import { PageHeader } from "../../components/PageHeader";
-import { PillButton } from "../../components/PillButton";
+import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
+import { Icon } from "../../../components/icons";
+import { PageHeader } from "../../../components/PageHeader";
+import { PillButton } from "../../../components/PillButton";
 import { S } from "./ClosingContestsPage.styles";
 
 type ContestCategory =
@@ -153,7 +153,7 @@ function ContestCard({ contest }: { contest: Contest }) {
             {contest.views}
           </S.Stat>
           <S.Stat>
-            <Icon name="chat" size={9} weight="regular" />
+            <Icon name="bookmark" size={9} weight="regular" />
             {contest.comments}
           </S.Stat>
         </S.Stats>
@@ -293,6 +293,11 @@ export function ClosingContestsPage() {
                 aria-pressed={selected}
                 key={option.value}
                 onClick={() => {
+                  if (option.value !== "deadline") {
+                    navigate(`/contests?sort=${option.value}`);
+                    return;
+                  }
+
                   setSortOption(option.value);
                   setIsSortSheetOpen(false);
                 }}

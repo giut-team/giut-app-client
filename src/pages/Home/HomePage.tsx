@@ -33,6 +33,7 @@ const popularContests = [
 
 const shortcuts = [
   {
+    destination: "/contests",
     icon: trophyIcon,
     iconType: "image" as const,
     title: "공모전 찾기",
@@ -186,7 +187,13 @@ export function HomePage() {
 
         <S.Shortcuts>
           {shortcuts.map((shortcut) => (
-            <S.Shortcut key={shortcut.title} type="button">
+            <S.Shortcut
+              key={shortcut.title}
+              onClick={() => {
+                if (shortcut.destination) navigate(shortcut.destination);
+              }}
+              type="button"
+            >
               <S.ShortcutIcon>
                 {shortcut.iconType === "image" ? (
                   <S.ShortcutIconImage alt="" src={shortcut.icon} />
