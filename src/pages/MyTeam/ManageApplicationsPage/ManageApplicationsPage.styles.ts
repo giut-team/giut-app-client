@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { Button } from "../../../components/Button";
 import { tokens } from "../../../design-system/tokens.generated";
 import type { ApplicantTone } from "../myTeam.data";
 
@@ -141,37 +140,24 @@ export const S = {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   `,
-  ApplicantActions: styled.div`
+  ApplicationMeta: styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-top: 9px;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px solid ${tokens.color.neutral[200]};
   `,
-  RejectButton: styled(Button)`
-    width: 100%;
-    height: 27px;
-    padding: 0;
-    border-radius: 8px;
-    font-size: 9px;
+  ApplicationMetaItem: styled.div`
+    display: grid;
+    gap: 3px;
   `,
-  AcceptButton: styled(Button)`
-    width: 100%;
-    height: 27px;
-    padding: 0;
-    border-radius: 8px;
-    font-size: 9px;
+  ApplicationMetaLabel: styled.span`
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
   `,
-  Decision: styled.p<{ $accepted: boolean }>`
-    margin: 9px 0 0;
-    padding: 7px 0;
-    border-radius: 8px;
-    background: ${({ $accepted }) =>
-      $accepted
-        ? colorMix(tokens.color.success[500], 12)
-        : tokens.color.neutral[100]};
-    color: ${({ $accepted }) =>
-      $accepted ? tokens.color.success[500] : tokens.color.neutral[500]};
-    text-align: center;
+  ApplicationMetaValue: styled.strong`
+    color: ${tokens.color.neutral[700]};
     font-size: 9px;
     font-weight: 700;
   `,

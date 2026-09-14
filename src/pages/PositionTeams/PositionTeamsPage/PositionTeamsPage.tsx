@@ -22,7 +22,6 @@ const teams = [
     dDay: "D-3",
     title: "데이터로 서울을",
     description: "2024 서울시 데이터 활용 공모전 · 이수현 팀장 · 3/5명",
-    featured: true,
   },
   {
     id: "fintech-hackathon",
@@ -31,7 +30,6 @@ const teams = [
     dDay: "D-9",
     title: "핀테크 해커톤 4팀",
     description: "제 12회 핀테크 해커톤 · 박지훈 팀장 · 2/5명",
-    featured: false,
   },
   {
     id: "greentech-study",
@@ -40,7 +38,6 @@ const teams = [
     dDay: "D-21",
     title: "그린테크 스터디팀",
     description: "대학생 환경 아이디어 챌린지 · 최우진 팀장 · 4/6명",
-    featured: false,
   },
   {
     id: "campaign-side",
@@ -49,7 +46,6 @@ const teams = [
     dDay: "D-25",
     title: "캠페인 사이드팀",
     description: "대학생 창업 아이디어 경진대회 · 하준혁 팀장 · 3/5명",
-    featured: false,
   },
   {
     id: "generative-ai",
@@ -58,7 +54,6 @@ const teams = [
     dDay: "D-30",
     title: "생성AI 서비스팀",
     description: "오픈소스 컨퍼런스 챌린지 · 김현진 팀장 · 2/6명",
-    featured: false,
   },
 ];
 
@@ -154,14 +149,12 @@ export function PositionTeamsPage() {
                     <S.PositionBadge>
                       {team.position} {team.openings}
                     </S.PositionBadge>
-                    <S.DDay $urgent={team.featured}>{team.dDay}</S.DDay>
+                    <S.DDay>{team.dDay}</S.DDay>
                   </S.TeamTopline>
                   <S.TeamTitle>{team.title}</S.TeamTitle>
                   <S.TeamDescription>{team.description}</S.TeamDescription>
                   <S.TeamActions>
-                    <S.ApplyButton $featured={team.featured} type="button">
-                      바로 지원하기
-                    </S.ApplyButton>
+                    <S.ApplyButton type="button">상세 보기&nbsp;→</S.ApplyButton>
                     <S.FavoriteButton
                       $favorite={isFavorite}
                       aria-pressed={isFavorite}

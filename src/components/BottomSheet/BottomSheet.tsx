@@ -7,12 +7,14 @@ import {
   type ReactNode,
 } from "react";
 import { OverlayShell } from "../OverlayShell/OverlayShell";
+import { Icon } from "../icons";
 import { S } from "./BottomSheet.styles";
 
 const DRAG_CLOSE_THRESHOLD = 120; // 바텀 시트를 120px 아래로 드래그하면 닫히도록 설정
 
 export type BottomSheetVariant = "default" | "compact";
 export type BottomSheetFooterVariant = "note" | "action";
+export type DecisionMode = "accept" | "reject";
 
 export type BottomSheetOption<T extends string> = {
   value: T;
@@ -28,8 +30,12 @@ type BottomSheetProps = {
   footerVariant?: BottomSheetFooterVariant;
   minHeight?: string;
   onClose: () => void;
-  children: ReactNode; // 바텀 시트의 내용
+  children?: ReactNode; // 바텀 시트의 내용
   footer?: ReactNode;
+  decisionMode?: DecisionMode;
+  applicantName?: string;
+  applicantRole?: string;
+  onDecisionConfirm?: () => void;
 };
 
 type BottomSheetOptionListProps<T extends string> = {
@@ -38,6 +44,103 @@ type BottomSheetOptionListProps<T extends string> = {
   onChange: (value: T) => void;
   ariaLabel?: string;
 };
+
+const rejectReasons = [
+  "이미 인원이 찼어요",
+  "포지션이 맞지 않아요",
+  "활동 시간이 안 맞아요",
+  "직접 입력",
+];
+
+function DecisionContent({
+  applicantName,
+  applicantRole,
+  mode,
+}: {
+  applicantName: string;
+  applicantRole: string;
+  mode: DecisionMode;
+}) {
+  const [selectedRole, setSelectedRole] = useState(applicantRole);
+  const [selectedReason, setSelectedReason] = useState("");
+  const isAccepting = mode === "accept";
+
+  return (
+    <>
+      <S.DecisionIcon $mode={mode}>
+        <Icon
+          name={isAccepting ? "check" : "x"}
+          size={22}
+          weight="bold"
+        />
+      </S.DecisionIcon>
+      <S.DecisionTitle>{`${applicantName}님을\n${
+        isAccepting
+          ? `${applicantRole}로 수락할까요?`
+          : "지원자의 지원을 거절할까요?"
+      }`}</S.DecisionTitle>
+      <S.DecisionDescription>
+        {isAccepting
+          ? `${applicantName}님은 ${applicantRole} 포지션에 지원했어요. 선택한 포지션으로 합류합니다.`
+          : "거절하면 목록에서 사라지고 다시 되돌릴 수 없어요. 지원자에게는 결과만 전달되고, 사유는 선택해도 매칭에 전달되지 않습니다."}
+      </S.DecisionDescription>
+
+      {isAccepting ? (
+        <>
+          <S.DecisionFieldHeader>
+            <S.DecisionFieldLabel>포지션 선택</S.DecisionFieldLabel>
+            <S.DecisionFieldHint>2개 지원</S.DecisionFieldHint>
+          </S.DecisionFieldHeader>
+          <S.DecisionOptionGroup aria-label="수락 포지션 선택">
+            {[applicantRole, "프론트엔드 개발자"].map((role) => (
+              <S.DecisionOptionButton
+                $selected={selectedRole === role}
+                aria-pressed={selectedRole === role}
+                key={role}
+                onClick={() => setSelectedRole(role)}
+                type="button"
+              >
+                {selectedRole === role && (
+                  <Icon name="check" size={12} weight="bold" />
+                )}
+                {role}
+              </S.DecisionOptionButton>
+            ))}
+          </S.DecisionOptionGroup>
+          <S.DecisionSummary>
+            <S.DecisionSummaryRow>
+              <span>팀 인원</span>
+              <strong>3명 → 4명</strong>
+            </S.DecisionSummaryRow>
+            <S.DecisionSummaryRow>
+              <span>남은 자리</span>
+              <strong>2건</strong>
+            </S.DecisionSummaryRow>
+          </S.DecisionSummary>
+        </>
+      ) : (
+        <>
+          <S.DecisionFieldHeader>
+            <S.DecisionFieldLabel>거절 사유 · 선택</S.DecisionFieldLabel>
+          </S.DecisionFieldHeader>
+          <S.DecisionReasonList aria-label="거절 사유 선택">
+            {rejectReasons.map((reason) => (
+              <S.DecisionReasonButton
+                $selected={selectedReason === reason}
+                aria-pressed={selectedReason === reason}
+                key={reason}
+                onClick={() => setSelectedReason(reason)}
+                type="button"
+              >
+                {reason}
+              </S.DecisionReasonButton>
+            ))}
+          </S.DecisionReasonList>
+        </>
+      )}
+    </>
+  );
+}
 
 export function BottomSheet({
   open,
@@ -50,6 +153,10 @@ export function BottomSheet({
   onClose,
   children,
   footer,
+  decisionMode,
+  applicantName,
+  applicantRole,
+  onDecisionConfirm,
 }: BottomSheetProps) {
   const titleId = useId();
   const dragStartY = useRef<number | null>(null); // 드래그를 시작한 시점의 y 좌표 저장
@@ -168,8 +275,39 @@ export function BottomSheet({
             )}
           </S.Header>
         )}
-        <S.Content>{children}</S.Content>
-        {footer && <S.Footer $variant={footerVariant}>{footer}</S.Footer>}
+        <S.Content>
+          {decisionMode && applicantName && applicantRole ? (
+            <DecisionContent
+              applicantName={applicantName}
+              applicantRole={applicantRole}
+              mode={decisionMode}
+            />
+          ) : (
+            children
+          )}
+        </S.Content>
+        {decisionMode && applicantName && applicantRole ? (
+          <S.Footer $variant="action">
+            <S.DecisionFooterActions>
+              <S.DecisionCancelButton
+                onClick={onClose}
+                tone="secondary"
+                type="button"
+              >
+                취소
+              </S.DecisionCancelButton>
+              <S.DecisionConfirmButton
+                $mode={decisionMode}
+                onClick={onDecisionConfirm}
+                type="button"
+              >
+                {decisionMode === "accept" ? "수락하기" : "거절하기"}
+              </S.DecisionConfirmButton>
+            </S.DecisionFooterActions>
+          </S.Footer>
+        ) : (
+          footer && <S.Footer $variant={footerVariant}>{footer}</S.Footer>
+        )}
       </S.InnerPadding>
     </OverlayShell>
   );

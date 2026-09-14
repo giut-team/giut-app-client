@@ -28,7 +28,7 @@ export const S = {
     width: min(100%, 480px);
     min-height: 100svh;
     margin: 0 auto;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
   `,
   PageIndicator: styled.span`
     color: ${tokens.color.neutral[500]};
@@ -37,6 +37,7 @@ export const S = {
   `,
   Content: styled.div`
     display: grid;
+    align-content: start;
     flex: 1;
     gap: 8px;
     padding: 8px 8px 16px;
@@ -179,7 +180,8 @@ export const S = {
   `,
   Notice: styled.p`
     margin: 0;
-    padding: 12px;
+    padding: 9px 12px;
+    border: 1px solid ${tokens.color.primary[100]};
     border-radius: 10px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.neutral[500]};

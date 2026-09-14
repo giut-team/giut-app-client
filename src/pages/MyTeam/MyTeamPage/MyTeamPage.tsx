@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../../components/BottomNavigation/BottomNavigation";
+import {
+  BottomSheet,
+  type DecisionMode,
+} from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import giutLogo from "../../../assets/giut-logo.svg";
-import { applicants } from "../myTeam.data";
+import { applicants, type Applicant } from "../myTeam.data";
 import { S } from "./MyTeamPage.styles";
 
 const teams = [
@@ -37,6 +41,10 @@ export function MyTeamPage() {
   const navigate = useNavigate();
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [selectedTeamId, setSelectedTeamId] = useState("data-seoul");
+  const [decisionRequest, setDecisionRequest] = useState<{
+    mode: DecisionMode;
+    applicant: Applicant;
+  } | null>(null);
   const selectedTeam =
     teams.find((team) => team.id === selectedTeamId) ?? teams[0];
   const selectedApplicants = applicants.filter(
@@ -172,7 +180,10 @@ export function MyTeamPage() {
               </S.MemberAnswer>
             </S.MemberQuestion>
 
-            <S.MemberOriginalLink type="button">
+            <S.MemberOriginalLink
+              onClick={() => navigate("/my-team/my-application")}
+              type="button"
+            >
               지원서 원본 보기 ›
             </S.MemberOriginalLink>
           </S.MemberApplicationCard>
@@ -222,10 +233,23 @@ export function MyTeamPage() {
                   <S.ReasonLabel>{applicant.reason}</S.ReasonLabel>
                   <S.ApplicantAnswer>{applicant.answer}</S.ApplicantAnswer>
                   <S.ApplicantActions>
-                    <S.RejectButton tone="secondary" type="button">
+                    <S.RejectButton
+                      onClick={() =>
+                        setDecisionRequest({ mode: "reject", applicant })
+                      }
+                      tone="secondary"
+                      type="button"
+                    >
                       거절
                     </S.RejectButton>
-                    <S.AcceptButton type="button">수락</S.AcceptButton>
+                    <S.AcceptButton
+                      onClick={() =>
+                        setDecisionRequest({ mode: "accept", applicant })
+                      }
+                      type="button"
+                    >
+                      수락
+                    </S.AcceptButton>
                   </S.ApplicantActions>
                 </S.ApplicantCard>
               ))}
@@ -244,6 +268,17 @@ export function MyTeamPage() {
             </S.InfoNote>
           </S.ApplicationSection>
         </>
+      )}
+
+      {decisionRequest && (
+        <BottomSheet
+          applicantName={decisionRequest.applicant.name}
+          applicantRole={decisionRequest.applicant.role}
+          decisionMode={decisionRequest.mode}
+          onClose={() => setDecisionRequest(null)}
+          onDecisionConfirm={() => setDecisionRequest(null)}
+          open
+        />
       )}
 
       <BottomNavigation

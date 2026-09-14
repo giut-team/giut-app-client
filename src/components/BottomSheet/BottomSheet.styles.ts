@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
+import { Button } from "../Button";
 import { tokens } from "../../design-system/tokens.generated";
+
+type DecisionMode = "accept" | "reject";
+
+const getDecisionAccent = (mode: DecisionMode) =>
+  mode === "accept" ? tokens.color.primary[500] : tokens.color.danger[500];
 
 export const S = {
   InnerPadding: styled.div<{ $compact: boolean }>`
@@ -111,5 +117,148 @@ export const S = {
     font-size: 14px;
     line-height: 1.65;
     letter-spacing: -0.35px;
+  `,
+  DecisionIcon: styled.div<{ $mode: DecisionMode }>`
+    display: grid;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 15px;
+    place-items: center;
+    border-radius: 12px;
+    background: ${({ $mode }) =>
+      $mode === "accept"
+        ? tokens.color.primary[100]
+        : `color-mix(in srgb, ${tokens.color.danger[500]} 10%, ${tokens.color.neutral[50]})`};
+    color: ${({ $mode }) => getDecisionAccent($mode)};
+  `,
+  DecisionTitle: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.55px;
+    line-height: 1.35;
+    white-space: pre-line;
+  `,
+  DecisionDescription: styled.p`
+    margin: 9px 0 14px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 10px;
+    line-height: 1.55;
+  `,
+  DecisionFieldHeader: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+  `,
+  DecisionFieldLabel: styled.strong`
+    color: ${tokens.color.neutral[700]};
+    font-size: 10px;
+    font-weight: 800;
+  `,
+  DecisionFieldHint: styled.span`
+    color: ${tokens.color.neutral[500]};
+    font-size: 9px;
+  `,
+  DecisionOptionGroup: styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  `,
+  DecisionOptionButton: styled.button<{ $selected: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 34px;
+    padding: 0 7px;
+    border: 1px solid
+      ${({ $selected }) =>
+        $selected ? tokens.color.primary[500] : tokens.color.neutral[200]};
+    border-radius: 9px;
+    background: ${({ $selected }) =>
+      $selected ? tokens.color.primary[100] : tokens.color.neutral[50]};
+    color: ${({ $selected }) =>
+      $selected ? tokens.color.primary[500] : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 9px;
+    font-weight: ${({ $selected }) => ($selected ? 800 : 500)};
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
+  DecisionSummary: styled.div`
+    display: grid;
+    gap: 9px;
+    margin-top: 10px;
+    padding: 11px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+  `,
+  DecisionSummaryRow: styled.div`
+    display: flex;
+    justify-content: space-between;
+    color: ${tokens.color.neutral[500]};
+    font-size: 9px;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-weight: 800;
+    }
+  `,
+  DecisionReasonList: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  `,
+  DecisionReasonButton: styled.button<{ $selected: boolean }>`
+    min-height: 29px;
+    padding: 0 9px;
+    border: 1px solid
+      ${({ $selected }) =>
+        $selected ? tokens.color.primary[500] : tokens.color.neutral[200]};
+    border-radius: 8px;
+    background: ${({ $selected }) =>
+      $selected ? tokens.color.primary[100] : tokens.color.neutral[50]};
+    color: ${({ $selected }) =>
+      $selected ? tokens.color.primary[500] : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 9px;
+    font-weight: ${({ $selected }) => ($selected ? 700 : 500)};
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
+  DecisionFooterActions: styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1.7fr;
+    gap: 7px;
+  `,
+  DecisionCancelButton: styled(Button)`
+    width: 100%;
+    height: 42px;
+    padding: 0;
+    border-radius: 11px;
+    font-size: 11px;
+  `,
+  DecisionConfirmButton: styled(Button)<{ $mode: DecisionMode }>`
+    width: 100%;
+    height: 42px;
+    padding: 0;
+    border-radius: 11px;
+    background: ${({ $mode }) => getDecisionAccent($mode)};
+    font-size: 11px;
+
+    &:hover:not(:disabled) {
+      background: ${({ $mode }) => getDecisionAccent($mode)};
+      opacity: 0.9;
+    }
   `,
 };

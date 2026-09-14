@@ -155,15 +155,15 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
-  DDay: styled.span<{ $urgent: boolean }>`
+  DDay: styled.span`
     padding: 4px 6px;
     border-radius: 5px;
-    background: ${({ $urgent }) =>
-      $urgent
-        ? `color-mix(in srgb, ${tokens.color.danger[500]} 10%, ${tokens.color.neutral[50]})`
-        : tokens.color.neutral[100]};
-    color: ${({ $urgent }) =>
-      $urgent ? tokens.color.danger[500] : tokens.color.neutral[500]};
+    background: color-mix(
+      in srgb,
+      ${tokens.color.danger[500]} 10%,
+      ${tokens.color.neutral[50]}
+    );
+    color: ${tokens.color.danger[500]};
     font-size: 8px;
     font-weight: 800;
     line-height: 1;
@@ -188,21 +188,18 @@ export const S = {
     gap: 6px;
     margin-top: 10px;
   `,
-  ApplyButton: styled(Button)<{ $featured: boolean }>`
+  ApplyButton: styled(Button)`
     flex: 1;
     width: auto;
     height: 34px;
     padding: 0 10px;
     border-radius: 9px;
-    background: ${({ $featured }) =>
-      $featured ? tokens.color.primary[500] : tokens.color.primary[100]};
-    color: ${({ $featured }) =>
-      $featured ? tokens.color.neutral[50] : tokens.color.primary[500]};
+    background: ${tokens.color.primary[500]};
+    color: ${tokens.color.neutral[50]};
     font-size: 10px;
 
     &:hover:not(:disabled) {
-      background: ${({ $featured }) =>
-        $featured ? tokens.color.primary[600] : tokens.color.primary[100]};
+      background: ${tokens.color.primary[600]};
       opacity: 0.9;
     }
   `,

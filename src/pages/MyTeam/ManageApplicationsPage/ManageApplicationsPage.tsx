@@ -18,19 +18,11 @@ const filters: { label: ApplicantFilter; count: number }[] = [
 export function ManageApplicationsPage() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<ApplicantFilter>("전체");
-  const [decisions, setDecisions] = useState<Record<string, "accepted" | "rejected">>({});
 
   const visibleApplicants =
     activeFilter === "전체"
       ? applicants
       : applicants.filter((applicant) => applicant.filter === activeFilter);
-
-  const updateDecision = (
-    applicant: Applicant,
-    decision: "accepted" | "rejected",
-  ) => {
-    setDecisions((current) => ({ ...current, [applicant.name]: decision }));
-  };
 
   return (
     <S.Page>
@@ -61,8 +53,6 @@ export function ManageApplicationsPage() {
 
         <S.ApplicantList>
           {visibleApplicants.map((applicant) => {
-            const decision = decisions[applicant.name];
-
             return (
               <S.ApplicantCard key={applicant.name}>
                 <S.ApplicantHeader>
@@ -72,9 +62,7 @@ export function ManageApplicationsPage() {
                       <S.Name>{applicant.name}</S.Name>
                       <S.VerifiedBadge>학교 인증</S.VerifiedBadge>
                     </S.NameRow>
-                    <S.ProfileLine>
-                      {applicant.school} · {applicant.role} 지원
-                    </S.ProfileLine>
+                    <S.ProfileLine>{applicant.school}</S.ProfileLine>
                   </S.Identity>
                   <S.ReceivedAt>{applicant.receivedAt}</S.ReceivedAt>
                 </S.ApplicantHeader>
@@ -82,28 +70,16 @@ export function ManageApplicationsPage() {
                 <S.ApplicantMessage>{applicant.message}</S.ApplicantMessage>
                 <S.ReasonLabel>{applicant.reason}</S.ReasonLabel>
                 <S.ApplicantAnswer>{applicant.answer}</S.ApplicantAnswer>
-
-                {decision ? (
-                  <S.Decision $accepted={decision === "accepted"}>
-                    {decision === "accepted" ? "수락한 지원이에요" : "거절한 지원이에요"}
-                  </S.Decision>
-                ) : (
-                  <S.ApplicantActions>
-                    <S.RejectButton
-                      onClick={() => updateDecision(applicant, "rejected")}
-                      tone="secondary"
-                      type="button"
-                    >
-                      거절
-                    </S.RejectButton>
-                    <S.AcceptButton
-                      onClick={() => updateDecision(applicant, "accepted")}
-                      type="button"
-                    >
-                      수락
-                    </S.AcceptButton>
-                  </S.ApplicantActions>
-                )}
+                <S.ApplicationMeta>
+                  <S.ApplicationMetaItem>
+                    <S.ApplicationMetaLabel>지원 포지션</S.ApplicationMetaLabel>
+                    <S.ApplicationMetaValue>{applicant.role}</S.ApplicationMetaValue>
+                  </S.ApplicationMetaItem>
+                  <S.ApplicationMetaItem>
+                    <S.ApplicationMetaLabel>참여 가능</S.ApplicationMetaLabel>
+                    <S.ApplicationMetaValue>{applicant.availability}</S.ApplicationMetaValue>
+                  </S.ApplicationMetaItem>
+                </S.ApplicationMeta>
                 <S.DetailButton
                   aria-label={`${applicant.name} 지원서 상세보기`}
                   onClick={() =>

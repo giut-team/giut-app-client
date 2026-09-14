@@ -4,6 +4,7 @@ import { LoginPage } from "./pages/Login/LoginPage";
 import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/ApplicationDetailPage";
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
 import { ManageApplicationsPage } from "./pages/MyTeam/ManageApplicationsPage/ManageApplicationsPage";
+import { MyApplicationPage } from "./pages/MyTeam/MyApplicationPage/MyApplicationPage";
 import { PositionTeamsPage } from "./pages/PositionTeams/PositionTeamsPage/PositionTeamsPage";
 import { StudentVerificationPage } from "./pages/StudentVerification/StudentVerificationPage";
 
@@ -16,6 +17,7 @@ export function AppRouter() {
         <Route element={<HomePage />} path="/home" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />
         <Route element={<MyTeamPage />} path="/my-team" />
+        <Route element={<MyApplicationPage />} path="/my-team/my-application" />
         <Route
           element={<ManageApplicationsPage />}
           path="/my-team/applications"

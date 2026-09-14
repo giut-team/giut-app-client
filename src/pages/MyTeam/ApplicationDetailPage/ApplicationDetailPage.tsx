@@ -1,4 +1,9 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  BottomSheet,
+  type DecisionMode,
+} from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
 import { applicants } from "../myTeam.data";
@@ -9,6 +14,7 @@ export function ApplicationDetailPage() {
   const { applicantId } = useParams();
   const applicant =
     applicants.find((item) => item.id === applicantId) ?? applicants[0];
+  const [decisionMode, setDecisionMode] = useState<DecisionMode | null>(null);
 
   return (
     <S.Page>
@@ -79,11 +85,31 @@ export function ApplicationDetailPage() {
       </S.Content>
 
       <S.ActionBar>
-        <S.RejectButton tone="secondary" type="button">
+        <S.RejectButton
+          onClick={() => setDecisionMode("reject")}
+          tone="secondary"
+          type="button"
+        >
           거절
         </S.RejectButton>
-        <S.AcceptButton type="button">수락</S.AcceptButton>
+        <S.AcceptButton
+          onClick={() => setDecisionMode("accept")}
+          type="button"
+        >
+          수락
+        </S.AcceptButton>
       </S.ActionBar>
+
+      {decisionMode && (
+        <BottomSheet
+          applicantName={applicant.name}
+          applicantRole={applicant.role}
+          decisionMode={decisionMode}
+          onClose={() => setDecisionMode(null)}
+          onDecisionConfirm={() => setDecisionMode(null)}
+          open
+        />
+      )}
     </S.Page>
   );
 }

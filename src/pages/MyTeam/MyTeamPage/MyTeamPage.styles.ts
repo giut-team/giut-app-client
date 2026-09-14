@@ -291,7 +291,7 @@ export const S = {
     width: min(100%, 480px);
     margin: 0 auto;
     padding: 16px 8px 88px;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
   `,
   MemberSectionTitle: styled.h2`
     margin: 0;
