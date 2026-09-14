@@ -95,15 +95,6 @@ export const S = {
     font-size: 10px;
     font-weight: 800;
   `,
-  VerifiedBadge: styled.span`
-    padding: 3px 5px;
-    border-radius: 5px;
-    background: ${colorMix(tokens.color.success[500], 12)};
-    color: ${tokens.color.success[500]};
-    font-size: 8px;
-    font-weight: 800;
-    line-height: 1;
-  `,
   ProfileLine: styled.span`
     display: block;
     margin-top: 4px;

@@ -112,7 +112,6 @@ export function PositionTeamsPage() {
             </S.HeaderActions>
           </S.Header>
 
-          <S.Greeting>이루매님, 안녕하세요</S.Greeting>
           <S.Title>
             백엔드 개발자를 찾는 팀이
             <br />
@@ -154,7 +153,9 @@ export function PositionTeamsPage() {
                   <S.TeamTitle>{team.title}</S.TeamTitle>
                   <S.TeamDescription>{team.description}</S.TeamDescription>
                   <S.TeamActions>
-                    <S.ApplyButton type="button">상세 보기&nbsp;→</S.ApplyButton>
+                    <S.ApplyButton type="button">
+                      상세 보기&nbsp;→
+                    </S.ApplyButton>
                     <S.FavoriteButton
                       $favorite={isFavorite}
                       aria-pressed={isFavorite}
@@ -175,8 +176,8 @@ export function PositionTeamsPage() {
           </S.TeamList>
 
           <S.InfoNote>
-            내 프로필의 백엔드 개발자 포지션 기준으로 자동 추천돼요.
-            마이페이지에서 포지션을 바꾸면 목록도 바뀝니다.
+            내 프로필의 포지션 기준으로 자동 추천돼요. 마이페이지에서 포지션을
+            바꾸면 목록도 바뀝니다.
           </S.InfoNote>
         </S.ListSection>
       </S.Content>

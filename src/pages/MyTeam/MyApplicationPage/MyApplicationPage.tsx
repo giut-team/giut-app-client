@@ -114,7 +114,7 @@ export function MyApplicationPage() {
           </S.CancelButton>
         ) : (
           <S.ChatButton onClick={() => undefined} type="button" width="100%">
-            <Icon name="chat" size={14} weight="regular" />
+            <Icon name="chat" size={14} weight="fill" />
             팀장님이랑 대화하러 가기
           </S.ChatButton>
         )}
@@ -125,8 +125,14 @@ export function MyApplicationPage() {
           applicationCancelState={applicationCancelState}
           applicationPosition="데이터 시각화"
           applicationTeamName={teamName}
-          onApplicationCancelComplete={() => navigate("/my-team")}
-          onApplicationCancelConfirm={() => setApplicationCancelState("complete")}
+          onApplicationCancelComplete={() =>
+            navigate("/my-team", {
+              state: { pendingApplicationCancelled: true },
+            })
+          }
+          onApplicationCancelConfirm={() => {
+            setApplicationCancelState("complete");
+          }}
           onClose={() => setApplicationCancelState(null)}
           open
         />

@@ -39,7 +39,8 @@ export function ApplicationDetailPage() {
           <S.PositionLabel>지원 포지션</S.PositionLabel>
           <S.PositionValue>
             <S.RoleBadge $tone={applicant.tone}>{applicant.role}</S.RoleBadge>
-            <S.PositionText>모집 2명 중 1자리가 남음</S.PositionText>
+            <S.PositionText>모집 인원 2명</S.PositionText>
+            <S.OpeningText>1자리 남음</S.OpeningText>
           </S.PositionValue>
 
           <S.InformationList>
@@ -85,6 +86,12 @@ export function ApplicationDetailPage() {
       </S.Content>
 
       <S.ActionBar>
+        <S.AcceptButton
+          onClick={() => setDecisionMode("accept")}
+          type="button"
+        >
+          수락
+        </S.AcceptButton>
         <S.RejectButton
           onClick={() => setDecisionMode("reject")}
           tone="secondary"
@@ -92,12 +99,6 @@ export function ApplicationDetailPage() {
         >
           거절
         </S.RejectButton>
-        <S.AcceptButton
-          onClick={() => setDecisionMode("accept")}
-          type="button"
-        >
-          수락
-        </S.AcceptButton>
       </S.ActionBar>
 
       {decisionMode && (

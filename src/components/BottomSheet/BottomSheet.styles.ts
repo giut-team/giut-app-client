@@ -209,47 +209,6 @@ export const S = {
     font-size: 9px;
     line-height: 1.5;
   `,
-  ApplicationCancelSummary: styled.div`
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 10px;
-    border-radius: 10px;
-    background: ${tokens.color.neutral[100]};
-  `,
-  ApplicationCancelAvatar: styled.span`
-    display: grid;
-    width: 30px;
-    height: 30px;
-    place-items: center;
-    border-radius: 9px;
-    background: ${tokens.color.primary[100]};
-    color: ${tokens.color.primary[500]};
-    font-size: 9px;
-    font-weight: 800;
-  `,
-  ApplicationCancelSummaryText: styled.div`
-    display: grid;
-    gap: 3px;
-    min-width: 0;
-
-    strong {
-      color: ${tokens.color.neutral[900]};
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    span {
-      color: ${tokens.color.neutral[500]};
-      font-size: 8px;
-    }
-  `,
-  ApplicationCancelLink: styled.span`
-    margin-left: auto;
-    color: ${tokens.color.primary[500]};
-    font-size: 9px;
-    font-weight: 800;
-  `,
   DecisionFieldHeader: styled.div`
     display: flex;
     align-items: center;
@@ -342,7 +301,7 @@ export const S = {
   `,
   DecisionFooterActions: styled.div`
     display: grid;
-    grid-template-columns: 1fr 1.7fr;
+    grid-template-columns: 1.7fr 1fr;
     gap: 7px;
   `,
   DecisionCancelButton: styled(Button)`
@@ -353,6 +312,19 @@ export const S = {
     font-size: 11px;
   `,
   DecisionConfirmButton: styled(Button)<{ $mode: DecisionMode }>`
+    width: 100%;
+    height: 42px;
+    padding: 0;
+    border-radius: 11px;
+    background: ${({ $mode }) => getDecisionAccent($mode)};
+    font-size: 11px;
+
+    &:hover:not(:disabled) {
+      background: ${({ $mode }) => getDecisionAccent($mode)};
+      opacity: 0.9;
+    }
+  `,
+  DecisionCompleteButton: styled(Button)<{ $mode: DecisionMode }>`
     width: 100%;
     height: 42px;
     padding: 0;

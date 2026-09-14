@@ -39,8 +39,8 @@ export const S = {
     display: grid;
     align-content: start;
     flex: 1;
-    gap: 8px;
-    padding: 8px 8px 16px;
+    gap: 14px;
+    padding: 14px 18px 20px;
   `,
   ProfileCard: styled.section`
     padding: 12px;
@@ -100,32 +100,54 @@ export const S = {
   `,
   InformationCard: styled.section`
     padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
   `,
   PositionLabel: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 700;
   `,
   PositionValue: styled.div`
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin-top: 7px;
+    gap: 8px;
+    margin-top: 8px;
   `,
   RoleBadge: styled.span<{ $tone: ApplicantTone }>`
-    padding: 5px 7px;
+    padding: 6px 8px;
     border-radius: 6px;
     background: ${({ $tone }) => applicantColors[$tone].background};
     color: ${({ $tone }) => applicantColors[$tone].color};
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
   `,
   PositionText: styled.span`
     color: ${tokens.color.neutral[500]};
     font-size: 9px;
+    font-weight: 500;
+  `,
+  OpeningText: styled.span`
+    position: relative;
+    padding-left: 8px;
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 700;
+
+    &::before {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: ${tokens.color.neutral[200]};
+      content: "";
+      transform: translateY(-50%);
+    }
   `,
   InformationList: styled.dl`
     display: grid;
@@ -153,6 +175,7 @@ export const S = {
   `,
   QuestionCard: styled.section`
     padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
   `,

@@ -188,6 +188,10 @@ export const S = {
     text-align: left;
     cursor: pointer;
     scroll-snap-align: start;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
 
     ${({ $pending, $selected }) =>
       $selected &&
@@ -199,6 +203,10 @@ export const S = {
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 2px;
+    }
+
+    &:active {
+      transform: scale(0.98);
     }
   `,
   TeamBadges: styled.div`
@@ -227,10 +235,10 @@ export const S = {
   `,
   NewApplications: styled.span`
     padding: 4px 6px;
-    border-radius: 6px;
-    background: ${colorMix(tokens.color.danger[500], 10)};
-    color: ${tokens.color.danger[500]};
-    font-size: 9px;
+    border-radius: 5px;
+    background: ${tokens.color.danger[500]};
+    color: ${tokens.color.neutral[50]};
+    font-size: 8px;
     font-weight: 800;
     line-height: 1;
   `,

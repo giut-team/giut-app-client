@@ -62,7 +62,7 @@ export const S = {
     display: flex;
     gap: 6px;
   `,
-  HeaderButton: styled.button`
+  HeaderButton: styled.button<{ $isTeamButtonAnimating?: boolean }>`
     position: relative;
     display: grid;
     width: 30px;
@@ -71,9 +71,13 @@ export const S = {
     place-items: center;
     border: 0;
     border-radius: 10px;
-    background: ${tokens.color.neutral[50]};
+    background: ${({ $isTeamButtonAnimating }) =>
+      $isTeamButtonAnimating
+        ? tokens.color.primary[100]
+        : tokens.color.neutral[50]};
     color: ${tokens.color.neutral[700]};
     cursor: pointer;
+    transition: background-color 180ms ease;
 
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
@@ -273,6 +277,11 @@ export const S = {
     font-size: 16px;
     line-height: 1;
   `,
+  ShortcutIconImage: styled.img`
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  `,
   ShortcutText: styled.span`
     display: grid;
     gap: 2px;
@@ -334,6 +343,11 @@ export const S = {
     align-items: center;
     justify-content: space-between;
   `,
+  ContestCategoryGroup: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  `,
   Category: styled.span<{ $tone: CategoryTone }>`
     padding: 4px 7px;
     border-radius: 6px;
@@ -343,15 +357,30 @@ export const S = {
     font-weight: 700;
     letter-spacing: -0.1px;
   `,
+  VerifiedBadge: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: color-mix(
+      in srgb,
+      ${tokens.color.success[500]} 12%,
+      ${tokens.color.neutral[50]}
+    );
+    color: ${tokens.color.success[500]};
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   DDay: styled.span`
-    min-width: 34px;
-    padding: 4px 8px;
-    border: 1px solid color-mix(in srgb, ${tokens.color.danger[500]} 18%, transparent);
-    border-radius: 999px;
-    background: color-mix(in srgb, ${tokens.color.danger[500]} 9%, ${tokens.color.neutral[50]});
-    color: ${tokens.color.danger[500]};
+    min-width: 30px;
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: ${tokens.color.danger[500]};
+    color: ${tokens.color.neutral[50]};
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0;

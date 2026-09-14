@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../../components/BottomNavigation/BottomNavigation";
 import {
   BottomSheet,
@@ -8,7 +8,10 @@ import {
 } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import giutLogo from "../../../assets/giut-logo.svg";
-import { applicants, type Applicant } from "../myTeam.data";
+import {
+  applicants,
+  type Applicant,
+} from "../myTeam.data";
 import { S } from "./MyTeamPage.styles";
 
 type TeamKind = "leader" | "member" | "pending";
@@ -32,7 +35,7 @@ const teams: Team[] = [
     status: "지원 대기",
     elapsed: "3일 경과",
     title: "ESG 임팩트 캠페인",
-    description: "한국디자인진흥원 · 4/4명 · 모집 중",
+    description: "한국디자인진흥원 · 3/4명 · 모집 중",
     tone: "pending",
   },
   {
@@ -65,9 +68,16 @@ const navigationItems = [
 
 export function MyTeamPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const wasPendingApplicationCancelled = Boolean(
+    (location.state as { pendingApplicationCancelled?: boolean } | null)
+      ?.pendingApplicationCancelled,
+  );
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [selectedTeamId, setSelectedTeamId] = useState("pending-esg");
-  const [hasPendingApplication, setHasPendingApplication] = useState(true);
+  const [hasPendingApplication, setHasPendingApplication] = useState(
+    () => !wasPendingApplicationCancelled,
+  );
   const [applicationCancelState, setApplicationCancelState] =
     useState<ApplicationCancelState | null>(null);
   const [decisionRequest, setDecisionRequest] = useState<{
@@ -84,7 +94,9 @@ export function MyTeamPage() {
   );
   const isMemberTeam = selectedTeam.kind === "member";
   const isPendingTeam = selectedTeam.kind === "pending";
-  const teamCount = visibleTeams.filter((team) => team.kind !== "pending").length;
+  const teamCount = visibleTeams.filter(
+    (team) => team.kind !== "pending",
+  ).length;
 
   return (
     <S.Page>
@@ -141,7 +153,6 @@ export function MyTeamPage() {
             내 팀 {teamCount}
             {hasPendingApplication && " · 지원 대기 1"}
           </S.SectionTitle>
-          <S.ViewAll type="button">전체보기 ›</S.ViewAll>
         </S.SectionHeader>
 
         <S.TeamScroller aria-label="내 팀 목록">
@@ -159,7 +170,9 @@ export function MyTeamPage() {
                 {team.newApplications && (
                   <S.NewApplications>{team.newApplications}</S.NewApplications>
                 )}
-                {team.elapsed && <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>}
+                {team.elapsed && (
+                  <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>
+                )}
               </S.TeamBadges>
               <S.TeamTitle>{team.title}</S.TeamTitle>
               <S.TeamDescription>{team.description}</S.TeamDescription>
@@ -328,6 +341,14 @@ export function MyTeamPage() {
                   <S.ReasonLabel>{applicant.reason}</S.ReasonLabel>
                   <S.ApplicantAnswer>{applicant.answer}</S.ApplicantAnswer>
                   <S.ApplicantActions>
+                    <S.AcceptButton
+                      onClick={() =>
+                        setDecisionRequest({ mode: "accept", applicant })
+                      }
+                      type="button"
+                    >
+                      수락
+                    </S.AcceptButton>
                     <S.RejectButton
                       onClick={() =>
                         setDecisionRequest({ mode: "reject", applicant })
@@ -337,14 +358,6 @@ export function MyTeamPage() {
                     >
                       거절
                     </S.RejectButton>
-                    <S.AcceptButton
-                      onClick={() =>
-                        setDecisionRequest({ mode: "accept", applicant })
-                      }
-                      type="button"
-                    >
-                      수락
-                    </S.AcceptButton>
                   </S.ApplicantActions>
                 </S.ApplicantCard>
               ))}

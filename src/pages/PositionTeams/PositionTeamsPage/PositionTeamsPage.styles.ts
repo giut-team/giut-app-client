@@ -51,17 +51,12 @@ export const S = {
     place-items: center;
     border: 0;
     border-radius: 10px;
-    background: ${tokens.color.neutral[100]};
+    background: transparent;
     color: ${tokens.color.neutral[700]};
     cursor: pointer;
 
-    &:first-child {
-      background: ${tokens.color.primary[100]};
-      color: ${tokens.color.primary[500]};
-    }
-
     &:focus-visible {
-      outline: 2px solid ${tokens.color.primary[500]};
+      outline: 2px solid ${tokens.color.neutral[500]};
       outline-offset: 2px;
     }
   `,
@@ -107,7 +102,7 @@ export const S = {
   ListSection: styled.section`
     min-height: calc(100svh - 160px);
     padding: 16px 8px 20px;
-    border-top: 8px solid ${tokens.color.neutral[100]};
+    border-top: 1px solid ${tokens.color.neutral[200]};
     background: ${tokens.color.neutral[50]};
   `,
   ListHeader: styled.div`
@@ -143,8 +138,7 @@ export const S = {
   TeamTopline: styled.div`
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
   `,
   PositionBadge: styled.span`
     padding: 4px 6px;
@@ -158,12 +152,8 @@ export const S = {
   DDay: styled.span`
     padding: 4px 6px;
     border-radius: 5px;
-    background: color-mix(
-      in srgb,
-      ${tokens.color.danger[500]} 10%,
-      ${tokens.color.neutral[50]}
-    );
-    color: ${tokens.color.danger[500]};
+    background: ${tokens.color.danger[500]};
+    color: ${tokens.color.neutral[50]};
     font-size: 8px;
     font-weight: 800;
     line-height: 1;

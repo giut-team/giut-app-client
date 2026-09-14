@@ -62,23 +62,41 @@ function DecisionContent({
   applicantName,
   applicantRole,
   mode,
+  completed,
 }: {
   applicantName: string;
   applicantRole: string;
   mode: DecisionMode;
+  completed: boolean;
 }) {
   const [selectedRole, setSelectedRole] = useState(applicantRole);
   const [selectedReason, setSelectedReason] = useState("");
   const isAccepting = mode === "accept";
 
+  if (completed) {
+    return (
+      <>
+        <S.DecisionIcon $mode={mode}>
+          <Icon name={isAccepting ? "check" : "x"} size={22} weight="bold" />
+        </S.DecisionIcon>
+        <S.DecisionTitle>
+          {isAccepting
+            ? `${applicantName}님을\n수락했습니다`
+            : `${applicantName}님의 지원을\n거절했습니다`}
+        </S.DecisionTitle>
+        <S.DecisionDescription>
+          {isAccepting
+            ? `${applicantRole} 포지션으로 수락했고, 지원자에게 결과 알림을 보냈습니다.`
+            : "지원자에게 결과 알림을 보냈습니다."}
+        </S.DecisionDescription>
+      </>
+    );
+  }
+
   return (
     <>
       <S.DecisionIcon $mode={mode}>
-        <Icon
-          name={isAccepting ? "check" : "x"}
-          size={22}
-          weight="bold"
-        />
+        <Icon name={isAccepting ? "check" : "x"} size={22} weight="bold" />
       </S.DecisionIcon>
       <S.DecisionTitle>{`${applicantName}님을\n${
         isAccepting
@@ -173,16 +191,7 @@ function ApplicationCancelContent({
           : "취소하면 팀장에게 전달된 지원서가 사라지고, 작성한 답변도 저장되지 않아요. 더는 지원하려면 처음부터 작성해야 해요."}
       </S.ApplicationCancelDescription>
 
-      {isComplete ? (
-        <S.ApplicationCancelSummary>
-          <S.ApplicationCancelAvatar>서</S.ApplicationCancelAvatar>
-          <S.ApplicationCancelSummaryText>
-            <strong>{teamName}</strong>
-            <span>데이터 시각화 모집 중 · 3/5명</span>
-          </S.ApplicationCancelSummaryText>
-          <S.ApplicationCancelLink>다시 지원</S.ApplicationCancelLink>
-        </S.ApplicationCancelSummary>
-      ) : (
+      {!isComplete && (
         <>
           <S.ApplicationCancelDetails>
             <S.ApplicationCancelDetailRow>
@@ -195,12 +204,14 @@ function ApplicationCancelContent({
             </S.ApplicationCancelDetailRow>
             <S.ApplicationCancelDetailRow>
               <span>진행 상태</span>
-              <S.ApplicationCancelPending>팀장 검토 중</S.ApplicationCancelPending>
+              <S.ApplicationCancelPending>
+                팀장 검토 중
+              </S.ApplicationCancelPending>
             </S.ApplicationCancelDetailRow>
           </S.ApplicationCancelDetails>
           <S.ApplicationCancelNotice>
-            취소 사유를 팀장에게 따로 알리지 않고, 지원 목록에서 사라져요. 모집이
-            열려 있으면 나중에 다시 지원할 수 있어요.
+            취소 사유를 팀장에게 따로 알리지 않고, 지원 목록에서 사라져요.
+            모집이 열려 있으면 나중에 다시 지원할 수 있어요.
           </S.ApplicationCancelNotice>
         </>
       )}
@@ -235,6 +246,7 @@ export function BottomSheet({
   const isClosingByDrag = useRef(false); // 드래그로 닫히는 중인지 구분함
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDecisionComplete, setIsDecisionComplete] = useState(false);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -246,11 +258,23 @@ export function BottomSheet({
       setDragOffset(0);
       setIsDragging(false);
 
-      if (open) isClosingByDrag.current = false;
+      if (open) {
+        isClosingByDrag.current = false;
+        setIsDecisionComplete(false);
+      }
     });
 
     return () => cancelAnimationFrame(frameId);
-  }, [open]);
+  }, [open, decisionMode]);
+
+  const handleDecisionConfirm = () => {
+    setIsDecisionComplete(true);
+  };
+
+  const handleDecisionComplete = () => {
+    onDecisionConfirm?.();
+    onClose();
+  };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -312,7 +336,8 @@ export function BottomSheet({
       isDragging={isDragging}
     >
       <S.InnerPadding $compact={variant === "compact"}>
-        <S.HandleWrapper $compact={variant === "compact"}
+        <S.HandleWrapper
+          $compact={variant === "compact"}
           onPointerCancel={resetDrag}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -321,7 +346,7 @@ export function BottomSheet({
           <S.Handle />
         </S.HandleWrapper>
         {(title || eyebrow || showCloseButton) && (
-            <S.Header $compact={variant === "compact"}>
+          <S.Header $compact={variant === "compact"}>
             <div>
               {eyebrow && (
                 <S.Eyebrow $compact={variant === "compact"}>
@@ -351,9 +376,12 @@ export function BottomSheet({
             <DecisionContent
               applicantName={applicantName}
               applicantRole={applicantRole}
+              completed={isDecisionComplete}
               mode={decisionMode}
             />
-          ) : applicationCancelState && applicationTeamName && applicationPosition ? (
+          ) : applicationCancelState &&
+            applicationTeamName &&
+            applicationPosition ? (
             <ApplicationCancelContent
               position={applicationPosition}
               state={applicationCancelState}
@@ -365,42 +393,43 @@ export function BottomSheet({
         </S.Content>
         {decisionMode && applicantName && applicantRole ? (
           <S.Footer $variant="action">
-            <S.DecisionFooterActions>
-              <S.DecisionCancelButton
-                onClick={onClose}
-                tone="secondary"
-                type="button"
-              >
-                취소
-              </S.DecisionCancelButton>
-              <S.DecisionConfirmButton
+            {isDecisionComplete ? (
+              <S.DecisionCompleteButton
                 $mode={decisionMode}
-                onClick={onDecisionConfirm}
+                onClick={handleDecisionComplete}
                 type="button"
               >
-                {decisionMode === "accept" ? "수락하기" : "거절하기"}
-              </S.DecisionConfirmButton>
-            </S.DecisionFooterActions>
+                확인
+              </S.DecisionCompleteButton>
+            ) : (
+              <S.DecisionFooterActions>
+                <S.DecisionConfirmButton
+                  $mode={decisionMode}
+                  onClick={handleDecisionConfirm}
+                  type="button"
+                >
+                  {decisionMode === "accept" ? "수락하기" : "거절하기"}
+                </S.DecisionConfirmButton>
+                <S.DecisionCancelButton
+                  onClick={onClose}
+                  tone="secondary"
+                  type="button"
+                >
+                  취소
+                </S.DecisionCancelButton>
+              </S.DecisionFooterActions>
+            )}
           </S.Footer>
-        ) : applicationCancelState && applicationTeamName && applicationPosition ? (
+        ) : applicationCancelState &&
+          applicationTeamName &&
+          applicationPosition ? (
           <S.Footer $variant="action">
             <S.DecisionFooterActions>
-              <S.DecisionCancelButton
-                onClick={
-                  applicationCancelState === "complete"
-                    ? onApplicationCancelComplete ?? onClose
-                    : onClose
-                }
-                tone="secondary"
-                type="button"
-              >
-                {applicationCancelState === "complete" ? "닫기" : "그대로 두기"}
-              </S.DecisionCancelButton>
               <S.DecisionConfirmButton
-                $mode="reject"
+                $mode={applicationCancelState === "complete" ? "accept" : "reject"}
                 onClick={
                   applicationCancelState === "complete"
-                    ? onApplicationCancelComplete ?? onClose
+                    ? (onApplicationCancelComplete ?? onClose)
                     : onApplicationCancelConfirm
                 }
                 type="button"
@@ -409,6 +438,17 @@ export function BottomSheet({
                   ? "다른 팀 보기"
                   : "지원 취소하기"}
               </S.DecisionConfirmButton>
+              <S.DecisionCancelButton
+                onClick={
+                  applicationCancelState === "complete"
+                    ? (onApplicationCancelComplete ?? onClose)
+                    : onClose
+                }
+                tone="secondary"
+                type="button"
+              >
+                {applicationCancelState === "complete" ? "닫기" : "그대로 두기"}
+              </S.DecisionCancelButton>
             </S.DecisionFooterActions>
           </S.Footer>
         ) : (

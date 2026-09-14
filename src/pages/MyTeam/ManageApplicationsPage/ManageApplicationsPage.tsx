@@ -57,11 +57,10 @@ export function ManageApplicationsPage() {
               <S.ApplicantCard key={applicant.name}>
                 <S.ApplicantHeader>
                   <S.Avatar $tone={applicant.tone}>{applicant.initial}</S.Avatar>
-                  <S.Identity>
-                    <S.NameRow>
-                      <S.Name>{applicant.name}</S.Name>
-                      <S.VerifiedBadge>학교 인증</S.VerifiedBadge>
-                    </S.NameRow>
+                    <S.Identity>
+                      <S.NameRow>
+                        <S.Name>{applicant.name}</S.Name>
+                      </S.NameRow>
                     <S.ProfileLine>{applicant.school}</S.ProfileLine>
                   </S.Identity>
                   <S.ReceivedAt>{applicant.receivedAt}</S.ReceivedAt>

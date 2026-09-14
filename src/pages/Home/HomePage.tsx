@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import giutLogo from "../../assets/giut-logo.svg";
+import trophyIcon from "../../assets/trophy.svg";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { S } from "./HomePage.styles";
@@ -30,8 +31,18 @@ const popularContests = [
 ];
 
 const shortcuts = [
-  { icon: "🏅", title: "공모전 찾기", description: "분야 · 마감으로 한눈에" },
-  { icon: "👥", title: "팀원으로 지원하기", description: "원하는 팀을 빠르게" },
+  {
+    icon: trophyIcon,
+    iconType: "image" as const,
+    title: "공모전 찾기",
+    description: "분야 · 마감으로 한눈에",
+  },
+  {
+    icon: "👥",
+    iconType: "text" as const,
+    title: "팀원으로 지원하기",
+    description: "원하는 팀을 빠르게",
+  },
 ];
 
 const navigationItems = [
@@ -45,6 +56,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [activeBanner, setActiveBanner] = useState(0);
+  const [isTeamButtonAnimating, setIsTeamButtonAnimating] = useState(false);
   const banners = [
     {
       eyebrow: "마감 임박",
@@ -60,6 +72,12 @@ export function HomePage() {
   const showNextBanner = () => {
     setActiveBanner((banner) => (banner + 1) % banners.length);
   };
+  const handleTeamNavigation = () => {
+    if (isTeamButtonAnimating) return;
+
+    setIsTeamButtonAnimating(true);
+    window.setTimeout(() => navigate("/my-team"), 180);
+  };
 
   return (
     <S.Page>
@@ -73,7 +91,8 @@ export function HomePage() {
             <S.HeaderActions>
               <S.HeaderButton
                 aria-label="팀 페이지로 이동"
-                onClick={() => navigate("/my-team")}
+                $isTeamButtonAnimating={isTeamButtonAnimating}
+                onClick={handleTeamNavigation}
                 type="button"
               >
                 <Icon name="users" size={16} weight="regular" />
@@ -91,9 +110,9 @@ export function HomePage() {
 
           <S.Greeting>이루매님, 안녕하세요</S.Greeting>
           <S.Title>
-            이번 방학엔
+            지금, 함께할 팀을
             <br />
-            어떤 프로젝트를 할까요?
+            찾아볼까요?
           </S.Title>
         </S.TopArea>
 
@@ -145,7 +164,13 @@ export function HomePage() {
         <S.Shortcuts>
           {shortcuts.map((shortcut) => (
             <S.Shortcut key={shortcut.title} type="button">
-              <S.ShortcutIcon>{shortcut.icon}</S.ShortcutIcon>
+              <S.ShortcutIcon>
+                {shortcut.iconType === "image" ? (
+                  <S.ShortcutIconImage alt="" src={shortcut.icon} />
+                ) : (
+                  shortcut.icon
+                )}
+              </S.ShortcutIcon>
               <S.ShortcutText>
                 <S.ShortcutTitle>{shortcut.title}</S.ShortcutTitle>
                 <S.ShortcutDescription>
@@ -166,9 +191,15 @@ export function HomePage() {
           {popularContests.map((contest) => (
             <S.ContestCard key={contest.title}>
               <S.ContestTopline>
-                <S.Category $tone={contest.categoryTone}>
-                  {contest.category}
-                </S.Category>
+                <S.ContestCategoryGroup>
+                  <S.Category $tone={contest.categoryTone}>
+                    {contest.category}
+                  </S.Category>
+                  <S.VerifiedBadge aria-label="인증된 공모전">
+                    <Icon name="check" size={8} weight="bold" />
+                    인증
+                  </S.VerifiedBadge>
+                </S.ContestCategoryGroup>
                 <S.DDay>{contest.dDay}</S.DDay>
               </S.ContestTopline>
               <S.ContestTitle>{contest.title}</S.ContestTitle>
