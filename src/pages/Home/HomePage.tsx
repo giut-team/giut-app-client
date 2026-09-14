@@ -4,6 +4,7 @@ import giutLogo from "../../assets/giut-logo.svg";
 import trophyIcon from "../../assets/trophy.svg";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
+import { SearchOverlay } from "../../components/SearchOverlay/SearchOverlay";
 import { S } from "./HomePage.styles";
 
 const popularContests = [
@@ -57,6 +58,7 @@ export function HomePage() {
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [activeBanner, setActiveBanner] = useState(0);
   const [isTeamButtonAnimating, setIsTeamButtonAnimating] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const banners = [
     {
       eyebrow: "마감 임박",
@@ -98,7 +100,11 @@ export function HomePage() {
                 <Icon name="users" size={16} weight="regular" />
                 <S.HeaderBadge>3</S.HeaderBadge>
               </S.HeaderButton>
-              <S.HeaderButton aria-label="검색" type="button">
+              <S.HeaderButton
+                aria-label="검색"
+                onClick={() => setIsSearchOpen(true)}
+                type="button"
+              >
                 <Icon name="search" size={16} weight="regular" />
               </S.HeaderButton>
               <S.HeaderButton aria-label="알림" type="button">
@@ -210,6 +216,11 @@ export function HomePage() {
           ))}
         </S.ContestList>
       </S.Content>
+
+      <SearchOverlay
+        onClose={() => setIsSearchOpen(false)}
+        open={isSearchOpen}
+      />
 
       <BottomNavigation
         activeKey={activeNavigation}

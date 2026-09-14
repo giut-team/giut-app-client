@@ -7,6 +7,7 @@ import {
   type DecisionMode,
 } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
+import { SearchOverlay } from "../../../components/SearchOverlay/SearchOverlay";
 import giutLogo from "../../../assets/giut-logo.svg";
 import {
   applicants,
@@ -74,6 +75,7 @@ export function MyTeamPage() {
       ?.pendingApplicationCancelled,
   );
   const [activeNavigation, setActiveNavigation] = useState("home");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState("pending-esg");
   const [hasPendingApplication, setHasPendingApplication] = useState(
     () => !wasPendingApplicationCancelled,
@@ -115,7 +117,11 @@ export function MyTeamPage() {
               <Icon name="users" size={17} weight="fill" />
               <S.HeaderBadge>3</S.HeaderBadge>
             </S.HeaderButton>
-            <S.HeaderButton aria-label="검색" type="button">
+            <S.HeaderButton
+              aria-label="검색"
+              onClick={() => setIsSearchOpen(true)}
+              type="button"
+            >
               <Icon name="search" size={17} weight="regular" />
             </S.HeaderButton>
             <S.HeaderButton aria-label="알림" type="button">
@@ -409,6 +415,11 @@ export function MyTeamPage() {
           open
         />
       )}
+
+      <SearchOverlay
+        onClose={() => setIsSearchOpen(false)}
+        open={isSearchOpen}
+      />
 
       <BottomNavigation
         activeKey={activeNavigation}
