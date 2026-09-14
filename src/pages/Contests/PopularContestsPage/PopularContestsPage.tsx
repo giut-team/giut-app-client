@@ -1,23 +1,23 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
-import { Icon } from "../../components/icons";
-import { PageHeader } from "../../components/PageHeader";
-import { PillButton } from "../../components/PillButton";
-import { S } from "./ContestsPage.styles";
+import { useNavigate } from "react-router-dom";
+import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
+import { Icon } from "../../../components/icons";
+import { PageHeader } from "../../../components/PageHeader";
+import { PillButton } from "../../../components/PillButton";
+import { S } from "./PopularContestsPage.styles";
 
 type ContestCategory = "전체" | "IT/과학" | "기획" | "디자인" | "개발" | "영상" | "창업";
-type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow" | "pink";
+type CategoryTone = "blue" | "orange" | "purple" | "green" | "pink" | "yellow";
 type SortOption = "views" | "scraps" | "latest" | "deadline";
 
 type Contest = {
-  id: string;
   category: Exclude<ContestCategory, "전체">;
   categoryTone: CategoryTone;
   comments: number;
   dDay: string;
+  id: string;
   organization: string;
-  scraps: number;
+  teamCount: number;
   title: string;
   verified: boolean;
   views: string;
@@ -40,10 +40,7 @@ const sortOptions: { label: string; value: SortOption }[] = [
   { label: "마감임박순", value: "deadline" },
 ];
 
-const isSortOption = (value: string | null): value is SortOption =>
-  sortOptions.some((option) => option.value === value);
-
-const contests: Contest[] = [
+const popularContests: Contest[] = [
   {
     id: "seoul-data",
     category: "IT/과학",
@@ -51,7 +48,7 @@ const contests: Contest[] = [
     comments: 128,
     dDay: "D-15",
     organization: "서울특별시 · 교내 공지 RSS",
-    scraps: 1240,
+    teamCount: 3,
     title: "2024 서울시 데이터 활용 공모전",
     verified: true,
     views: "41,852",
@@ -63,7 +60,7 @@ const contests: Contest[] = [
     comments: 96,
     dDay: "D-3",
     organization: "환경부 · K-Startup",
-    scraps: 842,
+    teamCount: 5,
     title: "대학생 환경 아이디어 챌린지",
     verified: true,
     views: "28,104",
@@ -75,7 +72,7 @@ const contests: Contest[] = [
     comments: 74,
     dDay: "D-10",
     organization: "한국디자인진흥원 · 콘텐츠코리아",
-    scraps: 713,
+    teamCount: 2,
     title: "디자인으로 만드는 ESG 캠페인",
     verified: true,
     views: "19,430",
@@ -87,7 +84,7 @@ const contests: Contest[] = [
     comments: 61,
     dDay: "D-21",
     organization: "금융위원회 · 학생 제보",
-    scraps: 456,
+    teamCount: 4,
     title: "제 12회 핀테크 해커톤",
     verified: false,
     views: "12,277",
@@ -96,21 +93,61 @@ const contests: Contest[] = [
     id: "creator-contest",
     category: "영상",
     categoryTone: "pink",
-    comments: 38,
+    comments: 44,
     dDay: "D-28",
-    organization: "한국콘텐츠진흥원 · 콘텐츠코리아",
-    scraps: 321,
+    organization: "문화체육관광부 · 콘텐츠코리아",
+    teamCount: 1,
     title: "청년 콘텐츠 크리에이터 공모전",
     verified: true,
-    views: "9,834",
+    views: "9,842",
   },
 ];
 
-function ContestCard({ contest }: { contest: Contest }) {
+const allContests: Contest[] = [
+  {
+    id: "public-api",
+    category: "IT/과학",
+    categoryTone: "blue",
+    comments: 38,
+    dDay: "D-31",
+    organization: "행정안전부 · 교내 공지 RSS",
+    teamCount: 7,
+    title: "공공 API 활용 서비스 개발전",
+    verified: true,
+    views: "8,510",
+  },
+  {
+    id: "campus-startup",
+    category: "창업",
+    categoryTone: "yellow",
+    comments: 29,
+    dDay: "D-19",
+    organization: "중소벤처기업부 · K-Startup",
+    teamCount: 3,
+    title: "캠퍼스 창업 아이템 경진대회",
+    verified: true,
+    views: "7,206",
+  },
+  {
+    id: "living-policy",
+    category: "기획",
+    categoryTone: "orange",
+    comments: 21,
+    dDay: "D-24",
+    organization: "국무조정실 · 학생 제보",
+    teamCount: 2,
+    title: "생활 속 규제 개선 제안 공모",
+    verified: false,
+    views: "5,981",
+  },
+];
+
+function ContestCard({ contest, rank }: { contest: Contest; rank?: number }) {
   return (
     <S.ContestCard>
       <S.CardTopline>
         <S.TagGroup>
+          {rank && <S.RankBadge>{rank}</S.RankBadge>}
           <S.CategoryBadge $tone={contest.categoryTone}>
             {contest.category}
           </S.CategoryBadge>
@@ -130,8 +167,8 @@ function ContestCard({ contest }: { contest: Contest }) {
       <S.ContestTitle>{contest.title}</S.ContestTitle>
       <S.Organization>{contest.organization}</S.Organization>
       <S.CardFooter>
-        <S.TeamCount>모집 중인 팀 {contest.id === "environment-idea" ? 5 : contest.id === "fintech-hackathon" ? 4 : contest.id === "esg-campaign" ? 2 : 3}</S.TeamCount>
-        <S.Stats aria-label={`조회 ${contest.views}, 댓글 ${contest.comments}`}>
+        <S.TeamCount>모집 중인 팀 {contest.teamCount}</S.TeamCount>
+        <S.Stats aria-label={`조회 ${contest.views}, 북마크 ${contest.comments}`}>
           <S.Stat>
             <Icon name="eye" size={9} weight="regular" />
             {contest.views}
@@ -149,37 +186,40 @@ function ContestCard({ contest }: { contest: Contest }) {
   );
 }
 
-export function ContestsPage() {
+export function PopularContestsPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<ContestCategory>("전체");
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
-  const sortParam = searchParams.get("sort");
-  const sortOption = isSortOption(sortParam) ? sortParam : "views";
+  const [sortOption, setSortOption] = useState<SortOption>("views");
 
-  const visibleContests = useMemo(() => {
-    const filtered =
-      activeCategory === "전체"
-        ? contests
-        : contests.filter((contest) => contest.category === activeCategory);
+  const [visiblePopularContests, visibleAllContests] = useMemo(() => {
+    const matchesCategory = (contest: Contest) =>
+      activeCategory === "전체" || contest.category === activeCategory;
+    const sortContests = (contests: Contest[]) =>
+      [...contests].sort((left, right) => {
+        if (sortOption === "views") {
+          return (
+            Number(right.views.replace(",", "")) -
+            Number(left.views.replace(",", ""))
+          );
+        }
 
-    return [...filtered].sort((left, right) => {
-      if (sortOption === "views") {
-        return Number(right.views.replace(",", "")) - Number(left.views.replace(",", ""));
-      }
+        if (sortOption === "scraps") return right.comments - left.comments;
+        if (sortOption === "latest") return 0;
 
-      if (sortOption === "scraps") return right.scraps - left.scraps;
-      if (sortOption === "latest") return contests.indexOf(right) - contests.indexOf(left);
+        return Number(left.dDay.slice(2)) - Number(right.dDay.slice(2));
+      });
 
-      return Number(left.dDay.slice(2)) - Number(right.dDay.slice(2));
-    });
+    return [
+      sortContests(popularContests.filter(matchesCategory)),
+      sortContests(allContests.filter(matchesCategory)),
+    ];
   }, [activeCategory, sortOption]);
-
   const sortLabel = sortOptions.find((option) => option.value === sortOption)?.label;
 
   return (
     <S.Page>
-      <PageHeader onBack={() => navigate("/")} title="공모전" />
+      <PageHeader onBack={() => navigate(-1)} title="인기 공모전" />
       <S.FilterArea>
         <S.FilterList aria-label="공모전 카테고리">
           {categories.map((category) => (
@@ -213,14 +253,32 @@ export function ContestsPage() {
           </S.SortButton>
         </S.ListControls>
 
+        <S.SectionHeading>
+          <S.SectionTitle>인기 TOP {visiblePopularContests.length}</S.SectionTitle>
+          <S.SectionMeta>이번 주 추천 기준</S.SectionMeta>
+        </S.SectionHeading>
         <S.ContestList>
-          {visibleContests.map((contest) => (
-            <ContestCard contest={contest} key={contest.id} />
+          {visiblePopularContests.map((contest, index) => (
+            <ContestCard contest={contest} key={contest.id} rank={index + 1} />
           ))}
-          {visibleContests.length === 0 && (
-            <S.EmptyState>선택한 분야의 공모전이 없어요.</S.EmptyState>
+          {visiblePopularContests.length === 0 && (
+            <S.EmptyState>선택한 분야의 인기 공모전이 없어요.</S.EmptyState>
           )}
         </S.ContestList>
+
+        {visibleAllContests.length > 0 && (
+          <>
+            <S.SectionHeading $spaced>
+              <S.SectionTitle>전체 공모전 128건</S.SectionTitle>
+              <S.SectionMeta>조회수순</S.SectionMeta>
+            </S.SectionHeading>
+            <S.ContestList>
+              {visibleAllContests.map((contest) => (
+                <ContestCard contest={contest} key={contest.id} />
+              ))}
+            </S.ContestList>
+          </>
+        )}
       </S.Content>
 
       <BottomSheet
@@ -231,7 +289,7 @@ export function ContestsPage() {
         title="정렬"
         variant="compact"
       >
-        <S.SortOptions aria-label="공모전 정렬 기준">
+        <S.SortOptions aria-label="인기 공모전 정렬 기준">
           {sortOptions.map((option) => {
             const selected = option.value === sortOption;
 
@@ -241,7 +299,12 @@ export function ContestsPage() {
                 aria-pressed={selected}
                 key={option.value}
                 onClick={() => {
-                  setSearchParams({ sort: option.value }, { replace: true });
+                  if (option.value !== "views") {
+                    navigate(`/contests?sort=${option.value}`);
+                    return;
+                  }
+
+                  setSortOption(option.value);
                   setIsSortSheetOpen(false);
                 }}
                 type="button"

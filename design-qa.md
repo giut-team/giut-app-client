@@ -1,34 +1,34 @@
-# Design QA — 공모전 찾기 목록
+# Design QA — Popular contests sort sheet
 
 ## Comparison target
 
-- Source visual truth: user-provided mobile screenshot of the contests page in this conversation.
-- Implementation route: `/contests`.
-- Intended viewport: 375 x 812 CSS px mobile viewport.
-- State: `전체` category and `조회수순` selected.
+- Source visual truth: user-provided popular-contests screenshots and the earlier sorting bottom-sheet screenshot in this conversation.
+- Implementation route: `/contests/popular`.
+- Intended viewport: 375 x 812 CSS px mobile viewport, device scale factor 1.
+- State: `전체` category selected; the `조회수순` control has opened the sort bottom sheet.
 
 ## Evidence
 
-- Source pixels: 338 x 738 image including the visible app content.
+- Source pixels: popular-contests continuation captures are 338 x 605 and 338 x 598; the sort-sheet reference is 659 x 685.
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: the home `공모전 찾기` shortcut opens `/contests`; category pills filter cards; the sort control opens a dismissible sheet and applies 조회수/스크랩/최신/마감임박 ordering.
+- Primary interactions implemented: the home `전체보기` action opens `/contests/popular`; category pills filter both contest groups; `조회수순` opens the sort sheet; selecting 조회수순, 스크랩순, 최신순, or 마감임박순 updates both lists and closes the sheet; back returns to the previous view.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: uses the existing SUIT hierarchy with compact filter labels, card metadata, and prominent card titles; visual comparison blocked.
-- Spacing and layout rhythm: follows the screenshot's white header/filter band, neutral list controls, 8px card spacing, and rounded white cards; visual comparison blocked.
-- Colors and visual tokens: uses semantic category badges, verification states, soft danger D-day badges, and primary team-count badges; visual comparison blocked.
-- Image quality and asset fidelity: the target contains standard interface icons only, rendered with the existing Phosphor set; visual comparison blocked.
-- Copy and content: reproduces visible Korean contest names, organizations, D-days, team counts, view counts, and comment counts with realistic mock data.
+- Fonts and typography: reuses the established SUIT heading, card-title, metadata, and option-label hierarchy. Visual comparison is blocked.
+- Spacing and layout rhythm: reuses the existing compact-card rhythm and shared BottomSheet geometry. Visual comparison is blocked.
+- Colors and visual tokens: D-day now uses the same solid `danger.500` red badge with white text as the general contest list; the selected sort option uses the established red check state. Visual comparison is blocked.
+- Image quality and asset fidelity: no source imagery is present; standard UI icons use the existing icon system. Visual comparison is blocked.
+- Copy and content: the popular ranking, category badges, contest metadata, and all four sort labels are represented. Visual comparison is blocked.
 
 ## Findings
 
 - [P1] Browser-rendered visual comparison unavailable.
   - Evidence: browser runtime returned `No browser is available`.
-  - Impact: exact 375px type wrapping, card density, arrow placement, and soft-red D-day contrast cannot be judged against the source.
-  - Fix: capture `/contests` at 375 x 812 and compare it side-by-side with the supplied screenshot.
+  - Impact: the D-day badge proportions and sorting-sheet spacing cannot be verified against the supplied reference at the target viewport.
+  - Fix: capture `/contests/popular` at 375 x 812 with the sort sheet open and compare it alongside the source.
 
 ## Comparison history
 
@@ -36,14 +36,14 @@
 
 ## Implementation checklist
 
-- [x] Add the contests route and connect the home shortcut.
-- [x] Add category filters and contest cards.
-- [x] Add selectable ordering and sort sheet.
+- [x] Use the shared solid-red D-day treatment.
+- [x] Add the functional sort bottom sheet.
+- [x] Apply the selected sorting to both contest groups.
 - [x] Run lint and production build.
-- [ ] Capture and visually compare the mobile rendered state.
+- [ ] Capture and compare the mobile rendered state.
 
 ## Follow-up polish
 
-- Confirm exact card height and D-day color treatment after browser capture.
+- Confirm exact D-day badge size, option-row rhythm, and sheet safe-area spacing after a browser capture is available.
 
 final result: blocked
