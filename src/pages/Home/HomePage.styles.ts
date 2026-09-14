@@ -137,7 +137,7 @@ export const S = {
     width: ${({ $count }) => `${$count * 100}%`};
     transform: ${({ $active, $count }) =>
       `translateX(-${($active * 100) / $count}%)`};
-    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
 
     @media (prefers-reduced-motion: reduce) {

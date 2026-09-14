@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import giutLogo from "../../assets/giut-logo.svg";
 import trophyIcon from "../../assets/trophy.svg";
@@ -53,6 +53,8 @@ const navigationItems = [
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 
+const BANNER_AUTOPLAY_INTERVAL = 10000;
+
 export function HomePage() {
   const navigate = useNavigate();
   const [activeNavigation, setActiveNavigation] = useState("home");
@@ -74,6 +76,15 @@ export function HomePage() {
   const showNextBanner = () => {
     setActiveBanner((banner) => (banner + 1) % banners.length);
   };
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActiveBanner((banner) => (banner + 1) % banners.length);
+    }, BANNER_AUTOPLAY_INTERVAL);
+
+    return () => window.clearInterval(intervalId);
+  }, [banners.length]);
+
   const handleTeamNavigation = () => {
     if (isTeamButtonAnimating) return;
 
@@ -107,7 +118,11 @@ export function HomePage() {
               >
                 <Icon name="search" size={16} weight="regular" />
               </S.HeaderButton>
-              <S.HeaderButton aria-label="알림" type="button">
+              <S.HeaderButton
+                aria-label="알림"
+                onClick={() => navigate("/notifications")}
+                type="button"
+              >
                 <Icon name="bell" size={16} weight="regular" />
                 <S.NotificationDot />
               </S.HeaderButton>
@@ -137,7 +152,9 @@ export function HomePage() {
                   <S.BannerTitle>{banner.title}</S.BannerTitle>
                   <S.BannerButton
                     onClick={
-                      index === 1 ? () => navigate("/position-teams") : undefined
+                      index === 1
+                        ? () => navigate("/position-teams")
+                        : undefined
                     }
                     tone="secondary"
                     type="button"

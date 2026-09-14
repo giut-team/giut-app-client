@@ -1,44 +1,44 @@
-# Design QA — Home Search Overlay
+# Design QA — Notifications Page
 
 ## Comparison target
 
-- Source visual truth: user-provided mobile home-search overlay screenshot in this conversation.
-- Implementation route: `/home`.
+- Source visual truth: user-provided mobile notifications-page screenshot in this conversation.
+- Implementation route: `/notifications`.
 - Intended viewport: 375 × 812 CSS px mobile viewport.
-- State: search icon selected; overlay, focused search input, and recent-search chips visible.
+- State: two unread notifications visible; the `모두 읽음` action is available.
 
 ## Evidence
 
-- Source pixels: 375 × 772 image including mobile device chrome.
+- Source pixels: 317 × 696 image including mobile device chrome.
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: search icon opens the panel; the input receives focus; recent-search chips populate the input; Enter records a recent search; cancel and backdrop clicks close the panel.
+- Primary interactions implemented: home bell navigates to the notifications page; a notification click clears its unread state; `모두 읽음` clears all unread markers; the back action returns to the preceding page.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: uses the existing SUIT-based application typography; visual comparison blocked.
-- Spacing and layout rhythm: panel is a constrained, rounded top overlay with an inline cancel action and chip row; visual comparison blocked.
-- Colors and visual tokens: uses primary blue for the active search border and neutral overlay, panel, and history-chip tokens; visual comparison blocked.
-- Image quality and asset fidelity: the target contains no custom raster or illustrative asset. Existing icon-library search and close icons are used.
-- Copy and content: includes a Korean search prompt, cancel action, and the three recent-search labels shown in the source.
+- Fonts and typography: uses the existing SUIT-based hierarchy for header, notification title, supporting copy, and relative timestamps; visual comparison blocked.
+- Spacing and layout rhythm: follows the source with a compact header, neutral page background, and vertically separated rounded notification cards; visual comparison blocked.
+- Colors and visual tokens: uses primary blue unread borders, danger unread dots, and semantic icon backgrounds from existing tokens; visual comparison blocked.
+- Image quality and asset fidelity: the target contains standard interface icons only, implemented with the existing icon library; visual comparison blocked.
+- Copy and content: reproduces five Korean notification scenarios, titles, descriptions, and relative timestamps modeled on the reference.
 
 ## Findings
 
 - [P1] Browser-rendered visual comparison unavailable.
   - Evidence: browser runtime returned `No browser is available`.
-  - Impact: mobile width, panel radius, typography, and overlay opacity cannot be compared directly with the source state.
-  - Fix: capture `/home` at 375 × 812 with the search overlay open, then compare it with the supplied reference.
+  - Impact: card height, compact text wrapping, icon alignment, and unread-border contrast cannot be judged against the source at the target width.
+  - Fix: capture `/notifications` at 375 × 812, then compare its open state with the supplied reference.
 
 ## Implementation checklist
 
-- [x] Add a dimmed overlay and top search panel.
-- [x] Add focused search input, recent-search chips, cancel, and backdrop-close interactions.
+- [x] Add the notifications route and connect the home bell action.
+- [x] Add unread notification cards and mark-as-read controls.
 - [x] Run lint and production build.
 - [ ] Capture and compare the mobile rendered state.
 
 ## Follow-up polish
 
-- Confirm the overlay’s top spacing and dimmed background opacity against a browser capture.
+- Confirm card density and individual icon hues after browser capture.
 
 final result: blocked
