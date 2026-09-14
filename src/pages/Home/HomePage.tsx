@@ -152,9 +152,9 @@ export function HomePage() {
                   <S.BannerTitle>{banner.title}</S.BannerTitle>
                   <S.BannerButton
                     onClick={
-                      index === 1
-                        ? () => navigate("/position-teams")
-                        : undefined
+                      index === 0
+                        ? () => navigate("/closing-contests")
+                        : () => navigate("/position-teams")
                     }
                     tone="secondary"
                     type="button"

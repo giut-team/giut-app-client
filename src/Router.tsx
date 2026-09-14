@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/Home/HomePage";
+import { ClosingContestsPage } from "./pages/ClosingContests/ClosingContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
 import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/ApplicationDetailPage";
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
@@ -16,6 +17,7 @@ export function AppRouter() {
         <Route element={<LoginPage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<HomePage />} path="/home" />
+        <Route element={<ClosingContestsPage />} path="/closing-contests" />
         <Route element={<NotificationsPage />} path="/notifications" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />
         <Route element={<MyTeamPage />} path="/my-team" />
