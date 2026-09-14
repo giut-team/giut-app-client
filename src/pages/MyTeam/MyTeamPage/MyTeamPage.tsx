@@ -124,7 +124,11 @@ export function MyTeamPage() {
             >
               <Icon name="search" size={17} weight="regular" />
             </S.HeaderButton>
-            <S.HeaderButton aria-label="알림" type="button">
+            <S.HeaderButton
+              aria-label="알림"
+              onClick={() => navigate("/notifications")}
+              type="button"
+            >
               <Icon name="bell" size={17} weight="regular" />
               <S.NotificationDot />
             </S.HeaderButton>
