@@ -1,10 +1,11 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/Home/HomePage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
 import { RecruitingTeamsPage } from "./pages/Contests/RecruitingTeamsPage/RecruitingTeamsPage";
 import { TeamCreationPage } from "./pages/Contests/TeamCreationPage/TeamCreationPage";
+import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCreationContext";
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
 import { MatchedTeamsPage } from "./pages/MatchedTeams/MatchedTeamsPage";
@@ -31,9 +32,16 @@ export function AppRouter() {
           path="/contests/:contestId/teams"
         />
         <Route
-          element={<TeamCreationPage />}
+          element={
+            <TeamCreationProvider>
+              <Outlet />
+            </TeamCreationProvider>
+          }
           path="/contests/:contestId/teams/create"
-        />
+        >
+          <Route index element={<TeamCreationPage />} />
+          <Route element={<TeamCreationPage />} path=":step" />
+        </Route>
         <Route element={<PopularContestsPage />} path="/contests/popular" />
         <Route element={<NotificationsPage />} path="/notifications" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />
