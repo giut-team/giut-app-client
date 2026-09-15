@@ -69,6 +69,12 @@ export const S = {
   Form: styled.div`
     padding: 14px 14px 28px;
   `,
+  StepThreeForm: styled.div`
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100svh - 136px);
+    padding: 14px 14px 28px;
+  `,
   ContestNotice: styled.div`
     display: grid;
     gap: 5px;
@@ -349,9 +355,9 @@ export const S = {
   `,
   SearchButton: styled.button`
     width: 42px;
-    border: 0;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 9px;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
     color: ${tokens.color.primary[500]};
     font: inherit;
     font-size: 8px;
@@ -385,8 +391,10 @@ export const S = {
     height: 24px;
     place-items: center;
     border-radius: 50%;
-    background: ${tokens.color.success[500]};
-    color: ${tokens.color.neutral[50]};
+    background: color-mix(in srgb, ${tokens.color.success[500]} 14%, ${tokens.color.neutral[50]});
+    color: ${tokens.color.success[500]};
+    font-size: 10px;
+    font-weight: 800;
   `,
   RemoveButton: styled.button`
     display: grid;
@@ -407,6 +415,12 @@ export const S = {
   `,
   SectionHeading: styled.h2`
     margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 11px;
+    font-weight: 800;
+  `,
+  LocationHeading: styled.h2`
+    margin: 20px 0 0;
     color: ${tokens.color.neutral[900]};
     font-size: 11px;
     font-weight: 800;
@@ -463,6 +477,15 @@ export const S = {
     font-size: 8px;
     font-weight: ${({ $active }) => $active ? 800 : 600};
     cursor: pointer;
+  `,
+  ActivityGuide: styled.p`
+    margin: 14px 0 0;
+    padding: 11px 12px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    line-height: 1.5;
   `,
   IntroductionInput: styled.textarea`
     width: 100%;
