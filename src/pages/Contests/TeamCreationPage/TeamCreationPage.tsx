@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Modal } from "../../../components/Modal/Modal";
 import { useTeamCreation } from "./TeamCreationContext";
 import { S } from "./TeamCreationPage.styles";
 
@@ -545,6 +546,8 @@ function StepFour() {
 export function TeamCreationPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data", step } = useParams();
+  const [searchParams] = useSearchParams();
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const { setSubmitted, submitted } = useTeamCreation();
   const requestedStep = Number(step);
   const currentStep = step
@@ -557,8 +560,20 @@ export function TeamCreationPage() {
     "팀 소개 · 지원 질문",
   ];
   const stepPath = (targetStep: number) =>
-    `/contests/${contestId}/teams/create${targetStep === 1 ? "" : `/${targetStep}`}`;
+    `/contests/${contestId}/teams/create${targetStep === 1 ? "" : `/${targetStep}`}${searchParams.get("from") ? `?from=${searchParams.get("from")}` : ""}`;
   const goToStep = (targetStep: number) => navigate(stepPath(targetStep));
+  const returnPath =
+    searchParams.get("from") === "teams"
+      ? `/contests/${contestId}/teams`
+      : `/contests/${contestId}`;
+  const handleBack = () => {
+    if (currentStep === 1) {
+      setIsExitModalOpen(true);
+      return;
+    }
+
+    goToStep(currentStep - 1);
+  };
 
   const renderStep = () => {
     if (currentStep === 2) return <StepTwo />;
@@ -573,7 +588,7 @@ export function TeamCreationPage() {
         <StepHeader
           currentStep={currentStep}
           onBack={() =>
-            currentStep === 1 ? navigate(-1) : goToStep(currentStep - 1)
+            handleBack()
           }
           onStepClick={goToStep}
           title={titleByStep[currentStep - 1]}
@@ -594,6 +609,18 @@ export function TeamCreationPage() {
             : "다음으로 가기"}
         </S.NextButton>
       </S.ActionBar>
+      <Modal
+        description="작성 중인 팀 정보는 저장되지 않아요."
+        icon={<Icon name="x" size={22} weight="bold" />}
+        onClose={() => setIsExitModalOpen(false)}
+        open={isExitModalOpen}
+        primaryAction={{ label: "나가기", onClick: () => navigate(returnPath) }}
+        secondaryAction={{
+          label: "계속 작성하기",
+          onClick: () => setIsExitModalOpen(false),
+        }}
+        title="팀 만들기를 나가시겠어요?"
+      />
     </S.Page>
   );
 }

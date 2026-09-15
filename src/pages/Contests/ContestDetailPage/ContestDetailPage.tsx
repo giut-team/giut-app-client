@@ -225,7 +225,7 @@ export function ContestDetailPage() {
       <S.ActionBar>
         <S.ApplyButton
           onClick={() =>
-            window.location.assign(`/contests/${contestId}/teams/create`)
+            window.location.assign(`/contests/${contestId}/teams/create?from=detail`)
           }
           type="button"
         >

@@ -238,7 +238,7 @@ export function RecruitingTeamsPage() {
       <S.ActionBar>
         <S.CreateButton
           onClick={() =>
-            window.location.assign(`/contests/${contestId}/teams/create`)
+            window.location.assign(`/contests/${contestId}/teams/create?from=teams`)
           }
           type="button"
         >
