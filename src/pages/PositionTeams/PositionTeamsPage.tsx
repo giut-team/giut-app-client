@@ -21,7 +21,7 @@ const teams = [
     openings: "1자리",
     dDay: "D-3",
     title: "데이터로 서울을",
-    description: "2024 서울시 데이터 활용 공모전 · 이수현 팀장 · 3/5명",
+    description: "2026 서울시 데이터 활용 공모전 · 이수현 팀장 · 3/5명",
   },
   {
     id: "fintech-hackathon",

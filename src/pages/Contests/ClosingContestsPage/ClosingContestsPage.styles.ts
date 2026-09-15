@@ -153,11 +153,22 @@ export const S = {
     display: grid;
     gap: 8px;
   `,
-  ContestCard: styled.article`
+  ContestCard: styled.button`
     position: relative;
+    width: 100%;
     padding: 11px 12px 10px;
+    border: 0;
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
     box-shadow: 0 1px 2px rgb(16 21 34 / 2%);
   `,
   CardCaret: styled.span`

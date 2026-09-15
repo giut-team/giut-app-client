@@ -331,12 +331,23 @@ export const S = {
     display: grid;
     gap: 8px;
   `,
-  ContestCard: styled.article`
+  ContestCard: styled.button`
     min-height: 86px;
+    width: 100%;
     padding: 12px;
+    border: 0;
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
   `,
   ContestTopline: styled.div`
     display: flex;

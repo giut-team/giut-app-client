@@ -94,7 +94,7 @@ const contests: Contest[] = [
     category: "IT/과학",
     categoryTone: "blue",
     dDay: "D-15",
-    title: "2024 서울시 데이터 활용 공모전",
+    title: "2026 서울시 데이터 활용 공모전",
     organization: "서울특별시 · 교내 공지 RSS",
     teamCount: 3,
     views: "41,852",
@@ -128,9 +128,15 @@ const sortOptions: { label: string; value: SortOption }[] = [
   { label: "마감임박순", value: "deadline" },
 ];
 
-function ContestCard({ contest }: { contest: Contest }) {
+function ContestCard({
+  contest,
+  onClick,
+}: {
+  contest: Contest;
+  onClick: () => void;
+}) {
   return (
-    <S.ContestCard>
+    <S.ContestCard onClick={onClick} type="button">
       <S.CardTopline>
         <S.TagGroup>
           <S.CategoryBadge $tone={contest.categoryTone}>
@@ -249,7 +255,11 @@ export function ClosingContestsPage() {
         </S.SectionHeading>
         <S.ContestList>
           {closingSoonContests.map((contest) => (
-            <ContestCard contest={contest} key={contest.id} />
+            <ContestCard
+              contest={contest}
+              key={contest.id}
+              onClick={() => navigate(`/contests/${contest.id}`)}
+            />
           ))}
           {closingSoonContests.length === 0 && (
             <S.EmptyState>
@@ -268,7 +278,11 @@ export function ClosingContestsPage() {
             </S.SectionHeading>
             <S.ContestList>
               {remainingContests.map((contest) => (
-                <ContestCard contest={contest} key={contest.id} />
+                <ContestCard
+                  contest={contest}
+                  key={contest.id}
+                  onClick={() => navigate(`/contests/${contest.id}`)}
+                />
               ))}
             </S.ContestList>
           </>

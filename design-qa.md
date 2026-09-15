@@ -1,34 +1,34 @@
-# Design QA — Home matched teams route
+# Design QA — Contest detail page
 
 ## Comparison target
 
-- Source visual truth: user-provided mobile screenshots of the "내게 맞는 팀" screen in this conversation.
-- Implementation route: `/matched-teams`, opened from the home "팀원으로 지원하기" shortcut.
-- Intended viewport: 372 x 772 CSS px mobile viewport, device scale factor 1.
-- State: 데이터 분석 filter selected; three matching-position cards and two overlapping-skill cards are shown.
+- Source visual truth: two user-provided mobile screenshots of the contest-detail screen in this conversation.
+- Implementation route: `/contests/seoul-data`.
+- Intended viewport: 305 x 510 CSS px mobile viewport, device scale factor 1.
+- State: overview tab selected, all three recruiting teams visible, and the bottom team-composition action bar present.
 
 ## Evidence
 
-- Source pixels: 372 x 772 for the first screen and 372 x 772 for the continuation screen.
+- Source pixels: 305 x 510 for both the overview and recruiting-team continuation captures.
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: home shortcut opens the dedicated route; skill filters update visible cards; heart buttons toggle saved state; header back returns home.
+- Primary interactions implemented: contest cards open the detail route; overview and detail-guide tabs switch content; bookmark toggles state; share uses the platform share sheet or copies the URL; the bottom action button exposes its pending state.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: existing SUIT hierarchy is applied to headings, card titles, metadata, labels, and badges. Visual comparison is blocked.
-- Spacing and layout rhythm: the page follows the source's header, compact hero/filter band, grouped cards, section dividers, and bottom guidance note. Visual comparison is blocked.
-- Colors and visual tokens: primary, neutral, purple, and danger semantic tokens are used for filters, cards, skills, buttons, and D-day badges. Visual comparison is blocked.
-- Image quality and asset fidelity: the source contains standard UI icons only, rendered with the existing Phosphor icon system. Visual comparison is blocked.
-- Copy and content: team, position, technical-stack, and metadata content is modeled on the supplied reference. Visual comparison is blocked.
+- Fonts and typography: existing SUIT heading, metadata, badge, tab, and CTA hierarchy is applied. Visual comparison is blocked.
+- Spacing and layout rhythm: the implementation follows the pale-blue contest hero, metadata rows, notice, tab band, card group, and fixed bottom action bar shown in the source. Visual comparison is blocked.
+- Colors and visual tokens: primary, neutral, success, and danger tokens are used for source-matched labels, D-day badge, tabs, and action surfaces. Visual comparison is blocked.
+- Image quality and asset fidelity: the reference contains standard UI icons only; the existing Phosphor icon set supplies navigation, bookmark, eye, check, and share affordances. Visual comparison is blocked.
+- Copy and content: source-inspired contest title, organizer, schedule, eligibility, prize, source, description, and recruiting team information are represented. Visual comparison is blocked.
 
 ## Findings
 
 - [P1] Browser-rendered visual comparison unavailable.
   - Evidence: browser runtime returned `No browser is available`.
-  - Impact: mobile card density, badge sizing, and continuation spacing cannot be compared against the reference.
-  - Fix: capture `/matched-teams` at 372 x 772 and compare its top and continuation states with the supplied screenshots.
+  - Impact: title wrapping, compact information-row rhythm, recruiting-card density, and fixed action-bar spacing cannot be compared at the reference viewport.
+  - Fix: capture `/contests/seoul-data` at 305 x 510 and compare overview and continuation states with the supplied screenshots.
 
 ## Comparison history
 
@@ -36,14 +36,14 @@
 
 ## Implementation checklist
 
-- [x] Add a dedicated matched-teams route.
-- [x] Connect the home shortcut to that route.
-- [x] Implement filters and favorite interactions.
+- [x] Add contest-detail route and contest-list entry point.
+- [x] Add hero, information rows, tabs, recruiting-team list, and fixed action bar.
+- [x] Add bookmark and share interactions.
 - [x] Run lint and production build.
-- [ ] Capture and compare the rendered mobile page.
+- [ ] Capture and compare the rendered mobile screen.
 
 ## Follow-up polish
 
-- Confirm exact card height, type scale, and D-day badge proportions after browser capture is available.
+- Confirm exact hero height, label scale, tab underline position, and bottom action safe-area spacing after browser capture is available.
 
 final result: blocked

@@ -52,7 +52,7 @@ const contests: Contest[] = [
     dDay: "D-15",
     organization: "서울특별시 · 교내 공지 RSS",
     scraps: 1240,
-    title: "2024 서울시 데이터 활용 공모전",
+    title: "2026 서울시 데이터 활용 공모전",
     verified: true,
     views: "41,852",
   },
@@ -106,9 +106,15 @@ const contests: Contest[] = [
   },
 ];
 
-function ContestCard({ contest }: { contest: Contest }) {
+function ContestCard({
+  contest,
+  onClick,
+}: {
+  contest: Contest;
+  onClick: () => void;
+}) {
   return (
-    <S.ContestCard>
+    <S.ContestCard onClick={onClick} type="button">
       <S.CardTopline>
         <S.TagGroup>
           <S.CategoryBadge $tone={contest.categoryTone}>
@@ -215,7 +221,11 @@ export function ContestsPage() {
 
         <S.ContestList>
           {visibleContests.map((contest) => (
-            <ContestCard contest={contest} key={contest.id} />
+            <ContestCard
+              contest={contest}
+              key={contest.id}
+              onClick={() => navigate(`/contests/${contest.id}`)}
+            />
           ))}
           {visibleContests.length === 0 && (
             <S.EmptyState>선택한 분야의 공모전이 없어요.</S.EmptyState>

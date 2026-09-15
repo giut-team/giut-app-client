@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/Home/HomePage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
+import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
 import { MatchedTeamsPage } from "./pages/MatchedTeams/MatchedTeamsPage";
@@ -22,6 +23,7 @@ export function AppRouter() {
         <Route element={<HomePage />} path="/home" />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />
         <Route element={<ContestsPage />} path="/contests" />
+        <Route element={<ContestDetailPage />} path="/contests/:contestId" />
         <Route element={<PopularContestsPage />} path="/contests/popular" />
         <Route element={<NotificationsPage />} path="/notifications" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />
