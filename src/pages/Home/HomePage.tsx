@@ -218,8 +218,11 @@ export function HomePage() {
 
         <S.SectionHeader>
           <S.SectionTitle>인기 공모전</S.SectionTitle>
-          <S.ViewAll onClick={() => navigate("/contests/popular")} type="button">
-            전체보기 ›
+          <S.ViewAll
+            onClick={() => navigate("/contests/popular")}
+            type="button"
+          >
+            전체 보기 ›
           </S.ViewAll>
         </S.SectionHeader>
 

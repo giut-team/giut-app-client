@@ -15,14 +15,14 @@ const recruitTeams = [
   },
   {
     id: "syrup-data-lab",
-    title: "시럽 데이터랩",
+    title: "시립대 데이터랩",
     leader: "최유진 팀장 · 온라인",
     members: "2/4명",
     positions: ["기획 모집", "디자인 모집"],
   },
   {
     id: "blending-3",
-    title: "블렌딩 3기",
+    title: "열린데이터 3기",
     leader: "박지윤 팀장 · 오프라인",
     members: "4/5명",
     positions: ["마케팅 모집"],
@@ -195,7 +195,9 @@ export function ContestDetailPage() {
             <S.SectionTitle>
               모집 중인 팀 <S.TeamTotal>{recruitTeams.length}</S.TeamTotal>
             </S.SectionTitle>
-            <S.ViewAll type="button">전체 보기 ›</S.ViewAll>
+            <S.ViewAll onClick={() => navigate("teams")} type="button">
+              전체 보기 ›
+            </S.ViewAll>
           </S.SectionHeader>
         </S.TeamsHeader>
         <S.TeamsSection>
