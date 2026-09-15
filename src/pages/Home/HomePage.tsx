@@ -40,6 +40,7 @@ const shortcuts = [
     description: "분야 · 마감으로 한눈에",
   },
   {
+    destination: "/matched-teams",
     icon: "👥",
     iconType: "text" as const,
     title: "팀원으로 지원하기",
