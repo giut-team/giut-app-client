@@ -1,34 +1,34 @@
-# Design QA — Recruiting teams page
+# Design QA — Team creation, step 1
 
 ## Comparison target
 
-- Source visual truth: two user-provided mobile screenshots of the contest recruiting-teams screen in this conversation.
-- Implementation route: `/contests/seoul-data/teams`, entered from the contest-detail "전체 보기" action.
-- Intended viewport: 380 x 699 CSS px mobile viewport, device scale factor 1.
-- State: 전체 5 filter selected; three active teams and two closed teams shown with the fixed team-creation action.
+- Source visual truth: the user-provided mobile screenshot of the first team-creation step in this conversation.
+- Implementation route: `/contests/seoul-data/teams/create`, entered from the recruiting-teams `팀 구성하기` action.
+- Intended viewport: 330 x 699 CSS px mobile viewport, device scale factor 1.
+- State: step 1 of 4, default team name, six total members, `기획` and `서비스 기획` selected.
 
 ## Evidence
 
-- Source pixels: 380 x 699 for the active-team screen and 380 x 699 for the closed-team continuation.
+- Source pixels: 330 x 699.
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: detail-page "전체 보기" opens this route; position filters update teams; hearts toggle saved state; closed-team detail controls are disabled; header back returns to contest detail.
+- Primary interactions implemented: team name input updates, total-member plus/minus controls update within 2–10 people, role chips update their selected state, and the back button returns to the recruiting-teams page.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: existing SUIT hierarchy is applied across header, subtitle, chips, cards, timestamps, and CTA. Visual comparison is blocked.
-- Spacing and layout rhythm: source-inspired header, contest context line, filter band, separated active/closed groups, cards, guidance note, and fixed CTA are implemented. Visual comparison is blocked.
-- Colors and visual tokens: primary, neutral, warning, and danger semantic tokens are used for selected pills, counts, availability labels, cards, and the action button. Visual comparison is blocked.
-- Image quality and asset fidelity: the reference uses standard UI icons only; existing Phosphor icons are used for navigation, favorites, and directional affordances. Visual comparison is blocked.
-- Copy and content: the contest title, D-day, group labels, team names, availability, position chips, timestamps, and team-creation guidance match the reference structure. Visual comparison is blocked.
+- Fonts and typography: existing SUIT type hierarchy is applied across the header, labels, helper copy, chips, input, and CTA. Visual comparison is blocked.
+- Spacing and layout rhythm: source-inspired compact header, four-segment progress bar, contest notice, form sections, role-chip groups, and fixed bottom CTA are implemented. Visual comparison is blocked.
+- Colors and visual tokens: existing primary, neutral, and semantic tokens are used for active progress, selected chips, input focus, notice, controls, and CTA. Visual comparison is blocked.
+- Image quality and asset fidelity: the reference uses only standard UI controls and a back icon; the existing Phosphor icon system is used. No raster assets are required. Visual comparison is blocked.
+- Copy and content: the implementation follows the source structure and uses the project-wide 2026 contest year convention. Visual comparison is blocked.
 
 ## Findings
 
 - [P1] Browser-rendered visual comparison unavailable.
   - Evidence: browser runtime returned `No browser is available`.
-  - Impact: card heights, compact type scale, fixed action-bar position, and continuation density cannot be compared with the supplied screenshots.
-  - Fix: capture `/contests/seoul-data/teams` at 380 x 699 and compare active and closed team states alongside the source screenshots.
+  - Impact: exact mobile spacing, compact text scale, control alignment, and fixed action-bar placement cannot be compared with the reference screenshot.
+  - Fix: capture `/contests/seoul-data/teams/create` at 330 x 699 and compare it beside the source screenshot.
 
 ## Comparison history
 
@@ -36,14 +36,14 @@
 
 ## Implementation checklist
 
-- [x] Add a dedicated recruiting-teams route.
-- [x] Connect contest-detail "전체 보기".
-- [x] Add filters, favorite interactions, and closed-team states.
+- [x] Add a dedicated team-creation step-one route.
+- [x] Connect the recruiting-teams action to the route.
+- [x] Implement team name, headcount, and role-selection controls.
 - [x] Run lint and production build.
 - [ ] Capture and compare the rendered mobile page.
 
 ## Follow-up polish
 
-- Confirm exact card elevation, title wrapping, and bottom safe-area spacing after browser capture is available.
+- Verify exact vertical spacing, text density, chip dimensions, and safe-area spacing when a browser is available.
 
 final result: blocked

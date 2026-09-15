@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
 import { S } from "./ContestDetailPage.styles";
 
@@ -31,9 +31,9 @@ const recruitTeams = [
 
 export function ContestDetailPage() {
   const navigate = useNavigate();
+  const { contestId = "seoul-data" } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [isSaved, setIsSaved] = useState(false);
-  const [isApplying, setIsApplying] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
 
   const handleShare = async () => {
@@ -223,8 +223,13 @@ export function ContestDetailPage() {
       </S.Content>
 
       <S.ActionBar>
-        <S.ApplyButton onClick={() => setIsApplying(true)} type="button">
-          {isApplying ? "지원 준비 중" : "팀 구성하기"}
+        <S.ApplyButton
+          onClick={() =>
+            window.location.assign(`/contests/${contestId}/teams/create`)
+          }
+          type="button"
+        >
+          팀 구성하기
         </S.ApplyButton>
       </S.ActionBar>
       {shareMessage && (

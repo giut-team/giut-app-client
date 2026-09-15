@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
 import { PillButton } from "../../../components/PillButton";
@@ -143,6 +143,7 @@ function TeamCard({
 
 export function RecruitingTeamsPage() {
   const navigate = useNavigate();
+  const { contestId = "seoul-data" } = useParams();
   const [activeCategory, setActiveCategory] = useState<TeamCategory>("전체");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState("data-seoul");
@@ -235,7 +236,14 @@ export function RecruitingTeamsPage() {
       </S.Content>
 
       <S.ActionBar>
-        <S.CreateButton type="button">팀 구성하기</S.CreateButton>
+        <S.CreateButton
+          onClick={() =>
+            window.location.assign(`/contests/${contestId}/teams/create`)
+          }
+          type="button"
+        >
+          팀 구성하기
+        </S.CreateButton>
       </S.ActionBar>
     </S.Page>
   );
