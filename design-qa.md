@@ -13,7 +13,7 @@
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: all four stage routes navigate forward/back; data persists through the flow; headcount controls, multi-select role/skill chips, member add/remove, activity preferences, questions, and final registration state all update in the UI.
+- Primary interactions implemented: all four stage routes navigate forward/back; data persists through the flow; headcount controls, multi-select role/skill chips, member add/remove, activity preferences, questions, and final registration state all update in the UI. Question addition now opens a bottom sheet with a 200-character draft, cancel/confirm states, and selectable suggested prompts that fill the draft.
 
 ## Required fidelity surfaces
 
@@ -22,6 +22,7 @@
 - Colors and visual tokens: existing primary, neutral, success, and semantic tokens represent active steps, selections, inputs, cards, helper surfaces, and buttons. Visual comparison is blocked.
 - Image quality and asset fidelity: the references use standard UI controls and one generic member avatar. The existing icon library is used for all icons; no raster asset is required. Visual comparison is blocked.
 - Copy and content: the screens implement the source structure and the project-wide 2026 contest convention. Visual comparison is blocked.
+- Question-add bottom sheet: the supplied reference's title, usage count, multi-line question field, character counter, suggested-question chips, guidance panel, and dual actions are implemented. Visual comparison is blocked.
 
 ## Findings
 
@@ -41,6 +42,7 @@
 - [x] Implement role allocation, activity settings, and team introduction/question controls.
 - [x] Run lint and production build.
 - [ ] Capture and compare each mobile step.
+- [ ] Capture the opened question-add bottom sheet and compare it against its reference.
 
 ## Follow-up polish
 

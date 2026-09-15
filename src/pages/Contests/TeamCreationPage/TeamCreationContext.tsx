@@ -68,8 +68,8 @@ export function TeamCreationProvider({ children }: { children: ReactNode }) {
   const [introduction, setIntroduction] = useState("");
   const [questions, setQuestions] = useState([
     "이 팀에 지원한 이유를 알려주세요",
-    "지원한 포지션에서 만들 수 있는 역량은 무엇인가요?",
-    "프로젝트에 어느정도의 성의를 하실 수 있나요?",
+    "지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?",
+    "프로젝트에 어느정도의 참여를 하실 수 있나요?",
   ]);
   const [submitted, setSubmitted] = useState(false);
 

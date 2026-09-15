@@ -493,7 +493,7 @@ export const S = {
     margin-top: 11px;
     padding: 11px;
     box-sizing: border-box;
-    resize: vertical;
+    resize: none;
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 10px;
     outline: none;
@@ -524,9 +524,9 @@ export const S = {
     gap: 7px;
     margin-top: 11px;
   `,
-  QuestionCard: styled.div`
+  QuestionCard: styled.div<{ $hasActions: boolean }>`
     position: relative;
-    padding: 10px 29px 10px 11px;
+    padding: ${({ $hasActions }) => $hasActions ? "10px 56px 10px 11px" : "10px 11px"};
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 10px;
     background: ${tokens.color.neutral[50]};
@@ -550,20 +550,46 @@ export const S = {
     font-size: 9px;
     font-weight: 700;
   `,
-  RemoveQuestionButton: styled.button`
+  QuestionText: styled.p`
+    overflow: hidden;
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `,
+  QuestionActions: styled.div`
     position: absolute;
     top: 9px;
     right: 9px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  `,
+  QuestionIconButton: styled.button`
     display: grid;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     padding: 0;
     place-items: center;
     border: 0;
-    border-radius: 5px;
-    background: ${tokens.color.neutral[100]};
+    border-radius: 6px;
+    background: transparent;
     color: ${tokens.color.neutral[500]};
     cursor: pointer;
+
+    &:hover { background: ${tokens.color.neutral[100]}; }
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      color: ${tokens.color.neutral[200]};
+      cursor: not-allowed;
+    }
   `,
   AddQuestionButton: styled.button`
     width: 100%;
@@ -578,17 +604,127 @@ export const S = {
     font-weight: 800;
     cursor: pointer;
   `,
-  ToolTagList: styled.div`
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
+  QuestionSheetHeader: styled.div`
+    position: relative;
+    padding-right: 76px;
   `,
-  ToolTag: styled.span`
-    padding: 5px 8px;
+  QuestionSheetDescription: styled.p`
+    margin: 0 0 16px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.65;
+  `,
+  QuestionSheetUsage: styled.span`
+    position: absolute;
+    top: -42px;
+    right: 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 13px;
+    font-weight: 800;
+  `,
+  QuestionSheetTextarea: styled.textarea`
+    width: 100%;
+    height: 100px;
+    padding: 17px;
+    box-sizing: border-box;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 16px;
+    outline: none;
+    resize: none;
+    color: ${tokens.color.neutral[900]};
+    background: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.55;
+
+    &::placeholder { color: ${tokens.color.neutral[500]}; }
+    &:focus { border-color: ${tokens.color.primary[500]}; }
+  `,
+  QuestionSheetCharacterCount: styled.p`
+    margin: 7px 2px 23px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+  `,
+  SuggestionHeading: styled.h3`
+    margin: 0 0 12px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 14px;
+    font-weight: 800;
+
+    span {
+      color: ${tokens.color.neutral[500]};
+      font-size: 12px;
+      font-weight: 600;
+    }
+  `,
+  SuggestionList: styled.div`
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  `,
+  SuggestionChip: styled.button<{ $selected: boolean }>`
+    flex: 1;
+    min-height: 39px;
+    padding: 0 8px;
+    border: 1px solid ${({ $selected }) => $selected ? tokens.color.primary[500] : tokens.color.neutral[200]};
     border-radius: 999px;
-    background: ${tokens.color.neutral[100]};
+    color: ${({ $selected }) => $selected ? tokens.color.primary[500] : tokens.color.neutral[700]};
+    background: ${({ $selected }) => $selected ? tokens.color.primary[100] : tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
+  QuestionSheetNote: styled.p`
+    margin: 17px 0 0;
+    padding: 14px 16px;
+    border-radius: 14px;
+    color: ${tokens.color.neutral[500]};
+    background: ${tokens.color.primary[100]};
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.55;
+  `,
+  QuestionSheetActions: styled.div`
+    display: flex;
+    gap: 10px;
+  `,
+  QuestionSheetCancelButton: styled.button`
+    flex: 0 0 36%;
+    height: 54px;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
     color: ${tokens.color.neutral[700]};
-    font-size: 8px;
+    background: ${tokens.color.neutral[100]};
+    font: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  QuestionSheetSubmitButton: styled.button<{ $disabled: boolean }>`
+    flex: 1;
+    height: 54px;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    color: ${({ $disabled }) => $disabled ? tokens.color.neutral[500] : tokens.color.neutral[50]};
+    background: ${({ $disabled }) => $disabled ? tokens.color.neutral[100] : tokens.color.primary[500]};
+    box-shadow: ${({ $disabled }) => $disabled ? "none" : "0 8px 18px rgb(43 87 255 / 28%)"};
+    font: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: ${({ $disabled }) => $disabled ? "not-allowed" : "pointer"};
   `,
   ActionBar: styled.div`
     position: fixed;

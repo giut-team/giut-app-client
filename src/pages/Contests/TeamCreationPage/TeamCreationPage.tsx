@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
+import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { useTeamCreation } from "./TeamCreationContext";
 import { S } from "./TeamCreationPage.styles";
 
@@ -46,6 +47,21 @@ const roleSpecs: Record<string, { skills: string[] }> = {
 };
 const activityModes = ["온라인", "오프라인", "온·오프 혼합"];
 const locationOptions = ["교내", "서울 전체", "수도권", "상관없음"];
+
+const suggestedQuestions = [
+  {
+    label: "사용 가능한 툴",
+    question: "이번 공모전에서 사용할 수 있는 툴을 알려주세요",
+  },
+  {
+    label: "공모전 경험",
+    question: "참여했던 공모전 경험과 맡았던 역할을 알려주세요",
+  },
+  {
+    label: "참여 가능 시간",
+    question: "프로젝트에 참여 가능한 시간을 알려주세요",
+  },
+];
 
 function StepHeader({
   currentStep,
@@ -464,14 +480,45 @@ function StepThree() {
 function StepFour() {
   const { introduction, questions, setIntroduction, setQuestions } =
     useTeamCreation();
-  const addQuestion = () =>
-    setQuestions([...questions, "새 지원자에게 물어볼 질문을 입력하세요"]);
+  const [isQuestionSheetOpen, setIsQuestionSheetOpen] = useState(false);
+  const [draftQuestion, setDraftQuestion] = useState("");
+  const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(
+    null,
+  );
+  const [editingQuestionDraft, setEditingQuestionDraft] = useState("");
+  const closeQuestionSheet = () => {
+    setIsQuestionSheetOpen(false);
+    setDraftQuestion("");
+  };
+  const addQuestion = () => {
+    const question = draftQuestion.trim();
+    if (!question || questions.length >= 5) return;
+
+    setQuestions([...questions, question]);
+    closeQuestionSheet();
+  };
   const updateQuestion = (index: number, value: string) =>
     setQuestions(
       questions.map((question, questionIndex) =>
         questionIndex === index ? value : question,
       ),
     );
+  const startQuestionEdit = (index: number) => {
+    setEditingQuestionIndex(index);
+    setEditingQuestionDraft(questions[index]);
+  };
+  const completeQuestionEdit = () => {
+    if (editingQuestionIndex === null || !editingQuestionDraft.trim()) return;
+
+    updateQuestion(editingQuestionIndex, editingQuestionDraft.trim());
+    setEditingQuestionIndex(null);
+    setEditingQuestionDraft("");
+  };
+  const removeQuestion = (index: number) => {
+    setQuestions(questions.filter((_, questionIndex) => questionIndex !== index));
+    setEditingQuestionIndex(null);
+    setEditingQuestionDraft("");
+  };
 
   return (
     <S.Form>
@@ -499,46 +546,133 @@ function StepFour() {
       </S.HelperText>
       <S.QuestionList>
         {questions.map((question, index) => (
-          <S.QuestionCard key={`${question}-${index}`}>
+          <S.QuestionCard $hasActions={index >= 2} key={`${question}-${index}`}>
             <S.QuestionNumber>Q{index + 1}</S.QuestionNumber>
-            <S.QuestionInput
-              aria-label={`질문 ${index + 1}`}
-              onChange={(event) => updateQuestion(index, event.target.value)}
-              value={question}
-            />
-            {questions.length > 1 && (
-              <S.RemoveQuestionButton
-                aria-label={`질문 ${index + 1} 삭제`}
-                onClick={() =>
-                  setQuestions(
-                    questions.filter(
-                      (_, questionIndex) => questionIndex !== index,
-                    ),
-                  )
-                }
-                type="button"
-              >
-                <Icon name="x" size={11} weight="bold" />
-              </S.RemoveQuestionButton>
+            {index < 2 ? (
+              <S.QuestionInput
+                aria-label={`질문 ${index + 1}`}
+                onChange={(event) => updateQuestion(index, event.target.value)}
+                value={question}
+              />
+            ) : editingQuestionIndex === index ? (
+              <S.QuestionInput
+                aria-label={`질문 ${index + 1} 편집`}
+                autoFocus
+                onChange={(event) => setEditingQuestionDraft(event.target.value)}
+                value={editingQuestionDraft}
+              />
+            ) : (
+              <S.QuestionText>{question}</S.QuestionText>
+            )}
+            {index >= 2 && (
+              <S.QuestionActions>
+                {editingQuestionIndex === index ? (
+                  <>
+                    <S.QuestionIconButton
+                      aria-label={`질문 ${index + 1} 수정 완료`}
+                      disabled={!editingQuestionDraft.trim()}
+                      onClick={completeQuestionEdit}
+                      type="button"
+                    >
+                      <Icon name="check" size={13} weight="bold" />
+                    </S.QuestionIconButton>
+                    <S.QuestionIconButton
+                      aria-label={`질문 ${index + 1} 삭제`}
+                      onClick={() => removeQuestion(index)}
+                      type="button"
+                    >
+                      <Icon name="x" size={11} weight="bold" />
+                    </S.QuestionIconButton>
+                  </>
+                ) : (
+                  <S.QuestionIconButton
+                    aria-label={`질문 ${index + 1} 편집`}
+                    onClick={() => startQuestionEdit(index)}
+                    type="button"
+                  >
+                    <Icon name="edit" size={12} weight="bold" />
+                  </S.QuestionIconButton>
+                )}
+              </S.QuestionActions>
             )}
           </S.QuestionCard>
         ))}
       </S.QuestionList>
       <S.AddQuestionButton
         disabled={questions.length >= 5}
-        onClick={addQuestion}
+        onClick={() => setIsQuestionSheetOpen(true)}
         type="button"
       >
         + 질문 추가하기
       </S.AddQuestionButton>
-      <S.ToolTagList>
-        <S.ToolTag>사용 가능한 툴</S.ToolTag>
-        <S.ToolTag>공고로 정함</S.ToolTag>
-      </S.ToolTagList>
       <S.InfoBox>
         등록하면 이 공모전 팀 목록에 바로 노출돼요. 팀 소개와 질문은 등록 후에도
         팀 상세 → 편집에서 바꿀 수 있습니다.
       </S.InfoBox>
+      <BottomSheet
+        footer={
+          <S.QuestionSheetActions>
+            <S.QuestionSheetCancelButton
+              onClick={closeQuestionSheet}
+              type="button"
+            >
+              취소
+            </S.QuestionSheetCancelButton>
+            <S.QuestionSheetSubmitButton
+              $disabled={!draftQuestion.trim()}
+              disabled={!draftQuestion.trim()}
+              onClick={addQuestion}
+              type="button"
+            >
+              질문 추가
+            </S.QuestionSheetSubmitButton>
+          </S.QuestionSheetActions>
+        }
+        footerVariant="action"
+        minHeight="510px"
+        onClose={closeQuestionSheet}
+        open={isQuestionSheetOpen}
+        title="질문 추가"
+      >
+        <S.QuestionSheetHeader>
+          <S.QuestionSheetDescription>
+            지원자가 지원서에서 답하게 될 질문이에요. 짧고 구체적으로 물어보면
+            답변을 비교하기 쉬워요.
+          </S.QuestionSheetDescription>
+          <S.QuestionSheetUsage>
+            {questions.length} / 5개 사용
+          </S.QuestionSheetUsage>
+        </S.QuestionSheetHeader>
+        <S.QuestionSheetTextarea
+          aria-label="추가할 질문"
+          maxLength={200}
+          onChange={(event) => setDraftQuestion(event.target.value)}
+          placeholder="예) 이번 공모전에 쓸 수 있는 툴이 있나요?"
+          value={draftQuestion}
+        />
+        <S.QuestionSheetCharacterCount>
+          {draftQuestion.length} / 200자
+        </S.QuestionSheetCharacterCount>
+        <S.SuggestionHeading>
+          추천 질문 <span>· 탭하면 바로 채워져요</span>
+        </S.SuggestionHeading>
+        <S.SuggestionList>
+          {suggestedQuestions.map((suggestion) => (
+            <S.SuggestionChip
+              $selected={draftQuestion === suggestion.question}
+              key={suggestion.label}
+              onClick={() => setDraftQuestion(suggestion.question)}
+              type="button"
+            >
+              {suggestion.label}
+            </S.SuggestionChip>
+          ))}
+        </S.SuggestionList>
+        <S.QuestionSheetNote>
+          질문은 최대 5개까지 가능해요 · 등록 후에도 팀 상세 → 편집에서 바꿀 수
+          있어요.
+        </S.QuestionSheetNote>
+      </BottomSheet>
     </S.Form>
   );
 }
@@ -548,6 +682,7 @@ export function TeamCreationPage() {
   const { contestId = "seoul-data", step } = useParams();
   const [searchParams] = useSearchParams();
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const { setSubmitted, submitted } = useTeamCreation();
   const requestedStep = Number(step);
   const currentStep = step
@@ -574,6 +709,14 @@ export function TeamCreationPage() {
 
     goToStep(currentStep - 1);
   };
+  const handleSubmit = () => {
+    if (!submitted) setIsSubmitModalOpen(true);
+  };
+  const confirmSubmit = () => {
+    setSubmitted(true);
+    setIsSubmitModalOpen(false);
+    navigate(`/contests/${contestId}`);
+  };
 
   const renderStep = () => {
     if (currentStep === 2) return <StepTwo />;
@@ -587,9 +730,7 @@ export function TeamCreationPage() {
       <S.Content>
         <StepHeader
           currentStep={currentStep}
-          onBack={() =>
-            handleBack()
-          }
+          onBack={() => handleBack()}
           onStepClick={goToStep}
           title={titleByStep[currentStep - 1]}
         />
@@ -597,9 +738,7 @@ export function TeamCreationPage() {
       </S.Content>
       <S.ActionBar>
         <S.NextButton
-          onClick={() =>
-            currentStep === 4 ? setSubmitted(true) : goToStep(currentStep + 1)
-          }
+          onClick={() => currentStep === 4 ? handleSubmit() : goToStep(currentStep + 1)}
           type="button"
         >
           {currentStep === 4
@@ -620,6 +759,18 @@ export function TeamCreationPage() {
           onClick: () => setIsExitModalOpen(false),
         }}
         title="팀 만들기를 나가시겠어요?"
+      />
+      <Modal
+        description="등록 후에도 팀 상세에서 정보를 수정할 수 있어요."
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setIsSubmitModalOpen(false)}
+        open={isSubmitModalOpen}
+        primaryAction={{ label: "등록하기", onClick: confirmSubmit }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setIsSubmitModalOpen(false),
+        }}
+        title="팀을 등록하시겠어요?"
       />
     </S.Page>
   );
