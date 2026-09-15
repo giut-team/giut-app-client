@@ -109,7 +109,9 @@ export const S = {
   Footer: styled.div<{ $variant: "note" | "action" }>`
     margin-top: ${({ $variant }) => ($variant === "action" ? "14px" : "22px")};
     padding: ${({ $variant }) =>
-      $variant === "action" ? "0" : "17px 16px"};
+      $variant === "action"
+        ? "0 0 max(16px, env(safe-area-inset-bottom))"
+        : "17px 16px"};
     border-radius: 15px;
     background: ${({ $variant }) =>
       $variant === "action" ? "transparent" : tokens.color.neutral[100]};
