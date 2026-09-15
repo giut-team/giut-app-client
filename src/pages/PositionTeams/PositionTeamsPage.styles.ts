@@ -152,8 +152,12 @@ export const S = {
   DDay: styled.span`
     padding: 4px 6px;
     border-radius: 5px;
-    background: ${tokens.color.danger[500]};
-    color: ${tokens.color.neutral[50]};
+    background: color-mix(
+      in srgb,
+      ${tokens.color.danger[500]} 12%,
+      ${tokens.color.neutral[50]}
+    );
+    color: ${tokens.color.danger[500]};
     font-size: 8px;
     font-weight: 800;
     line-height: 1;

@@ -37,16 +37,16 @@ export const S = {
     font-weight: 800;
     letter-spacing: -0.7px;
   `,
-  Header: styled.div<{ $compact: boolean }>`
+  Header: styled.div<{ $compact: boolean; $showDivider: boolean }>`
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    ${({ $compact }) =>
+    ${({ $compact, $showDivider }) =>
       $compact &&
       `
-        padding-bottom: 12px;
-        border-bottom: 1px solid ${tokens.color.neutral[200]};
-        margin-bottom: 12px;
+        padding-bottom: ${$showDivider ? "12px" : "0"};
+        border-bottom: ${$showDivider ? `1px solid ${tokens.color.neutral[200]}` : "0"};
+        margin-bottom: ${$showDivider ? "12px" : "0"};
       `}
   `,
   Eyebrow: styled.p<{ $compact: boolean }>`

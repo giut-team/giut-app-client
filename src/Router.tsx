@@ -1,6 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/Home/HomePage";
+import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
+import { ContestsPage } from "./pages/Contests/ContestsPage";
+import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
+import { MatchedTeamsPage } from "./pages/MatchedTeams/MatchedTeamsPage";
 import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/ApplicationDetailPage";
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
 import { ManageApplicationsPage } from "./pages/MyTeam/ManageApplicationsPage/ManageApplicationsPage";
@@ -13,11 +17,15 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<LoginPage />} path="/" />
+        <Route element={<HomePage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<HomePage />} path="/home" />
+        <Route element={<ClosingContestsPage />} path="/closing-contests" />
+        <Route element={<ContestsPage />} path="/contests" />
+        <Route element={<PopularContestsPage />} path="/contests/popular" />
         <Route element={<NotificationsPage />} path="/notifications" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />
+        <Route element={<MatchedTeamsPage />} path="/matched-teams" />
         <Route element={<MyTeamPage />} path="/my-team" />
         <Route
           element={<MyApplicationPage />}
@@ -31,7 +39,10 @@ export function AppRouter() {
           element={<ApplicationDetailPage />}
           path="/my-team/applications/:applicantId"
         />
-        <Route element={<StudentVerificationPage />} path="/student-verification" />
+        <Route
+          element={<StudentVerificationPage />}
+          path="/student-verification"
+        />
         <Route element={<Navigate replace to="/" />} path="*" />
       </Routes>
     </BrowserRouter>

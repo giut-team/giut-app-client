@@ -33,12 +33,14 @@ const popularContests = [
 
 const shortcuts = [
   {
+    destination: "/contests",
     icon: trophyIcon,
     iconType: "image" as const,
     title: "공모전 찾기",
     description: "분야 · 마감으로 한눈에",
   },
   {
+    destination: "/matched-teams",
     icon: "👥",
     iconType: "text" as const,
     title: "팀원으로 지원하기",
@@ -152,9 +154,9 @@ export function HomePage() {
                   <S.BannerTitle>{banner.title}</S.BannerTitle>
                   <S.BannerButton
                     onClick={
-                      index === 1
-                        ? () => navigate("/position-teams")
-                        : undefined
+                      index === 0
+                        ? () => navigate("/closing-contests")
+                        : () => navigate("/position-teams")
                     }
                     tone="secondary"
                     type="button"
@@ -186,7 +188,13 @@ export function HomePage() {
 
         <S.Shortcuts>
           {shortcuts.map((shortcut) => (
-            <S.Shortcut key={shortcut.title} type="button">
+            <S.Shortcut
+              key={shortcut.title}
+              onClick={() => {
+                if (shortcut.destination) navigate(shortcut.destination);
+              }}
+              type="button"
+            >
               <S.ShortcutIcon>
                 {shortcut.iconType === "image" ? (
                   <S.ShortcutIconImage alt="" src={shortcut.icon} />
@@ -207,7 +215,9 @@ export function HomePage() {
 
         <S.SectionHeader>
           <S.SectionTitle>인기 공모전</S.SectionTitle>
-          <S.ViewAll type="button">전체보기 ›</S.ViewAll>
+          <S.ViewAll onClick={() => navigate("/contests/popular")} type="button">
+            전체보기 ›
+          </S.ViewAll>
         </S.SectionHeader>
 
         <S.ContestList>

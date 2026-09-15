@@ -27,6 +27,7 @@ type BottomSheetProps = {
   title?: string;
   eyebrow?: string;
   showCloseButton?: boolean; // 닫기 버튼 표시 여부
+  showHeaderDivider?: boolean;
   variant?: BottomSheetVariant;
   footerVariant?: BottomSheetFooterVariant;
   minHeight?: string;
@@ -224,6 +225,7 @@ export function BottomSheet({
   title,
   eyebrow,
   showCloseButton = false,
+  showHeaderDivider = true,
   variant = "default",
   footerVariant = "note",
   minHeight,
@@ -346,7 +348,10 @@ export function BottomSheet({
           <S.Handle />
         </S.HandleWrapper>
         {(title || eyebrow || showCloseButton) && (
-          <S.Header $compact={variant === "compact"}>
+          <S.Header
+            $compact={variant === "compact"}
+            $showDivider={showHeaderDivider}
+          >
             <div>
               {eyebrow && (
                 <S.Eyebrow $compact={variant === "compact"}>
