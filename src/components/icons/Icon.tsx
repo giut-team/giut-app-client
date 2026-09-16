@@ -13,7 +13,10 @@ import {
   House,
   LockKey,
   MagnifyingGlass,
+  Minus,
   Plus,
+  NotePencil,
+  ShareNetwork,
   UserCircle,
   UserPlus,
   UsersThree,
@@ -36,8 +39,11 @@ export type IconName =
   | "home"
   | "heart"
   | "lock"
+  | "minus"
   | "plus"
+  | "edit"
   | "search"
+  | "share"
   | "user"
   | "user-plus"
   | "users"
@@ -59,8 +65,11 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   home: House,
   heart: Heart,
   lock: LockKey,
+  minus: Minus,
   plus: Plus,
+  edit: NotePencil,
   search: MagnifyingGlass,
+  share: ShareNetwork,
   user: UserCircle,
   "user-plus": UserPlus,
   users: UsersThree,

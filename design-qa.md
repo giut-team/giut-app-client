@@ -1,34 +1,36 @@
-# Design QA — Home matched teams route
+# Design QA — Team creation flow, steps 1–4
 
 ## Comparison target
 
-- Source visual truth: user-provided mobile screenshots of the "내게 맞는 팀" screen in this conversation.
-- Implementation route: `/matched-teams`, opened from the home "팀원으로 지원하기" shortcut.
-- Intended viewport: 372 x 772 CSS px mobile viewport, device scale factor 1.
-- State: 데이터 분석 filter selected; three matching-position cards and two overlapping-skill cards are shown.
+- Source visual truth: the user-provided mobile screenshots of the team-creation flow, including the final team-creation confirmation screen.
+- Implementation routes: `/contests/seoul-data/teams/create` through `/contests/seoul-data/teams/create/5`.
+- Intended viewport: 300 x 640 CSS px mobile viewport, device scale factor 1.
+- States: draft setup, role and headcount allocation, activity details, final introduction/questions, and registration confirmation.
 
 ## Evidence
 
-- Source pixels: 372 x 772 for the first screen and 372 x 772 for the continuation screen.
+- Source pixels: 300 x 640 for steps 2–4, plus the earlier first-step mobile screenshot.
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: home shortcut opens the dedicated route; skill filters update visible cards; heart buttons toggle saved state; header back returns home.
+- Primary interactions implemented: all five stage routes navigate forward/back; data persists through the flow; headcount controls, multi-select role/skill chips, member add/remove, activity preferences, questions, confirmation summaries, and final registration state all update in the UI. Question addition now opens a bottom sheet with a 200-character draft, cancel/confirm states, and selectable suggested prompts that fill the draft.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: existing SUIT hierarchy is applied to headings, card titles, metadata, labels, and badges. Visual comparison is blocked.
-- Spacing and layout rhythm: the page follows the source's header, compact hero/filter band, grouped cards, section dividers, and bottom guidance note. Visual comparison is blocked.
-- Colors and visual tokens: primary, neutral, purple, and danger semantic tokens are used for filters, cards, skills, buttons, and D-day badges. Visual comparison is blocked.
-- Image quality and asset fidelity: the source contains standard UI icons only, rendered with the existing Phosphor icon system. Visual comparison is blocked.
-- Copy and content: team, position, technical-stack, and metadata content is modeled on the supplied reference. Visual comparison is blocked.
+- Fonts and typography: SUIT hierarchy is applied across compact headers, labels, helper copy, chips, cards, form controls, and fixed CTAs. Visual comparison is blocked.
+- Spacing and layout rhythm: source-inspired four-segment progress bars, grouped form sections, compact cards, dividers, and bottom action bars are implemented. Visual comparison is blocked.
+- Colors and visual tokens: existing primary, neutral, success, and semantic tokens represent active steps, selections, inputs, cards, helper surfaces, and buttons. Visual comparison is blocked.
+- Image quality and asset fidelity: the references use standard UI controls and one generic member avatar. The existing icon library is used for all icons; no raster asset is required. Visual comparison is blocked.
+- Copy and content: the screens implement the source structure and the project-wide 2026 contest convention. Visual comparison is blocked.
+- Question-add bottom sheet: the supplied reference's title, usage count, multi-line question field, character counter, suggested-question chips, guidance panel, and dual actions are implemented. Visual comparison is blocked.
+- Registration confirmation: a fifth stage displays team information and recruiting allocation summaries, with direct edit actions back to the relevant stages, temporary-save feedback, and a final completion action. Visual comparison is blocked.
 
 ## Findings
 
 - [P1] Browser-rendered visual comparison unavailable.
   - Evidence: browser runtime returned `No browser is available`.
-  - Impact: mobile card density, badge sizing, and continuation spacing cannot be compared against the reference.
-  - Fix: capture `/matched-teams` at 372 x 772 and compare its top and continuation states with the supplied screenshots.
+  - Impact: compact mobile spacing, form density, fixed CTA placement, and cross-step visual continuity cannot be compared with the supplied screenshots.
+  - Fix: capture each route at 300 x 640 and compare against its matching source screenshot.
 
 ## Comparison history
 
@@ -36,14 +38,16 @@
 
 ## Implementation checklist
 
-- [x] Add a dedicated matched-teams route.
-- [x] Connect the home shortcut to that route.
-- [x] Implement filters and favorite interactions.
+- [x] Add routes for steps 1–4.
+- [x] Preserve the team-creation draft with Context across route transitions.
+- [x] Implement role allocation, activity settings, and team introduction/question controls.
 - [x] Run lint and production build.
-- [ ] Capture and compare the rendered mobile page.
+- [ ] Capture and compare each mobile step.
+- [ ] Capture the opened question-add bottom sheet and compare it against its reference.
+- [ ] Capture and compare the fifth-stage registration confirmation screen.
 
 ## Follow-up polish
 
-- Confirm exact card height, type scale, and D-day badge proportions after browser capture is available.
+- Verify exact vertical rhythm, chip widths, card elevation, and bottom safe-area spacing when a browser is available.
 
 final result: blocked

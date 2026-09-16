@@ -6,7 +6,14 @@ import { PageHeader } from "../../../components/PageHeader";
 import { PillButton } from "../../../components/PillButton";
 import { S } from "./PopularContestsPage.styles";
 
-type ContestCategory = "전체" | "IT/과학" | "기획" | "디자인" | "개발" | "영상" | "창업";
+type ContestCategory =
+  | "전체"
+  | "IT/과학"
+  | "기획"
+  | "디자인"
+  | "개발"
+  | "영상"
+  | "창업";
 type CategoryTone = "blue" | "orange" | "purple" | "green" | "pink" | "yellow";
 type SortOption = "views" | "scraps" | "latest" | "deadline";
 
@@ -49,7 +56,7 @@ const popularContests: Contest[] = [
     dDay: "D-15",
     organization: "서울특별시 · 교내 공지 RSS",
     teamCount: 3,
-    title: "2024 서울시 데이터 활용 공모전",
+    title: "2026 서울시 데이터 활용 공모전",
     verified: true,
     views: "41,852",
   },
@@ -142,9 +149,17 @@ const allContests: Contest[] = [
   },
 ];
 
-function ContestCard({ contest, rank }: { contest: Contest; rank?: number }) {
+function ContestCard({
+  contest,
+  onClick,
+  rank,
+}: {
+  contest: Contest;
+  onClick: () => void;
+  rank?: number;
+}) {
   return (
-    <S.ContestCard>
+    <S.ContestCard onClick={onClick} type="button">
       <S.CardTopline>
         <S.TagGroup>
           {rank && <S.RankBadge>{rank}</S.RankBadge>}
@@ -168,7 +183,9 @@ function ContestCard({ contest, rank }: { contest: Contest; rank?: number }) {
       <S.Organization>{contest.organization}</S.Organization>
       <S.CardFooter>
         <S.TeamCount>모집 중인 팀 {contest.teamCount}</S.TeamCount>
-        <S.Stats aria-label={`조회 ${contest.views}, 북마크 ${contest.comments}`}>
+        <S.Stats
+          aria-label={`조회 ${contest.views}, 북마크 ${contest.comments}`}
+        >
           <S.Stat>
             <Icon name="eye" size={9} weight="regular" />
             {contest.views}
@@ -215,7 +232,9 @@ export function PopularContestsPage() {
       sortContests(allContests.filter(matchesCategory)),
     ];
   }, [activeCategory, sortOption]);
-  const sortLabel = sortOptions.find((option) => option.value === sortOption)?.label;
+  const sortLabel = sortOptions.find(
+    (option) => option.value === sortOption,
+  )?.label;
 
   return (
     <S.Page>
@@ -254,12 +273,19 @@ export function PopularContestsPage() {
         </S.ListControls>
 
         <S.SectionHeading>
-          <S.SectionTitle>인기 TOP {visiblePopularContests.length}</S.SectionTitle>
+          <S.SectionTitle>
+            인기 TOP {visiblePopularContests.length}
+          </S.SectionTitle>
           <S.SectionMeta>이번 주 추천 기준</S.SectionMeta>
         </S.SectionHeading>
         <S.ContestList>
           {visiblePopularContests.map((contest, index) => (
-            <ContestCard contest={contest} key={contest.id} rank={index + 1} />
+            <ContestCard
+              contest={contest}
+              key={contest.id}
+              onClick={() => navigate(`/contests/${contest.id}`)}
+              rank={index + 1}
+            />
           ))}
           {visiblePopularContests.length === 0 && (
             <S.EmptyState>선택한 분야의 인기 공모전이 없어요.</S.EmptyState>
@@ -274,7 +300,11 @@ export function PopularContestsPage() {
             </S.SectionHeading>
             <S.ContestList>
               {visibleAllContests.map((contest) => (
-                <ContestCard contest={contest} key={contest.id} />
+                <ContestCard
+                  contest={contest}
+                  key={contest.id}
+                  onClick={() => navigate(`/contests/${contest.id}`)}
+                />
               ))}
             </S.ContestList>
           </>
@@ -316,7 +346,8 @@ export function PopularContestsPage() {
           })}
         </S.SortOptions>
         <S.SortNotice>
-          ‘인증’ 배지가 있는 공모전은 원문 링크가 확인된 항목으로, 정렬과 검색에 활용돼요.
+          ‘인증’ 배지가 있는 공모전은 원문 링크가 확인된 항목으로, 정렬과 검색에
+          활용돼요.
         </S.SortNotice>
       </BottomSheet>
     </S.Page>

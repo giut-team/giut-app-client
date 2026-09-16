@@ -9,13 +9,15 @@ import { S } from "./HomePage.styles";
 
 const popularContests = [
   {
+    id: "seoul-data",
     category: "IT",
     categoryTone: "blue" as const,
     dDay: "D-15",
-    title: "2024 서울시 데이터 활용 공모전",
+    title: "2026 서울시 데이터 활용 공모전",
     organization: "서울특별시",
   },
   {
+    id: "environment-idea",
     category: "기획",
     categoryTone: "orange" as const,
     dDay: "D-3",
@@ -23,6 +25,7 @@ const popularContests = [
     organization: "환경부",
   },
   {
+    id: "esg-campaign",
     category: "디자인",
     categoryTone: "purple" as const,
     dDay: "D-10",
@@ -215,14 +218,21 @@ export function HomePage() {
 
         <S.SectionHeader>
           <S.SectionTitle>인기 공모전</S.SectionTitle>
-          <S.ViewAll onClick={() => navigate("/contests/popular")} type="button">
-            전체보기 ›
+          <S.ViewAll
+            onClick={() => navigate("/contests/popular")}
+            type="button"
+          >
+            전체 보기 ›
           </S.ViewAll>
         </S.SectionHeader>
 
         <S.ContestList>
           {popularContests.map((contest) => (
-            <S.ContestCard key={contest.title}>
+            <S.ContestCard
+              key={contest.id}
+              onClick={() => navigate(`/contests/${contest.id}`)}
+              type="button"
+            >
               <S.ContestTopline>
                 <S.ContestCategoryGroup>
                   <S.Category $tone={contest.categoryTone}>

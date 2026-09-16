@@ -1,0 +1,111 @@
+import { createContext, useContext, useState, type ReactNode } from "react";
+
+type TeamMember = {
+  id: string;
+  name: string;
+  profile: string;
+};
+
+type TeamCreationContextValue = {
+  activityMode: string;
+  introduction: string;
+  locations: string[];
+  majorRole: string[];
+  memberCount: number;
+  members: TeamMember[];
+  questions: string[];
+  recruitingRoles: string[];
+  roleCounts: Record<string, number>;
+  roleSkills: Record<string, string[]>;
+  setActivityMode: (mode: string) => void;
+  setIntroduction: (introduction: string) => void;
+  setLocations: (locations: string[]) => void;
+  setMajorRole: (roles: string[]) => void;
+  setMemberCount: (count: number) => void;
+  setMembers: (members: TeamMember[]) => void;
+  setQuestions: (questions: string[]) => void;
+  setRecruitingRoles: (roles: string[]) => void;
+  setRoleCounts: (counts: Record<string, number>) => void;
+  setRoleSkills: (skills: Record<string, string[]>) => void;
+  setSubRole: (roles: string[]) => void;
+  setTeamName: (teamName: string) => void;
+  setWeeklyMeetings: (count: number) => void;
+  subRole: string[];
+  submitted: boolean;
+  teamName: string;
+  setSubmitted: (submitted: boolean) => void;
+  weeklyMeetings: number;
+};
+
+const TeamCreationContext = createContext<TeamCreationContextValue | null>(
+  null,
+);
+
+export function TeamCreationProvider({ children }: { children: ReactNode }) {
+  const [teamName, setTeamName] = useState("");
+  const [memberCount, setMemberCount] = useState(0);
+  const [majorRole, setMajorRole] = useState<string[]>([]);
+  const [subRole, setSubRole] = useState<string[]>([]);
+  const [recruitingRoles, setRecruitingRoles] = useState<string[]>([]);
+  const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
+  const [roleSkills, setRoleSkills] = useState<Record<string, string[]>>({});
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [activityMode, setActivityMode] = useState("");
+  const [weeklyMeetings, setWeeklyMeetings] = useState(0);
+  const [locations, setLocations] = useState<string[]>([]);
+  const [introduction, setIntroduction] = useState("");
+  const [questions, setQuestions] = useState([
+    "이 팀에 지원한 이유를 알려주세요",
+    "지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?",
+    "프로젝트에 어느정도의 참여를 하실 수 있나요?",
+  ]);
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <TeamCreationContext.Provider
+      value={{
+        activityMode,
+        introduction,
+        locations,
+        majorRole,
+        memberCount,
+        members,
+        questions,
+        recruitingRoles,
+        roleCounts,
+        roleSkills,
+        setActivityMode,
+        setIntroduction,
+        setLocations,
+        setMajorRole,
+        setMemberCount,
+        setMembers,
+        setQuestions,
+        setRecruitingRoles,
+        setRoleCounts,
+        setRoleSkills,
+        setSubRole,
+        setSubmitted,
+        setTeamName,
+        setWeeklyMeetings,
+        subRole,
+        submitted,
+        teamName,
+        weeklyMeetings,
+      }}
+    >
+      {children}
+    </TeamCreationContext.Provider>
+  );
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useTeamCreation() {
+  const context = useContext(TeamCreationContext);
+
+  if (!context) {
+    throw new Error("useTeamCreation must be used within TeamCreationProvider");
+  }
+
+  return context;
+}
