@@ -150,11 +150,13 @@ function StepOne() {
           >
             <Icon name="minus" size={15} weight="bold" />
           </S.CountButton>
-          <S.MemberCount>{memberCount}명</S.MemberCount>
+          <S.MemberCount>{memberCount ? `${memberCount}명` : "선택"}</S.MemberCount>
           <S.CountButton
             aria-label="모집 인원 늘리기"
             disabled={memberCount >= 10}
-            onClick={() => setMemberCount(memberCount + 1)}
+            onClick={() =>
+              setMemberCount(memberCount < 2 ? 2 : memberCount + 1)
+            }
             type="button"
           >
             +
@@ -166,7 +168,7 @@ function StepOne() {
         <S.RoleHeading>
           <S.Label>나(팀장) 역할</S.Label>
           <S.SelectedRole>
-            {majorRole} · {subRole}
+            {majorRole && subRole ? `${majorRole} · ${subRole}` : "선택해주세요"}
           </S.SelectedRole>
         </S.RoleHeading>
         <S.RoleLabel>대분류</S.RoleLabel>
@@ -232,21 +234,22 @@ function StepTwo() {
     setRoleCounts,
     setRoleSkills,
   } = useTeamCreation();
-  const totalSlots = Math.max(1, memberCount - 1);
+  const totalSlots = Math.max(0, memberCount - 1);
   const assignedSlots = recruitingRoles.reduce(
-    (total, role) => total + (roleCounts[role] ?? 1),
+    (total, role) => total + (roleCounts[role] ?? 0),
     0,
   );
   const allocationSummary = recruitingRoles
-    .map((role) => `${role} ${roleCounts[role] ?? 1}명`)
+    .filter((role) => (roleCounts[role] ?? 0) > 0)
+    .map((role) => `${role} ${roleCounts[role]}명`)
     .join(" · ");
 
   const changeCount = (role: string, amount: number) => {
-    const currentCount = roleCounts[role] ?? 1;
+    const currentCount = roleCounts[role] ?? 0;
     const availableCount = totalSlots - assignedSlots + currentCount;
     const nextCount = Math.min(
       availableCount,
-      Math.max(1, currentCount + amount),
+      Math.max(0, currentCount + amount),
     );
     setRoleCounts({ ...roleCounts, [role]: nextCount });
   };
@@ -287,7 +290,7 @@ function StepTwo() {
       <S.RoleGroupList>
         {recruitingRoles.map((role) => {
           const spec = roleSpecs[role];
-          const count = roleCounts[role] ?? 1;
+          const count = roleCounts[role] ?? 0;
           const selectedSkills = roleSkills[role] ?? [];
           return (
             <S.RoleGroup key={role}>
@@ -301,7 +304,7 @@ function StepTwo() {
                 <S.CompactCountControl>
                   <S.CountButton
                     aria-label={`${role} 인원 줄이기`}
-                    disabled={count <= 1}
+                    disabled={count <= 0}
                     onClick={() => changeCount(role, -1)}
                     type="button"
                   >
@@ -445,11 +448,15 @@ function StepThree() {
           >
             <Icon name="minus" size={13} weight="bold" />
           </S.CountButton>
-          <S.MemberCount>주 {weeklyMeetings}회</S.MemberCount>
+          <S.MemberCount>
+            {weeklyMeetings ? `주 ${weeklyMeetings}회` : "선택"}
+          </S.MemberCount>
           <S.CountButton
             aria-label="회의 횟수 늘리기"
             disabled={weeklyMeetings >= 7}
-            onClick={() => setWeeklyMeetings(weeklyMeetings + 1)}
+            onClick={() =>
+              setWeeklyMeetings(weeklyMeetings === 0 ? 1 : weeklyMeetings + 1)
+            }
             type="button"
           >
             +
@@ -683,11 +690,56 @@ export function TeamCreationPage() {
   const [searchParams] = useSearchParams();
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-  const { setSubmitted, submitted } = useTeamCreation();
+  const {
+    activityMode,
+    introduction,
+    locations,
+    majorRole,
+    memberCount,
+    questions,
+    recruitingRoles,
+    roleCounts,
+    roleSkills,
+    setSubmitted,
+    subRole,
+    submitted,
+    teamName,
+    weeklyMeetings,
+  } = useTeamCreation();
   const requestedStep = Number(step);
   const currentStep = step
     ? Math.min(4, Math.max(1, Number.isNaN(requestedStep) ? 1 : requestedStep))
     : 1;
+  const requiredRecruitingSlots = Math.max(0, memberCount - 1);
+  const assignedRecruitingSlots = recruitingRoles.reduce(
+    (total, role) => total + (roleCounts[role] ?? 0),
+    0,
+  );
+  const isCurrentStepValid =
+    currentStep === 1
+      ? Boolean(
+          teamName.trim() &&
+            memberCount >= 2 &&
+            majorRole &&
+            subRole &&
+            recruitingRoles.length,
+        )
+      : currentStep === 2
+        ? Boolean(
+            assignedRecruitingSlots === requiredRecruitingSlots &&
+              recruitingRoles.every(
+                (role) =>
+                  (roleCounts[role] ?? 0) > 0 &&
+                  (roleSkills[role] ?? []).length > 0,
+              ),
+          )
+        : currentStep === 3
+          ? Boolean(activityMode && weeklyMeetings > 0 && locations.length)
+          : Boolean(
+              introduction.trim() &&
+                questions.length >= 2 &&
+                questions.slice(0, 2).every((question) => question.trim()),
+            );
   const titleByStep = [
     "팀 만들기",
     "모집 포지션 정하기",
@@ -696,11 +748,8 @@ export function TeamCreationPage() {
   ];
   const stepPath = (targetStep: number) =>
     `/contests/${contestId}/teams/create${targetStep === 1 ? "" : `/${targetStep}`}${searchParams.get("from") ? `?from=${searchParams.get("from")}` : ""}`;
-  const goToStep = (targetStep: number) => navigate(stepPath(targetStep));
-  const returnPath =
-    searchParams.get("from") === "teams"
-      ? `/contests/${contestId}/teams`
-      : `/contests/${contestId}`;
+  const goToStep = (targetStep: number) =>
+    navigate(stepPath(targetStep), { replace: true });
   const handleBack = () => {
     if (currentStep === 1) {
       setIsExitModalOpen(true);
@@ -709,13 +758,35 @@ export function TeamCreationPage() {
 
     goToStep(currentStep - 1);
   };
+  const exitTeamCreation = () => {
+    navigate(-1);
+  };
   const handleSubmit = () => {
-    if (!submitted) setIsSubmitModalOpen(true);
+    if (isCurrentStepValid && !submitted) setIsSubmitModalOpen(true);
   };
   const confirmSubmit = () => {
     setSubmitted(true);
     setIsSubmitModalOpen(false);
-    navigate(`/contests/${contestId}`);
+    navigate(`/contests/${contestId}`, {
+      replace: true,
+      state: {
+        fromTeamCreation: true,
+        teamRegistered: true,
+        backPath:
+          searchParams.get("from") === "teams"
+            ? `/contests/${contestId}/teams`
+            : "/",
+      },
+    });
+  };
+  const handleNext = () => {
+    if (!isCurrentStepValid) return;
+    if (currentStep === 4) {
+      handleSubmit();
+      return;
+    }
+
+    goToStep(currentStep + 1);
   };
 
   const renderStep = () => {
@@ -738,7 +809,9 @@ export function TeamCreationPage() {
       </S.Content>
       <S.ActionBar>
         <S.NextButton
-          onClick={() => currentStep === 4 ? handleSubmit() : goToStep(currentStep + 1)}
+          $disabled={!isCurrentStepValid || submitted}
+          disabled={!isCurrentStepValid || submitted}
+          onClick={handleNext}
           type="button"
         >
           {currentStep === 4
@@ -753,7 +826,7 @@ export function TeamCreationPage() {
         icon={<Icon name="x" size={22} weight="bold" />}
         onClose={() => setIsExitModalOpen(false)}
         open={isExitModalOpen}
-        primaryAction={{ label: "나가기", onClick: () => navigate(returnPath) }}
+        primaryAction={{ label: "나가기", onClick: exitTeamCreation }}
         secondaryAction={{
           label: "계속 작성하기",
           onClick: () => setIsExitModalOpen(false),

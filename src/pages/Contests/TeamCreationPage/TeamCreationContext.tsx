@@ -42,29 +42,17 @@ const TeamCreationContext = createContext<TeamCreationContextValue | null>(
 );
 
 export function TeamCreationProvider({ children }: { children: ReactNode }) {
-  const [teamName, setTeamName] = useState("데이터로 서울을");
-  const [memberCount, setMemberCount] = useState(6);
-  const [majorRole, setMajorRole] = useState("기획");
-  const [subRole, setSubRole] = useState("서비스 기획");
-  const [recruitingRoles, setRecruitingRoles] = useState(["개발", "디자인"]);
-  const [roleCounts, setRoleCounts] = useState<Record<string, number>>({
-    개발: 4,
-    디자인: 1,
-  });
-  const [roleSkills, setRoleSkills] = useState<Record<string, string[]>>({
-    개발: ["백엔드 개발자", "데이터 엔지니어", "프론트엔드 개발자"],
-    디자인: ["UI 디자이너", "UX 디자이너"],
-  });
-  const [members, setMembers] = useState<TeamMember[]>([
-    {
-      id: "seoyeon",
-      name: "이서연",
-      profile: "@seoyeon · 기획 포지션",
-    },
-  ]);
-  const [activityMode, setActivityMode] = useState("온·오프 혼합");
-  const [weeklyMeetings, setWeeklyMeetings] = useState(1);
-  const [locations, setLocations] = useState(["교내"]);
+  const [teamName, setTeamName] = useState("");
+  const [memberCount, setMemberCount] = useState(0);
+  const [majorRole, setMajorRole] = useState("");
+  const [subRole, setSubRole] = useState("");
+  const [recruitingRoles, setRecruitingRoles] = useState<string[]>([]);
+  const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
+  const [roleSkills, setRoleSkills] = useState<Record<string, string[]>>({});
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [activityMode, setActivityMode] = useState("");
+  const [weeklyMeetings, setWeeklyMeetings] = useState(0);
+  const [locations, setLocations] = useState<string[]>([]);
   const [introduction, setIntroduction] = useState("");
   const [questions, setQuestions] = useState([
     "이 팀에 지원한 이유를 알려주세요",

@@ -329,17 +329,4 @@ export const S = {
       background: ${tokens.color.primary[600]};
     }
   `,
-  ShareToast: styled.p`
-    position: fixed;
-    z-index: 3;
-    bottom: 68px;
-    left: 50%;
-    margin: 0;
-    padding: 9px 12px;
-    border-radius: 9px;
-    background: ${tokens.color.neutral[900]};
-    color: ${tokens.color.neutral[50]};
-    font-size: 9px;
-    transform: translateX(-50%);
-  `,
 };

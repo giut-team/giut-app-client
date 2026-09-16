@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Toast } from "../../../components/Toast/Toast";
 import { S } from "./ContestDetailPage.styles";
 
 type DetailTab = "overview" | "guide";
@@ -31,10 +32,35 @@ const recruitTeams = [
 
 export function ContestDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { contestId = "seoul-data" } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [isSaved, setIsSaved] = useState(false);
-  const [shareMessage, setShareMessage] = useState("");
+  const teamCreationState = location.state as
+    | {
+        fromTeamCreation?: boolean;
+        backPath?: string;
+        teamRegistered?: boolean;
+      }
+    | null;
+  const [toastMessage, setToastMessage] = useState(() =>
+    teamCreationState?.teamRegistered ? "팀이 등록되었습니다!" : "",
+  );
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 1800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
+  const handleBack = () => {
+    if (teamCreationState?.fromTeamCreation) {
+      navigate(teamCreationState.backPath ?? "/", { replace: true });
+      return;
+    }
+
+    navigate(-1);
+  };
 
   const handleShare = async () => {
     const shareData = {
@@ -50,8 +76,8 @@ export function ContestDetailPage() {
       }
 
       await navigator.clipboard?.writeText(window.location.href);
-      setShareMessage("링크를 복사했어요.");
-      window.setTimeout(() => setShareMessage(""), 1800);
+      setToastMessage("링크를 복사했어요.");
+      window.setTimeout(() => setToastMessage(""), 1800);
     } catch {
       // 공유 시트를 닫은 경우에는 별도의 피드백을 표시하지 않습니다.
     }
@@ -63,7 +89,7 @@ export function ContestDetailPage() {
         <S.Header>
           <S.HeaderButton
             aria-label="뒤로 가기"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             type="button"
           >
             <Icon name="arrow-left" size={20} weight="regular" />
@@ -232,9 +258,7 @@ export function ContestDetailPage() {
           팀 구성하기
         </S.ApplyButton>
       </S.ActionBar>
-      {shareMessage && (
-        <S.ShareToast role="status">{shareMessage}</S.ShareToast>
-      )}
+      <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );
 }

@@ -740,19 +740,19 @@ export const S = {
     box-sizing: border-box;
     background: ${tokens.color.neutral[50]};
   `,
-  NextButton: styled.button`
+  NextButton: styled.button<{ $disabled: boolean }>`
     flex: 1;
     height: 41px;
     padding: 0;
     border: 0;
     border-radius: 11px;
-    background: ${tokens.color.primary[500]};
-    color: ${tokens.color.neutral[50]};
-    box-shadow: 0 7px 16px rgb(43 87 255 / 28%);
+    background: ${({ $disabled }) => $disabled ? tokens.color.neutral[200] : tokens.color.primary[500]};
+    color: ${({ $disabled }) => $disabled ? tokens.color.neutral[500] : tokens.color.neutral[50]};
+    box-shadow: ${({ $disabled }) => $disabled ? "none" : "0 7px 16px rgb(43 87 255 / 28%)"};
     font: inherit;
     font-size: 10px;
     font-weight: 800;
-    cursor: pointer;
+    cursor: ${({ $disabled }) => $disabled ? "not-allowed" : "pointer"};
   `,
   PreviousButton: styled.button`
     flex: 0 0 58px;
