@@ -77,21 +77,29 @@ function TeamCard({
   favorite,
   onToggleFavorite,
   onSelect,
-  selected,
+  onView,
   team,
 }: {
   favorite: boolean;
   onToggleFavorite: () => void;
   onSelect: () => void;
-  selected: boolean;
+  onView: () => void;
   team: Team;
 }) {
   const isOpen = team.status === "open";
 
   return (
     <S.TeamCard
-      $selected={isOpen && selected}
+      $selected={false}
       onClick={isOpen ? onSelect : undefined}
+      onKeyDown={(event) => {
+        if (isOpen && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      role={isOpen ? "button" : undefined}
+      tabIndex={isOpen ? 0 : undefined}
     >
       <S.TeamTopline>
         <S.TeamCount $closed={!isOpen}>{team.members}</S.TeamCount>
@@ -112,7 +120,14 @@ function TeamCard({
         </S.PositionList>
       )}
       <S.TeamActions $closed={!isOpen}>
-        <S.DetailButton disabled={!isOpen} type="button">
+          <S.DetailButton
+            disabled={!isOpen}
+            onClick={(event) => {
+              event.stopPropagation();
+              onView();
+            }}
+            type="button"
+          >
           {isOpen ? (
             <>
               상세 보기 <Icon name="caret-right" size={14} weight="bold" />
@@ -126,7 +141,10 @@ function TeamCard({
             $favorite={favorite}
             aria-label={team.title + " 찜하기"}
             aria-pressed={favorite}
-            onClick={onToggleFavorite}
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggleFavorite();
+            }}
             type="button"
           >
             <Icon
@@ -146,7 +164,6 @@ export function RecruitingTeamsPage() {
   const { contestId = "seoul-data" } = useParams();
   const [activeCategory, setActiveCategory] = useState<TeamCategory>("전체");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
-  const [selectedTeamId, setSelectedTeamId] = useState("data-seoul");
 
   const visibleTeams = useMemo(
     () =>
@@ -202,9 +219,9 @@ export function RecruitingTeamsPage() {
               <TeamCard
                 favorite={favoriteIds.includes(team.id)}
                 key={team.id}
-                onSelect={() => setSelectedTeamId(team.id)}
+                onSelect={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
+                onView={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
                 onToggleFavorite={() => toggleFavorite(team.id)}
-                selected={selectedTeamId === team.id}
                 team={team}
               />
             ))}
@@ -221,9 +238,9 @@ export function RecruitingTeamsPage() {
                 <TeamCard
                   favorite={favoriteIds.includes(team.id)}
                   key={team.id}
-                  onSelect={() => setSelectedTeamId(team.id)}
+                onSelect={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
+                onView={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
                   onToggleFavorite={() => toggleFavorite(team.id)}
-                  selected={selectedTeamId === team.id}
                   team={team}
                 />
               ))}

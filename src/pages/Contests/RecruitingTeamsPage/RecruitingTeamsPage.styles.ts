@@ -90,6 +90,15 @@ export const S = {
     background: ${tokens.color.neutral[50]};
     box-shadow: 0 2px 7px rgb(16 21 34 / 4%);
     transition: border-color 180ms ease, box-shadow 180ms ease;
+
+    &[role="button"] {
+      cursor: pointer;
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
   `,
   TeamTopline: styled.div`
     display: flex;

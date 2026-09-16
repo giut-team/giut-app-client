@@ -229,7 +229,18 @@ export function ContestDetailPage() {
         <S.TeamsSection>
           <S.TeamList>
             {recruitTeams.map((team) => (
-              <S.TeamCard key={team.id}>
+              <S.TeamCard
+                key={team.id}
+                onClick={() => navigate(`teams/${team.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(`teams/${team.id}`);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <S.TeamTitleRow>
                   <S.TeamTitle>{team.title}</S.TeamTitle>
                   <S.TeamCount>{team.members}</S.TeamCount>

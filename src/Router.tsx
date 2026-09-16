@@ -4,6 +4,7 @@ import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/Closin
 import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
 import { RecruitingTeamsPage } from "./pages/Contests/RecruitingTeamsPage/RecruitingTeamsPage";
+import { TeamDetailPage } from "./pages/Contests/TeamDetailPage/TeamDetailPage";
 import { TeamCreationPage } from "./pages/Contests/TeamCreationPage/TeamCreationPage";
 import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCreationContext";
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
@@ -30,6 +31,10 @@ export function AppRouter() {
         <Route
           element={<RecruitingTeamsPage />}
           path="/contests/:contestId/teams"
+        />
+        <Route
+          element={<TeamDetailPage />}
+          path="/contests/:contestId/teams/:teamId"
         />
         <Route
           element={
