@@ -47,7 +47,7 @@ export const S = {
   `,
   Progress: styled.div`
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 4px;
     padding: 0 14px 12px;
     background: ${tokens.color.neutral[50]};
@@ -725,6 +725,154 @@ export const S = {
     font-size: 16px;
     font-weight: 800;
     cursor: ${({ $disabled }) => $disabled ? "not-allowed" : "pointer"};
+  `,
+  ConfirmationForm: styled.div`
+    min-height: calc(100svh - 136px);
+    padding: 14px 14px 28px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  ConfirmationCard: styled.section`
+    padding: 14px 13px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${tokens.color.neutral[50]};
+    box-shadow: 0 2px 8px rgb(16 21 34 / 3%);
+
+    & + & { margin-top: 10px; }
+  `,
+  ConfirmationTeamName: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 13px;
+    font-weight: 800;
+  `,
+  ConfirmationContest: styled.p`
+    margin: 7px 0 0;
+    color: ${tokens.color.primary[500]};
+    font-size: 8px;
+    font-weight: 700;
+  `,
+  ConfirmationDivider: styled.hr`
+    margin: 16px 0 10px;
+    border: 0;
+    border-top: 1px solid ${tokens.color.neutral[100]};
+  `,
+  ConfirmationRow: styled.div`
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 3px 0;
+
+    span {
+      color: ${tokens.color.neutral[500]};
+      font-size: 8px;
+    }
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 8px;
+      font-weight: 800;
+      text-align: right;
+    }
+  `,
+  ConfirmationLabel: styled.span`
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    font-weight: 700;
+  `,
+  ConfirmationEditButton: styled.button`
+    padding: 0;
+    border: 0;
+    color: ${tokens.color.success[500]};
+    background: transparent;
+    font: inherit;
+    font-size: 8px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ConfirmationEditRow: styled.div`
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+  `,
+  ConfirmationRecruitingTotal: styled.h3`
+    margin: 10px 0 8px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 10px;
+    font-weight: 800;
+  `,
+  ConfirmationRoleList: styled.div`
+    display: grid;
+    gap: 8px;
+  `,
+  ConfirmationRole: styled.div`
+    display: grid;
+    gap: 3px;
+  `,
+  ConfirmationRoleHeader: styled.div`
+    display: flex;
+    justify-content: space-between;
+
+    span {
+      color: ${tokens.color.neutral[500]};
+      font-size: 8px;
+    }
+
+    strong {
+      color: ${tokens.color.primary[500]};
+      font-size: 8px;
+      font-weight: 800;
+    }
+  `,
+  ConfirmationSkillList: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    line-height: 1.4;
+  `,
+  ConfirmationNote: styled.p`
+    margin: 13px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 7px;
+    line-height: 1.5;
+  `,
+  ConfirmationQuestionList: styled.div`
+    display: grid;
+    gap: 8px;
+    margin-top: 11px;
+  `,
+  ConfirmationQuestion: styled.div`
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: ${tokens.color.neutral[100]};
+
+    span {
+      display: block;
+      margin-bottom: 4px;
+      color: ${tokens.color.primary[500]};
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0;
+      color: ${tokens.color.neutral[900]};
+      font-size: 8px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+  `,
+  ConfirmationGuide: styled.p`
+    margin: 11px 0 0;
+    padding: 12px;
+    border-radius: 10px;
+    color: ${tokens.color.neutral[500]};
+    background: color-mix(in srgb, ${tokens.color.primary[100]} 55%, ${tokens.color.neutral[50]});
+    font-size: 8px;
+    line-height: 1.5;
   `,
   ActionBar: styled.div`
     position: fixed;

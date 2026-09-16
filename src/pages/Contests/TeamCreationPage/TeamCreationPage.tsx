@@ -6,15 +6,9 @@ import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { useTeamCreation } from "./TeamCreationContext";
 import { S } from "./TeamCreationPage.styles";
 
+const totalSteps = 5;
+
 const majorRoles = ["개발", "디자인", "기획", "마케팅"];
-const subRoles = [
-  "프로덕트 매니저",
-  "프로젝트 매니저",
-  "서비스 기획",
-  "비즈니스 기획",
-  "콘텐츠 기획",
-  "데이터 분석 기획자",
-];
 const roleSpecs: Record<string, { skills: string[] }> = {
   개발: {
     skills: [
@@ -81,10 +75,12 @@ function StepHeader({
           <Icon name="arrow-left" size={20} weight="regular" />
         </S.BackButton>
         <S.Title>{title}</S.Title>
-        <S.StepCount>{currentStep}/4</S.StepCount>
+        <S.StepCount>
+          {currentStep}/{totalSteps}
+        </S.StepCount>
       </S.Header>
-      <S.Progress aria-label={`총 4단계 중 ${currentStep}단계`}>
-        {[0, 1, 2, 3].map((step) => (
+      <S.Progress aria-label={`총 ${totalSteps}단계 중 ${currentStep}단계`}>
+        {Array.from({ length: totalSteps }, (_, step) => step).map((step) => (
           <S.ProgressSegment
             $active={step < currentStep}
             $clickable={step + 1 < currentStep}
@@ -113,6 +109,9 @@ function StepOne() {
     subRole,
     teamName,
   } = useTeamCreation();
+  const [activeMajorRole, setActiveMajorRole] = useState(
+    () => majorRole[0] ?? "",
+  );
 
   const toggleRecruitingRole = (role: string) => {
     setRecruitingRoles(
@@ -121,6 +120,47 @@ function StepOne() {
         : [...recruitingRoles, role],
     );
   };
+  const selectMajorRole = (role: string) => {
+    if (!majorRole.includes(role)) {
+      setMajorRole([...majorRole, role]);
+      setActiveMajorRole(role);
+      return;
+    }
+
+    if (activeMajorRole !== role) {
+      setActiveMajorRole(role);
+      return;
+    }
+
+    const remainingMajorRoles = majorRole.filter(
+      (selectedRole) => selectedRole !== role,
+    );
+    const relatedSubRoles = roleSpecs[role]?.skills ?? [];
+    setMajorRole(remainingMajorRoles);
+    setSubRole(
+      subRole.filter((selectedRole) => !relatedSubRoles.includes(selectedRole)),
+    );
+    setActiveMajorRole(remainingMajorRoles.at(-1) ?? "");
+  };
+  const toggleSubRole = (role: string) => {
+    setSubRole(
+      subRole.includes(role)
+        ? subRole.filter((selectedRole) => selectedRole !== role)
+        : [...subRole, role],
+    );
+  };
+  const availableSubRoles = roleSpecs[activeMajorRole]?.skills ?? [];
+  const selectedRoleSummary = majorRole
+    .map((role) => {
+      const selectedSubRoles = (roleSpecs[role]?.skills ?? []).filter((skill) =>
+        subRole.includes(skill),
+      );
+
+      return selectedSubRoles.length
+        ? `${role} · ${selectedSubRoles.join(" · ")}`
+        : role;
+    })
+    .join(" / ");
 
   return (
     <S.Form>
@@ -150,7 +190,9 @@ function StepOne() {
           >
             <Icon name="minus" size={15} weight="bold" />
           </S.CountButton>
-          <S.MemberCount>{memberCount ? `${memberCount}명` : "선택"}</S.MemberCount>
+          <S.MemberCount>
+            {memberCount ? `${memberCount}명` : "선택"}
+          </S.MemberCount>
           <S.CountButton
             aria-label="모집 인원 늘리기"
             disabled={memberCount >= 10}
@@ -168,36 +210,44 @@ function StepOne() {
         <S.RoleHeading>
           <S.Label>나(팀장) 역할</S.Label>
           <S.SelectedRole>
-            {majorRole && subRole ? `${majorRole} · ${subRole}` : "선택해주세요"}
+            {majorRole.length && subRole.length
+              ? selectedRoleSummary
+              : "선택해주세요"}
           </S.SelectedRole>
         </S.RoleHeading>
         <S.RoleLabel>대분류</S.RoleLabel>
         <S.ChipList>
           {majorRoles.map((role) => (
             <S.RoleChip
-              $active={majorRole === role}
-              aria-pressed={majorRole === role}
+              $active={majorRole.includes(role)}
+              aria-pressed={majorRole.includes(role)}
               key={role}
-              onClick={() => setMajorRole(role)}
+              onClick={() => selectMajorRole(role)}
               type="button"
             >
               {role}
             </S.RoleChip>
           ))}
         </S.ChipList>
-        <S.RoleLabel>소분류</S.RoleLabel>
+        <S.RoleLabel>
+          소분류{activeMajorRole ? ` · ${activeMajorRole}` : ""}
+        </S.RoleLabel>
         <S.ChipList>
-          {subRoles.map((role) => (
-            <S.RoleChip
-              $active={subRole === role}
-              aria-pressed={subRole === role}
-              key={role}
-              onClick={() => setSubRole(role)}
-              type="button"
-            >
-              {role}
-            </S.RoleChip>
-          ))}
+          {availableSubRoles.length ? (
+            availableSubRoles.map((role) => (
+              <S.RoleChip
+                $active={subRole.includes(role)}
+                aria-pressed={subRole.includes(role)}
+                key={role}
+                onClick={() => toggleSubRole(role)}
+                type="button"
+              >
+                {role}
+              </S.RoleChip>
+            ))
+          ) : (
+            <S.HelperText>대분류를 먼저 선택해주세요.</S.HelperText>
+          )}
         </S.ChipList>
       </S.RoleField>
 
@@ -489,9 +539,9 @@ function StepFour() {
     useTeamCreation();
   const [isQuestionSheetOpen, setIsQuestionSheetOpen] = useState(false);
   const [draftQuestion, setDraftQuestion] = useState("");
-  const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(
-    null,
-  );
+  const [editingQuestionIndex, setEditingQuestionIndex] = useState<
+    number | null
+  >(null);
   const [editingQuestionDraft, setEditingQuestionDraft] = useState("");
   const closeQuestionSheet = () => {
     setIsQuestionSheetOpen(false);
@@ -522,7 +572,9 @@ function StepFour() {
     setEditingQuestionDraft("");
   };
   const removeQuestion = (index: number) => {
-    setQuestions(questions.filter((_, questionIndex) => questionIndex !== index));
+    setQuestions(
+      questions.filter((_, questionIndex) => questionIndex !== index),
+    );
     setEditingQuestionIndex(null);
     setEditingQuestionDraft("");
   };
@@ -565,7 +617,9 @@ function StepFour() {
               <S.QuestionInput
                 aria-label={`질문 ${index + 1} 편집`}
                 autoFocus
-                onChange={(event) => setEditingQuestionDraft(event.target.value)}
+                onChange={(event) =>
+                  setEditingQuestionDraft(event.target.value)
+                }
                 value={editingQuestionDraft}
               />
             ) : (
@@ -684,6 +738,108 @@ function StepFour() {
   );
 }
 
+function StepFive({ onEdit }: { onEdit: (step: number) => void }) {
+  const {
+    majorRole,
+    memberCount,
+    recruitingRoles,
+    roleCounts,
+    roleSkills,
+    subRole,
+    teamName,
+    questions,
+  } = useTeamCreation();
+  const totalRecruitingCount = recruitingRoles.reduce(
+    (total, role) => total + (roleCounts[role] ?? 0),
+    0,
+  );
+  const leaderRoleSummary = majorRole
+    .map((role) => {
+      const selectedSubRoles = (roleSpecs[role]?.skills ?? []).filter((skill) =>
+        subRole.includes(skill),
+      );
+
+      return selectedSubRoles.length
+        ? `${role} · ${selectedSubRoles.join(" · ")}`
+        : role;
+    })
+    .join(" / ");
+
+  return (
+    <S.ConfirmationForm>
+      <S.ConfirmationCard>
+        <S.ConfirmationTeamName>{teamName}</S.ConfirmationTeamName>
+        <S.ConfirmationContest>
+          2026 서울시 데이터 활용 공모전
+        </S.ConfirmationContest>
+        <S.ConfirmationDivider />
+        <S.ConfirmationRow>
+          <span>총 팀원</span>
+          <strong>{memberCount}명</strong>
+        </S.ConfirmationRow>
+        <S.ConfirmationRow>
+          <span>현재 팀장</span>
+          <strong>김용욱 / {leaderRoleSummary}</strong>
+        </S.ConfirmationRow>
+        <S.ConfirmationEditRow>
+          <S.ConfirmationEditButton onClick={() => onEdit(1)} type="button">
+            기본 정보 수정
+          </S.ConfirmationEditButton>
+        </S.ConfirmationEditRow>
+      </S.ConfirmationCard>
+
+      <S.ConfirmationCard>
+        <S.ConfirmationLabel>모집 분야</S.ConfirmationLabel>
+        <S.ConfirmationRecruitingTotal>
+          총 {totalRecruitingCount}명 모집
+        </S.ConfirmationRecruitingTotal>
+        <S.ConfirmationRoleList>
+          {recruitingRoles.map((role) => (
+            <S.ConfirmationRole key={role}>
+              <S.ConfirmationRoleHeader>
+                <span>{role}</span>
+                <strong>{roleCounts[role] ?? 0}명</strong>
+              </S.ConfirmationRoleHeader>
+              <S.ConfirmationSkillList>
+                {(roleSkills[role] ?? []).join(" · ")}
+              </S.ConfirmationSkillList>
+            </S.ConfirmationRole>
+          ))}
+        </S.ConfirmationRoleList>
+        <S.ConfirmationNote>
+          지원이 오면 팀장이 직접 배분해요.
+        </S.ConfirmationNote>
+        <S.ConfirmationEditRow>
+          <S.ConfirmationEditButton onClick={() => onEdit(2)} type="button">
+            수정
+          </S.ConfirmationEditButton>
+        </S.ConfirmationEditRow>
+      </S.ConfirmationCard>
+
+      <S.ConfirmationCard>
+        <S.ConfirmationLabel>지원자에게 받을 질문</S.ConfirmationLabel>
+        <S.ConfirmationQuestionList>
+          {questions.map((question, index) => (
+            <S.ConfirmationQuestion key={`${question}-${index}`}>
+              <span>Q{index + 1}</span>
+              <p>{question}</p>
+            </S.ConfirmationQuestion>
+          ))}
+        </S.ConfirmationQuestionList>
+        <S.ConfirmationEditRow>
+          <S.ConfirmationEditButton onClick={() => onEdit(4)} type="button">
+            수정
+          </S.ConfirmationEditButton>
+        </S.ConfirmationEditRow>
+      </S.ConfirmationCard>
+
+      <S.ConfirmationGuide>
+        등록 후에도 모집 분야와 팀 정보를 수정할 수 있어요.
+      </S.ConfirmationGuide>
+    </S.ConfirmationForm>
+  );
+}
+
 export function TeamCreationPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data", step } = useParams();
@@ -708,7 +864,10 @@ export function TeamCreationPage() {
   } = useTeamCreation();
   const requestedStep = Number(step);
   const currentStep = step
-    ? Math.min(4, Math.max(1, Number.isNaN(requestedStep) ? 1 : requestedStep))
+    ? Math.min(
+        totalSteps,
+        Math.max(1, Number.isNaN(requestedStep) ? 1 : requestedStep),
+      )
     : 1;
   const requiredRecruitingSlots = Math.max(0, memberCount - 1);
   const assignedRecruitingSlots = recruitingRoles.reduce(
@@ -719,32 +878,35 @@ export function TeamCreationPage() {
     currentStep === 1
       ? Boolean(
           teamName.trim() &&
-            memberCount >= 2 &&
-            majorRole &&
-            subRole &&
-            recruitingRoles.length,
+          memberCount >= 2 &&
+          majorRole.length &&
+          subRole.length &&
+          recruitingRoles.length,
         )
       : currentStep === 2
         ? Boolean(
             assignedRecruitingSlots === requiredRecruitingSlots &&
-              recruitingRoles.every(
-                (role) =>
-                  (roleCounts[role] ?? 0) > 0 &&
-                  (roleSkills[role] ?? []).length > 0,
-              ),
+            recruitingRoles.every(
+              (role) =>
+                (roleCounts[role] ?? 0) > 0 &&
+                (roleSkills[role] ?? []).length > 0,
+            ),
           )
         : currentStep === 3
           ? Boolean(activityMode && weeklyMeetings > 0 && locations.length)
-          : Boolean(
-              introduction.trim() &&
+          : currentStep === 4
+            ? Boolean(
+                introduction.trim() &&
                 questions.length >= 2 &&
                 questions.slice(0, 2).every((question) => question.trim()),
-            );
+              )
+            : true;
   const titleByStep = [
     "팀 만들기",
     "모집 포지션 정하기",
     "팀원 · 활동 방식",
     "팀 소개 · 지원 질문",
+    "팀 만들기 확인",
   ];
   const stepPath = (targetStep: number) =>
     `/contests/${contestId}/teams/create${targetStep === 1 ? "" : `/${targetStep}`}${searchParams.get("from") ? `?from=${searchParams.get("from")}` : ""}`;
@@ -762,7 +924,9 @@ export function TeamCreationPage() {
     navigate(-1);
   };
   const handleSubmit = () => {
-    if (isCurrentStepValid && !submitted) setIsSubmitModalOpen(true);
+    if (currentStep === totalSteps && isCurrentStepValid && !submitted) {
+      setIsSubmitModalOpen(true);
+    }
   };
   const confirmSubmit = () => {
     setSubmitted(true);
@@ -781,15 +945,15 @@ export function TeamCreationPage() {
   };
   const handleNext = () => {
     if (!isCurrentStepValid) return;
-    if (currentStep === 4) {
+    if (currentStep === totalSteps) {
       handleSubmit();
       return;
     }
 
     goToStep(currentStep + 1);
   };
-
   const renderStep = () => {
+    if (currentStep === 5) return <StepFive onEdit={goToStep} />;
     if (currentStep === 2) return <StepTwo />;
     if (currentStep === 3) return <StepThree />;
     if (currentStep === 4) return <StepFour />;
@@ -814,10 +978,10 @@ export function TeamCreationPage() {
           onClick={handleNext}
           type="button"
         >
-          {currentStep === 4
+          {currentStep === totalSteps
             ? submitted
               ? "팀 등록 완료"
-              : "팀 등록하기"
+              : "팀 만들기 완료"
             : "다음으로 가기"}
         </S.NextButton>
       </S.ActionBar>

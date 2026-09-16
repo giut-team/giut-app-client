@@ -2,10 +2,10 @@
 
 ## Comparison target
 
-- Source visual truth: the four user-provided mobile screenshots of the team-creation flow in this conversation.
-- Implementation routes: `/contests/seoul-data/teams/create` through `/contests/seoul-data/teams/create/4`.
+- Source visual truth: the user-provided mobile screenshots of the team-creation flow, including the final team-creation confirmation screen.
+- Implementation routes: `/contests/seoul-data/teams/create` through `/contests/seoul-data/teams/create/5`.
 - Intended viewport: 300 x 640 CSS px mobile viewport, device scale factor 1.
-- States: draft setup, role and headcount allocation, activity details, and final introduction/questions.
+- States: draft setup, role and headcount allocation, activity details, final introduction/questions, and registration confirmation.
 
 ## Evidence
 
@@ -13,7 +13,7 @@
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — the available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: all four stage routes navigate forward/back; data persists through the flow; headcount controls, multi-select role/skill chips, member add/remove, activity preferences, questions, and final registration state all update in the UI. Question addition now opens a bottom sheet with a 200-character draft, cancel/confirm states, and selectable suggested prompts that fill the draft.
+- Primary interactions implemented: all five stage routes navigate forward/back; data persists through the flow; headcount controls, multi-select role/skill chips, member add/remove, activity preferences, questions, confirmation summaries, and final registration state all update in the UI. Question addition now opens a bottom sheet with a 200-character draft, cancel/confirm states, and selectable suggested prompts that fill the draft.
 
 ## Required fidelity surfaces
 
@@ -23,6 +23,7 @@
 - Image quality and asset fidelity: the references use standard UI controls and one generic member avatar. The existing icon library is used for all icons; no raster asset is required. Visual comparison is blocked.
 - Copy and content: the screens implement the source structure and the project-wide 2026 contest convention. Visual comparison is blocked.
 - Question-add bottom sheet: the supplied reference's title, usage count, multi-line question field, character counter, suggested-question chips, guidance panel, and dual actions are implemented. Visual comparison is blocked.
+- Registration confirmation: a fifth stage displays team information and recruiting allocation summaries, with direct edit actions back to the relevant stages, temporary-save feedback, and a final completion action. Visual comparison is blocked.
 
 ## Findings
 
@@ -43,6 +44,7 @@
 - [x] Run lint and production build.
 - [ ] Capture and compare each mobile step.
 - [ ] Capture the opened question-add bottom sheet and compare it against its reference.
+- [ ] Capture and compare the fifth-stage registration confirmation screen.
 
 ## Follow-up polish
 

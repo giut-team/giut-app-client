@@ -10,7 +10,7 @@ type TeamCreationContextValue = {
   activityMode: string;
   introduction: string;
   locations: string[];
-  majorRole: string;
+  majorRole: string[];
   memberCount: number;
   members: TeamMember[];
   questions: string[];
@@ -20,17 +20,17 @@ type TeamCreationContextValue = {
   setActivityMode: (mode: string) => void;
   setIntroduction: (introduction: string) => void;
   setLocations: (locations: string[]) => void;
-  setMajorRole: (role: string) => void;
+  setMajorRole: (roles: string[]) => void;
   setMemberCount: (count: number) => void;
   setMembers: (members: TeamMember[]) => void;
   setQuestions: (questions: string[]) => void;
   setRecruitingRoles: (roles: string[]) => void;
   setRoleCounts: (counts: Record<string, number>) => void;
   setRoleSkills: (skills: Record<string, string[]>) => void;
-  setSubRole: (role: string) => void;
+  setSubRole: (roles: string[]) => void;
   setTeamName: (teamName: string) => void;
   setWeeklyMeetings: (count: number) => void;
-  subRole: string;
+  subRole: string[];
   submitted: boolean;
   teamName: string;
   setSubmitted: (submitted: boolean) => void;
@@ -44,8 +44,8 @@ const TeamCreationContext = createContext<TeamCreationContextValue | null>(
 export function TeamCreationProvider({ children }: { children: ReactNode }) {
   const [teamName, setTeamName] = useState("");
   const [memberCount, setMemberCount] = useState(0);
-  const [majorRole, setMajorRole] = useState("");
-  const [subRole, setSubRole] = useState("");
+  const [majorRole, setMajorRole] = useState<string[]>([]);
+  const [subRole, setSubRole] = useState<string[]>([]);
   const [recruitingRoles, setRecruitingRoles] = useState<string[]>([]);
   const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
   const [roleSkills, setRoleSkills] = useState<Record<string, string[]>>({});
