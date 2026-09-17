@@ -90,7 +90,8 @@ export const S = {
     &:hover:not(:disabled) { background: ${({ $active }) => $active ? tokens.color.primary[100] : tokens.color.neutral[50]}; }
   `,
   Results: styled.section`
-    padding: 25px 16px 0;
+    padding: 25px 16px 20px;
+    background: #f6f7fa;
   `,
   SectionTitle: styled.h2`
     margin: 0;
@@ -113,13 +114,14 @@ export const S = {
   `,
   ProfileList: styled.div`
     display: grid;
-    gap: 14px;
+    gap: 20px;
   `,
   ProfileCard: styled.article`
     padding: 16px;
-    border-radius: 22px;
+    border: 1px solid #e8ebf2;
+    border-radius: 18px;
     background: ${tokens.color.neutral[50]};
-    box-shadow: 0 7px 20px rgb(38 50 71 / 5%);
+    box-shadow: 0 3px 10px rgb(38 50 71 / 3%);
   `,
   StatusList: styled.div`
     display: flex;
