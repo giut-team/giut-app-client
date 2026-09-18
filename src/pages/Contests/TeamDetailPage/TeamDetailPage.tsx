@@ -36,11 +36,29 @@ export function TeamDetailPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   return (
     <S.Page>
       <S.Content>
-        <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+        <PageHeader
+          onBack={() => navigate(-1)}
+          rightContent={
+            <S.BookmarkButton
+              aria-label={isBookmarked ? "팀 찜 해제" : "팀 찜하기"}
+              aria-pressed={isBookmarked}
+              onClick={() => setIsBookmarked((current) => !current)}
+              type="button"
+            >
+              <Icon
+                name="bookmark"
+                size={20}
+                weight={isBookmarked ? "fill" : "regular"}
+              />
+            </S.BookmarkButton>
+          }
+          title="팀 상세"
+        />
 
         <S.Hero>
           <S.TitleRow>

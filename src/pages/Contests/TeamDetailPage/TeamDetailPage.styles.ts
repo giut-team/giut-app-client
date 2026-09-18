@@ -13,6 +13,27 @@ export const S = {
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};
   `,
+  BookmarkButton: styled.button`
+    display: grid;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: ${tokens.color.neutral[700]};
+    cursor: pointer;
+
+    &[aria-pressed="true"] {
+      color: ${tokens.color.neutral[700]};
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
   Hero: styled.section`
     padding: 15px 16px 16px;
     border-bottom: 8px solid ${tokens.color.neutral[100]};
