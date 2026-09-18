@@ -840,6 +840,79 @@ function StepFive({ onEdit }: { onEdit: (step: number) => void }) {
   );
 }
 
+function TeamCreationComplete({ onConfirm }: { onConfirm: () => void }) {
+  const { memberCount, recruitingRoles, roleCounts, teamName } = useTeamCreation();
+  const recruitingSummary = recruitingRoles
+    .filter((role) => (roleCounts[role] ?? 0) > 0)
+    .map((role) => `${role} ${roleCounts[role]}명`)
+    .join(" · ");
+
+  return (
+    <>
+      <S.CreationCompleteContent>
+        <S.CreationSuccessIcon>
+          <Icon name="check" size={25} weight="bold" />
+        </S.CreationSuccessIcon>
+        <S.CreationCompleteTitle>팀을 만들었어요</S.CreationCompleteTitle>
+        <S.CreationCompleteDescription>
+          {teamName} 팀이 공모전 팀 목록에 등록됐어요.
+        </S.CreationCompleteDescription>
+
+        <S.CreationSummary>
+          <div>
+            <dt>팀 이름</dt>
+            <dd>{teamName}</dd>
+          </div>
+          <div>
+            <dt>총 팀 인원</dt>
+            <dd>{memberCount}명</dd>
+          </div>
+          <div>
+            <dt>모집 분야</dt>
+            <dd>{recruitingSummary || "모집 정보"}</dd>
+          </div>
+        </S.CreationSummary>
+
+        <S.CreationNextSteps>
+          <S.CreationNextStepsTitle>다음 단계</S.CreationNextStepsTitle>
+          <S.CreationNextStep $active>
+            <S.CreationStepMark $active>
+              <Icon name="check" size={10} weight="bold" />
+            </S.CreationStepMark>
+            <div>
+              <strong>팀 등록 완료</strong>
+              <span>지금 막 등록했어요.</span>
+            </div>
+          </S.CreationNextStep>
+          <S.CreationNextStep>
+            <S.CreationStepMark>2</S.CreationStepMark>
+            <div>
+              <strong>팀원 모집 시작</strong>
+              <span>모집 중인 팀 목록에 노출돼요.</span>
+            </div>
+          </S.CreationNextStep>
+          <S.CreationNextStep>
+            <S.CreationStepMark>3</S.CreationStepMark>
+            <div>
+              <strong>지원서 확인</strong>
+              <span>지원자가 생기면 알려드릴게요.</span>
+            </div>
+          </S.CreationNextStep>
+        </S.CreationNextSteps>
+
+        <S.CreationCompleteNotice>
+          팀 상세 페이지에서 모집 정보를 수정하거나 팀원을 초대할 수 있어요.
+        </S.CreationCompleteNotice>
+      </S.CreationCompleteContent>
+      <S.ActionBar>
+        <S.NextButton $disabled={false} onClick={onConfirm} type="button">
+          확인
+        </S.NextButton>
+      </S.ActionBar>
+    </>
+  );
+}
+
 export function TeamCreationPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data", step, teamId } = useParams();
@@ -847,6 +920,7 @@ export function TeamCreationPage() {
   const isEditMode = Boolean(teamId);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [isCreationComplete, setIsCreationComplete] = useState(false);
   const {
     activityMode,
     introduction,
@@ -944,6 +1018,18 @@ export function TeamCreationPage() {
       setIsSubmitModalOpen(true);
     }
   };
+  const finishTeamCreation = () => {
+    navigate(`/contests/${contestId}`, {
+      replace: true,
+      state: {
+        fromTeamCreation: true,
+        backPath:
+          searchParams.get("from") === "teams"
+            ? `/contests/${contestId}/teams`
+            : "/",
+      },
+    });
+  };
   const confirmSubmit = () => {
     setSubmitted(true);
     setIsSubmitModalOpen(false);
@@ -953,17 +1039,7 @@ export function TeamCreationPage() {
       return;
     }
 
-    navigate(`/contests/${contestId}`, {
-      replace: true,
-      state: {
-        fromTeamCreation: true,
-        teamRegistered: true,
-        backPath:
-          searchParams.get("from") === "teams"
-            ? `/contests/${contestId}/teams`
-            : "/",
-      },
-    });
+    setIsCreationComplete(true);
   };
   const handleNext = () => {
     if (!isCurrentStepValid) return;
@@ -983,6 +1059,16 @@ export function TeamCreationPage() {
     if (currentStep === 4) return <StepFour />;
     return <StepOne />;
   };
+
+  if (isCreationComplete) {
+    return (
+      <S.Page>
+        <S.Content>
+          <TeamCreationComplete onConfirm={finishTeamCreation} />
+        </S.Content>
+      </S.Page>
+    );
+  }
 
   return (
     <S.Page>

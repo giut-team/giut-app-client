@@ -49,11 +49,8 @@ export function ContestDetailPage() {
   const teamCreationState = location.state as {
     fromTeamCreation?: boolean;
     backPath?: string;
-    teamRegistered?: boolean;
   } | null;
-  const [toastMessage, setToastMessage] = useState(() =>
-    teamCreationState?.teamRegistered ? "팀이 등록되었습니다!" : "",
-  );
+  const [toastMessage, setToastMessage] = useState("");
   useEffect(() => {
     if (!toastMessage) return;
 
