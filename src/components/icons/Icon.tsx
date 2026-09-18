@@ -6,6 +6,7 @@ import {
   CaretLeft,
   CaretRight,
   Check,
+  Code,
   ChatCircleDots,
   DotsThree,
   Eye,
@@ -13,10 +14,12 @@ import {
   Heart,
   House,
   LockKey,
+  Megaphone,
   MagnifyingGlass,
   Minus,
   Plus,
   NotePencil,
+  Palette,
   ShareNetwork,
   Trash,
   UserCircle,
@@ -36,8 +39,10 @@ export type IconName =
   | "bookmark"
   | "caret-right"
   | "check"
+  | "code"
   | "chat"
   | "more"
+  | "megaphone"
   | "eye"
   | "eye-slash"
   | "home"
@@ -45,6 +50,7 @@ export type IconName =
   | "lock"
   | "minus"
   | "plus"
+  | "palette"
   | "edit"
   | "search"
   | "share"
@@ -65,8 +71,10 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   bookmark: BookmarkSimple,
   "caret-right": CaretRight,
   check: Check,
+  code: Code,
   chat: ChatCircleDots,
   more: DotsThree,
+  megaphone: Megaphone,
   eye: Eye,
   "eye-slash": EyeSlash,
   home: House,
@@ -74,6 +82,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   lock: LockKey,
   minus: Minus,
   plus: Plus,
+  palette: Palette,
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,

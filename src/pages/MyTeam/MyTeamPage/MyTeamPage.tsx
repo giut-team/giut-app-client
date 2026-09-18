@@ -256,7 +256,7 @@ export function MyTeamPage() {
 
             <S.MemberQuestion>
               <S.MemberQuestionTitle>
-                Q1. 이 팀에 지원한 이유
+                Q1. 이 팀에 지원한 이유를 알려주세요
               </S.MemberQuestionTitle>
               <S.MemberAnswer>
                 캠페인 성과를 숫자로 보여주는 일에 관심이 많았습니다. ESG 주제는
@@ -266,7 +266,7 @@ export function MyTeamPage() {
             </S.MemberQuestion>
             <S.MemberQuestion>
               <S.MemberQuestionTitle>
-                Q2. 맡을 수 있는 역할
+                Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?
               </S.MemberQuestionTitle>
               <S.MemberAnswer>
                 데이터 수집·정제와 시각화를 맡을 수 있습니다. Python·SQL로

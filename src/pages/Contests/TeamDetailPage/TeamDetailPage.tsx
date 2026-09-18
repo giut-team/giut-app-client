@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
 import { S } from "./TeamDetailPage.styles";
 
@@ -32,7 +34,8 @@ const members = [
 
 export function TeamDetailPage() {
   const navigate = useNavigate();
-  const { contestId = "seoul-data" } = useParams();
+  const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
   return (
     <S.Page>
@@ -113,13 +116,27 @@ export function TeamDetailPage() {
         <S.ChatButton aria-label="팀장에게 문의하기" type="button">
           <Icon name="chat" size={19} weight="regular" />
         </S.ChatButton>
-        <S.ApplyButton
-          onClick={() => navigate(`/contests/${contestId}/teams`)}
-          type="button"
-        >
+        <S.ApplyButton onClick={() => setIsApplyModalOpen(true)} type="button">
           팀 지원하기
         </S.ApplyButton>
       </S.ActionBar>
+      <Modal
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setIsApplyModalOpen(false)}
+        open={isApplyModalOpen}
+        primaryAction={{
+          label: "지원하기",
+          onClick: () =>
+            navigate(`/contests/${contestId}/teams/${teamId}/apply`),
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setIsApplyModalOpen(false),
+        }}
+        title="이 팀에 지원하시겠습니까?"
+      />
     </S.Page>
   );
 }

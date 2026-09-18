@@ -44,13 +44,11 @@ export function ContestDetailPage() {
   const { contestId = "seoul-data" } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [isSaved, setIsSaved] = useState(false);
-  const teamCreationState = location.state as
-    | {
-        fromTeamCreation?: boolean;
-        backPath?: string;
-        teamRegistered?: boolean;
-      }
-    | null;
+  const teamCreationState = location.state as {
+    fromTeamCreation?: boolean;
+    backPath?: string;
+    teamRegistered?: boolean;
+  } | null;
   const [toastMessage, setToastMessage] = useState(() =>
     teamCreationState?.teamRegistered ? "팀이 등록되었습니다!" : "",
   );
@@ -168,10 +166,6 @@ export function ContestDetailPage() {
               <strong>총 상금 3,000만원</strong>
             </S.InfoRow>
             <S.InfoRow>
-              <span>수집 경로</span>
-              <strong>서울시립대 공지 RSS · 자동</strong>
-            </S.InfoRow>
-            <S.InfoRow>
               <span>원문</span>
               <S.SourceLink
                 href="https://contest.seoul.go.kr"
@@ -262,9 +256,9 @@ export function ContestDetailPage() {
                   {team.positions
                     .filter((position) => position.includes("모집"))
                     .map((position) => (
-                    <S.PositionBadge $open key={position}>
-                      {position}
-                    </S.PositionBadge>
+                      <S.PositionBadge $open key={position}>
+                        {position}
+                      </S.PositionBadge>
                     ))}
                 </S.PositionList>
               </S.TeamCard>
@@ -276,7 +270,9 @@ export function ContestDetailPage() {
       <S.ActionBar>
         <S.ApplyButton
           onClick={() =>
-            window.location.assign(`/contests/${contestId}/teams/create?from=detail`)
+            window.location.assign(
+              `/contests/${contestId}/teams/create?from=detail`,
+            )
           }
           type="button"
         >

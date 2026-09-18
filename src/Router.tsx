@@ -5,6 +5,7 @@ import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
 import { RecruitingTeamsPage } from "./pages/Contests/RecruitingTeamsPage/RecruitingTeamsPage";
 import { TeamDetailPage } from "./pages/Contests/TeamDetailPage/TeamDetailPage";
+import { TeamApplicationPage } from "./pages/Contests/TeamApplicationPage/TeamApplicationPage";
 import { OwnerTeamDetailPage } from "./pages/Contests/OwnerTeamDetailPage/OwnerTeamDetailPage";
 import { TeamCreationPage } from "./pages/Contests/TeamCreationPage/TeamCreationPage";
 import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCreationContext";
@@ -36,6 +37,10 @@ export function AppRouter() {
         <Route
           element={<TeamDetailPage />}
           path="/contests/:contestId/teams/:teamId"
+        />
+        <Route
+          element={<TeamApplicationPage />}
+          path="/contests/:contestId/teams/:teamId/apply"
         />
         <Route
           element={<OwnerTeamDetailPage />}

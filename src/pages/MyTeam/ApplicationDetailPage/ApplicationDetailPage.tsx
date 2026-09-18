@@ -63,7 +63,7 @@ export function ApplicationDetailPage() {
 
         <S.QuestionCard>
           <S.QuestionHeader>
-            <S.QuestionTitle>Q1. 이 팀에 지원한 이유</S.QuestionTitle>
+            <S.QuestionTitle>Q1. 이 팀에 지원한 이유를 알려주세요</S.QuestionTitle>
             <S.CharacterCount>96 / 300</S.CharacterCount>
           </S.QuestionHeader>
           <S.Answer>{applicant.answer}</S.Answer>
@@ -71,7 +71,9 @@ export function ApplicationDetailPage() {
 
         <S.QuestionCard>
           <S.QuestionHeader>
-            <S.QuestionTitle>Q2. 맡고 싶은 역할과 근거</S.QuestionTitle>
+            <S.QuestionTitle>
+              Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?
+            </S.QuestionTitle>
             <S.CharacterCount>78 / 300</S.CharacterCount>
           </S.QuestionHeader>
           <S.Answer>
