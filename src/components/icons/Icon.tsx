@@ -1,5 +1,6 @@
 import {
   AppleLogo,
+  ArrowRight,
   ArrowsDownUp,
   Bell,
   BookmarkSimple,
@@ -9,13 +10,16 @@ import {
   ChatCircleDots,
   Eye,
   EyeSlash,
+  FolderSimple,
   Heart,
+  Lightning,
   House,
   LockKey,
   MagnifyingGlass,
   Minus,
   Plus,
   NotePencil,
+  ShieldCheck,
   ShareNetwork,
   UserCircle,
   UserPlus,
@@ -27,6 +31,7 @@ import type { ComponentType } from "react";
 
 export type IconName =
   | "apple"
+  | "arrow-right"
   | "arrow-left"
   | "arrows-down-up"
   | "bell"
@@ -36,14 +41,17 @@ export type IconName =
   | "chat"
   | "eye"
   | "eye-slash"
+  | "folder"
   | "home"
   | "heart"
+  | "lightning"
   | "lock"
   | "minus"
   | "plus"
   | "edit"
   | "search"
   | "share"
+  | "shield-check"
   | "user"
   | "user-plus"
   | "users"
@@ -53,6 +61,7 @@ type IconComponentProps = PhosphorIconProps & { name: IconName };
 
 const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   apple: AppleLogo,
+  "arrow-right": ArrowRight,
   "arrow-left": CaretLeft,
   "arrows-down-up": ArrowsDownUp,
   bell: Bell,
@@ -62,14 +71,17 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   chat: ChatCircleDots,
   eye: Eye,
   "eye-slash": EyeSlash,
+  folder: FolderSimple,
   home: House,
   heart: Heart,
+  lightning: Lightning,
   lock: LockKey,
   minus: Minus,
   plus: Plus,
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,
+  "shield-check": ShieldCheck,
   user: UserCircle,
   "user-plus": UserPlus,
   users: UsersThree,
