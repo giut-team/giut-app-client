@@ -115,20 +115,26 @@ export const S = {
     align-items: center;
     justify-content: space-between;
   `,
-  OwnerBadge: styled.span`
+  OwnerBadge: styled.span<{ $closed: boolean }>`
     padding: 5px 7px;
     border-radius: 6px;
-    background: color-mix(in srgb, ${tokens.color.success[500]} 12%, ${tokens.color.neutral[50]});
-    color: ${tokens.color.success[500]};
+    background: ${({ $closed }) =>
+      $closed
+        ? tokens.color.neutral[100]
+        : `color-mix(in srgb, ${tokens.color.success[500]} 12%, ${tokens.color.neutral[50]})`};
+    color: ${({ $closed }) =>
+      $closed ? tokens.color.neutral[500] : tokens.color.success[500]};
     font-size: 8px;
     font-weight: 800;
     line-height: 1;
   `,
-  CountBadge: styled.span`
+  CountBadge: styled.span<{ $closed: boolean }>`
     padding: 6px 8px;
     border-radius: 7px;
-    background: ${tokens.color.primary[100]};
-    color: ${tokens.color.primary[500]};
+    background: ${({ $closed }) =>
+      $closed ? tokens.color.neutral[100] : tokens.color.primary[100]};
+    color: ${({ $closed }) =>
+      $closed ? tokens.color.neutral[500] : tokens.color.primary[500]};
     font-size: 10px;
     font-weight: 800;
     line-height: 1;
@@ -153,12 +159,13 @@ export const S = {
     border-radius: 999px;
     background: ${tokens.color.neutral[100]};
   `,
-  ProgressValue: styled.span`
+  ProgressValue: styled.span<{ $closed: boolean }>`
     display: block;
     width: 60%;
     height: 100%;
     border-radius: inherit;
-    background: ${tokens.color.primary[500]};
+    background: ${({ $closed }) =>
+      $closed ? tokens.color.neutral[500] : tokens.color.primary[500]};
   `,
   HeroMeta: styled.p`
     margin: 7px 0 0;
@@ -364,6 +371,35 @@ export const S = {
     font-size: 8px;
     font-weight: 700;
     cursor: pointer;
+  `,
+  ClosedAction: styled.div`
+    display: flex;
+    gap: 8px;
+  `,
+  ChatButton: styled.button`
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 12px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[700]};
+    cursor: pointer;
+  `,
+  ClosedRecruitmentButton: styled.button`
+    flex: 1;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: ${tokens.color.neutral[200]};
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800;
   `,
   SheetIcon: styled.div<{ $tone: "primary" | "warning" }>`
     display: grid;

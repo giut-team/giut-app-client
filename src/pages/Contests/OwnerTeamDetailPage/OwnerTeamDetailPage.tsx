@@ -12,7 +12,7 @@ import { S } from "./OwnerTeamDetailPage.styles";
 const positions = [
   { name: "백엔드 개발자", info: "지원 3건 대기 중", open: true },
   { name: "데이터 엔지니어", info: "지원 2건 대기 중", open: true },
-  { name: "기획", info: "이서연(팀장) 확정", open: false },
+  { name: "기획", info: "모집이 마감되었어요", open: false },
 ];
 
 const members = [
@@ -42,6 +42,8 @@ const members = [
   },
 ];
 
+const teamCapacity = 5;
+
 type ActionMenuState = "closed" | "opening";
 
 const getInviteExpiry = () => {
@@ -63,6 +65,9 @@ export function OwnerTeamDetailPage() {
   const [actionMenuState, setActionMenuState] =
     useState<ActionMenuState>("closed");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const isTeamFull = members.length >= teamCapacity;
+  const isRecruitmentOpen = isRecruiting && !isTeamFull;
+  const isRecruitmentClosed = !isRecruitmentOpen;
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -111,64 +116,73 @@ export function OwnerTeamDetailPage() {
         <PageHeader
           onBack={() => navigate(-1)}
           rightContent={
-            <S.HeaderActions>
-              <S.MoreButton
-                aria-expanded={isActionMenuOpen}
-                aria-haspopup="menu"
-                aria-label="팀 관리 메뉴"
-                onClick={toggleActionMenu}
-                type="button"
-              >
-                <Icon name="more" size={20} weight="bold" />
-              </S.MoreButton>
-              {actionMenuState !== "closed" && (
-                <S.ActionMenu
-                  $state={actionMenuState}
-                  role="menu"
+            isRecruitmentOpen ? (
+              <S.HeaderActions>
+                <S.MoreButton
+                  aria-expanded={isActionMenuOpen}
+                  aria-haspopup="menu"
+                  aria-label="팀 관리 메뉴"
+                  onClick={toggleActionMenu}
+                  type="button"
                 >
-                  <S.ActionMenuButton
-                    $index={0}
-                    $state={actionMenuState}
-                    onClick={() => {
-                      setActionMenuState("closed");
-                      navigate("/contests/seoul-data/teams/my-data-seoul/edit");
-                    }}
-                    role="menuitem"
-                    type="button"
-                  >
-                    <Icon name="edit" size={14} weight="bold" />팀 수정하기
-                  </S.ActionMenuButton>
-                  <S.ActionMenuButton
-                    $danger
-                    $index={1}
-                    $state={actionMenuState}
-                    onClick={() => {
-                      setActionMenuState("closed");
-                      setIsDeleteModalOpen(true);
-                    }}
-                    role="menuitem"
-                    type="button"
-                  >
-                    <Icon name="trash" size={14} weight="bold" />팀 삭제하기
-                  </S.ActionMenuButton>
-                </S.ActionMenu>
-              )}
-            </S.HeaderActions>
+                  <Icon name="more" size={20} weight="bold" />
+                </S.MoreButton>
+                {actionMenuState !== "closed" && (
+                  <S.ActionMenu $state={actionMenuState} role="menu">
+                    <S.ActionMenuButton
+                      $index={0}
+                      $state={actionMenuState}
+                      onClick={() => {
+                        setActionMenuState("closed");
+                        navigate("/contests/seoul-data/teams/my-data-seoul/edit");
+                      }}
+                      role="menuitem"
+                      type="button"
+                    >
+                      <Icon name="edit" size={14} weight="bold" />팀 수정하기
+                    </S.ActionMenuButton>
+                    <S.ActionMenuButton
+                      $danger
+                      $index={1}
+                      $state={actionMenuState}
+                      onClick={() => {
+                        setActionMenuState("closed");
+                        setIsDeleteModalOpen(true);
+                      }}
+                      role="menuitem"
+                      type="button"
+                    >
+                      <Icon name="trash" size={14} weight="bold" />팀 삭제하기
+                    </S.ActionMenuButton>
+                  </S.ActionMenu>
+                )}
+              </S.HeaderActions>
+            ) : undefined
           }
           title="팀 상세"
         />
 
         <S.Hero>
           <S.HeroTopline>
-            <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>
-            <S.CountBadge>3/5명</S.CountBadge>
+            <S.OwnerBadge $closed={isRecruitmentClosed}>
+              {isRecruitmentClosed ? "모집 마감" : "내가 만든 팀"}
+            </S.OwnerBadge>
+            <S.CountBadge $closed={isRecruitmentClosed}>
+              {members.length}/{teamCapacity}명
+            </S.CountBadge>
           </S.HeroTopline>
           <S.TeamTitle>데이터로 서울을</S.TeamTitle>
           <S.ContestName>2026 서울시 데이터 활용 공모전</S.ContestName>
           <S.ProgressTrack aria-label="팀원 모집 진행률">
-            <S.ProgressValue />
+            <S.ProgressValue $closed={isRecruitmentClosed} />
           </S.ProgressTrack>
-          <S.HeroMeta>2자리 남았어요 · 새 지원 3건</S.HeroMeta>
+          <S.HeroMeta>
+            {isRecruitmentClosed
+              ? isTeamFull
+                ? "모든 자리가 찼어요 · 새 지원 3건"
+                : "모집이 마감되었어요"
+              : `${teamCapacity - members.length}자리 남았어요 · 새 지원 3건`}
+          </S.HeroMeta>
         </S.Hero>
 
         <S.Section>
@@ -176,17 +190,19 @@ export function OwnerTeamDetailPage() {
           <S.PositionList>
             {positions.map((position) => (
               <S.PositionCard
-                $open={position.open && isRecruiting}
+                $open={position.open && isRecruitmentOpen}
                 key={position.name}
               >
                 <div>
-                  <S.PositionName $open={position.open && isRecruiting}>
+                  <S.PositionName $open={position.open && isRecruitmentOpen}>
                     {position.name}
                   </S.PositionName>
-                  <S.PositionInfo>{position.info}</S.PositionInfo>
+                  {!isRecruitmentClosed && (
+                    <S.PositionInfo>{position.info}</S.PositionInfo>
+                  )}
                 </div>
-                <S.PositionStatus $open={position.open && isRecruiting}>
-                  {position.open && isRecruiting ? "모집 중" : "마감"}
+                <S.PositionStatus $open={position.open && isRecruitmentOpen}>
+                  {position.open && isRecruitmentOpen ? "모집 중" : "마감"}
                 </S.PositionStatus>
               </S.PositionCard>
             ))}
@@ -213,8 +229,8 @@ export function OwnerTeamDetailPage() {
         <S.Section>
           <S.SectionTitle>팀 소개</S.SectionTitle>
           <S.Introduction>
-            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의와 온라인
-            소통으로 함께해요.
+            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인
+            회의와 온라인 소통으로 함께해요.
           </S.Introduction>
         </S.Section>
 
@@ -239,34 +255,39 @@ export function OwnerTeamDetailPage() {
       </S.Content>
 
       <S.ActionBar>
-        <S.ApplicationsButton
-          onClick={() => navigate("/my-team/applications")}
-          type="button"
-        >
-          받은 지원 3건 보기 <S.NewBadge>NEW</S.NewBadge>
-        </S.ApplicationsButton>
-        <S.SecondaryActions>
-          <S.SecondaryButton
-            onClick={() => setIsInviteSheetOpen(true)}
-            type="button"
-          >
-            팀원 초대하기
-          </S.SecondaryButton>
-          <S.SecondaryButton
-            onClick={() => {
-              if (isRecruiting) {
-                setIsCloseSheetOpen(true);
-                return;
-              }
-
-              setIsRecruiting(true);
-              showToast("모집을 다시 열었어요.");
-            }}
-            type="button"
-          >
-            {isRecruiting ? "모집 마감하기" : "모집 다시 열기"}
-          </S.SecondaryButton>
-        </S.SecondaryActions>
+        {isRecruitmentClosed ? (
+          <S.ClosedAction>
+            <S.ChatButton aria-label="팀에 문의하기" type="button">
+              <Icon name="chat" size={19} weight="regular" />
+            </S.ChatButton>
+            <S.ClosedRecruitmentButton disabled type="button">
+              모집이 마감된 팀이에요
+            </S.ClosedRecruitmentButton>
+          </S.ClosedAction>
+        ) : (
+          <>
+            <S.ApplicationsButton
+              onClick={() => navigate("/my-team/applications")}
+              type="button"
+            >
+              받은 지원 3건 보기 <S.NewBadge>NEW</S.NewBadge>
+            </S.ApplicationsButton>
+            <S.SecondaryActions>
+              <S.SecondaryButton
+                onClick={() => setIsInviteSheetOpen(true)}
+                type="button"
+              >
+                팀원 초대하기
+              </S.SecondaryButton>
+              <S.SecondaryButton
+                onClick={() => setIsCloseSheetOpen(true)}
+                type="button"
+              >
+                모집 마감하기
+              </S.SecondaryButton>
+            </S.SecondaryActions>
+          </>
+        )}
       </S.ActionBar>
       <BottomSheet
         footer={
@@ -328,9 +349,6 @@ export function OwnerTeamDetailPage() {
           />
           대기 중인 지원자에게 개별 알림을 보낼게요
         </S.Acknowledgement>
-        <S.SheetHelpText>
-          마감 후에도 팀 상세 → 수정에서 다시 모집을 열 수 있어요.
-        </S.SheetHelpText>
       </BottomSheet>
       <BottomSheet
         footer={
