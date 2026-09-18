@@ -315,6 +315,33 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     font-size: 8px;
   `,
+  PendingInvite: styled.article`
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding-top: 2px;
+  `,
+  PendingInviteAvatar: styled.span`
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 11px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 11px;
+    font-weight: 800;
+  `,
+  InviteSentBadge: styled.span`
+    padding: 3px 5px;
+    border-radius: 4px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 7px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   ActionBar: styled.div`
     position: fixed;
     z-index: 2;
@@ -434,7 +461,7 @@ export const S = {
     border-radius: 11px;
     background: ${tokens.color.neutral[100]};
   `,
-  SummaryRow: styled.div`
+  SummaryRow: styled.div<{ $darkLabels?: boolean }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -447,12 +474,16 @@ export const S = {
     }
 
     dt {
-      color: ${tokens.color.neutral[500]};
+      color: ${({ $darkLabels }) =>
+        $darkLabels ? tokens.color.neutral[900] : tokens.color.neutral[500]};
       font-size: 8px;
       font-weight: 600;
     }
 
     dd {
+      display: flex;
+      min-height: 32px;
+      align-items: center;
       margin: 0;
       color: ${tokens.color.neutral[900]};
       font-size: 9px;
@@ -460,7 +491,7 @@ export const S = {
     }
   `,
   Pending: styled.strong`
-    color: ${tokens.color.danger[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 9px;
     font-weight: 800;
   `,
@@ -472,7 +503,7 @@ export const S = {
     padding: 10px 11px;
     border-radius: 10px;
     background: ${tokens.color.primary[100]};
-    color: ${tokens.color.neutral[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 8px;
     line-height: 1.4;
     cursor: pointer;
@@ -491,7 +522,7 @@ export const S = {
   `,
   SheetActions: styled.div`
     display: grid;
-    grid-template-columns: 0.9fr 1.3fr;
+    grid-template-columns: 1.3fr 0.9fr;
     gap: 7px;
   `,
   SheetButton: styled.button<{ $primary?: boolean }>`
@@ -521,7 +552,7 @@ export const S = {
   `,
   InviteLinkLabel: styled.p`
     margin: 0;
-    color: ${tokens.color.neutral[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 8px;
     font-weight: 600;
   `,
@@ -559,12 +590,12 @@ export const S = {
   `,
   InviteExpiry: styled.p`
     margin: 9px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 8px;
 
     strong {
       float: right;
-      color: ${tokens.color.neutral[700]};
+      color: ${tokens.color.neutral[900]};
       font-weight: 800;
     }
   `,
@@ -628,6 +659,263 @@ export const S = {
   InviteCaret: styled.span`
     margin-left: auto;
     color: ${tokens.color.neutral[500]};
+  `,
+  IdInvitePage: styled.main`
+    min-height: 100svh;
+    background: ${tokens.color.neutral[100]};
+  `,
+  IdInviteContent: styled.div`
+    padding: 10px 14px 28px;
+  `,
+  IdInviteSearch: styled.label`
+    display: flex;
+    height: 36px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 10px;
+    border-radius: 9px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+
+    input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: ${tokens.color.neutral[900]};
+      font: inherit;
+      font-size: 9px;
+      font-weight: 700;
+
+      &::placeholder {
+        color: ${tokens.color.neutral[500]};
+      }
+    }
+
+    button {
+      display: grid;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: ${tokens.color.neutral[500]};
+      cursor: pointer;
+    }
+  `,
+  IdInviteHelp: styled.p`
+    margin: 8px 0 16px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.45;
+  `,
+  IdInviteResultsHeader: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    span {
+      color: ${tokens.color.neutral[500]};
+      font-size: 7px;
+      font-weight: 600;
+    }
+  `,
+  IdInviteResults: styled.div`
+    display: grid;
+    gap: 8px;
+  `,
+  IdInviteCandidate: styled.article`
+    position: relative;
+    padding: 10px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 11px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  IdInviteCandidateTop: styled.div`
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding-right: 22px;
+  `,
+  ProfileNavigationHint: styled.span`
+    position: absolute;
+    top: 33px;
+    right: 10px;
+    display: grid;
+    width: 18px;
+    height: 18px;
+    place-items: center;
+    color: ${tokens.color.neutral[500]};
+  `,
+  IdInviteAvatar: styled.span`
+    display: grid;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font-size: 10px;
+    font-weight: 800;
+  `,
+  IdInviteProfile: styled.div`
+    min-width: 0;
+    flex: 1;
+
+    p {
+      margin: 4px 0 0;
+      overflow: hidden;
+      color: ${tokens.color.neutral[900]};
+      font-size: 7px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `,
+  IdInviteName: styled.div`
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 4px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 9px;
+    font-weight: 800;
+
+    > span {
+      overflow: hidden;
+      color: ${tokens.color.neutral[500]};
+      font-size: 7px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `,
+  SkillList: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 7px;
+
+    span {
+      padding: 3px 5px;
+      border-radius: 4px;
+      background: ${tokens.color.primary[100]};
+      color: ${tokens.color.primary[500]};
+      font-size: 7px;
+      font-weight: 700;
+      line-height: 1;
+    }
+  `,
+  InviteCandidateAction: styled.div`
+    display: block;
+    margin-top: 10px;
+
+    button {
+      width: 100%;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: ${tokens.color.primary[500]};
+      color: ${tokens.color.neutral[50]};
+      font: inherit;
+      font-size: 8px;
+      font-weight: 800;
+      cursor: pointer;
+
+      &:disabled {
+        background: ${tokens.color.neutral[100]};
+        color: ${tokens.color.neutral[500]};
+        cursor: default;
+      }
+    }
+  `,
+  EmptyInviteResult: styled.p`
+    margin: 0;
+    padding: 18px 12px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 9px;
+    line-height: 1.5;
+    text-align: center;
+  `,
+  IdInviteNotice: styled.p`
+    margin: 12px 0 0;
+    padding: 10px 11px;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    line-height: 1.55;
+  `,
+  IdInviteConfirmIcon: styled.div`
+    display: grid;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 11px;
+    place-items: center;
+    border-radius: 10px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+  `,
+  IdInviteConfirmTitle: styled.h2`
+    margin: 1px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  `,
+  IdInviteTeamCount: styled.strong`
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 800;
+  `,
+  IdInviteConfirmNote: styled.div`
+    display: grid;
+    gap: 5px;
+    margin-top: 9px;
+    padding: 9px 10px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 10px;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 7px;
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 29px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      resize: none;
+      background: transparent;
+      color: ${tokens.color.neutral[900]};
+      font: inherit;
+      font-size: 8px;
+      font-weight: 700;
+      line-height: 1.4;
+      box-sizing: border-box;
+
+      &::placeholder {
+        color: ${tokens.color.neutral[500]};
+        opacity: 1;
+      }
+    }
   `,
   SheetCloseButton: styled.button`
     width: 100%;

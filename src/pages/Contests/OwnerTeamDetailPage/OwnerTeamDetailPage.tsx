@@ -42,7 +42,35 @@ const members = [
   },
 ];
 
+const inviteCandidates = [
+  {
+    id: "hyunjin_k",
+    initial: "김",
+    name: "김현진",
+    position: "백엔드 개발자",
+    profile: "서울시립대 컴퓨터공학부 3학년 · 백엔드 개발자",
+    skills: ["Python", "SQL", "Spring"],
+  },
+  {
+    id: "hyunjin_dev",
+    initial: "김",
+    name: "김현지",
+    position: "데이터 엔지니어",
+    profile: "경영학부 데이터경영학과 4학년 · 데이터 분석",
+    skills: ["Python", "Tableau"],
+  },
+  {
+    id: "hyunjinww",
+    initial: "현",
+    name: "현진욱",
+    position: "데이터 엔지니어",
+    profile: "서울시립대 통계학과 2학년 · 데이터 엔지니어",
+    skills: ["SQL", "Airflow"],
+  },
+];
+
 const teamCapacity = 5;
+const defaultInviteMessage = "백엔드 파트 함께해요!";
 
 type ActionMenuState = "closed" | "opening";
 
@@ -61,6 +89,16 @@ export function OwnerTeamDetailPage() {
   const [isRecruiting, setIsRecruiting] = useState(true);
   const [isCloseSheetOpen, setIsCloseSheetOpen] = useState(false);
   const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false);
+  const [isIdInvitePageOpen, setIsIdInvitePageOpen] = useState(false);
+  const [isIdInviteConfirmOpen, setIsIdInviteConfirmOpen] = useState(false);
+  const [inviteQuery, setInviteQuery] = useState("hyunjin_k");
+  const [selectedInviteCandidate, setSelectedInviteCandidate] = useState(
+    inviteCandidates[0],
+  );
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [sentInviteCandidateIds, setSentInviteCandidateIds] = useState<
+    string[]
+  >([]);
   const [isCloseAcknowledged, setIsCloseAcknowledged] = useState(true);
   const [actionMenuState, setActionMenuState] =
     useState<ActionMenuState>("closed");
@@ -81,6 +119,22 @@ export function OwnerTeamDetailPage() {
   };
   const inviteLink = "https://giut.app/t/seoul-data/QK7F2";
   const inviteExpiry = getInviteExpiry();
+  const filteredInviteCandidates = inviteCandidates.filter((candidate) => {
+    const normalizedQuery = inviteQuery.trim().toLowerCase();
+    const idPrefix = normalizedQuery.split("_")[0];
+
+    return (
+      !normalizedQuery ||
+      candidate.name.includes(normalizedQuery) ||
+      candidate.id.includes(normalizedQuery) ||
+      candidate.id.includes(idPrefix)
+    );
+  });
+  const openInviteConfirm = (candidate: (typeof inviteCandidates)[number]) => {
+    setSelectedInviteCandidate(candidate);
+    setInviteMessage("");
+    setIsIdInviteConfirmOpen(true);
+  };
   const copyInviteLink = async () => {
     try {
       if (!navigator.clipboard) {
@@ -110,6 +164,161 @@ export function OwnerTeamDetailPage() {
     }
   };
 
+  if (isIdInvitePageOpen) {
+    return (
+      <S.IdInvitePage>
+        <S.Content>
+          <PageHeader
+            onBack={() => {
+              setIsIdInviteConfirmOpen(false);
+              setIsIdInvitePageOpen(false);
+            }}
+            title="아이디로 초대"
+          />
+          <S.IdInviteContent>
+            <S.IdInviteSearch>
+              <Icon name="search" size={15} weight="bold" />
+              <input
+                aria-label="아이디 또는 닉네임 검색"
+                onChange={(event) => setInviteQuery(event.target.value)}
+                placeholder="아이디 또는 닉네임"
+                value={inviteQuery}
+              />
+              {inviteQuery && (
+                <button
+                  aria-label="검색어 지우기"
+                  onClick={() => setInviteQuery("")}
+                  type="button"
+                >
+                  <Icon name="x" size={13} weight="bold" />
+                </button>
+              )}
+            </S.IdInviteSearch>
+            <S.IdInviteHelp>
+              기존 아이디·닉네임으로 찾을 수 있어요.
+            </S.IdInviteHelp>
+
+            <S.IdInviteResultsHeader>
+              <strong>검색 결과 {filteredInviteCandidates.length}명</strong>
+            </S.IdInviteResultsHeader>
+            <S.IdInviteResults>
+              {filteredInviteCandidates.map((candidate) => (
+                <S.IdInviteCandidate key={candidate.id}>
+                  <S.ProfileNavigationHint aria-hidden="true">
+                    <Icon name="caret-right" size={16} weight="bold" />
+                  </S.ProfileNavigationHint>
+                  <S.IdInviteCandidateTop>
+                    <S.IdInviteAvatar>{candidate.initial}</S.IdInviteAvatar>
+                    <S.IdInviteProfile>
+                      <S.IdInviteName>
+                        {candidate.name} <span>@{candidate.id}</span>
+                      </S.IdInviteName>
+                      <p>{candidate.profile}</p>
+                      <S.SkillList>
+                        {candidate.skills.map((skill) => (
+                          <span key={skill}>{skill}</span>
+                        ))}
+                      </S.SkillList>
+                    </S.IdInviteProfile>
+                  </S.IdInviteCandidateTop>
+                  <S.InviteCandidateAction>
+                    <button
+                      disabled={sentInviteCandidateIds.includes(candidate.id)}
+                      onClick={() => openInviteConfirm(candidate)}
+                      type="button"
+                    >
+                      {sentInviteCandidateIds.includes(candidate.id)
+                        ? "초대 보냄"
+                        : "초대 보내기"}
+                    </button>
+                  </S.InviteCandidateAction>
+                </S.IdInviteCandidate>
+              ))}
+            </S.IdInviteResults>
+            {filteredInviteCandidates.length === 0 && (
+              <S.EmptyInviteResult>
+                검색 결과가 없어요. 아이디 또는 닉네임을 다시 확인해 주세요.
+              </S.EmptyInviteResult>
+            )}
+          </S.IdInviteContent>
+        </S.Content>
+
+        <BottomSheet
+          footer={
+            <S.SheetActions>
+              <S.SheetButton
+                $primary
+                onClick={() => {
+                  setIsIdInviteConfirmOpen(false);
+                  setSentInviteCandidateIds((current) =>
+                    current.includes(selectedInviteCandidate.id)
+                      ? current
+                      : [...current, selectedInviteCandidate.id],
+                  );
+                  showToast(
+                    `${selectedInviteCandidate.name}님에게 초대를 보냈어요.`,
+                  );
+                }}
+                type="button"
+              >
+                초대 보내기
+              </S.SheetButton>
+              <S.SheetButton
+                onClick={() => setIsIdInviteConfirmOpen(false)}
+                type="button"
+              >
+                취소
+              </S.SheetButton>
+            </S.SheetActions>
+          }
+          footerVariant="action"
+          minHeight="347px"
+          onClose={() => setIsIdInviteConfirmOpen(false)}
+          open={isIdInviteConfirmOpen}
+          showHeaderDivider={false}
+          variant="compact"
+        >
+          <S.IdInviteConfirmIcon>
+            <Icon name="check" size={20} weight="bold" />
+          </S.IdInviteConfirmIcon>
+          <S.SheetTitle>{selectedInviteCandidate.name}님에게</S.SheetTitle>
+          <S.IdInviteConfirmTitle>초대를 보낼까요?</S.IdInviteConfirmTitle>
+          <S.SheetDescription>
+            수락하면 지원서 없이 바로 팀원이 됩니다. 초대는 7일 후 자동으로
+            만료돼요.
+          </S.SheetDescription>
+          <S.Summary>
+            <S.SummaryRow $darkLabels>
+              <dt>초대 포지션</dt>
+              <dd>
+                <S.IdInviteTeamCount>
+                  {selectedInviteCandidate.position}
+                </S.IdInviteTeamCount>
+              </dd>
+            </S.SummaryRow>
+            <S.SummaryRow $darkLabels>
+              <dt>팀 인원</dt>
+              <dd>
+                <S.IdInviteTeamCount>3명 → 4명 예정</S.IdInviteTeamCount>
+              </dd>
+            </S.SummaryRow>
+          </S.Summary>
+          <S.IdInviteConfirmNote>
+            <strong>함께 보낼 메시지 · 선택</strong>
+            <textarea
+              aria-label="함께 보낼 메시지"
+              maxLength={120}
+              onChange={(event) => setInviteMessage(event.target.value)}
+              placeholder={defaultInviteMessage}
+              value={inviteMessage}
+            />
+          </S.IdInviteConfirmNote>
+        </BottomSheet>
+        <Toast message={toastMessage} open={Boolean(toastMessage)} />
+      </S.IdInvitePage>
+    );
+  }
+
   return (
     <S.Page>
       <S.Content>
@@ -134,7 +343,9 @@ export function OwnerTeamDetailPage() {
                       $state={actionMenuState}
                       onClick={() => {
                         setActionMenuState("closed");
-                        navigate("/contests/seoul-data/teams/my-data-seoul/edit");
+                        navigate(
+                          "/contests/seoul-data/teams/my-data-seoul/edit",
+                        );
                       }}
                       role="menuitem"
                       type="button"
@@ -250,6 +461,26 @@ export function OwnerTeamDetailPage() {
                 </div>
               </S.Member>
             ))}
+            {inviteCandidates
+              .filter((candidate) =>
+                sentInviteCandidateIds.includes(candidate.id),
+              )
+              .map((candidate) => (
+                <S.PendingInvite key={candidate.id}>
+                  <S.PendingInviteAvatar>
+                    {candidate.initial}
+                  </S.PendingInviteAvatar>
+                  <div>
+                    <S.MemberHeading>
+                      <S.MemberName>{candidate.name}</S.MemberName>
+                      <S.InviteSentBadge>초대 보냄</S.InviteSentBadge>
+                    </S.MemberHeading>
+                    <S.MemberRole>
+                      {candidate.position} · 초대 수락 대기 중
+                    </S.MemberRole>
+                  </div>
+                </S.PendingInvite>
+              ))}
           </S.MemberList>
         </S.Section>
       </S.Content>
@@ -293,12 +524,6 @@ export function OwnerTeamDetailPage() {
         footer={
           <S.SheetActions>
             <S.SheetButton
-              onClick={() => setIsCloseSheetOpen(false)}
-              type="button"
-            >
-              취소
-            </S.SheetButton>
-            <S.SheetButton
               $primary
               disabled={!isCloseAcknowledged}
               onClick={() => {
@@ -309,6 +534,12 @@ export function OwnerTeamDetailPage() {
               type="button"
             >
               모집 마감하기
+            </S.SheetButton>
+            <S.SheetButton
+              onClick={() => setIsCloseSheetOpen(false)}
+              type="button"
+            >
+              취소
             </S.SheetButton>
           </S.SheetActions>
         }
@@ -328,15 +559,15 @@ export function OwnerTeamDetailPage() {
           지원은 자동으로 거절됩니다.
         </S.SheetDescription>
         <S.Summary>
-          <S.SummaryRow>
+          <S.SummaryRow $darkLabels>
             <dt>현재 팀 인원</dt>
             <dd>3 / 5명</dd>
           </S.SummaryRow>
-          <S.SummaryRow>
+          <S.SummaryRow $darkLabels>
             <dt>대기 중인 지원</dt>
-            <S.Pending>3건 저장됨</S.Pending>
+            <S.Pending>3건</S.Pending>
           </S.SummaryRow>
-          <S.SummaryRow>
+          <S.SummaryRow $darkLabels>
             <dt>남는 자리</dt>
             <dd>2자리 → 마감</dd>
           </S.SummaryRow>
@@ -399,7 +630,7 @@ export function OwnerTeamDetailPage() {
             </S.InviteOptionIcon>
             <S.InviteOptionCopy>
               <strong>메시지로 보내기</strong>
-              <small>카카오톡 · 문자</small>
+              <small>카카오톡 · 문자 등</small>
             </S.InviteOptionCopy>
             <S.InviteCaret>
               <Icon name="caret-right" size={13} weight="bold" />
@@ -408,7 +639,7 @@ export function OwnerTeamDetailPage() {
           <S.InviteOption
             onClick={() => {
               setIsInviteSheetOpen(false);
-              showToast("아이디로 초대 기능을 준비 중이에요.");
+              setIsIdInvitePageOpen(true);
             }}
             type="button"
           >
