@@ -7,6 +7,7 @@ import {
   CaretRight,
   Check,
   ChatCircleDots,
+  DotsThree,
   Eye,
   EyeSlash,
   Heart,
@@ -17,9 +18,11 @@ import {
   Plus,
   NotePencil,
   ShareNetwork,
+  Trash,
   UserCircle,
   UserPlus,
   UsersThree,
+  Warning,
   X,
   type IconProps as PhosphorIconProps,
 } from "@phosphor-icons/react";
@@ -34,6 +37,7 @@ export type IconName =
   | "caret-right"
   | "check"
   | "chat"
+  | "more"
   | "eye"
   | "eye-slash"
   | "home"
@@ -44,9 +48,11 @@ export type IconName =
   | "edit"
   | "search"
   | "share"
+  | "trash"
   | "user"
   | "user-plus"
   | "users"
+  | "warning"
   | "x";
 
 type IconComponentProps = PhosphorIconProps & { name: IconName };
@@ -60,6 +66,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "caret-right": CaretRight,
   check: Check,
   chat: ChatCircleDots,
+  more: DotsThree,
   eye: Eye,
   "eye-slash": EyeSlash,
   home: House,
@@ -70,9 +77,11 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,
+  trash: Trash,
   user: UserCircle,
   "user-plus": UserPlus,
   users: UsersThree,
+  warning: Warning,
   x: X,
 };
 

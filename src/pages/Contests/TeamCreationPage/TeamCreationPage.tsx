@@ -842,8 +842,9 @@ function StepFive({ onEdit }: { onEdit: (step: number) => void }) {
 
 export function TeamCreationPage() {
   const navigate = useNavigate();
-  const { contestId = "seoul-data", step } = useParams();
+  const { contestId = "seoul-data", step, teamId } = useParams();
   const [searchParams] = useSearchParams();
+  const isEditMode = Boolean(teamId);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const {
@@ -901,15 +902,23 @@ export function TeamCreationPage() {
                 questions.slice(0, 2).every((question) => question.trim()),
               )
             : true;
-  const titleByStep = [
-    "팀 만들기",
-    "모집 포지션 정하기",
-    "팀원 · 활동 방식",
-    "팀 소개 · 지원 질문",
-    "팀 만들기 확인",
-  ];
+  const titleByStep = isEditMode
+    ? [
+        "팀 수정하기",
+        "모집 포지션 수정",
+        "팀원 · 활동 방식",
+        "팀 소개 · 지원 질문",
+        "팀 수정 확인",
+      ]
+    : [
+        "팀 만들기",
+        "모집 포지션 정하기",
+        "팀원 · 활동 방식",
+        "팀 소개 · 지원 질문",
+        "팀 만들기 확인",
+      ];
   const stepPath = (targetStep: number) =>
-    `/contests/${contestId}/teams/create${targetStep === 1 ? "" : `/${targetStep}`}${searchParams.get("from") ? `?from=${searchParams.get("from")}` : ""}`;
+    `/contests/${contestId}/teams/${isEditMode ? `${teamId}/edit` : "create"}${targetStep === 1 ? "" : `/${targetStep}`}${searchParams.get("from") ? `?from=${searchParams.get("from")}` : ""}`;
   const goToStep = (targetStep: number) =>
     navigate(stepPath(targetStep), { replace: true });
   const handleBack = () => {
@@ -921,6 +930,13 @@ export function TeamCreationPage() {
     goToStep(currentStep - 1);
   };
   const exitTeamCreation = () => {
+    if (isEditMode) {
+      navigate(`/contests/${contestId}/teams/${teamId}/manage`, {
+        replace: true,
+      });
+      return;
+    }
+
     navigate(-1);
   };
   const handleSubmit = () => {
@@ -931,6 +947,12 @@ export function TeamCreationPage() {
   const confirmSubmit = () => {
     setSubmitted(true);
     setIsSubmitModalOpen(false);
+
+    if (isEditMode) {
+      navigate(`/contests/${contestId}/teams/${teamId}/manage`, { replace: true });
+      return;
+    }
+
     navigate(`/contests/${contestId}`, {
       replace: true,
       state: {
@@ -953,7 +975,9 @@ export function TeamCreationPage() {
     goToStep(currentStep + 1);
   };
   const renderStep = () => {
-    if (currentStep === 5) return <StepFive onEdit={goToStep} />;
+    if (currentStep === 5) {
+      return <StepFive onEdit={goToStep} />;
+    }
     if (currentStep === 2) return <StepTwo />;
     if (currentStep === 3) return <StepThree />;
     if (currentStep === 4) return <StepFour />;
@@ -980,13 +1004,21 @@ export function TeamCreationPage() {
         >
           {currentStep === totalSteps
             ? submitted
-              ? "팀 등록 완료"
-              : "팀 만들기 완료"
+              ? isEditMode
+                ? "팀 수정 완료"
+                : "팀 등록 완료"
+              : isEditMode
+                ? "팀 수정 완료"
+                : "팀 만들기 완료"
             : "다음으로 가기"}
         </S.NextButton>
       </S.ActionBar>
       <Modal
-        description="작성 중인 팀 정보는 저장되지 않아요."
+        description={
+          isEditMode
+            ? "수정 중인 팀 정보는 저장되지 않아요."
+            : "작성 중인 팀 정보는 저장되지 않아요."
+        }
         icon={<Icon name="x" size={22} weight="bold" />}
         onClose={() => setIsExitModalOpen(false)}
         open={isExitModalOpen}
@@ -995,19 +1027,26 @@ export function TeamCreationPage() {
           label: "계속 작성하기",
           onClick: () => setIsExitModalOpen(false),
         }}
-        title="팀 만들기를 나가시겠어요?"
+        title={isEditMode ? "팀 수정을 나가시겠어요?" : "팀 만들기를 나가시겠어요?"}
       />
       <Modal
-        description="등록 후에도 팀 상세에서 정보를 수정할 수 있어요."
+        description={
+          isEditMode
+            ? "수정한 팀 정보가 바로 반영돼요."
+            : "등록 후에도 팀 상세에서 정보를 수정할 수 있어요."
+        }
         icon={<Icon name="check" size={22} weight="bold" />}
         onClose={() => setIsSubmitModalOpen(false)}
         open={isSubmitModalOpen}
-        primaryAction={{ label: "등록하기", onClick: confirmSubmit }}
+        primaryAction={{
+          label: isEditMode ? "수정 완료" : "등록하기",
+          onClick: confirmSubmit,
+        }}
         secondaryAction={{
           label: "취소",
           onClick: () => setIsSubmitModalOpen(false),
         }}
-        title="팀을 등록하시겠어요?"
+        title={isEditMode ? "팀 정보를 수정할까요?" : "팀을 등록하시겠어요?"}
       />
     </S.Page>
   );

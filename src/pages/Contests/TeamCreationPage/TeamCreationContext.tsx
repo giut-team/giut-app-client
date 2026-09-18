@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { useParams } from "react-router-dom";
 
 type TeamMember = {
   id: string;
@@ -42,18 +43,46 @@ const TeamCreationContext = createContext<TeamCreationContextValue | null>(
 );
 
 export function TeamCreationProvider({ children }: { children: ReactNode }) {
-  const [teamName, setTeamName] = useState("");
-  const [memberCount, setMemberCount] = useState(0);
-  const [majorRole, setMajorRole] = useState<string[]>([]);
-  const [subRole, setSubRole] = useState<string[]>([]);
-  const [recruitingRoles, setRecruitingRoles] = useState<string[]>([]);
-  const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
-  const [roleSkills, setRoleSkills] = useState<Record<string, string[]>>({});
-  const [members, setMembers] = useState<TeamMember[]>([]);
-  const [activityMode, setActivityMode] = useState("");
-  const [weeklyMeetings, setWeeklyMeetings] = useState(0);
-  const [locations, setLocations] = useState<string[]>([]);
-  const [introduction, setIntroduction] = useState("");
+  const { teamId } = useParams();
+  const isEditMode = Boolean(teamId);
+  const [teamName, setTeamName] = useState(() =>
+    isEditMode ? "데이터로 서울을" : "",
+  );
+  const [memberCount, setMemberCount] = useState(() => (isEditMode ? 5 : 0));
+  const [majorRole, setMajorRole] = useState<string[]>(() =>
+    isEditMode ? ["기획"] : [],
+  );
+  const [subRole, setSubRole] = useState<string[]>(() =>
+    isEditMode ? ["서비스 기획"] : [],
+  );
+  const [recruitingRoles, setRecruitingRoles] = useState<string[]>(() =>
+    isEditMode ? ["개발"] : [],
+  );
+  const [roleCounts, setRoleCounts] = useState<Record<string, number>>(() =>
+    isEditMode ? { 개발: 4 } : ({} as Record<string, number>),
+  );
+  const [roleSkills, setRoleSkills] = useState<Record<string, string[]>>(() =>
+    isEditMode
+      ? { 개발: ["백엔드 개발자", "데이터 엔지니어"] }
+      : ({} as Record<string, string[]>),
+  );
+  const [members, setMembers] = useState<TeamMember[]>(() =>
+    isEditMode
+      ? [{ id: "seoyeon", name: "이서연", profile: "@seoyeon · 기획 포지션" }]
+      : [],
+  );
+  const [activityMode, setActivityMode] = useState(() =>
+    isEditMode ? "온·오프 혼합" : "",
+  );
+  const [weeklyMeetings, setWeeklyMeetings] = useState(() => (isEditMode ? 1 : 0));
+  const [locations, setLocations] = useState<string[]>(() =>
+    isEditMode ? ["교내"] : [],
+  );
+  const [introduction, setIntroduction] = useState(() =>
+    isEditMode
+      ? "서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의와 온라인 소통으로 함께해요."
+      : "",
+  );
   const [questions, setQuestions] = useState([
     "이 팀에 지원한 이유를 알려주세요",
     "지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?",

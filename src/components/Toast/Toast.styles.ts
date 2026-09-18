@@ -8,7 +8,7 @@ const toastLifecycle = keyframes`
     transform: translate(-50%, 8px);
   }
 
-  22%, 76% {
+  18%, 70% {
     opacity: 1;
     transform: translate(-50%, 0);
   }
@@ -30,7 +30,7 @@ export const S = {
     border-radius: 9px;
     color: ${tokens.color.neutral[50]};
     background: ${tokens.color.neutral[900]};
-    animation: ${toastLifecycle} 1.8s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
+    animation: ${toastLifecycle} 3.2s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
     font-size: 9px;
 
     @media (prefers-reduced-motion: reduce) {

@@ -52,6 +52,17 @@ export function AppRouter() {
           <Route index element={<TeamCreationPage />} />
           <Route element={<TeamCreationPage />} path=":step" />
         </Route>
+        <Route
+          element={
+            <TeamCreationProvider>
+              <Outlet />
+            </TeamCreationProvider>
+          }
+          path="/contests/:contestId/teams/:teamId/edit"
+        >
+          <Route index element={<TeamCreationPage />} />
+          <Route element={<TeamCreationPage />} path=":step" />
+        </Route>
         <Route element={<PopularContestsPage />} path="/contests/popular" />
         <Route element={<NotificationsPage />} path="/notifications" />
         <Route element={<PositionTeamsPage />} path="/position-teams" />

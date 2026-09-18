@@ -57,7 +57,7 @@ export function ContestDetailPage() {
   useEffect(() => {
     if (!toastMessage) return;
 
-    const timeoutId = window.setTimeout(() => setToastMessage(""), 1800);
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
 
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
@@ -85,7 +85,6 @@ export function ContestDetailPage() {
 
       await navigator.clipboard?.writeText(window.location.href);
       setToastMessage("링크를 복사했어요.");
-      window.setTimeout(() => setToastMessage(""), 1800);
     } catch {
       // 공유 시트를 닫은 경우에는 별도의 피드백을 표시하지 않습니다.
     }
