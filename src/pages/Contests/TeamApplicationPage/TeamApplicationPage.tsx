@@ -4,7 +4,7 @@ import { Icon, type IconName } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { S } from "./TeamApplicationPage.styles";
 
-const totalSteps = 4;
+const totalSteps = 3;
 const introductionDefault = "";
 
 type Field = "개발" | "디자인" | "기획" | "마케팅";
@@ -90,7 +90,7 @@ export function TeamApplicationPage() {
   };
 
   const handleBack = () => {
-    if (step > 1 && step < totalSteps) {
+    if (step > 1 && step <= totalSteps) {
       setStep((currentStep) => currentStep - 1);
       return;
     }
@@ -112,10 +112,10 @@ export function TeamApplicationPage() {
   return (
     <S.Page>
       <S.Content>
-        {step < totalSteps && (
+        {step <= totalSteps && (
           <>
         <S.Header>
-          {step < totalSteps && (
+          {step <= totalSteps && (
             <S.BackButton
               aria-label="뒤로 가기"
               onClick={handleBack}
@@ -274,10 +274,10 @@ export function TeamApplicationPage() {
                     }
                     value={questionAnswers[index]}
                   />
+                  </S.QuestionPreviewCard>
                   <S.QuestionCharacterCount>
                     {questionAnswers[index].length}/300
                   </S.QuestionCharacterCount>
-                  </S.QuestionPreviewCard>
                 </S.QuestionInputGroup>
               ))}
             </S.QuestionPreviewList>

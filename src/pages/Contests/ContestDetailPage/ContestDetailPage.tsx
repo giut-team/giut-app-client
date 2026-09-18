@@ -286,8 +286,10 @@ export function ContestDetailPage() {
         open={isTeamCreationModalOpen}
         primaryAction={{
           label: "팀 만들기",
-          onClick: () =>
-            window.location.assign(`/contests/${contestId}/teams/create?from=detail`),
+          onClick: () => {
+            setIsTeamCreationModalOpen(false);
+            navigate(`/contests/${contestId}/teams/create?from=detail`);
+          },
         }}
         secondaryAction={{
           label: "취소",

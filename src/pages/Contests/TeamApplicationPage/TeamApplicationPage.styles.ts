@@ -75,7 +75,7 @@ export const S = {
   `,
   Progress: styled.div`
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 3px;
     padding: 0 12px;
     background: ${tokens.color.neutral[50]};
@@ -409,9 +409,8 @@ export const S = {
     gap: 7px;
   `,
   QuestionPreviewCard: styled.article`
-    position: relative;
     min-height: 116px;
-    padding: 0 14px 28px;
+    padding: 0 14px;
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 10px;
     background: ${tokens.color.neutral[50]};
@@ -441,9 +440,9 @@ export const S = {
     resize: none;
   `,
   QuestionCharacterCount: styled.span`
-    position: absolute;
-    right: 14px;
-    bottom: 10px;
+    justify-self: end;
+    margin-top: -3px;
+    margin-right: 2px;
     color: ${tokens.color.neutral[900]};
     font-size: 8px;
     font-weight: 600;
