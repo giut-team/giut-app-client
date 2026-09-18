@@ -198,10 +198,6 @@ export function MyTeamPage() {
               )}
             </S.TeamCard>
           ))}
-          <S.CreateTeamCard type="button">
-            <Icon name="plus" size={19} weight="bold" />
-            <span>팀 만들기</span>
-          </S.CreateTeamCard>
         </S.TeamScroller>
       </S.TeamSection>
 

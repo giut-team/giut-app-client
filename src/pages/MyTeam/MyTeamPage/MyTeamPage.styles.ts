@@ -288,31 +288,6 @@ export const S = {
     font-size: 9px;
     font-weight: 600;
   `,
-  CreateTeamCard: styled.button`
-    display: flex;
-    flex: 0 0 98px;
-    min-height: 128px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: 1px dashed
-      color-mix(in srgb, ${tokens.color.primary[500]} 28%, transparent);
-    border-radius: 14px;
-    background: transparent;
-    color: ${tokens.color.primary[500]};
-    font: inherit;
-    font-size: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    scroll-snap-align: start;
-
-    &:focus-visible {
-      outline: 2px solid ${tokens.color.primary[500]};
-      outline-offset: 2px;
-    }
-  `,
   ApplicationSection: styled.section`
     width: min(100%, 480px);
     margin: 0 auto;
