@@ -8,6 +8,14 @@ type DetailTab = "overview" | "guide";
 
 const recruitTeams = [
   {
+    id: "my-data-seoul",
+    title: "데이터로 서울을",
+    leader: "이서연 팀장 · 온라인 + 오프라인",
+    members: "3/5명",
+    positions: ["백엔드 개발자 모집", "데이터 엔지니어 모집"],
+    isOwner: true,
+  },
+  {
     id: "data-seoul",
     title: "데이터로 서울을",
     leader: "이수현 팀장 · 온라인 + 오프라인",
@@ -82,6 +90,8 @@ export function ContestDetailPage() {
       // 공유 시트를 닫은 경우에는 별도의 피드백을 표시하지 않습니다.
     }
   };
+  const getTeamPath = (team: (typeof recruitTeams)[number]) =>
+    team.isOwner ? `teams/${team.id}/manage` : `teams/${team.id}`;
 
   return (
     <S.Page>
@@ -231,27 +241,32 @@ export function ContestDetailPage() {
             {recruitTeams.map((team) => (
               <S.TeamCard
                 key={team.id}
-                onClick={() => navigate(`teams/${team.id}`)}
+                onClick={() => navigate(getTeamPath(team))}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
-                    navigate(`teams/${team.id}`);
+                    navigate(getTeamPath(team));
                   }
                 }}
                 role="button"
                 tabIndex={0}
               >
                 <S.TeamTitleRow>
-                  <S.TeamTitle>{team.title}</S.TeamTitle>
+                  <S.TeamTitleGroup>
+                    <S.TeamTitle>{team.title}</S.TeamTitle>
+                    {team.isOwner && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
+                  </S.TeamTitleGroup>
                   <S.TeamCount>{team.members}</S.TeamCount>
                 </S.TeamTitleRow>
                 <S.TeamMeta>{team.leader}</S.TeamMeta>
                 <S.PositionList>
-                  {team.positions.map((position, index) => (
-                    <S.PositionBadge $open={index === 0} key={position}>
+                  {team.positions
+                    .filter((position) => position.includes("모집"))
+                    .map((position) => (
+                    <S.PositionBadge $open key={position}>
                       {position}
                     </S.PositionBadge>
-                  ))}
+                    ))}
                 </S.PositionList>
               </S.TeamCard>
             ))}

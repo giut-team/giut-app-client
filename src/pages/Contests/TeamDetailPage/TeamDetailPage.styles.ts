@@ -65,9 +65,10 @@ export const S = {
     font-size: 9px;
     font-weight: 600;
   `,
-  Section: styled.section`
+  Section: styled.section<{ $last?: boolean }>`
     padding: 16px;
-    border-bottom: 8px solid ${tokens.color.neutral[100]};
+    border-bottom: ${({ $last }) =>
+      $last ? "0" : `8px solid ${tokens.color.neutral[100]}`};
   `,
   SectionTitle: styled.h2`
     margin: 0 0 12px;

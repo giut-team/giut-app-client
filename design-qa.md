@@ -1,34 +1,34 @@
-# Design QA — 팀 상세 페이지
+# Design QA — 팀장용 팀 관리 상세
 
 ## Comparison target
 
-- Source visual truth: 사용자가 제공한 모바일 팀 상세 화면 스크린샷.
-- Implementation route: `/contests/seoul-data/teams/data-seoul`.
-- Intended viewport: 340 × 720 CSS px mobile viewport, device scale factor 1.
-- State: `데이터로 서울을` 팀의 모집 중 상태.
+- Source visual truth: 사용자가 제공한 팀장용 모바일 팀 상세 화면 스크린샷.
+- Implementation routes: `/contests/seoul-data` 및 `/contests/seoul-data/teams/my-data-seoul/manage`.
+- Intended viewport: 393 × 720 CSS px mobile viewport, device scale factor 1.
+- State: 공모전 상세 또는 전체 팀 목록에서 `내가 만든 팀`으로 표시된 `데이터로 서울을` 카드를 선택한 상태.
 
 ## Evidence
 
-- Source pixels: 340 × 720 px (사용자 제공 이미지).
+- Source pixels: 393 × 720 px (사용자 제공 이미지).
 - Implementation screenshot: unavailable.
 - Browser and console check: blocked — available browser runtime returned `No browser is available`.
 - Code checks: `npm run lint` and `npm run build` passed.
-- Primary interactions implemented: 공모전 상세와 전체 팀 목록의 모집 중 팀 카드를 클릭하거나 상세 보기 버튼을 누르면 팀 상세 경로로 이동한다. 팀 상세의 뒤로 가기는 이전 화면으로 돌아가며, 하단 팀 지원 버튼은 팀 목록으로 이동한다.
+- Primary interactions implemented: 공모전 상세와 전체 팀 목록의 내 팀 카드는 팀장용 상세로 이동한다. 받은 지원 CTA는 지원서 관리로 이동하고, 모집 마감은 마감/재개 상태를 전환한다. 수정 및 팀원 초대는 안내 토스트를 표시한다.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: 기존 SUIT 기반의 제목·보조 문구·배지 계층을 적용했다. 렌더 화면 비교는 차단됨.
-- Spacing and layout rhythm: 헤더, 모집 진행률, 섹션 구분선, 팀원 목록, 하단 고정 CTA의 모바일 리듬을 구현했다. 렌더 화면 비교는 차단됨.
-- Colors and visual tokens: 기존 primary·neutral·success·purple 토큰으로 모집 상태, 인원 수, 팀원 역할과 CTA를 구성했다. 렌더 화면 비교는 차단됨.
-- Image quality and asset fidelity: 참고 화면은 표준 UI 아이콘과 이니셜 아바타를 사용한다. 프로젝트의 기존 아이콘 라이브러리를 사용했고 별도 래스터 자산은 필요하지 않다. 렌더 화면 비교는 차단됨.
-- Copy and content: 참고 화면의 팀명, 공모전명, 포지션, 활동 정보, 소개, 팀원 데이터를 반영했다. 렌더 화면 비교는 차단됨.
+- Fonts and typography: 기존 SUIT 기반의 제목·배지·보조 문구 계층을 적용했다. 렌더 화면 비교는 차단됨.
+- Spacing and layout rhythm: 공모전 상세의 팀 카드, 팀 요약, 모집 포지션 카드, 가로 팀원 칩, 하단 CTA를 참고 화면 구조에 맞춰 구현했다. 렌더 화면 비교는 차단됨.
+- Colors and visual tokens: primary·neutral·success·purple 토큰으로 팀장 상태, 모집 여부, 인원 수, CTA를 구성했다. 렌더 화면 비교는 차단됨.
+- Image quality and asset fidelity: 참고 화면은 표준 UI와 이니셜 팀원 표기를 사용한다. 프로젝트의 기존 아이콘과 텍스트 기반 이니셜 표현을 사용했고 별도 래스터 자산은 필요하지 않다. 렌더 화면 비교는 차단됨.
+- Copy and content: 참고 화면의 팀명, 공모전명, 포지션 현황, 팀원, 지원 관리 문구를 반영했다. 렌더 화면 비교는 차단됨.
 
 ## Findings
 
 - [P1] 브라우저 렌더 기반의 시각 비교를 수행할 수 없음.
   - Evidence: browser runtime returned `No browser is available`.
-  - Impact: 340px 모바일 폭에서의 글자 줄바꿈, 세로 간격, 하단 CTA 안전 영역, 카드 높이를 참고 화면과 대조할 수 없다.
-  - Fix: 브라우저 연결 후 같은 뷰포트에서 상세 페이지를 캡처하고, 제공된 스크린샷과 전체·팀원 영역을 비교한다.
+  - Impact: 공모전 상세 카드의 배지 위치와 모바일 폭에서 포지션 카드·팀원 칩·하단 CTA의 높이 및 간격을 참고 화면과 대조할 수 없다.
+  - Fix: 브라우저 연결 후 두 진입 경로와 팀장용 상세를 같은 뷰포트에서 캡처해 제공된 이미지와 비교한다.
 
 ## Comparison history
 
@@ -36,14 +36,15 @@
 
 ## Implementation checklist
 
-- [x] 팀 상세 라우트 추가.
-- [x] 공모전 상세 및 팀 목록 카드에서 팀 상세로 이동 연결.
-- [x] 모집 현황, 활동 정보, 소개, 팀원 목록, 하단 CTA 구현.
+- [x] 전체 팀 목록에 팀장 권한의 내 팀 카드 추가.
+- [x] 공모전 상세에 내 팀 카드와 식별 배지 추가.
+- [x] 두 카드에서 같은 팀 관리 상세 경로로 이동 연결.
+- [x] 모집 현황, 팀원 요약, 지원서 관리·모집 마감 인터랙션 구현.
 - [x] Lint 및 production build 실행.
 - [ ] 동일 뷰포트의 구현 화면을 캡처해 참고 이미지와 비교.
 
 ## Follow-up polish
 
-- 브라우저를 사용할 수 있을 때 제목·배지의 줄바꿈, 팀원 행 간격, 하단 CTA 높이를 참고 이미지와 맞춘다.
+- 브라우저를 사용할 수 있을 때 공모전 상세 카드의 배지 위치, 포지션 카드 세로 밀도, 팀원 칩 폭, 하단 버튼 높이와 여백을 참고 이미지에 맞춘다.
 
 final result: blocked

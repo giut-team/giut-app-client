@@ -9,14 +9,14 @@ const members = [
     name: "이서연",
     role: "팀장 · 기획",
     specialty: "서비스 기획 · 프로젝트 매니저",
-    school: "경희대학교 경영학과",
+    school: "경영학부 3학년",
     tone: "green" as const,
   },
   {
     initials: "김",
     name: "김민재",
     role: "개발",
-    specialty: "프론트엔드 개발 · 풀스택 개발자",
+    specialty: "프론트엔드 개발",
     school: "컴퓨터과학부 3학년",
     tone: "blue" as const,
   },
@@ -84,12 +84,12 @@ export function TeamDetailPage() {
         <S.Section>
           <S.SectionTitle>팀 소개</S.SectionTitle>
           <S.Introduction>
-            서울의 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회
-            오프라인 회의, 나머지는 노션·디스코드로 소통해요.
+            서울의 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의,
+            나머지는 노션·디스코드로 소통해요.
           </S.Introduction>
         </S.Section>
 
-        <S.Section>
+        <S.Section $last>
           <S.SectionTitle>팀원 3명</S.SectionTitle>
           <S.MemberList>
             {members.map((member) => (

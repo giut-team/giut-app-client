@@ -116,6 +116,19 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
+  OwnerBadge: styled.span`
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: color-mix(
+      in srgb,
+      ${tokens.color.success[500]} 12%,
+      ${tokens.color.neutral[50]}
+    );
+    color: ${tokens.color.success[500]};
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   LastSeat: styled.span`
     padding: 4px 7px;
     border: 1px solid

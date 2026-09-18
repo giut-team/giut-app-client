@@ -10,6 +10,7 @@ type TeamCategory = "전체" | "개발" | "기획" | "디자인" | "마케팅";
 type Team = {
   category: Exclude<TeamCategory, "전체">;
   id: string;
+  isOwner?: boolean;
   leader: string;
   members: string;
   positions: string[];
@@ -21,6 +22,17 @@ type Team = {
 const categories: TeamCategory[] = ["전체", "개발", "기획", "디자인", "마케팅"];
 
 const teams: Team[] = [
+  {
+    id: "my-data-seoul",
+    category: "기획",
+    title: "데이터로 서울을",
+    leader: "이서연 팀장 · 온라인 + 오프라인 · 주 1회",
+    members: "3/5명",
+    positions: ["백엔드 개발자 모집중", "데이터 엔지니어 모집중"],
+    status: "open",
+    timeAgo: "방금 전",
+    isOwner: true,
+  },
   {
     id: "data-seoul",
     category: "개발",
@@ -103,6 +115,7 @@ function TeamCard({
     >
       <S.TeamTopline>
         <S.TeamCount $closed={!isOpen}>{team.members}</S.TeamCount>
+        {team.isOwner && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
         {team.id === "blending-3" && <S.LastSeat>한 자리</S.LastSeat>}
         <S.TimeAgo>{team.timeAgo}</S.TimeAgo>
       </S.TeamTopline>
@@ -182,6 +195,10 @@ export function RecruitingTeamsPage() {
         : [...current, teamId],
     );
   };
+  const getDetailPath = (team: Team) =>
+    team.isOwner
+      ? `/contests/${contestId}/teams/${team.id}/manage`
+      : `/contests/${contestId}/teams/${team.id}`;
 
   return (
     <S.Page>
@@ -219,8 +236,8 @@ export function RecruitingTeamsPage() {
               <TeamCard
                 favorite={favoriteIds.includes(team.id)}
                 key={team.id}
-                onSelect={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
-                onView={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
+                onSelect={() => navigate(getDetailPath(team))}
+                onView={() => navigate(getDetailPath(team))}
                 onToggleFavorite={() => toggleFavorite(team.id)}
                 team={team}
               />
@@ -238,8 +255,8 @@ export function RecruitingTeamsPage() {
                 <TeamCard
                   favorite={favoriteIds.includes(team.id)}
                   key={team.id}
-                onSelect={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
-                onView={() => navigate(`/contests/${contestId}/teams/${team.id}`)}
+                onSelect={() => navigate(getDetailPath(team))}
+                onView={() => navigate(getDetailPath(team))}
                   onToggleFavorite={() => toggleFavorite(team.id)}
                   team={team}
                 />
