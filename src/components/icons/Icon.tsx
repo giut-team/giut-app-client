@@ -8,6 +8,7 @@ import {
   CaretRight,
   Check,
   ChatCircleDots,
+  Code,
   Eye,
   EyeSlash,
   FolderSimple,
@@ -16,9 +17,12 @@ import {
   House,
   LockKey,
   MagnifyingGlass,
+  Megaphone,
   Minus,
+  Palette,
   Plus,
   NotePencil,
+  RocketLaunch,
   ShieldCheck,
   ShareNetwork,
   UserCircle,
@@ -39,6 +43,7 @@ export type IconName =
   | "caret-right"
   | "check"
   | "chat"
+  | "code"
   | "eye"
   | "eye-slash"
   | "folder"
@@ -47,11 +52,14 @@ export type IconName =
   | "lightning"
   | "lock"
   | "minus"
+  | "megaphone"
+  | "palette"
   | "plus"
   | "edit"
   | "search"
   | "share"
   | "shield-check"
+  | "rocket"
   | "user"
   | "user-plus"
   | "users"
@@ -69,6 +77,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "caret-right": CaretRight,
   check: Check,
   chat: ChatCircleDots,
+  code: Code,
   eye: Eye,
   "eye-slash": EyeSlash,
   folder: FolderSimple,
@@ -77,11 +86,14 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   lightning: Lightning,
   lock: LockKey,
   minus: Minus,
+  megaphone: Megaphone,
+  palette: Palette,
   plus: Plus,
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,
   "shield-check": ShieldCheck,
+  rocket: RocketLaunch,
   user: UserCircle,
   "user-plus": UserPlus,
   users: UsersThree,

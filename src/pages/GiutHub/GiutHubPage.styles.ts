@@ -105,7 +105,7 @@ export const S = {
   `,
   CategoryList: styled.div`
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin: 15px -20px 20px;
     padding: 0 20px;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
@@ -285,6 +285,101 @@ export const S = {
     font: inherit;
     font-size: 13px;
     font-weight: 800;
+    cursor: pointer;
+  `,
+  PositionSheetHeader: styled.div`
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    margin: -5px -9px 18px;
+  `,
+  PositionSheetClose: styled.button`
+    position: absolute;
+    left: 0;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: ${tokens.color.neutral[900]};
+    cursor: pointer;
+  `,
+  PositionSheetTitle: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  `,
+  PositionSheetHeading: styled.h3`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -1.3px;
+    line-height: 1.3;
+  `,
+  PositionSheetDescription: styled.p`
+    margin: 9px 0 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.6px;
+  `,
+  PositionGrid: styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 28px;
+  `,
+  PositionOption: styled.button<{ $selected: boolean }>`
+    position: relative;
+    display: grid;
+    min-height: 118px;
+    padding: 14px 12px;
+    place-content: center;
+    gap: 10px;
+    border: 2px solid ${({ $selected }) => $selected ? tokens.color.primary[500] : tokens.color.neutral[200]};
+    border-radius: 20px;
+    background: ${({ $selected }) => $selected ? "#f5f8ff" : tokens.color.neutral[50]};
+    color: ${({ $selected }) => $selected ? "#213f87" : tokens.color.neutral[700]};
+    font: inherit;
+    cursor: pointer;
+
+    span { font-size: 18px; font-weight: 800; letter-spacing: -0.8px; }
+
+    &:focus-visible { outline: 3px solid ${tokens.color.primary[500]}; outline-offset: 2px; }
+  `,
+  PositionCheck: styled.span`
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: 50%;
+    background: ${tokens.color.primary[500]};
+    color: ${tokens.color.neutral[50]};
+  `,
+  PositionSheetFooter: styled.div`
+    width: 100%;
+  `,
+  ViewPositionsButton: styled.button`
+    width: 100%;
+    height: 62px;
+    border: 0;
+    border-radius: 22px;
+    background: #1d397d;
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
     cursor: pointer;
   `,
   EmptyState: styled.p`

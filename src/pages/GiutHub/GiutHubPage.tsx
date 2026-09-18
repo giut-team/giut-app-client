@@ -8,31 +8,38 @@ import marketingFemale from "../../assets/default_image/marketing-female.png";
 import marketingMale from "../../assets/default_image/marketing-male.png";
 import plannerFemale from "../../assets/default_image/planner-female.png";
 import plannerMale from "../../assets/default_image/planner-male.png";
+import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { PillButton } from "../../components/PillButton";
 import { S } from "./GiutHubPage.styles";
 
-type Category = "전체" | "기획" | "디자인" | "개발" | "마케팅" | "창업";
-type FilterName = "포지션" | "활동 지역" | "현재 상태";
+type Category = "전체" | "기획" | "디자인" | "개발" | "마케팅";
+type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
+type Position = "기획" | "디자인" | "개발" | "마케팅";
 
 type Profile = {
   id: string;
-  category: Exclude<Category, "전체" | "창업">;
+  category: Exclude<Category, "전체">;
   name: string;
   available: boolean;
   summary: string;
   introduction: string;
   tags: string[];
-  projectCount: string;
+  projectCount: number;
   lastActiveAt: string;
   avatarFallback: string;
   avatarTone: "blue" | "purple" | "orange" | "green";
   avatarSrc?: string;
 };
 
-const categories: Category[] = ["전체", "기획", "디자인", "개발", "마케팅", "창업"];
-
+const categories: Category[] = ["전체", "기획", "디자인", "개발", "마케팅"];
+const positionOptions: { value: Position; icon: "edit" | "palette" | "code" | "megaphone" }[] = [
+  { value: "기획", icon: "edit" },
+  { value: "디자인", icon: "palette" },
+  { value: "개발", icon: "code" },
+  { value: "마케팅", icon: "megaphone" },
+];
 const mockRecentAccessAt = (hoursAgo: number) =>
   new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
 
@@ -58,7 +65,7 @@ const profiles: Profile[] = [
     summary: "개발 · 컴퓨터과학부 3학년",
     introduction: "AI로 더 편리한 캠퍼스 서비스를 만들고 싶어요.\n포트폴리오 프로젝트에 관심 있어요.",
     tags: ["AI/ML", "프론트엔드"],
-    projectCount: "프로젝트 2회",
+    projectCount: 2,
     // 최근 접속 12시간 전: 목업 기준 '응답 빠름'으로 표시됩니다.
     lastActiveAt: mockRecentAccessAt(12),
     avatarFallback: "김",
@@ -73,7 +80,7 @@ const profiles: Profile[] = [
     summary: "기획 · 경영학부 3학년",
     introduction: "사용자의 문제를 쉽게 푸는 기획을 좋아해요.",
     tags: ["서비스 기획", "시장 분석"],
-    projectCount: "프로젝트 4회",
+    projectCount: 4,
     lastActiveAt: mockRecentAccessAt(4),
     avatarFallback: "이",
     avatarTone: "purple",
@@ -87,7 +94,7 @@ const profiles: Profile[] = [
     summary: "디자인 · 산업디자인학과 2학년",
     introduction: "아이디어를 이해하기 쉬운 경험으로 만드는 데 관심 있어요.\n다음 공모전을 천천히 둘러보고 있어요.",
     tags: ["UX/UI", "Figma"],
-    projectCount: "프로젝트 3회",
+    projectCount: 3,
     lastActiveAt: mockRecentAccessAt(18),
     avatarFallback: "박",
     avatarTone: "orange",
@@ -101,7 +108,7 @@ const profiles: Profile[] = [
     summary: "개발 · 소프트웨어학부 2학년",
     introduction: "완성도 높은 서비스를 함께 만들 동료를 찾고 있어요.",
     tags: ["백엔드", "Spring"],
-    projectCount: "프로젝트 3회",
+    projectCount: 3,
     lastActiveAt: mockRecentAccessAt(9),
     avatarFallback: "최",
     avatarTone: "blue",
@@ -115,7 +122,7 @@ const profiles: Profile[] = [
     summary: "기획 · 행정학과 4학년",
     introduction: "팀의 방향을 함께 찾고 끝까지 실행하는 걸 좋아해요.",
     tags: ["서비스 기획", "리서치"],
-    projectCount: "프로젝트 5회",
+    projectCount: 5,
     lastActiveAt: mockRecentAccessAt(13),
     avatarFallback: "정",
     avatarTone: "purple",
@@ -129,7 +136,7 @@ const profiles: Profile[] = [
     summary: "디자인 · 시각디자인학과 3학년",
     introduction: "브랜드의 이야기를 설득력 있는 화면으로 풀어내고 싶어요.",
     tags: ["브랜딩", "UI 디자인"],
-    projectCount: "프로젝트 2회",
+    projectCount: 2,
     lastActiveAt: mockRecentAccessAt(2),
     avatarFallback: "김",
     avatarTone: "orange",
@@ -143,7 +150,7 @@ const profiles: Profile[] = [
     summary: "마케팅 · 경영학부 2학년",
     introduction: "사람들의 마음을 움직이는 캠페인을 만들어 보고 싶어요.",
     tags: ["콘텐츠", "SNS 마케팅"],
-    projectCount: "프로젝트 3회",
+    projectCount: 3,
     lastActiveAt: mockRecentAccessAt(12),
     avatarFallback: "한",
     avatarTone: "green",
@@ -157,7 +164,7 @@ const profiles: Profile[] = [
     summary: "마케팅 · 경제학부 3학년",
     introduction: "데이터와 아이디어를 연결하는 마케팅을 좋아합니다.",
     tags: ["데이터 분석", "광고 기획"],
-    projectCount: "프로젝트 4회",
+    projectCount: 4,
     lastActiveAt: mockRecentAccessAt(24),
     avatarFallback: "이",
     avatarTone: "green",
@@ -176,6 +183,8 @@ export function GiutHubPage() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<Category>("전체");
   const [activeFilter, setActiveFilter] = useState<FilterName | null>(null);
+  const [isPositionSheetOpen, setIsPositionSheetOpen] = useState(false);
+  const [selectedPositions, setSelectedPositions] = useState<Position[]>(["기획", "개발"]);
 
   const visibleProfiles = useMemo(
     () =>
@@ -188,6 +197,15 @@ export function GiutHubPage() {
   const resetFilters = () => {
     setActiveCategory("전체");
     setActiveFilter(null);
+    setSelectedPositions([]);
+  };
+
+  const togglePosition = (position: Position) => {
+    setSelectedPositions((current) =>
+      current.includes(position)
+        ? current.filter((item) => item !== position)
+        : [...current, position],
+    );
   };
 
   const recommendationTitle =
@@ -210,12 +228,19 @@ export function GiutHubPage() {
             필터 초기화
           </S.ResetButton>
           <S.FilterPanel aria-label="팀원 탐색 필터">
-            {(["포지션", "활동 지역", "현재 상태"] as FilterName[]).map((filter) => (
+            {(["포지션", "학과 및 학년", "현재 상태"] as FilterName[]).map((filter) => (
               <S.FilterButton
                 $active={activeFilter === filter}
                 aria-pressed={activeFilter === filter}
                 key={filter}
-                onClick={() => setActiveFilter((current) => current === filter ? null : filter)}
+                onClick={() => {
+                  if (filter === "포지션") {
+                    setIsPositionSheetOpen(true);
+                    return;
+                  }
+
+                  setActiveFilter((current) => current === filter ? null : filter);
+                }}
                 tone="secondary"
                 type="button"
                 width="100%"
@@ -258,6 +283,49 @@ export function GiutHubPage() {
           if (key === "mypage") navigate("/my-team");
         }}
       />
+      <BottomSheet
+        footer={
+          <S.PositionSheetFooter>
+            <S.ViewPositionsButton onClick={() => setIsPositionSheetOpen(false)} type="button">
+              {selectedPositions.length}명 보기
+            </S.ViewPositionsButton>
+          </S.PositionSheetFooter>
+        }
+        footerVariant="action"
+        minHeight="min(78svh, 560px)"
+        onClose={() => setIsPositionSheetOpen(false)}
+        open={isPositionSheetOpen}
+        showHeaderDivider={false}
+        variant="compact"
+      >
+        <S.PositionSheetHeader>
+          <S.PositionSheetClose aria-label="닫기" onClick={() => setIsPositionSheetOpen(false)} type="button">
+            <Icon name="x" size={30} weight="regular" />
+          </S.PositionSheetClose>
+          <S.PositionSheetTitle>포지션</S.PositionSheetTitle>
+        </S.PositionSheetHeader>
+        <S.PositionSheetHeading>어떤 역할을 찾고 있나요?</S.PositionSheetHeading>
+        <S.PositionSheetDescription>여러 포지션을 선택할 수 있어요.</S.PositionSheetDescription>
+        <S.PositionGrid aria-label="찾는 포지션 선택">
+          {positionOptions.map((option) => {
+            const selected = selectedPositions.includes(option.value);
+
+            return (
+              <S.PositionOption
+                $selected={selected}
+                aria-pressed={selected}
+                key={option.value}
+                onClick={() => togglePosition(option.value)}
+                type="button"
+              >
+                {selected && <S.PositionCheck><Icon name="check" size={16} weight="bold" /></S.PositionCheck>}
+                <Icon name={option.icon} size={38} weight="regular" />
+                <span>{option.value}</span>
+              </S.PositionOption>
+            );
+          })}
+        </S.PositionGrid>
+      </BottomSheet>
     </S.Page>
   );
 }
@@ -286,7 +354,10 @@ function ProfileCard({ profile }: { profile: Profile }) {
         </S.DetailButton>
       </S.ProfileTop>
       <S.ProfileMeta aria-label={`${profile.name} 활동 정보`}>
-        <span><Icon name="folder" size={14} weight="regular" />{profile.projectCount}</span>
+        <span>
+          <Icon name="users" size={16} weight="regular" />
+          협업 경험 {profile.projectCount}회
+        </span>
         <S.ResponseMeta
           $fast={responseStatus.isFast}
           aria-label={`최근 접속 ${responseStatus.elapsedHours}시간 전, ${responseStatus.label}`}
@@ -297,7 +368,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
       <S.Introduction>{profile.introduction}</S.Introduction>
       <S.CardFooter>
         <S.TagList aria-label={`${profile.name} 관심 분야`}>
-          <S.Tag>{profile.tags.join(" · ")}</S.Tag>
+          {profile.tags.map((tag) => <S.Tag key={tag}>#{tag}</S.Tag>)}
         </S.TagList>
         <S.ProfileLink type="button">프로필 보기 <Icon name="arrow-right" size={16} weight="bold" /></S.ProfileLink>
       </S.CardFooter>
