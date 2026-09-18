@@ -47,4 +47,16 @@
 - [x] Connect primary navigation and run lint/build checks.
 - [ ] Capture and compare the implemented route when a browser becomes available.
 
+## Latest cancellation-sheet update
+
+- Source visual truth: the latest supplied mobile composite shows the application-cancellation confirmation sheet and completion sheet.
+- Intended state: review detail → cancellation confirmation → cancellation complete.
+- Implementation screenshot: unavailable; the browser runtime returned `No browser is available`.
+- Implementation: `지원 취소하기` opens the confirmation state with the team, applied position, and review status. Confirming it switches to the completion state. `다른 팀 보기` and `닫기` return to the recruiting-team list.
+- Code checks: `npm.cmd run lint` and `npm.cmd run build` passed.
+
+**Latest finding**
+
+- [P1] The cancellation-sheet layout, typography, and exact spacing cannot be visually compared at the 320px mobile viewport without a browser-rendered implementation capture.
+
 final result: blocked

@@ -1,4 +1,9 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  BottomSheet,
+  type ApplicationCancelState,
+} from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
 import { S } from "./ApplicationReviewTeamDetailPage.styles";
@@ -42,7 +47,19 @@ const currentMember = {
 export function ApplicationReviewTeamDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { contestId = "seoul-data" } = useParams();
   const isAccepted = location.pathname.endsWith("/joined-data-seoul");
+  const [applicationCancelState, setApplicationCancelState] =
+    useState<ApplicationCancelState | null>(null);
+
+  const closeApplicationCancelSheet = () => {
+    if (applicationCancelState === "complete") {
+      navigate(`/contests/${contestId}/teams`);
+      return;
+    }
+
+    setApplicationCancelState(null);
+  };
 
   return (
     <S.Page>
@@ -213,10 +230,31 @@ export function ApplicationReviewTeamDetailPage() {
             >
               내 지원서 보기
             </S.ViewApplicationButton>
-            <S.CancelApplicationButton type="button">지원 취소하기</S.CancelApplicationButton>
+            <S.CancelApplicationButton
+              onClick={() => setApplicationCancelState("confirm")}
+              type="button"
+            >
+              지원 취소하기
+            </S.CancelApplicationButton>
           </S.ApplicationActions>
         )}
       </S.ActionBar>
+
+      {applicationCancelState && (
+        <BottomSheet
+          applicationCancelState={applicationCancelState}
+          applicationPosition="백엔드 개발자"
+          applicationTeamName="데이터로 서울을"
+          onApplicationCancelComplete={() =>
+            navigate(`/contests/${contestId}/teams`)
+          }
+          onApplicationCancelConfirm={() =>
+            setApplicationCancelState("complete")
+          }
+          onClose={closeApplicationCancelSheet}
+          open
+        />
+      )}
     </S.Page>
   );
 }

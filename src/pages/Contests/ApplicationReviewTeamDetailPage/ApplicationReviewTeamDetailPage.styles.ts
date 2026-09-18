@@ -363,7 +363,7 @@ export const S = {
   `,
   MemberSchool: styled.p`
     margin: 0;
-    color: ${tokens.color.neutral[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 9px;
     line-height: 1.35;
   `,
