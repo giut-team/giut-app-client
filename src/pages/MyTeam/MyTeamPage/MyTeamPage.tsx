@@ -9,6 +9,7 @@ import {
 import { Icon } from "../../../components/icons";
 import { SearchOverlay } from "../../../components/SearchOverlay/SearchOverlay";
 import giutLogo from "../../../assets/giut-logo.svg";
+import informationIcon from "../../../assets/information.svg";
 import {
   applicants,
   type Applicant,
@@ -174,32 +175,46 @@ export function MyTeamPage() {
             <S.TeamCard
               $pending={team.kind === "pending"}
               $selected={team.id === selectedTeam.id}
-              aria-pressed={team.id === selectedTeam.id}
               key={team.id}
-              onClick={() => setSelectedTeamId(team.id)}
-              type="button"
             >
-              <S.TeamBadges>
-                <S.TeamStatus $tone={team.tone}>{team.status}</S.TeamStatus>
-                {team.newApplications && (
-                  <S.NewApplications>{team.newApplications}</S.NewApplications>
+              <S.TeamSelectButton
+                aria-pressed={team.id === selectedTeam.id}
+                onClick={() => setSelectedTeamId(team.id)}
+                type="button"
+              >
+                <S.TeamBadges>
+                  <S.TeamStatus $tone={team.tone}>{team.status}</S.TeamStatus>
+                  {team.newApplications && (
+                    <S.NewApplications>{team.newApplications}</S.NewApplications>
+                  )}
+                  {team.elapsed && (
+                    <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>
+                  )}
+                </S.TeamBadges>
+                <S.TeamTitle>{team.title}</S.TeamTitle>
+                <S.TeamDescription>{team.description}</S.TeamDescription>
+                {team.kind === "pending" ? (
+                  <S.PendingMessage>팀장이 마지막 확인 중이에요</S.PendingMessage>
+                ) : (
+                  <S.ProgressTrack>
+                    <S.ProgressBar
+                      $progress={team.progress ?? 0}
+                      $tone={team.tone}
+                    />
+                  </S.ProgressTrack>
                 )}
-                {team.elapsed && (
-                  <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>
-                )}
-              </S.TeamBadges>
-              <S.TeamTitle>{team.title}</S.TeamTitle>
-              <S.TeamDescription>{team.description}</S.TeamDescription>
-              {team.kind === "pending" ? (
-                <S.PendingMessage>팀장이 마지막 확인 중이에요</S.PendingMessage>
-              ) : (
-                <S.ProgressTrack>
-                  <S.ProgressBar
-                    $progress={team.progress ?? 0}
-                    $tone={team.tone}
-                  />
-                </S.ProgressTrack>
-              )}
+              </S.TeamSelectButton>
+              <S.ContestShortcut
+                aria-label={`${team.title} 공모전 정보 보기`}
+                onClick={() => navigate(`/contests/${team.contestId}`)}
+                type="button"
+              >
+                <S.ContestShortcutIcon
+                  alt=""
+                  aria-hidden="true"
+                  src={informationIcon}
+                />
+              </S.ContestShortcut>
             </S.TeamCard>
           ))}
         </S.TeamScroller>
@@ -308,18 +323,6 @@ export function MyTeamPage() {
               팀장님에게 대화하러 가기
             </S.MemberChatButton>
           )}
-          {!isPendingTeam && (
-            <S.MemberInfoNote>
-              팀원으로 합류한 팀에서는 내가 보낸 지원서를 확인할 수 있어요.
-            </S.MemberInfoNote>
-          )}
-          <S.ContestDetailButton
-            onClick={() => navigate(`/contests/${selectedTeam.contestId}`)}
-            type="button"
-          >
-            <span>공모전 정보 보러가기</span>
-            <Icon name="caret-right" size={14} weight="bold" />
-          </S.ContestDetailButton>
         </S.MemberApplicationSection>
       ) : (
         <>
@@ -387,17 +390,6 @@ export function MyTeamPage() {
             >
               지원 {selectedApplicants.length}건 관리하기
             </S.ManageButton>
-            <S.InfoNote>
-              팀에 소속되면 홈은 내 팀 중심으로 바뀌어요. 공모전 탐색은 하단
-              공모전 탭에서 계속할 수 있습니다.
-            </S.InfoNote>
-            <S.ContestDetailButton
-              onClick={() => navigate(`/contests/${selectedTeam.contestId}`)}
-              type="button"
-            >
-              <span>공모전 정보 보러가기</span>
-              <Icon name="caret-right" size={14} weight="bold" />
-            </S.ContestDetailButton>
           </S.ApplicationSection>
         </>
       )}
