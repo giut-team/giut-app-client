@@ -29,13 +29,14 @@ const actionMenuItemEnter = keyframes`
 export const S = {
   Page: styled.main`
     min-height: 100svh;
-    padding-bottom: 104px;
     background: ${tokens.color.neutral[100]};
   `,
   Content: styled.div`
     width: min(100%, 480px);
     min-height: 100svh;
     margin: 0 auto;
+    padding-bottom: calc(152px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
     background: ${tokens.color.neutral[50]};
   `,
   HeaderActions: styled.div`

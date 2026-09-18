@@ -3,6 +3,7 @@ import { HomePage } from "./pages/Home/HomePage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
+import { ApplicationReviewTeamDetailPage } from "./pages/Contests/ApplicationReviewTeamDetailPage/ApplicationReviewTeamDetailPage";
 import { RecruitingTeamsPage } from "./pages/Contests/RecruitingTeamsPage/RecruitingTeamsPage";
 import { TeamDetailPage } from "./pages/Contests/TeamDetailPage/TeamDetailPage";
 import { TeamApplicationPage } from "./pages/Contests/TeamApplicationPage/TeamApplicationPage";
@@ -37,6 +38,14 @@ export function AppRouter() {
         <Route
           element={<TeamDetailPage />}
           path="/contests/:contestId/teams/:teamId"
+        />
+        <Route
+          element={<ApplicationReviewTeamDetailPage />}
+          path="/contests/:contestId/teams/applied-data-seoul"
+        />
+        <Route
+          element={<ApplicationReviewTeamDetailPage />}
+          path="/contests/:contestId/teams/joined-data-seoul"
         />
         <Route
           element={<TeamApplicationPage />}

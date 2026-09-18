@@ -8,6 +8,8 @@ import { S } from "./RecruitingTeamsPage.styles";
 type TeamCategory = "전체" | "개발" | "기획" | "디자인" | "마케팅";
 
 type Team = {
+  applicationReview?: boolean;
+  memberOfTeam?: boolean;
   category: Exclude<TeamCategory, "전체">;
   id: string;
   isOwner?: boolean;
@@ -34,12 +36,24 @@ const teams: Team[] = [
     isOwner: true,
   },
   {
-    id: "data-seoul",
+    id: "applied-data-seoul",
+    applicationReview: true,
     category: "개발",
     title: "데이터로 서울을",
     leader: "이수현 팀장 · 온라인 + 오프라인 · 주 1회",
     members: "3/5명",
     positions: ["백엔드 모집중", "프론트엔드 마감", "기획 마감"],
+    status: "open",
+    timeAgo: "2일 전",
+  },
+  {
+    id: "joined-data-seoul",
+    memberOfTeam: true,
+    category: "개발",
+    title: "데이터로 서울을",
+    leader: "이수연 팀장 · 온라인 + 오프라인 · 주 1회",
+    members: "4/5명",
+    positions: ["백엔드 개발자 모집중", "데이터 엔지니어 모집중"],
     status: "open",
     timeAgo: "2일 전",
   },
@@ -115,6 +129,10 @@ function TeamCard({
     >
       <S.TeamTopline>
         <S.TeamCount $closed={!isOpen}>{team.members}</S.TeamCount>
+        {team.applicationReview && (
+          <S.ApplicationReviewBadge>지원 검토 중</S.ApplicationReviewBadge>
+        )}
+        {team.memberOfTeam && <S.MemberOfTeamBadge>내 팀</S.MemberOfTeamBadge>}
         {team.isOwner && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
         {team.id === "blending-3" && <S.LastSeat>한 자리</S.LastSeat>}
         <S.TimeAgo>{team.timeAgo}</S.TimeAgo>

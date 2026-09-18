@@ -116,6 +116,24 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
+  ApplicationReviewBadge: styled.span`
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #fff2d8;
+    color: #bf7700;
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+  `,
+  MemberOfTeamBadge: styled.span`
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #e1f6eb;
+    color: #159b65;
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   OwnerBadge: styled.span`
     padding: 4px 6px;
     border-radius: 5px;
