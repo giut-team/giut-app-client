@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Modal } from "../../../components/Modal/Modal";
 import { Toast } from "../../../components/Toast/Toast";
 import { S } from "./ContestDetailPage.styles";
 
@@ -44,6 +45,7 @@ export function ContestDetailPage() {
   const { contestId = "seoul-data" } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [isSaved, setIsSaved] = useState(false);
+  const [isTeamCreationModalOpen, setIsTeamCreationModalOpen] = useState(false);
   const teamCreationState = location.state as {
     fromTeamCreation?: boolean;
     backPath?: string;
@@ -269,16 +271,30 @@ export function ContestDetailPage() {
 
       <S.ActionBar>
         <S.ApplyButton
-          onClick={() =>
-            window.location.assign(
-              `/contests/${contestId}/teams/create?from=detail`,
-            )
-          }
+          onClick={() => setIsTeamCreationModalOpen(true)}
           type="button"
         >
           팀 구성하기
         </S.ApplyButton>
       </S.ActionBar>
+      <Modal
+        description="팀을 만들고 함께할 팀원을 모집해 보세요."
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setIsTeamCreationModalOpen(false)}
+        open={isTeamCreationModalOpen}
+        primaryAction={{
+          label: "팀 만들기",
+          onClick: () =>
+            window.location.assign(`/contests/${contestId}/teams/create?from=detail`),
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setIsTeamCreationModalOpen(false),
+        }}
+        title="팀을 만들까요?"
+      />
       <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );
