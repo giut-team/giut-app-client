@@ -19,6 +19,7 @@ type TeamKind = "leader" | "member" | "pending";
 
 type Team = {
   id: string;
+  contestId: string;
   kind: TeamKind;
   status: string;
   title: string;
@@ -32,6 +33,7 @@ type Team = {
 const teams: Team[] = [
   {
     id: "pending-esg",
+    contestId: "esg-campaign",
     kind: "pending",
     status: "지원 대기",
     elapsed: "3일 경과",
@@ -41,6 +43,7 @@ const teams: Team[] = [
   },
   {
     id: "data-seoul",
+    contestId: "seoul-data",
     kind: "leader",
     status: "팀장",
     newApplications: "새 지원 3",
@@ -51,6 +54,7 @@ const teams: Team[] = [
   },
   {
     id: "esg-campaign",
+    contestId: "esg-campaign",
     kind: "member",
     status: "팀원",
     title: "ESG 캠페인 프로젝트",
@@ -304,11 +308,18 @@ export function MyTeamPage() {
               팀장님에게 대화하러 가기
             </S.MemberChatButton>
           )}
-          <S.MemberInfoNote>
-            {isPendingTeam
-              ? "팀장이 수락하면 알림으로 알려드립니다."
-              : "팀원으로 합류한 팀에서는 내가 보낸 지원서를 확인할 수 있어요."}
-          </S.MemberInfoNote>
+          {!isPendingTeam && (
+            <S.MemberInfoNote>
+              팀원으로 합류한 팀에서는 내가 보낸 지원서를 확인할 수 있어요.
+            </S.MemberInfoNote>
+          )}
+          <S.ContestDetailButton
+            onClick={() => navigate(`/contests/${selectedTeam.contestId}`)}
+            type="button"
+          >
+            <span>공모전 정보 보러가기</span>
+            <Icon name="caret-right" size={14} weight="bold" />
+          </S.ContestDetailButton>
         </S.MemberApplicationSection>
       ) : (
         <>
@@ -380,6 +391,13 @@ export function MyTeamPage() {
               팀에 소속되면 홈은 내 팀 중심으로 바뀌어요. 공모전 탐색은 하단
               공모전 탭에서 계속할 수 있습니다.
             </S.InfoNote>
+            <S.ContestDetailButton
+              onClick={() => navigate(`/contests/${selectedTeam.contestId}`)}
+              type="button"
+            >
+              <span>공모전 정보 보러가기</span>
+              <Icon name="caret-right" size={14} weight="bold" />
+            </S.ContestDetailButton>
           </S.ApplicationSection>
         </>
       )}

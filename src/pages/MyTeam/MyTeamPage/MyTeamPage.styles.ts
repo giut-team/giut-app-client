@@ -483,6 +483,33 @@ export const S = {
     font-size: 8px;
     line-height: 1.5;
   `,
+  ContestDetailButton: styled.button`
+    display: flex;
+    width: 100%;
+    height: 42px;
+    margin-top: 10px;
+    padding: 0 14px;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 11px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[800]};
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      border-color: ${tokens.color.primary[300]};
+      color: ${tokens.color.primary[500]};
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
   ApplicationHeader: styled.div`
     padding: 0 1px 10px;
   `,

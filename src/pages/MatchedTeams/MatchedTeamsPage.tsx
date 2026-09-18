@@ -71,10 +71,12 @@ const teams: Team[] = [
 function TeamCard({
   favorite,
   onToggleFavorite,
+  onView,
   team,
 }: {
   favorite: boolean;
   onToggleFavorite: () => void;
+  onView?: () => void;
   team: Team;
 }) {
   return (
@@ -91,7 +93,7 @@ function TeamCard({
         ))}
       </S.SkillList>
       <S.TeamActions>
-        <S.DetailButton type="button">
+        <S.DetailButton onClick={onView} type="button">
           상세 보기
           <Icon name="caret-right" size={14} weight="bold" />
         </S.DetailButton>
@@ -170,6 +172,11 @@ export function MatchedTeamsPage() {
                 favorite={favoriteIds.includes(team.id)}
                 key={team.id}
                 onToggleFavorite={() => toggleFavorite(team.id)}
+                onView={
+                  team.id === "data-seoul"
+                    ? () => navigate("/contests/seoul-data/teams/data-seoul")
+                    : undefined
+                }
                 team={team}
               />
             ))}
@@ -189,9 +196,14 @@ export function MatchedTeamsPage() {
               {overlapTeams.map((team) => (
                 <TeamCard
                   favorite={favoriteIds.includes(team.id)}
-                  key={team.id}
-                  onToggleFavorite={() => toggleFavorite(team.id)}
-                  team={team}
+                key={team.id}
+                onToggleFavorite={() => toggleFavorite(team.id)}
+                onView={
+                  team.id === "data-seoul"
+                    ? () => navigate("/contests/seoul-data/teams/data-seoul")
+                    : undefined
+                }
+                team={team}
                 />
               ))}
             </S.TeamList>
