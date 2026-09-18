@@ -275,7 +275,7 @@ export const S = {
   InfoGrid: styled.dl`
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 20px;
     margin: 0;
   `,
   InfoItem: styled.div`
@@ -299,7 +299,7 @@ export const S = {
     }
   `,
   IntroductionTitle: styled.h3`
-    margin: 17px 0 7px;
+    margin: 0 0 7px;
     color: ${tokens.color.neutral[900]};
     font-size: 11px;
     font-weight: 800;

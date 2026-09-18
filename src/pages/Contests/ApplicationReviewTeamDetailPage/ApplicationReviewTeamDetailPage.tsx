@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
 import { S } from "./ApplicationReviewTeamDetailPage.styles";
@@ -30,10 +30,19 @@ const members = [
   },
 ];
 
+const currentMember = {
+  initial: "김",
+  name: "김현진",
+  role: "백엔드 개발 · 나",
+  specialty: "백엔드 개발",
+  school: "서울시립대 컴퓨터과학부 3학년",
+  tone: "blue" as const,
+};
+
 export function ApplicationReviewTeamDetailPage() {
   const navigate = useNavigate();
-  const { teamId } = useParams();
-  const isAccepted = teamId === "joined-data-seoul";
+  const location = useLocation();
+  const isAccepted = location.pathname.endsWith("/joined-data-seoul");
 
   return (
     <S.Page>
@@ -65,6 +74,14 @@ export function ApplicationReviewTeamDetailPage() {
             {isAccepted ? "내가 합류해서 4/5명 · 1자리 남았어요" : "2자리 남았어요"}
           </S.Remaining>
         </S.Hero>
+
+        <S.Section>
+          <S.IntroductionTitle>팀 소개</S.IntroductionTitle>
+          <S.Introduction>
+            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의,
+            나머지는 노션·디스코드로 소통해요.
+          </S.Introduction>
+        </S.Section>
 
         <S.ApplicationSection>
           <S.ApplicationCard $accepted={isAccepted}>
@@ -153,11 +170,6 @@ export function ApplicationReviewTeamDetailPage() {
               <dd>주 1회</dd>
             </S.InfoItem>
           </S.InfoGrid>
-          <S.IntroductionTitle>팀 소개</S.IntroductionTitle>
-          <S.Introduction>
-            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의,
-            나머지는 노션·디스코드로 소통해요.
-          </S.Introduction>
         </S.Section>
 
         <S.Section $last>
@@ -165,7 +177,7 @@ export function ApplicationReviewTeamDetailPage() {
             {isAccepted ? "팀원 4명 · 나 포함" : "팀원 3명"}
           </S.SectionTitle>
           <S.MemberList>
-            {members.map((member) => (
+            {(isAccepted ? [...members, currentMember] : members).map((member) => (
               <S.Member key={member.name}>
                 <S.MemberAvatar $tone={member.tone}>{member.initial}</S.MemberAvatar>
                 <S.MemberContent>

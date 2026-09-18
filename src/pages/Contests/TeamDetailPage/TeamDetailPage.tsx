@@ -73,6 +73,14 @@ export function TeamDetailPage() {
         </S.Hero>
 
         <S.Section>
+          <S.SectionTitle>팀 소개</S.SectionTitle>
+          <S.Introduction>
+            서울의 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의,
+            나머지는 노션·디스코드로 소통해요.
+          </S.Introduction>
+        </S.Section>
+
+        <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
           <S.RecruitmentCard>
             <div>
@@ -100,14 +108,6 @@ export function TeamDetailPage() {
               <dd>주 1회</dd>
             </S.InfoItem>
           </S.InfoGrid>
-        </S.Section>
-
-        <S.Section>
-          <S.SectionTitle>팀 소개</S.SectionTitle>
-          <S.Introduction>
-            서울의 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의,
-            나머지는 노션·디스코드로 소통해요.
-          </S.Introduction>
         </S.Section>
 
         <S.Section $last>

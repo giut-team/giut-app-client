@@ -397,6 +397,14 @@ export function OwnerTeamDetailPage() {
         </S.Hero>
 
         <S.Section>
+          <S.SectionTitle>팀 소개</S.SectionTitle>
+          <S.Introduction>
+            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인
+            회의와 온라인 소통으로 함께해요.
+          </S.Introduction>
+        </S.Section>
+
+        <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
           <S.PositionList>
             {positions.map((position) => (
@@ -435,14 +443,6 @@ export function OwnerTeamDetailPage() {
               <dd>주 1회</dd>
             </S.InfoItem>
           </S.InfoGrid>
-        </S.Section>
-
-        <S.Section>
-          <S.SectionTitle>팀 소개</S.SectionTitle>
-          <S.Introduction>
-            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인
-            회의와 온라인 소통으로 함께해요.
-          </S.Introduction>
         </S.Section>
 
         <S.Section $last>
