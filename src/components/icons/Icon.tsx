@@ -13,6 +13,7 @@ import {
   EyeSlash,
   FolderSimple,
   Heart,
+  ImageSquare,
   Lightning,
   House,
   LockKey,
@@ -21,6 +22,7 @@ import {
   Minus,
   Palette,
   Plus,
+  PaperPlaneTilt,
   NotePencil,
   RocketLaunch,
   ShieldCheck,
@@ -28,6 +30,8 @@ import {
   UserCircle,
   UserPlus,
   UsersThree,
+  Star,
+  DotsThree,
   X,
   type IconProps as PhosphorIconProps,
 } from "@phosphor-icons/react";
@@ -49,12 +53,14 @@ export type IconName =
   | "folder"
   | "home"
   | "heart"
+  | "image"
   | "lightning"
   | "lock"
   | "minus"
   | "megaphone"
   | "palette"
   | "plus"
+  | "paper-plane"
   | "edit"
   | "search"
   | "share"
@@ -63,6 +69,8 @@ export type IconName =
   | "user"
   | "user-plus"
   | "users"
+  | "star"
+  | "more"
   | "x";
 
 type IconComponentProps = PhosphorIconProps & { name: IconName };
@@ -83,12 +91,14 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   folder: FolderSimple,
   home: House,
   heart: Heart,
+  image: ImageSquare,
   lightning: Lightning,
   lock: LockKey,
   minus: Minus,
   megaphone: Megaphone,
   palette: Palette,
   plus: Plus,
+  "paper-plane": PaperPlaneTilt,
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,
@@ -97,6 +107,8 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   user: UserCircle,
   "user-plus": UserPlus,
   users: UsersThree,
+  star: Star,
+  more: DotsThree,
   x: X,
 };
 

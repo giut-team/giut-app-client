@@ -21,7 +21,8 @@ type TeamStatus = "전체" | "바로 합류 가능" | "제안 검토 중" | "일
 type Grade = 1 | 2 | 3 | 4;
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
 
-type Profile = {
+export type GiutHubProfile = {
+  profileNumber: number;
   id: string;
   category: Exclude<Category, "전체">;
   name: string;
@@ -65,7 +66,7 @@ const departments: { name: string; category: DepartmentCategory }[] = [
 const mockRecentAccessAt = (hoursAgo: number) =>
   new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
 
-const getResponseStatus = (lastActiveAt: string) => {
+export const getResponseStatus = (lastActiveAt: string) => {
   const elapsedHours = Math.max(
     0,
     Math.floor((Date.now() - new Date(lastActiveAt).getTime()) / (60 * 60 * 1000)),
@@ -78,8 +79,9 @@ const getResponseStatus = (lastActiveAt: string) => {
   };
 };
 
-const profiles: Profile[] = [
+export const giutHubProfiles: GiutHubProfile[] = [
   {
+    profileNumber: 1,
     id: "minjae",
     category: "개발" as const,
     name: "김민재",
@@ -95,6 +97,7 @@ const profiles: Profile[] = [
     avatarSrc: developerMale,
   },
   {
+    profileNumber: 2,
     id: "seoyeon",
     category: "기획" as const,
     name: "이서연",
@@ -109,6 +112,7 @@ const profiles: Profile[] = [
     avatarSrc: plannerFemale,
   },
   {
+    profileNumber: 3,
     id: "jiwoo",
     category: "디자인" as const,
     name: "박지우",
@@ -123,6 +127,7 @@ const profiles: Profile[] = [
     avatarSrc: designerFemale,
   },
   {
+    profileNumber: 4,
     id: "junseo",
     category: "개발",
     name: "최준서",
@@ -137,6 +142,7 @@ const profiles: Profile[] = [
     avatarSrc: developerFemale,
   },
   {
+    profileNumber: 5,
     id: "dohyun",
     category: "기획",
     name: "정도현",
@@ -151,6 +157,7 @@ const profiles: Profile[] = [
     avatarSrc: plannerMale,
   },
   {
+    profileNumber: 6,
     id: "hayoon",
     category: "디자인",
     name: "김하윤",
@@ -165,6 +172,7 @@ const profiles: Profile[] = [
     avatarSrc: designerMale,
   },
   {
+    profileNumber: 7,
     id: "soomin",
     category: "마케팅",
     name: "한수민",
@@ -179,6 +187,7 @@ const profiles: Profile[] = [
     avatarSrc: marketingFemale,
   },
   {
+    profileNumber: 8,
     id: "minho",
     category: "마케팅",
     name: "이민호",
@@ -207,8 +216,8 @@ const profileFilterData: Record<string, { grade: Grade; department: string; team
 
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
-  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
   { key: "hub", label: "기웃허브", icon: "users" as const },
+  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 
@@ -226,7 +235,7 @@ export function GiutHubPage() {
   const [departmentQuery, setDepartmentQuery] = useState("");
 
   const visibleProfiles = useMemo(
-    () => profiles.filter((profile) => {
+    () => giutHubProfiles.filter((profile) => {
       const filterData = profileFilterData[profile.id];
       const matchesCategory = activeCategory === "전체" || profile.category === activeCategory;
       const matchesPosition = selectedPositions.length === 0 || selectedPositions.includes(profile.category);
@@ -348,7 +357,11 @@ export function GiutHubPage() {
 
           <S.ProfileList>
             {visibleProfiles.map((profile) => (
-              <ProfileCard key={profile.id} profile={profile} />
+              <ProfileCard
+                key={profile.id}
+                onView={() => navigate(`/giut-hub/${profile.profileNumber}`)}
+                profile={profile}
+              />
             ))}
             {visibleProfiles.length === 0 && <S.EmptyState>선택한 분야의 팀원을 준비하고 있어요.</S.EmptyState>}
           </S.ProfileList>
@@ -496,7 +509,7 @@ export function GiutHubPage() {
   );
 }
 
-function ProfileCard({ profile }: { profile: Profile }) {
+function ProfileCard({ profile, onView }: { profile: GiutHubProfile; onView: () => void }) {
   const responseStatus = getResponseStatus(profile.lastActiveAt);
 
   return (
@@ -515,7 +528,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
           </S.ProfileHeader>
           <S.ProfileSummary>{profile.summary}</S.ProfileSummary>
         </S.ProfileIdentity>
-        <S.DetailButton aria-label={`${profile.name} 프로필 보기`} type="button">
+        <S.DetailButton aria-label={`${profile.name} 프로필 보기`} onClick={onView} type="button">
           <Icon name="caret-right" size={20} weight="bold" />
         </S.DetailButton>
       </S.ProfileTop>
@@ -536,7 +549,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
         <S.TagList aria-label={`${profile.name} 관심 분야`}>
           {profile.tags.map((tag) => <S.Tag key={tag}>#{tag}</S.Tag>)}
         </S.TagList>
-        <S.ProfileLink type="button">프로필 보기 <Icon name="arrow-right" size={16} weight="bold" /></S.ProfileLink>
+        <S.ProfileLink onClick={onView} type="button">프로필 보기 <Icon name="arrow-right" size={16} weight="bold" /></S.ProfileLink>
       </S.CardFooter>
     </S.ProfileCard>
   );
