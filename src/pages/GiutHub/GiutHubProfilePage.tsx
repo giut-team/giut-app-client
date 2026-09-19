@@ -110,12 +110,64 @@ export function TeamProposalBottomSheet({
   );
 }
 
+function ProfileMoreBottomSheet({
+  open,
+  profileName,
+  onClose,
+}: {
+  open: boolean;
+  profileName: string;
+  onClose: () => void;
+}) {
+  const shareProfile = async () => {
+    const shareData = {
+      title: `${profileName}님의 프로필`,
+      text: `${profileName}님의 기웃허브 프로필을 확인해 보세요.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard?.writeText(shareData.url);
+      }
+    } finally {
+      onClose();
+    }
+  };
+
+  return (
+    <BottomSheet
+      minHeight="auto"
+      onClose={onClose}
+      open={open}
+      showHeaderDivider={false}
+      variant="compact"
+    >
+      <S.ProfileMenu aria-label="프로필 더보기 메뉴">
+        <S.ProfileMenuButton onClick={shareProfile} type="button">
+          <Icon name="share" size={21} weight="regular" />프로필 공유
+        </S.ProfileMenuButton>
+        <S.ProfileMenuDivider />
+        <S.ProfileMenuButton $destructive onClick={onClose} type="button">
+          <Icon name="shield-check" size={21} weight="regular" />신고하기
+        </S.ProfileMenuButton>
+        <S.ProfileMenuButton $destructive onClick={onClose} type="button">
+          <Icon name="lock" size={21} weight="regular" />차단하기
+        </S.ProfileMenuButton>
+      </S.ProfileMenu>
+    </BottomSheet>
+  );
+}
+
 export function GiutHubProfilePage() {
   const navigate = useNavigate();
   const { profileNumber } = useParams();
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
   const [isScrapped, setIsScrapped] = useState(false);
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
+  const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
   const profile = giutHubProfiles.find((item) => item.profileNumber === Number(profileNumber));
   if (!profile) return <Navigate replace to="/giut-hub" />;
 
@@ -127,7 +179,7 @@ export function GiutHubProfilePage() {
   return (
     <S.Page>
       <S.Content>
-        <PageHeader onBack={() => navigate("/giut-hub")} rightContent={<S.MoreButton aria-label="더보기" type="button"><Icon name="more" size={28} weight="bold" /></S.MoreButton>} title="" />
+        <PageHeader onBack={() => navigate("/giut-hub")} rightContent={<S.MoreButton aria-label="더보기" onClick={() => setIsMoreSheetOpen(true)} type="button"><Icon name="more" size={28} weight="bold" /></S.MoreButton>} title="" />
         <S.ProfileSection>
           <S.Avatar $tone={profile.avatarTone}>{profile.avatarSrc ? <img alt={`${profile.name} 프로필`} src={profile.avatarSrc} /> : profile.avatarFallback}</S.Avatar>
           <S.ProfileInfo>
@@ -165,6 +217,7 @@ export function GiutHubProfilePage() {
         ) : <S.ActivityList>{activities.map((activity, index) => <S.ActivityItem $last={index === activities.length - 1} key={activity.title}><S.ActivityDot /><S.ActivityCopy><S.ActivityTitle>{activity.title}</S.ActivityTitle><S.ActivityDescription>{activity.description}</S.ActivityDescription></S.ActivityCopy></S.ActivityItem>)}</S.ActivityList>}
       </S.Content>
       <TeamProposalBottomSheet onClose={() => setIsProposalSheetOpen(false)} open={isProposalSheetOpen} profileName={profile.name} />
+      <ProfileMoreBottomSheet onClose={() => setIsMoreSheetOpen(false)} open={isMoreSheetOpen} profileName={profile.name} />
     </S.Page>
   );
 }

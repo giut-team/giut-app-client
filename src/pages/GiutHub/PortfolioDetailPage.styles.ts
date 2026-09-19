@@ -1,14 +1,30 @@
 import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import { tokens } from "../../design-system/tokens.generated";
 
 const giutHubPrimary = "#1C4EA3";
 
+const enterFromRight = keyframes`
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+`;
+
+const exitToRight = keyframes`
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(28px); }
+`;
+
 type AvatarTone = "blue" | "purple" | "orange" | "green";
 
 export const S = {
-  Page: styled.main`
+  Page: styled.main<{ $isLeaving: boolean }>`
     min-height: 100svh;
     background: ${tokens.color.neutral[100]};
+    animation: ${({ $isLeaving }) => $isLeaving ? exitToRight : enterFromRight} .24s cubic-bezier(.2, .8, .2, 1) both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   `,
   Content: styled.div`
     width: min(100%, 453px);

@@ -27,6 +27,13 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[900]};
     cursor: pointer;
+    transition: transform .12s ease, background-color .12s ease;
+
+    &:active {
+      transform: scale(.9);
+      border-radius: 10px;
+      background: ${tokens.color.neutral[100]};
+    }
   `,
   ProfileSection: styled.section`
     display: grid;
@@ -199,6 +206,13 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${({ $active }) => $active ? "#f1b900" : "#63718a"};
     cursor: pointer;
+    transition: transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+
+    &:active {
+      transform: scale(.9);
+      background: ${tokens.color.neutral[200]};
+      box-shadow: inset 0 2px 4px rgb(38 50 71 / 12%);
+    }
   `,
   TabList: styled.div`
     display: grid;
@@ -233,6 +247,9 @@ export const S = {
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
     cursor: pointer;
+    transition: transform .16s ease, box-shadow .16s ease;
+
+    &:active { transform: scale(.985); box-shadow: 0 4px 12px rgb(38 50 71 / 9%); }
   `,
   FeaturedPortfolioImage: styled.div`
     align-self: center;
@@ -260,6 +277,9 @@ export const S = {
     padding: 14px 0;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     cursor: pointer;
+    transition: transform .16s ease, background-color .16s ease;
+
+    &:active { transform: scale(.99); background: ${tokens.color.neutral[100]}; }
 
     &:last-child { border-bottom: 0; }
   `,
@@ -359,6 +379,35 @@ export const S = {
     padding: 64px 20px;
     color: ${tokens.color.neutral[500]};
     text-align: center;
+  `,
+  ProfileMenu: styled.div`
+    display: grid;
+    margin: 2px 0 4px;
+  `,
+  ProfileMenuButton: styled.button<{ $destructive?: boolean }>`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 15px 4px;
+    border: 0;
+    background: transparent;
+    color: ${({ $destructive }) => $destructive ? tokens.color.danger[500] : tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    text-align: left;
+    cursor: pointer;
+
+    &:active { opacity: .6; }
+  `,
+  ProfileMenuDivider: styled.hr`
+    width: 100%;
+    height: 1px;
+    margin: 4px 0;
+    border: 0;
+    background: ${tokens.color.neutral[200]};
   `,
   ProposalHeading: styled.h2`
     margin: 4px 0 0;
