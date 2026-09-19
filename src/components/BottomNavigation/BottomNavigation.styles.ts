@@ -10,6 +10,7 @@ export const S = {
     z-index: 5;
     display: flex;
     justify-content: center;
+    padding-bottom: env(safe-area-inset-bottom);
     border-top: 1px solid ${tokens.color.neutral[200]};
     background: rgba(255, 255, 255, .96);
     box-shadow: 0 -4px 16px rgba(38, 50, 71, .04);

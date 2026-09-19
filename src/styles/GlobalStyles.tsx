@@ -6,6 +6,7 @@ export function GlobalStyles() {
     <Global
       styles={css`
         :root {
+          --app-safe-bottom: max(16px, env(safe-area-inset-bottom, 0px));
           font-family:
             "SUIT Variable",
             "SUIT",
@@ -26,7 +27,24 @@ export function GlobalStyles() {
         }
 
         #root {
+          position: relative;
           min-height: 100svh;
+          padding-bottom: var(--app-safe-bottom);
+        }
+
+        #root::after {
+          position: fixed;
+          z-index: 30;
+          bottom: 5px;
+          left: 50%;
+          display: ${import.meta.env.DEV ? "block" : "none"};
+          width: 134px;
+          height: 5px;
+          border-radius: 999px;
+          background: #101522;
+          content: "";
+          pointer-events: none;
+          transform: translateX(-50%);
         }
 
         body {

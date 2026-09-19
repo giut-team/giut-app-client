@@ -198,7 +198,7 @@ export function PositionTeamsPage() {
         onChange={(key) => {
           setActiveNavigation(key);
           if (key === "home") navigate("/home");
-          if (key === "hub") navigate("/my-team");
+          if (key === "hub") navigate("/giut-hub");
         }}
       />
     </S.Page>

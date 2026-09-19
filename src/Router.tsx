@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/Home/HomePage";
+import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
@@ -28,6 +29,7 @@ export function AppRouter() {
         <Route element={<HomePage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<HomePage />} path="/home" />
+        <Route element={<GiutHubPage />} path="/giut-hub" />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />
         <Route element={<ContestsPage />} path="/contests" />
         <Route element={<ContestDetailPage />} path="/contests/:contestId" />
