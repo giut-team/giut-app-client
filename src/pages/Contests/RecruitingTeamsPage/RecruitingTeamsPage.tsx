@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
 import { S } from "./RecruitingTeamsPage.styles";
 
@@ -92,6 +93,9 @@ export function RecruitingTeamsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("전체");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [applyTargetTeam, setApplyTargetTeam] = useState<RecruitingTeam | null>(
+    null,
+  );
   const filterRef = useRef<HTMLDivElement>(null);
   const visibleTeams = useMemo(
     () =>
@@ -275,11 +279,12 @@ export function RecruitingTeamsPage() {
                     <S.ApplyButton
                       onClick={(event) => {
                         event.stopPropagation();
-                        navigate(
-                          team.relationship
-                            ? getTeamDetailPath(team)
-                            : `/contests/${contestId}/teams/${team.id}/apply`,
-                        );
+                        if (team.relationship) {
+                          navigate(getTeamDetailPath(team));
+                          return;
+                        }
+
+                        setApplyTargetTeam(team);
                       }}
                       type="button"
                     >
@@ -292,6 +297,26 @@ export function RecruitingTeamsPage() {
           </S.TeamList>
         </S.TeamSection>
       </S.Content>
+      <Modal
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setApplyTargetTeam(null)}
+        open={Boolean(applyTargetTeam)}
+        primaryAction={{
+          label: "지원하기",
+          onClick: () => {
+            if (!applyTargetTeam) return;
+
+            navigate(`/contests/${contestId}/teams/${applyTargetTeam.id}/apply`);
+          },
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setApplyTargetTeam(null),
+        }}
+        title="이 팀에 지원하시겠습니까?"
+      />
     </S.Page>
   );
 }

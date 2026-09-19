@@ -56,6 +56,9 @@ export function ContestDetailPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [favoriteTeamIds, setFavoriteTeamIds] = useState<string[]>([]);
+  const [applyTargetTeam, setApplyTargetTeam] = useState<
+    (typeof recruitTeams)[number] | null
+  >(null);
   const [isTeamCreationModalOpen, setIsTeamCreationModalOpen] = useState(false);
   const teamCreationState = location.state as {
     fromTeamCreation?: boolean;
@@ -321,11 +324,12 @@ export function ContestDetailPage() {
                     <S.TeamApplyButton
                       onClick={(event) => {
                         event.stopPropagation();
-                        navigate(
-                          team.isOwner
-                            ? getTeamPath(team)
-                            : `${getTeamPath(team)}/apply`,
-                        );
+                        if (team.isOwner) {
+                          navigate(getTeamPath(team));
+                          return;
+                        }
+
+                        setApplyTargetTeam(team);
                       }}
                       type="button"
                     >
@@ -388,6 +392,26 @@ export function ContestDetailPage() {
           팀 구성하기
         </S.ApplyButton>
       </S.ActionBar>
+      <Modal
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setApplyTargetTeam(null)}
+        open={Boolean(applyTargetTeam)}
+        primaryAction={{
+          label: "지원하기",
+          onClick: () => {
+            if (!applyTargetTeam) return;
+
+            navigate(`${getTeamPath(applyTargetTeam)}/apply`);
+          },
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setApplyTargetTeam(null),
+        }}
+        title="이 팀에 지원하시겠습니까?"
+      />
       <Modal
         description="팀을 만들고 함께할 팀원을 모집해 보세요."
         emphasizeDescription

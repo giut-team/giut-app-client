@@ -232,10 +232,6 @@ export function PopularContestsPage() {
       sortContests(allContests.filter(matchesCategory)),
     ];
   }, [activeCategory, sortOption]);
-  const sortLabel = sortOptions.find(
-    (option) => option.value === sortOption,
-  )?.label;
-
   return (
     <S.Page>
       <PageHeader onBack={() => navigate(-1)} title="인기 공모전" />
@@ -264,22 +260,12 @@ export function PopularContestsPage() {
             <Icon name="plus" size={10} weight="bold" />
             공모전 등록
           </S.RegisterButton>
-          <S.SortButton
-            aria-expanded={isSortSheetOpen}
-            aria-haspopup="dialog"
-            onClick={() => setIsSortSheetOpen(true)}
-            type="button"
-          >
-            {sortLabel}
-            <Icon name="arrows-down-up" size={10} weight="regular" />
-          </S.SortButton>
         </S.ListControls>
 
         <S.SectionHeading>
           <S.SectionTitle>
             인기 TOP {visiblePopularContests.length}
           </S.SectionTitle>
-          <S.SectionMeta>이번 주 추천 기준</S.SectionMeta>
         </S.SectionHeading>
         <S.ContestList>
           {visiblePopularContests.map((contest, index) => (
@@ -299,7 +285,6 @@ export function PopularContestsPage() {
           <>
             <S.SectionHeading $spaced>
               <S.SectionTitle>전체 공모전 128건</S.SectionTitle>
-              <S.SectionMeta>조회수순</S.SectionMeta>
             </S.SectionHeading>
             <S.ContestList>
               {visibleAllContests.map((contest) => (
