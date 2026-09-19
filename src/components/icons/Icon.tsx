@@ -4,6 +4,7 @@ import {
   ArrowsDownUp,
   Bell,
   BookmarkSimple,
+  CalendarBlank,
   CaretLeft,
   CaretRight,
   Check,
@@ -13,6 +14,7 @@ import {
   Eye,
   EyeSlash,
   FolderSimple,
+  FunnelSimple,
   Heart,
   ImageSquare,
   Lightning,
@@ -30,6 +32,7 @@ import {
   ShieldCheck,
   ShareNetwork,
   Trash,
+  User,
   UserCircle,
   UserPlus,
   UsersThree,
@@ -47,6 +50,7 @@ export type IconName =
   | "arrows-down-up"
   | "bell"
   | "bookmark"
+  | "calendar"
   | "caret-right"
   | "check"
   | "chat"
@@ -56,6 +60,7 @@ export type IconName =
   | "eye"
   | "eye-slash"
   | "folder"
+  | "filter"
   | "home"
   | "heart"
   | "image"
@@ -73,6 +78,7 @@ export type IconName =
   | "shield-check"
   | "rocket"
   | "user"
+  | "person"
   | "user-plus"
   | "users"
   | "star"
@@ -88,6 +94,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "arrows-down-up": ArrowsDownUp,
   bell: Bell,
   bookmark: BookmarkSimple,
+  calendar: CalendarBlank,
   "caret-right": CaretRight,
   check: Check,
   chat: ChatCircleDots,
@@ -97,6 +104,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   eye: Eye,
   "eye-slash": EyeSlash,
   folder: FolderSimple,
+  filter: FunnelSimple,
   home: House,
   heart: Heart,
   image: ImageSquare,
@@ -114,6 +122,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "shield-check": ShieldCheck,
   rocket: RocketLaunch,
   user: UserCircle,
+  person: User,
   "user-plus": UserPlus,
   users: UsersThree,
   star: Star,

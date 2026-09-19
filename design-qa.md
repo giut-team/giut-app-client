@@ -61,6 +61,31 @@
 
 final result: blocked
 
+## Recruiting-teams page update
+
+- Source visual truth: the 822px-wide recruiting-teams screenshot supplied in this conversation.
+- Implementation route: `/contests/:contestId/teams`.
+- Intended state: the team recruitment list with category and verification badges, contest metadata, a recruitment-field filter, and five open-team ticket cards.
+- Implemented interactions: recruitment-field filtering updates the card list; team-status badges identify the current user's owner, member, and application states; card selection opens its matching existing team-detail route; bookmarks toggle independently; footer actions route to application, team view, management, or application-status flows as appropriate.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime is not available in this chat, so the 822px-wide source capture could not be compared with a same-viewport rendering.
+- Code checks: `npm.cmd run build` passed.
+
+**Findings**
+- [P1] Visual fidelity is unverified.
+  Location: recruiting-teams route.
+  Evidence: the provided reference has no captured implementation counterpart.
+  Impact: exact header sizing, card height, copy wrapping, and dashed-divider alignment remain unverified.
+  Fix: when browser rendering is available, capture the recruiting-teams route at the source viewport and compare full page plus an individual team card.
+
+**Required fidelity surfaces**
+- Fonts and typography: uses the existing product type system; visual comparison is blocked.
+- Spacing and layout rhythm: implements the reference hierarchy with a summary divider, section header, and bordered cards; visual comparison is blocked.
+- Colors and visual tokens: primary, neutral, and danger design tokens are used for the target hierarchy.
+- Image quality and asset fidelity: no raster or custom image assets appear in the supplied target; existing icon components are used for UI controls.
+- Copy and content: existing contest and recruiting-team mock data are retained within the redesigned layout.
+
+final result: blocked
+
 ## Chat-room detail update
 
 - Source visual truth: the two mobile chat-room screenshots supplied in this conversation for 이서연 and 최유진.
