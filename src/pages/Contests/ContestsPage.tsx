@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../components/icons";
 import { PageHeader } from "../../components/PageHeader";
 import { PillButton } from "../../components/PillButton";
+import { Toast } from "../../components/Toast/Toast";
 import { S } from "./ContestsPage.styles";
 
 type ContestCategory = "전체" | "IT/과학" | "기획" | "디자인" | "개발" | "영상" | "창업";
@@ -157,9 +158,13 @@ function ContestCard({
 
 export function ContestsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<ContestCategory>("전체");
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState(
+    (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
+  );
   const sortParam = searchParams.get("sort");
   const sortOption = isSortOption(sortParam) ? sortParam : "views";
 
@@ -182,6 +187,14 @@ export function ContestsPage() {
   }, [activeCategory, sortOption]);
 
   const sortLabel = sortOptions.find((option) => option.value === sortOption)?.label;
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
 
   return (
     <S.Page>
@@ -269,6 +282,7 @@ export function ContestsPage() {
           ‘인증’ 배지가 있는 공모전은 원문 링크가 확인된 항목으로, 정렬과 검색에 활용돼요.
         </S.SortNotice>
       </BottomSheet>
+      <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );
 }

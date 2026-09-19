@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
 import { SkeletonBar } from "../../../components/SkeletonBar/SkeletonBar";
 import { S } from "./ContestRegistrationPage.styles";
@@ -57,6 +58,7 @@ export function ContestRegistrationPage() {
   const [editingField, setEditingField] = useState<keyof ContestDraft | null>(
     null,
   );
+  const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [draft, setDraft] = useState<ContestDraft>({
     title: "제 12회 핀테크 해커톤",
     organizer: "금융위원회",
@@ -116,6 +118,7 @@ export function ContestRegistrationPage() {
     ["참가 대상", "target"],
   ] as const;
   const categories = ["IT/과학", "기획", "디자인", "마케팅"];
+  const canRegister = Boolean(category && draft.prize.trim());
 
   const steps = [
     "중복 검사",
@@ -187,8 +190,8 @@ export function ContestRegistrationPage() {
               <S.ExtractionCount>6개 중 4개 추출</S.ExtractionCount>
             </S.FormHeadingRow>
             <S.FormDescription>
-              추출된 항목은 눌러서 바로 수정할 수 있어요. 아래{" "}
-              <em>2개 항목</em>만 직접 입력하면 등록됩니다.
+              추출된 항목은 눌러서 바로 수정할 수 있어요. 아래 <em>2개 항목</em>
+              만 직접 입력하면 등록됩니다.
             </S.FormDescription>
 
             <S.ExtractedFieldList>
@@ -219,7 +222,9 @@ export function ContestRegistrationPage() {
                     <S.FieldEditButton
                       $editing={editingField === key}
                       aria-label={
-                        editingField === key ? `${label} 수정 완료` : `${label} 수정`
+                        editingField === key
+                          ? `${label} 수정 완료`
+                          : `${label} 수정`
                       }
                       onClick={() =>
                         setEditingField((current) =>
@@ -379,13 +384,13 @@ export function ContestRegistrationPage() {
                           ? "이미 등록된 공모전입니다"
                           : stepState === "partial"
                             ? "필수 항목 일부를 찾지 못했어요"
-                          : stepState === "blocked"
-                            ? "중복으로 중단됨"
-                            : stepState === "complete"
-                              ? completedDescriptions[index]
-                              : stepState === "pending"
-                                ? pendingDescriptions[index]
-                                : processingDescriptions[index]}
+                            : stepState === "blocked"
+                              ? "중복으로 중단됨"
+                              : stepState === "complete"
+                                ? completedDescriptions[index]
+                                : stepState === "pending"
+                                  ? pendingDescriptions[index]
+                                  : processingDescriptions[index]}
                       </span>
                     </div>
                   </S.StepCard>
@@ -486,20 +491,51 @@ export function ContestRegistrationPage() {
       {isResultView && (
         <S.Footer>
           <S.ContinueButton
-            onClick={() => view === "partial" && setView("field-edit")}
+            onClick={() => {
+              if (view === "partial") {
+                setView("field-edit");
+                return;
+              }
+
+              setIsRegistrationModalOpen(true);
+            }}
             type="button"
           >
-            {view === "partial" ? "직접 입력해서 계속하기" : "지금 게시하기"}
+            {view === "partial" ? "직접 입력해서 계속하기" : "지금 등록하기"}
           </S.ContinueButton>
         </S.Footer>
       )}
       {view === "field-edit" && (
         <S.Footer>
-          <S.ContinueButton onClick={() => navigate("/contests")} type="button">
+          <S.ContinueButton
+            disabled={!canRegister}
+            onClick={() => setIsRegistrationModalOpen(true)}
+            type="button"
+          >
             등록하기
           </S.ContinueButton>
         </S.Footer>
       )}
+      <Modal
+        description="등록한 공모전은 공모전 목록에서 확인할 수 있어요."
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setIsRegistrationModalOpen(false)}
+        open={isRegistrationModalOpen}
+        primaryAction={{
+          label: "등록하기",
+          onClick: () => {
+            setIsRegistrationModalOpen(false);
+            navigate("/contests", {
+              state: { toastMessage: "공모전을 등록했어요." },
+            });
+          },
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setIsRegistrationModalOpen(false),
+        }}
+        title="정말 등록할까요?"
+      />
     </S.Page>
   );
 }

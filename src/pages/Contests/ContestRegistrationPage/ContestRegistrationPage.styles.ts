@@ -822,5 +822,11 @@ export const S = {
     font-size: 11px;
     font-weight: 800;
     cursor: pointer;
+
+    &:disabled {
+      background: ${tokens.color.neutral[200]};
+      color: ${tokens.color.neutral[500]};
+      cursor: not-allowed;
+    }
   `,
 };
