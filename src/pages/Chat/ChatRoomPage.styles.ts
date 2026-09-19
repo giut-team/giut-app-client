@@ -76,13 +76,45 @@ export const S = {
     display: grid;
     width: 30px;
     height: 32px;
-    margin-left: auto;
     padding: 0;
     place-items: center;
     border: 0;
     background: transparent;
     color: ${tokens.color.neutral[900]};
     cursor: pointer;
+  `,
+  MenuAnchor: styled.div`
+    position: relative;
+    display: grid;
+    margin-left: auto;
+  `,
+  ChatMenu: styled.div`
+    position: absolute;
+    top: 39px;
+    right: 0;
+    z-index: 4;
+    display: grid;
+    width: 148px;
+    overflow: hidden;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${tokens.color.neutral[50]};
+    box-shadow: 0 8px 20px rgba(16, 21, 34, 0.14);
+  `,
+  ChatMenuButton: styled.button<{ $danger?: boolean }>`
+    min-height: 48px;
+    padding: 0 14px;
+    border: 0;
+    background: ${tokens.color.neutral[50]};
+    color: ${({ $danger }) =>
+      $danger ? tokens.color.danger[500] : tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.35px;
+    text-align: left;
+    cursor: pointer;
+
   `,
   Thread: styled.section`
     min-height: calc(100svh - 136px);

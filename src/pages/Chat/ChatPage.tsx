@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
+import { Toast } from "../../components/Toast/Toast";
 import { S } from "./ChatPage.styles";
 
 type ChatTab = "all" | "unread";
@@ -58,10 +59,21 @@ const navigationItems = [
 
 export function ChatPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<ChatTab>("all");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [readChatIds, setReadChatIds] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState(
+    () => (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
+  );
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
 
   const unreadCount = chatRows.filter(
     (chat) => chat.unread && !readChatIds.includes(chat.id),
@@ -192,6 +204,7 @@ export function ChatPage() {
           if (key === "mypage") navigate("/my-team");
         }}
       />
+      <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );
 }

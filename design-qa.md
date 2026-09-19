@@ -66,7 +66,7 @@ final result: blocked
 - Source visual truth: the two mobile chat-room screenshots supplied in this conversation for 이서연 and 최유진.
 - Implementation routes: `/chat/seoul-data` and `/chat/startup-package`.
 - Intended state: an open chat room with profile header, conversation-origin card, today marker, left/right message bubbles, and a fixed message composer.
-- Implemented interactions: selecting a chat from `/chat` opens its room; back returns to the list; message text can be entered and sent into the current thread; contextual action buttons open their matching team, contest, or profile route; the attachment/menu controls are visual-only.
+- Implemented interactions: selecting a chat from `/chat` opens its room; back returns to the list; message text can be entered and sent into the current thread; contextual action buttons open their matching team, contest, or profile route; the more menu toggles chat notifications, confirms reports, and confirms leaving the room; the attachment control is visual-only.
 - Browser-rendered implementation screenshot: unavailable. The browser runtime returned `No browser is available`, so no same-viewport full-view or focused-region comparison could be captured.
 - Code checks: `npm.cmd run build` passed. The existing lint blocker remains the five pre-existing `react-refresh/only-export-components` errors in GiutHub files.
 

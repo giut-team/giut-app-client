@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../components/icons";
+import { Modal } from "../../components/Modal/Modal";
+import { Toast } from "../../components/Toast/Toast";
 import { S } from "./ChatRoomPage.styles";
 
 type AvatarTone = "mint" | "peach" | "purple";
@@ -24,6 +26,8 @@ type ChatRoom = {
   secondaryPath: string;
   messages: Message[];
 };
+
+type ConfirmationAction = "report" | "leave" | null;
 
 const chatRooms: Record<string, ChatRoom> = {
   "seoul-data": {
@@ -121,11 +125,40 @@ export function ChatRoomPage() {
   const room = chatRooms[chatId ?? ""];
   const [draft, setDraft] = useState("");
   const [sentMessages, setSentMessages] = useState<Message[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [confirmationAction, setConfirmationAction] =
+    useState<ConfirmationAction>(null);
+  const [toastMessage, setToastMessage] = useState("");
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const messages = useMemo(
     () => [...(room?.messages ?? []), ...sentMessages],
     [room?.messages, sentMessages],
   );
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const closeWhenClickedOutside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !menuRef.current?.contains(event.target)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", closeWhenClickedOutside);
+    return () => window.removeEventListener("pointerdown", closeWhenClickedOutside);
+  }, [isMenuOpen]);
 
   if (!room) {
     return <Navigate replace to="/chat" />;
@@ -151,6 +184,28 @@ export function ChatRoomPage() {
     setDraft("");
   };
 
+  const toggleMute = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    setIsMenuOpen(false);
+    setToastMessage(
+      nextMuted ? "채팅방 알림을 껐어요." : "채팅방 알림을 켰어요.",
+    );
+  };
+
+  const completeConfirmation = () => {
+    if (confirmationAction === "leave") {
+      navigate("/chat", {
+        replace: true,
+        state: { toastMessage: "채팅방을 나갔어요." },
+      });
+      return;
+    }
+
+    setConfirmationAction(null);
+    setToastMessage("신고가 접수되었어요.");
+  };
+
   return (
     <S.Page>
       <S.Header>
@@ -166,9 +221,42 @@ export function ChatRoomPage() {
           <S.Name>{room.name}</S.Name>
           <S.Subtitle>{room.subtitle}</S.Subtitle>
         </S.Profile>
-        <S.MoreButton aria-label="대화 메뉴" type="button">
-          <Icon name="more" size={21} weight="bold" />
-        </S.MoreButton>
+        <S.MenuAnchor ref={menuRef}>
+          <S.MoreButton
+            aria-expanded={isMenuOpen}
+            aria-label="대화 메뉴"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            type="button"
+          >
+            <Icon name="more" size={21} weight="bold" />
+          </S.MoreButton>
+          {isMenuOpen && (
+            <S.ChatMenu aria-label="채팅방 메뉴">
+              <S.ChatMenuButton onClick={toggleMute} type="button">
+                {isMuted ? "알림 켜기" : "알림 끄기"}
+              </S.ChatMenuButton>
+              <S.ChatMenuButton
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setConfirmationAction("report");
+                }}
+                type="button"
+              >
+                신고하기
+              </S.ChatMenuButton>
+              <S.ChatMenuButton
+                $danger
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setConfirmationAction("leave");
+                }}
+                type="button"
+              >
+                채팅방 나가기
+              </S.ChatMenuButton>
+            </S.ChatMenu>
+          )}
+        </S.MenuAnchor>
       </S.Header>
 
       <S.Thread>
@@ -202,6 +290,37 @@ export function ChatRoomPage() {
         </S.Messages>
       </S.Thread>
 
+      <Modal
+        description={
+          confirmationAction === "leave"
+            ? "나가면 이 채팅방의 메시지를 더 이상 확인할 수 없어요."
+            : "신고 내용은 운영팀이 검토해요. 허위 신고는 서비스 이용에 제한이 있을 수 있어요."
+        }
+        emphasizeDescription
+        icon={
+          <Icon
+            name={confirmationAction === "leave" ? "x" : "warning"}
+            size={22}
+            weight="bold"
+          />
+        }
+        onClose={() => setConfirmationAction(null)}
+        open={confirmationAction !== null}
+        primaryAction={{
+          label: confirmationAction === "leave" ? "나가기" : "신고하기",
+          onClick: completeConfirmation,
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setConfirmationAction(null),
+        }}
+        title={
+          confirmationAction === "leave"
+            ? "채팅방을 나갈까요?"
+            : `${room.name}님을 신고할까요?`
+        }
+      />
+
       <S.Composer
         onSubmit={(event) => {
           event.preventDefault();
@@ -225,6 +344,7 @@ export function ChatRoomPage() {
           <Icon name="paper-plane" size={19} weight="fill" />
         </S.SendButton>
       </S.Composer>
+      <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );
 }
