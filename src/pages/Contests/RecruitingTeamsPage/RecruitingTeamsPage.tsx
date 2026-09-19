@@ -168,7 +168,7 @@ export function RecruitingTeamsPage() {
             </S.MetaItem>
             <S.DDay>D-15</S.DDay>
             <S.MetaItem>
-              <Icon name="user" size={16} weight="regular" />
+              <Icon name="person" size={16} weight="regular" />
               팀당 2~5인
             </S.MetaItem>
           </S.ContestMeta>

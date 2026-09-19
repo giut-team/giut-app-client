@@ -44,9 +44,9 @@ export const S = {
     line-height: 1;
   `,
   ContestTitle: styled.h1`
-    margin: 6px 0 13px;
+    margin: 10px 0 13px;
     color: ${tokens.color.neutral[900]};
-    font-size: 23px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -1px;
     line-height: 1.3;
@@ -67,7 +67,7 @@ export const S = {
     white-space: nowrap;
 
     svg {
-      color: ${tokens.color.neutral[500]};
+      color: #000;
     }
   `,
   DDay: styled.span`
@@ -167,21 +167,20 @@ export const S = {
     }
   `,
   TicketTop: styled.div`
-    padding-bottom: 12px;
+    padding-bottom: 2px;
     border: 2px solid ${tokens.color.neutral[200]};
     border-bottom: 0;
     border-radius: 18px 18px 0 0;
-
   `,
   TicketDivider: styled.div`
     position: relative;
-    height: 22px;
+    height: 12px;
 
     &::before {
       position: absolute;
-      top: 10px;
-      right: 11px;
-      left: 11px;
+      top: 5px;
+      right: 6px;
+      left: 6px;
       content: "";
       border-top: 2px dashed ${tokens.color.neutral[200]};
     }
@@ -190,20 +189,20 @@ export const S = {
     position: absolute;
     z-index: 1;
     top: 0;
-    width: 22px;
-    height: 22px;
+    width: 12px;
+    height: 12px;
     border: 2px solid ${tokens.color.neutral[200]};
     border-radius: 50%;
     background: ${tokens.color.neutral[50]};
 
-    ${({ $side }) => ($side === "left" ? "left: -11px;" : "right: -11px;")}
+    ${({ $side }) => ($side === "left" ? "left: -6px;" : "right: -6px;")}
   `,
   CardHeading: styled.div`
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
-    padding: 22px 20px 0;
+    padding: 14px 14px 0;
   `,
   TitleGroup: styled.div`
     display: flex;
@@ -214,7 +213,7 @@ export const S = {
   TeamTitle: styled.h3`
     margin: 0;
     color: ${tokens.color.primary[500]};
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: -0.8px;
     line-height: 1.35;
@@ -223,7 +222,7 @@ export const S = {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
-    padding: 5px 8px;
+    padding: 4px 6px;
     border-radius: 6px;
     background: ${({ $type }) =>
       $type === "owner"
@@ -237,7 +236,7 @@ export const S = {
         : $type === "applied"
           ? tokens.color.warning[500]
           : tokens.color.primary[500]};
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: -0.4px;
     line-height: 1;
@@ -251,23 +250,22 @@ export const S = {
     place-items: center;
     border: 0;
     background: transparent;
-    color: ${({ $favorite }) =>
-      $favorite ? tokens.color.neutral[700] : tokens.color.neutral[500]};
+    color: #000;
     cursor: pointer;
   `,
   TeamDescription: styled.p`
     min-height: 24px;
-    margin: 12px 20px 0;
+    margin: 2px 14px 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 500;
     letter-spacing: -0.5px;
-    line-height: 1.65;
+    line-height: 1.45;
   `,
   CardFooter: styled.div`
     display: flex;
-    min-height: 60px;
-    padding: 8px 20px;
+    min-height: 46px;
+    padding: 4px 14px;
     align-items: center;
     justify-content: space-between;
     border: 2px solid ${tokens.color.neutral[200]};
@@ -277,26 +275,26 @@ export const S = {
   MemberCount: styled.span`
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     color: ${tokens.color.neutral[700]};
-    font-size: 15px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: -0.45px;
 
     svg {
-      color: ${tokens.color.neutral[500]};
+      color: #000;
     }
   `,
   ApplyButton: styled.button`
-    min-width: 92px;
-    height: 42px;
-    padding: 0 16px;
+    min-width: 76px;
+    height: 32px;
+    padding: 0 11px;
     border: 0;
     border-radius: 10px;
     background: ${tokens.color.primary[600]};
     color: ${tokens.color.neutral[50]};
     font: inherit;
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: -0.4px;
     cursor: pointer;

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { RiKakaoTalkFill } from "react-icons/ri";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { Toast } from "../../../components/Toast/Toast";
@@ -12,6 +14,8 @@ const recruitTeams = [
     id: "my-data-seoul",
     title: "데이터로 서울을",
     leader: "이서연 팀장 · 온라인 + 오프라인",
+    description:
+      "서울의 공공데이터로 시민이 체감할 수 있는 서비스를 기획하고 있어요.",
     members: "3/5명",
     positions: ["백엔드 개발자 모집", "데이터 엔지니어 모집"],
     isOwner: true,
@@ -20,6 +24,8 @@ const recruitTeams = [
     id: "data-seoul",
     title: "데이터로 서울을",
     leader: "이수현 팀장 · 온라인 + 오프라인",
+    description:
+      "서울시 데이터를 분석해 생활 문제를 해결할 서비스를 만들고 있어요.",
     members: "3/5명",
     positions: ["백엔드 모집", "프론트엔드 마감", "기획 마감"],
   },
@@ -27,6 +33,8 @@ const recruitTeams = [
     id: "syrup-data-lab",
     title: "시립대 데이터랩",
     leader: "최유진 팀장 · 온라인",
+    description:
+      "시립대 학생에게 필요한 데이터를 쉽고 친절하게 연결하는 팀입니다.",
     members: "2/4명",
     positions: ["기획 모집", "디자인 모집"],
   },
@@ -34,6 +42,7 @@ const recruitTeams = [
     id: "blending-3",
     title: "열린데이터 3기",
     leader: "박지윤 팀장 · 오프라인",
+    description: "열린데이터를 활용한 캠페인 경험을 함께 만들어가고 있어요.",
     members: "4/5명",
     positions: ["마케팅 모집"],
   },
@@ -45,6 +54,8 @@ export function ContestDetailPage() {
   const { contestId = "seoul-data" } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [isSaved, setIsSaved] = useState(false);
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
+  const [favoriteTeamIds, setFavoriteTeamIds] = useState<string[]>([]);
   const [isTeamCreationModalOpen, setIsTeamCreationModalOpen] = useState(false);
   const teamCreationState = location.state as {
     fromTeamCreation?: boolean;
@@ -67,7 +78,20 @@ export function ContestDetailPage() {
     navigate(-1);
   };
 
-  const handleShare = async () => {
+  const handleShare = () => {
+    setIsShareSheetOpen(true);
+  };
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard?.writeText(window.location.href);
+      setToastMessage("링크를 복사했어요.");
+    } catch {
+      setToastMessage("링크를 복사하지 못했어요.");
+    }
+  };
+
+  const handleShareMore = async () => {
     const shareData = {
       title: "2026 서울시 데이터 활용 공모전",
       text: "2026 서울시 데이터 활용 공모전을 확인해 보세요.",
@@ -80,14 +104,21 @@ export function ContestDetailPage() {
         return;
       }
 
-      await navigator.clipboard?.writeText(window.location.href);
-      setToastMessage("링크를 복사했어요.");
+      await copyShareLink();
     } catch {
       // 공유 시트를 닫은 경우에는 별도의 피드백을 표시하지 않습니다.
     }
   };
   const getTeamPath = (team: (typeof recruitTeams)[number]) =>
     team.isOwner ? `teams/${team.id}/manage` : `teams/${team.id}`;
+
+  const toggleTeamFavorite = (teamId: string) => {
+    setFavoriteTeamIds((current) =>
+      current.includes(teamId)
+        ? current.filter((id) => id !== teamId)
+        : [...current, teamId],
+    );
+  };
 
   return (
     <S.Page>
@@ -115,10 +146,15 @@ export function ContestDetailPage() {
             </S.HeaderButton>
             <S.HeaderButton
               aria-label="공유하기"
+              aria-pressed={isShareSheetOpen}
               onClick={handleShare}
               type="button"
             >
-              <Icon name="share" size={18} weight="regular" />
+              <Icon
+                name="share"
+                size={18}
+                weight={isShareSheetOpen ? "fill" : "regular"}
+              />
             </S.HeaderButton>
           </S.HeaderActions>
         </S.Header>
@@ -128,7 +164,7 @@ export function ContestDetailPage() {
             <S.Category>IT/과학</S.Category>
             <S.Verified>
               <Icon name="check" size={8} weight="bold" />
-              인증마크
+              인증
             </S.Verified>
           </S.HeroTags>
           <S.HeroTitle>
@@ -221,7 +257,7 @@ export function ContestDetailPage() {
         <S.TeamsHeader>
           <S.SectionHeader>
             <S.SectionTitle>
-              모집 중인 팀 <S.TeamTotal>{recruitTeams.length}</S.TeamTotal>
+              모집 중인 팀 <S.TeamTotal>5</S.TeamTotal>
             </S.SectionTitle>
             <S.ViewAll onClick={() => navigate("teams")} type="button">
               전체 보기 ›
@@ -230,41 +266,119 @@ export function ContestDetailPage() {
         </S.TeamsHeader>
         <S.TeamsSection>
           <S.TeamList>
-            {recruitTeams.map((team) => (
-              <S.TeamCard
-                key={team.id}
-                onClick={() => navigate(getTeamPath(team))}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigate(getTeamPath(team));
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <S.TeamTitleRow>
-                  <S.TeamTitleGroup>
-                    <S.TeamTitle>{team.title}</S.TeamTitle>
-                    {team.isOwner && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
-                  </S.TeamTitleGroup>
-                  <S.TeamCount>{team.members}</S.TeamCount>
-                </S.TeamTitleRow>
-                <S.TeamMeta>{team.leader}</S.TeamMeta>
-                <S.PositionList>
-                  {team.positions
-                    .filter((position) => position.includes("모집"))
-                    .map((position) => (
-                      <S.PositionBadge $open key={position}>
-                        {position}
-                      </S.PositionBadge>
-                    ))}
-                </S.PositionList>
-              </S.TeamCard>
-            ))}
+            {recruitTeams.slice(0, 3).map((team) => {
+              const favorite = favoriteTeamIds.includes(team.id);
+
+              return (
+                <S.TeamCard
+                  key={team.id}
+                  onClick={() => navigate(getTeamPath(team))}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      navigate(getTeamPath(team));
+                    }
+                  }}
+                  role="link"
+                  tabIndex={0}
+                >
+                  <S.TeamTicketTop>
+                    <S.TeamTitleRow>
+                      <S.TeamTitleGroup>
+                        <S.TeamTitle>{team.title}</S.TeamTitle>
+                        {team.isOwner && (
+                          <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>
+                        )}
+                      </S.TeamTitleGroup>
+                      <S.TeamFavoriteButton
+                        $favorite={favorite}
+                        aria-label={favorite ? "팀 찜 해제" : "팀 찜하기"}
+                        aria-pressed={favorite}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleTeamFavorite(team.id);
+                        }}
+                        type="button"
+                      >
+                        <Icon
+                          name="bookmark"
+                          size={21}
+                          weight={favorite ? "fill" : "regular"}
+                        />
+                      </S.TeamFavoriteButton>
+                    </S.TeamTitleRow>
+                    <S.TeamDescription>{team.description}</S.TeamDescription>
+                  </S.TeamTicketTop>
+                  <S.TeamTicketDivider aria-hidden="true">
+                    <S.TeamTicketNotch $side="left" />
+                    <S.TeamTicketNotch $side="right" />
+                  </S.TeamTicketDivider>
+                  <S.TeamFooter>
+                    <S.TeamMemberCount>
+                      <Icon name="person" size={17} weight="regular" />
+                      {team.members}
+                    </S.TeamMemberCount>
+                    <S.TeamApplyButton
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        navigate(
+                          team.isOwner
+                            ? getTeamPath(team)
+                            : `${getTeamPath(team)}/apply`,
+                        );
+                      }}
+                      type="button"
+                    >
+                      {team.isOwner ? "팀 관리" : "지원하기"}
+                    </S.TeamApplyButton>
+                  </S.TeamFooter>
+                </S.TeamCard>
+              );
+            })}
           </S.TeamList>
         </S.TeamsSection>
       </S.Content>
+
+      <BottomSheet
+        minHeight="180px"
+        onClose={() => setIsShareSheetOpen(false)}
+        open={isShareSheetOpen}
+        showCloseButton
+        showHeaderDivider={false}
+        title="공유하기"
+        variant="compact"
+      >
+        <S.ShareLinkRow>
+          <S.ShareLinkText>giut.app/c/seoul-data-2026</S.ShareLinkText>
+          <S.CopyButton onClick={copyShareLink} type="button">복사</S.CopyButton>
+        </S.ShareLinkRow>
+        <S.ShareActions>
+          <S.ShareActionButton
+            onClick={() => setToastMessage("카카오톡 공유를 준비 중이에요.")}
+            type="button"
+          >
+            <S.ShareActionIcon $tone="kakao">
+              <RiKakaoTalkFill aria-hidden="true" size={18} />
+            </S.ShareActionIcon>
+            카카오톡
+          </S.ShareActionButton>
+          <S.ShareActionButton
+            onClick={() => setToastMessage("문자 공유를 준비 중이에요.")}
+            type="button"
+          >
+            <S.ShareActionIcon $tone="neutral">
+              <Icon name="chat" size={18} weight="regular" />
+            </S.ShareActionIcon>
+            문자
+          </S.ShareActionButton>
+          <S.ShareActionButton onClick={handleShareMore} type="button">
+            <S.ShareActionIcon $tone="neutral">
+              <Icon name="more" size={19} weight="bold" />
+            </S.ShareActionIcon>
+            더보기
+          </S.ShareActionButton>
+        </S.ShareActions>
+      </BottomSheet>
 
       <S.ActionBar>
         <S.ApplyButton

@@ -60,10 +60,11 @@ export const S = {
     width: ${({ $compact }) => ($compact ? "28px" : "40px")};
     height: ${({ $compact }) => ($compact ? "28px" : "40px")};
     place-items: center;
-    margin: ${({ $compact }) => ($compact ? "0 -2px 0 12px" : "-2px -8px 0 16px")};
+    margin: ${({ $compact }) =>
+      $compact ? "-5px -2px 0 12px" : "-2px -8px 0 16px"};
     border: 0;
     border-radius: 50%;
-    background: ${tokens.color.neutral[100]};
+    background: transparent;
     color: ${tokens.color.neutral[700]};
     font-size: ${({ $compact }) => ($compact ? "20px" : "28px")};
     font-weight: 300;

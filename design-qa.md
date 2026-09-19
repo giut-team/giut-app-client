@@ -86,6 +86,28 @@ final result: blocked
 
 final result: blocked
 
+## Contest-detail team tickets update
+
+- Source visual truth: the contest-detail team-list screenshot supplied in this conversation, together with the previously approved recruiting-team ticket card.
+- Implementation route: `/contests/:contestId`.
+- Implemented state: the section displays `모집 중인 팀 5` while rendering the first three existing mock teams as ticket cards with a dashed divider and connected circular notches.
+- Implemented interactions: each card opens its existing team route; per-team bookmarks toggle independently; owner cards open team management and other cards can open the application form.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime remains unavailable, so the ticket-card geometry cannot be compared at the supplied viewport.
+- Code checks: `npm.cmd run build` passed.
+
+final result: blocked
+
+## Contest-detail share-sheet update
+
+- Source visual truth: the mobile share bottom-sheet screenshot supplied in this conversation.
+- Implementation route: `/contests/:contestId`.
+- Implemented state: selecting the header share icon opens a dimmed share sheet with a close control, contest preview, link row, copy action, and KakaoTalk/message/more options.
+- Implemented interactions: copy writes the current URL and shows a toast; more uses the platform share sheet when available or falls back to copying; KakaoTalk and message options display their unavailable-state feedback.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime remains unavailable, so sheet height and spacing cannot be compared at the supplied viewport.
+- Code checks: `npm.cmd run build` passed.
+
+final result: blocked
+
 ## Chat-room detail update
 
 - Source visual truth: the two mobile chat-room screenshots supplied in this conversation for 이서연 and 최유진.
