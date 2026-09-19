@@ -230,6 +230,7 @@ export const S = {
     padding: 18px;
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
+    cursor: pointer;
   `,
   FeaturedPortfolioImage: styled.div`
     align-self: center;
@@ -256,6 +257,7 @@ export const S = {
     min-height: 104px;
     padding: 14px 0;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
+    cursor: pointer;
 
     &:last-child { border-bottom: 0; }
   `,
@@ -298,6 +300,57 @@ export const S = {
   `,
   PortfolioArrow: styled.span`
     color: #647087;
+  `,
+  ActivityList: styled.section`
+    display: grid;
+    gap: 4px;
+    margin: 25px 22px 30px;
+    padding: 24px 28px 12px;
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  ActivityItem: styled.article<{ $last: boolean }>`
+    position: relative;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 15px;
+    min-height: ${({ $last }) => $last ? "55px" : "82px"};
+
+    &::before {
+      position: absolute;
+      top: 16px;
+      bottom: -4px;
+      left: 8px;
+      width: 2px;
+      background: ${({ $last }) => $last ? "transparent" : tokens.color.primary[100]};
+      content: "";
+    }
+  `,
+  ActivityDot: styled.span`
+    position: relative;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    border-radius: 50%;
+    background: ${tokens.color.primary[500]};
+  `,
+  ActivityCopy: styled.div`
+    min-width: 0;
+  `,
+  ActivityTitle: styled.h3`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -.7px;
+    line-height: 1.4;
+  `,
+  ActivityDescription: styled.p`
+    margin: 7px 0 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 15px;
+    letter-spacing: -.5px;
   `,
   EmptyTab: styled.p`
     margin: 0;
