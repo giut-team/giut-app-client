@@ -262,7 +262,11 @@ export function HomePage() {
       <BottomNavigation
         activeKey={activeNavigation}
         items={navigationItems}
-        onChange={setActiveNavigation}
+        onChange={(key) => {
+          setActiveNavigation(key);
+          if (key === "hub") navigate("/giut-hub");
+          if (key === "mypage") navigate("/my-team");
+        }}
       />
     </S.Page>
   );

@@ -110,7 +110,7 @@ export const S = {
     margin-top: ${({ $variant }) => ($variant === "action" ? "14px" : "22px")};
     padding: ${({ $variant }) =>
       $variant === "action"
-        ? "0 0 max(16px, env(safe-area-inset-bottom))"
+        ? "0 0 var(--app-safe-bottom)"
         : "17px 16px"};
     border-radius: 15px;
     background: ${({ $variant }) =>
