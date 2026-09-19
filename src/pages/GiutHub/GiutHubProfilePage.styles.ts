@@ -105,30 +105,68 @@ export const S = {
     line-height: 1.65;
     white-space: pre-line;
   `,
+  Metrics: styled.section`
+    display: grid;
+    grid-template-columns: 1fr 1.25fr .8fr;
+    margin: 0;
+    padding: 20px 0;
+    border-top: 1px solid ${tokens.color.neutral[200]};
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
+    background: ${tokens.color.neutral[50]};
+  `,
+  Metric: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    justify-content: center;
+    padding: 0 18px;
+    color: #647087;
+
+    + div { border-left: 1px solid ${tokens.color.neutral[200]}; }
+    svg { flex: 0 0 auto; }
+    span { display: grid; gap: 3px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    strong { color: ${tokens.color.neutral[900]}; font-size: 17px; font-weight: 800; }
+    small { color: ${tokens.color.neutral[500]}; font-size: 11px; }
+
+    &:last-child span {
+      text-align: center;
+    }
+  `,
   SkillList: styled.div`
     display: flex;
     flex-wrap: wrap;
-    gap: 9px;
-    padding: 16px 30px 24px;
+    gap: 8px;
+    padding: 16px 12px 24px;
     background: ${tokens.color.neutral[50]};
   `,
   Skill: styled.span<{ $index: number }>`
-    padding: 11px 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 9px 8px;
     border-radius: 12px;
     background: ${({ $index }) => ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
     color: white;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
     line-height: 1;
+    white-space: nowrap;
+
+    img {
+      width: 14px;
+      height: 14px;
+      filter: brightness(0) invert(1);
+    }
   `,
   ActionRow: styled.div`
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.25fr) 68px;
-    gap: 10px;
-    padding: 0 30px 30px;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 0 16px 30px;
     background: ${tokens.color.neutral[50]};
 
-    > button:first-of-type { gap: 7px; padding: 0 10px; border-radius: 14px; font-size: 14px; }
+    > button:first-of-type { height: auto; gap: 9px; padding: 14px 12px; border-radius: 14px; font-size: 16px; }
   `,
   MessageButton: styled.button`
     display: inline-flex;
@@ -136,27 +174,28 @@ export const S = {
     justify-content: center;
     gap: 7px;
     min-width: 0;
-    height: 48px;
+    height: auto;
     padding: 0 8px;
+    padding-block: 14px;
     border: 0;
     border-radius: 14px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
   `,
-  FavoriteButton: styled.button`
+  FavoriteButton: styled.button<{ $active: boolean }>`
     display: grid;
-    height: 48px;
-    padding: 0;
+    height: auto;
+    padding: 12px;
     place-items: center;
     border: 0;
     border-radius: 14px;
     background: ${tokens.color.neutral[100]};
-    color: #63718a;
+    color: ${({ $active }) => $active ? "#f1b900" : "#63718a"};
     cursor: pointer;
   `,
   TabList: styled.div`
@@ -179,43 +218,86 @@ export const S = {
 
     &::after { position: absolute; right: 20px; bottom: -1px; left: 20px; height: 3px; background: ${tokens.color.neutral[900]}; content: ${({ $active }) => $active ? '""' : "none"}; }
   `,
-  PortfolioGrid: styled.section`
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-    padding: 25px 28px 30px;
+  PortfolioContent: styled.section`
+    padding: 25px 22px 30px;
   `,
-  PortfolioCard: styled.article`
-    overflow: hidden;
-    border-radius: 0 0 18px 18px;
+  FeaturedPortfolioCard: styled.article`
+    display: grid;
+    grid-template-columns: minmax(108px, .9fr) minmax(0, 1fr) 20px;
+    align-items: center;
+    gap: 16px;
+    min-height: 154px;
+    padding: 18px;
+    border-radius: 18px;
     background: ${tokens.color.neutral[50]};
   `,
-  PortfolioImage: styled.div`
-    display: flex;
-    flex-direction: column;
+  FeaturedPortfolioImage: styled.div`
+    align-self: center;
+    aspect-ratio: 1.58;
+    overflow: hidden;
+    border-radius: 13px;
+    background: ${tokens.color.neutral[100]};
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  `,
+  PortfolioList: styled.section`
+    display: grid;
+    gap: 0;
+    margin-top: 14px;
+    padding: 0 18px;
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  PortfolioCard: styled.article`
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr) 20px;
     align-items: center;
-    justify-content: center;
-    gap: 7px;
-    aspect-ratio: 1.15;
-    border: 2px dashed #aeb4bf;
-    background: #fbfbfc;
-    color: #828895;
-    font-size: 13px;
+    gap: 14px;
+    min-height: 104px;
+    padding: 14px 0;
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
+
+    &:last-child { border-bottom: 0; }
+  `,
+  PortfolioImage: styled.div`
+    align-self: center;
+    aspect-ratio: 1.72;
+    overflow: hidden;
+    border-radius: 10px;
+    background: ${tokens.color.neutral[100]};
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  `,
+  PortfolioCopy: styled.div`
+    min-width: 0;
+  `,
+  RepresentativeLabel: styled.span`
+    display: inline-flex;
+    margin-bottom: 10px;
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font-size: 11px;
+    font-weight: 700;
   `,
   PortfolioTitle: styled.h3`
-    margin: 13px 12px 0;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 14px;
     font-weight: 800;
     letter-spacing: -.5px;
-    line-height: 1.4;
+    line-height: 1.45;
   `,
   PortfolioDescription: styled.p`
-    margin: 8px 12px 17px;
+    margin: 8px 0 0;
     color: ${tokens.color.neutral[500]};
     font-size: 12px;
     letter-spacing: -.4px;
     line-height: 1.45;
+  `,
+  PortfolioArrow: styled.span`
+    color: #647087;
   `,
   EmptyTab: styled.p`
     margin: 0;
