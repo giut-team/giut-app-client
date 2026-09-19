@@ -196,6 +196,7 @@ export const S = {
 
     span {
       color: ${tokens.color.neutral[900]};
+      font-weight: 800;
     }
 
     strong {
@@ -275,7 +276,7 @@ export const S = {
   InfoGrid: styled.dl`
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
+    gap: 12px;
     margin: 0;
   `,
   InfoItem: styled.div`
@@ -283,7 +284,7 @@ export const S = {
 
     dt {
       margin-bottom: 5px;
-      color: ${tokens.color.neutral[900]};
+      color: ${tokens.color.neutral[500]};
       font-size: 8px;
       font-weight: 600;
     }
@@ -316,56 +317,54 @@ export const S = {
   `,
   Member: styled.article`
     display: grid;
-    grid-template-columns: 46px minmax(0, 1fr);
-    align-items: center;
-    gap: 13px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
   `,
   MemberAvatar: styled.span<{ $tone: MemberTone }>`
     display: grid;
-    width: 46px;
-    height: 46px;
+    width: 34px;
+    height: 34px;
     place-items: center;
-    border-radius: 50%;
+    border-radius: 11px;
     background: ${({ $tone }) => memberColors[$tone].background};
     color: ${({ $tone }) => memberColors[$tone].color};
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 800;
   `,
   MemberContent: styled.div`
-    display: grid;
+    display: block;
     min-width: 0;
-    gap: 3px;
   `,
   MemberHeading: styled.div`
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   `,
   MemberName: styled.strong`
     color: ${tokens.color.neutral[900]};
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
   `,
   MemberRole: styled.span`
     padding: 3px 5px;
-    border-radius: 5px;
+    border-radius: 4px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 8px;
-    font-weight: 700;
+    font-size: 7px;
+    font-weight: 800;
     line-height: 1;
   `,
   MemberSpecialty: styled.p`
-    margin: 0;
-    color: ${tokens.color.neutral[700]};
-    font-size: 9px;
-    line-height: 1.35;
+    margin: 4px 0 0;
+    color: #000;
+    font-size: 8px;
+    font-weight: 600;
   `,
   MemberSchool: styled.p`
-    margin: 0;
-    color: ${tokens.color.neutral[900]};
-    font-size: 9px;
-    line-height: 1.35;
+    margin: 3px 0 0;
+    color: #000;
+    font-size: 8px;
   `,
   ActionBar: styled.div`
     position: fixed;

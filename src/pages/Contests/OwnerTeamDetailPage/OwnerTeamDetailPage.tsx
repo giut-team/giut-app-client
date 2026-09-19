@@ -416,7 +416,7 @@ export function OwnerTeamDetailPage() {
                   <S.PositionName $open={position.open && isRecruitmentOpen}>
                     {position.name}
                   </S.PositionName>
-                  {!isRecruitmentClosed && (
+                  {position.open && !isRecruitmentClosed && (
                     <S.PositionInfo>{position.info}</S.PositionInfo>
                   )}
                 </div>

@@ -222,13 +222,13 @@ export const S = {
   `,
   MemberRole: styled.p`
     margin: 4px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 600;
   `,
   MemberSchool: styled.p`
     margin: 3px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
   `,
   ActionBar: styled.div`

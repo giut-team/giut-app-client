@@ -38,7 +38,7 @@ const members = [
 const currentMember = {
   initial: "김",
   name: "김현진",
-  role: "백엔드 개발 · 나",
+  role: "나 · 백엔드 개발",
   specialty: "백엔드 개발",
   school: "서울시립대 컴퓨터과학부 3학년",
   tone: "blue" as const,

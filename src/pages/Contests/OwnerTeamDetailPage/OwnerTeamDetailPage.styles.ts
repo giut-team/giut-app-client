@@ -150,7 +150,7 @@ export const S = {
   `,
   ContestName: styled.p`
     margin: 0 0 15px;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     font-weight: 600;
   `,
@@ -170,7 +170,7 @@ export const S = {
   `,
   HeroMeta: styled.p`
     margin: 7px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 600;
   `,
@@ -209,7 +209,7 @@ export const S = {
   `,
   PositionInfo: styled.p`
     margin: 4px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 600;
   `,
@@ -307,13 +307,13 @@ export const S = {
   `,
   MemberRole: styled.p`
     margin: 4px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 600;
   `,
   MemberSchool: styled.p`
     margin: 3px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
   `,
   PendingInvite: styled.article`
@@ -450,7 +450,7 @@ export const S = {
   `,
   SheetDescription: styled.p`
     margin: 8px 0 13px;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     line-height: 1.55;
   `,
@@ -652,14 +652,14 @@ export const S = {
     }
 
     small {
-      color: ${tokens.color.neutral[500]};
+      color: #000;
       font-size: 7px;
       font-weight: 600;
     }
   `,
   InviteCaret: styled.span`
     margin-left: auto;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
   `,
   IdInvitePage: styled.main`
     min-height: 100svh;
@@ -708,7 +708,7 @@ export const S = {
   `,
   IdInviteHelp: styled.p`
     margin: 8px 0 16px;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 600;
     line-height: 1.45;
