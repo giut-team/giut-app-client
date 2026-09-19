@@ -2,7 +2,13 @@ import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import { tokens } from "../../../design-system/tokens.generated";
 
-type StepState = "complete" | "current" | "pending" | "blocked" | "duplicate";
+type StepState =
+  | "complete"
+  | "current"
+  | "pending"
+  | "blocked"
+  | "duplicate"
+  | "partial";
 
 const revealStep = keyframes`
   from {
@@ -50,6 +56,10 @@ const stepColors: Record<StepState, { background: string; color: string }> = {
   },
   duplicate: {
     background: tokens.color.danger[500],
+    color: tokens.color.neutral[50],
+  },
+  partial: {
+    background: tokens.color.warning[500],
     color: tokens.color.neutral[50],
   },
 };
@@ -244,7 +254,9 @@ export const S = {
           ? "#16b879"
           : $state === "duplicate"
             ? tokens.color.danger[500]
-          : tokens.color.neutral[200]};
+            : $state === "partial"
+              ? tokens.color.warning[500]
+              : tokens.color.neutral[200]};
       content: "";
     }
 
@@ -259,7 +271,9 @@ export const S = {
           ? tokens.color.primary[500]
           : $state === "duplicate"
             ? tokens.color.danger[500]
-          : tokens.color.neutral[900]};
+            : $state === "partial"
+              ? tokens.color.warning[500]
+              : tokens.color.neutral[900]};
       font-size: 10px;
       font-weight: 800;
     }
@@ -269,9 +283,12 @@ export const S = {
       color: ${({ $state }) =>
         $state === "duplicate"
           ? tokens.color.danger[500]
-          : tokens.color.neutral[700]};
+          : $state === "partial"
+            ? tokens.color.warning[500]
+            : tokens.color.neutral[700]};
       font-size: 9px;
-      font-weight: ${({ $state }) => ($state === "duplicate" ? 700 : 400)};
+      font-weight: ${({ $state }) =>
+        $state === "duplicate" || $state === "partial" ? 700 : 400};
       line-height: 1.35;
     }
   `,
@@ -526,6 +543,259 @@ export const S = {
     background: ${tokens.color.warning[100]};
     color: ${tokens.color.warning[500]} !important;
     font-weight: 700;
+  `,
+  EditScreen: styled.section`
+    min-height: calc(100svh - 56px);
+    padding: 10px 8px 88px;
+    background: ${tokens.color.neutral[50]};
+    box-sizing: border-box;
+  `,
+  EditUrlBar: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 0 8px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 7px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    font-weight: 700;
+
+    > svg {
+      flex: 0 0 auto;
+      color: ${tokens.color.neutral[500]};
+    }
+
+    > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    > button {
+      flex: 0 0 auto;
+      margin-left: auto;
+      padding: 5px 2px;
+      border: 0;
+      background: transparent;
+      color: ${tokens.color.primary[500]};
+      font: inherit;
+      font-size: 7px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+  `,
+  FormHeadingRow: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 15px 4px 0;
+  `,
+  FormHeading: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 11px;
+    font-weight: 800;
+  `,
+  ExtractionCount: styled.span`
+    flex: 0 0 auto;
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: ${tokens.color.warning[100]};
+    color: ${tokens.color.warning[500]};
+    font-size: 7px;
+    font-weight: 800;
+  `,
+  FormDescription: styled.p`
+    margin: 6px 4px 12px;
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.55;
+
+    em {
+      color: ${tokens.color.warning[500]};
+      font-style: normal;
+      font-weight: 800;
+    }
+  `,
+  ExtractedFieldList: styled.div`
+    display: grid;
+    gap: 8px;
+  `,
+  ExtractedField: styled.div`
+    position: relative;
+    padding: 9px 4px;
+    border: 0;
+    border-radius: 9px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  FieldMeta: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 7px;
+
+    > strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 9px;
+      font-weight: 800;
+    }
+  `,
+  FieldStatus: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  `,
+  AutoTag: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 4px;
+    border-radius: 4px;
+    background: #dff5ec;
+    color: ${tokens.color.success[500]};
+    font-size: 7px;
+    font-weight: 800;
+  `,
+  FieldInputWrap: styled.div`
+    position: relative;
+  `,
+  FieldInput: styled.input<{ $editing: boolean }>`
+    width: 100%;
+    height: 30px;
+    padding: 0 28px 0 8px;
+    border: 1px solid
+      ${({ $editing }) =>
+        $editing ? tokens.color.primary[500] : tokens.color.neutral[200]};
+    border-radius: 7px;
+    outline: 0;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 8px;
+    font-weight: 700;
+    box-sizing: border-box;
+
+  `,
+  FieldEditButton: styled.button<{ $editing: boolean }>`
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: grid;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: ${tokens.color.neutral[900]};
+    cursor: pointer;
+    transform: translateY(-50%);
+  `,
+  ManualDivider: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 14px 0;
+    color: ${tokens.color.warning[500]};
+
+    &::before,
+    &::after {
+      height: 1px;
+      flex: 1;
+      background: ${tokens.color.neutral[200]};
+      content: "";
+    }
+
+    span {
+      padding: 4px 6px;
+      border-radius: 5px;
+      background: ${tokens.color.warning[100]};
+      font-size: 7px;
+      font-weight: 800;
+    }
+  `,
+  ManualField: styled.section`
+    margin-top: 8px;
+    padding: 10px;
+    border: 1px solid #f4dbad;
+    border-radius: 9px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  ManualFieldHeader: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 9px;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    em {
+      color: ${tokens.color.danger[500]};
+      font-style: normal;
+    }
+  `,
+  RequiredTag: styled.span`
+    padding: 4px 5px;
+    border-radius: 4px;
+    background: ${tokens.color.orange[100]};
+    color: ${tokens.color.orange[500]};
+    font-size: 7px;
+    font-weight: 800;
+  `,
+  CategoryOptions: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  `,
+  CategoryButton: styled.button<{ $selected: boolean }>`
+    height: 24px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 6px;
+    background: ${({ $selected }) =>
+      $selected ? tokens.color.neutral[900] : tokens.color.neutral[100]};
+    color: ${({ $selected }) =>
+      $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 8px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ManualInput: styled.input`
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid ${tokens.color.primary[500]};
+    border-radius: 7px;
+    outline: 0;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 8px;
+    font-weight: 700;
+    box-sizing: border-box;
+  `,
+  ManualHint: styled.p`
+    margin: 10px 0 0;
+    padding: 9px;
+    border-radius: 8px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1.5;
   `,
   Footer: styled.footer`
     position: fixed;

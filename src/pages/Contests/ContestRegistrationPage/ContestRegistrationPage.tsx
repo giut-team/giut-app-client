@@ -6,8 +6,21 @@ import { SkeletonBar } from "../../../components/SkeletonBar/SkeletonBar";
 import { S } from "./ContestRegistrationPage.styles";
 
 type ResultState = "complete" | "duplicate" | "partial";
-type ViewState = "entry" | "loading" | ResultState;
-type StepState = "complete" | "current" | "pending" | "blocked" | "duplicate";
+type ViewState = "entry" | "loading" | "field-edit" | ResultState;
+type ContestDraft = {
+  title: string;
+  organizer: string;
+  period: string;
+  target: string;
+  prize: string;
+};
+type StepState =
+  | "complete"
+  | "current"
+  | "pending"
+  | "blocked"
+  | "duplicate"
+  | "partial";
 
 const getResultState = (url: string): ResultState => {
   const normalizedUrl = url.toLowerCase();
@@ -26,8 +39,9 @@ const getStepState = (
   if (view === "duplicate" && index === 1) return "duplicate";
   if (view === "duplicate" && index > 1) return "blocked";
   if (view === "complete") return "complete";
-  if (view === "partial" && index < 4) return "complete";
-  if (view === "partial" && index === 4) return "current";
+  if (view === "partial" && index < 3) return "complete";
+  if (view === "partial" && index === 3) return "partial";
+  if (view === "partial" && index > 3) return "blocked";
   if (index < activeStep) return "complete";
   if (index === activeStep) return "current";
   return "pending";
@@ -36,11 +50,20 @@ const getStepState = (
 export function ContestRegistrationPage() {
   const navigate = useNavigate();
   const sequenceRef = useRef(0);
-  const [url, setUrl] = useState(
-    "https://contest.example.kr/data-contest-2026",
-  );
+  const [url, setUrl] = useState("https://contest.example.kr/partial");
   const [view, setView] = useState<ViewState>("entry");
   const [activeStep, setActiveStep] = useState(1);
+  const [category, setCategory] = useState("");
+  const [editingField, setEditingField] = useState<keyof ContestDraft | null>(
+    null,
+  );
+  const [draft, setDraft] = useState<ContestDraft>({
+    title: "제 12회 핀테크 해커톤",
+    organizer: "금융위원회",
+    period: "2026.09.01 - 09.21",
+    target: "대학 재/휴학생",
+    prize: "",
+  });
 
   const startLoading = () => {
     if (!url.trim()) return;
@@ -65,6 +88,12 @@ export function ContestRegistrationPage() {
 
     schedule(1200, () => setActiveStep(2));
     schedule(2400, () => setActiveStep(3));
+
+    if (resultState === "partial") {
+      schedule(3600, () => setView("partial"));
+      return;
+    }
+
     schedule(3600, () => setActiveStep(4));
     schedule(4800, () => setView(resultState));
   };
@@ -79,6 +108,14 @@ export function ContestRegistrationPage() {
     setView("entry");
     setActiveStep(1);
   };
+
+  const extractedFields = [
+    ["공모전명", "title"],
+    ["주최", "organizer"],
+    ["접수 기간", "period"],
+    ["참가 대상", "target"],
+  ] as const;
+  const categories = ["IT/과학", "기획", "디자인", "마케팅"];
 
   const steps = [
     "중복 검사",
@@ -135,7 +172,126 @@ export function ContestRegistrationPage() {
           </S.EntryForm>
         )}
 
-        {view !== "entry" && (
+        {view === "field-edit" && (
+          <S.EditScreen>
+            <S.EditUrlBar>
+              <Icon name="link" size={11} weight="bold" />
+              <span>{url.replace(/^https?:\/\//, "")}</span>
+              <button onClick={startLoading} type="button">
+                다시 불러오기
+              </button>
+            </S.EditUrlBar>
+
+            <S.FormHeadingRow>
+              <S.FormHeading>자동 추출 결과</S.FormHeading>
+              <S.ExtractionCount>6개 중 4개 추출</S.ExtractionCount>
+            </S.FormHeadingRow>
+            <S.FormDescription>
+              추출된 항목은 눌러서 바로 수정할 수 있어요. 아래{" "}
+              <em>2개 항목</em>만 직접 입력하면 등록됩니다.
+            </S.FormDescription>
+
+            <S.ExtractedFieldList>
+              {extractedFields.map(([label, key]) => (
+                <S.ExtractedField key={key}>
+                  <S.FieldMeta>
+                    <strong>{label}</strong>
+                    <S.FieldStatus>
+                      <S.AutoTag>
+                        <Icon name="check" size={8} weight="bold" />
+                        자동
+                      </S.AutoTag>
+                    </S.FieldStatus>
+                  </S.FieldMeta>
+                  <S.FieldInputWrap>
+                    <S.FieldInput
+                      aria-label={label}
+                      $editing={editingField === key}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          [key]: event.target.value,
+                        }))
+                      }
+                      readOnly={editingField !== key}
+                      value={draft[key]}
+                    />
+                    <S.FieldEditButton
+                      $editing={editingField === key}
+                      aria-label={
+                        editingField === key ? `${label} 수정 완료` : `${label} 수정`
+                      }
+                      onClick={() =>
+                        setEditingField((current) =>
+                          current === key ? null : key,
+                        )
+                      }
+                      type="button"
+                    >
+                      <Icon
+                        name={editingField === key ? "check" : "edit"}
+                        size={11}
+                        weight="bold"
+                      />
+                    </S.FieldEditButton>
+                  </S.FieldInputWrap>
+                </S.ExtractedField>
+              ))}
+            </S.ExtractedFieldList>
+
+            <S.ManualDivider>
+              <span>직접 입력 2개</span>
+            </S.ManualDivider>
+
+            <S.ManualField>
+              <S.ManualFieldHeader>
+                <strong>
+                  카테고리 <em>*</em>
+                </strong>
+                <S.RequiredTag>입력 필요</S.RequiredTag>
+              </S.ManualFieldHeader>
+              <S.CategoryOptions>
+                {categories.map((item) => (
+                  <S.CategoryButton
+                    $selected={category === item}
+                    key={item}
+                    onClick={() => setCategory(item)}
+                    type="button"
+                  >
+                    {item}
+                  </S.CategoryButton>
+                ))}
+              </S.CategoryOptions>
+            </S.ManualField>
+
+            <S.ManualField>
+              <S.ManualFieldHeader>
+                <strong>
+                  시상금 <em>*</em>
+                </strong>
+                <S.RequiredTag>입력 필요</S.RequiredTag>
+              </S.ManualFieldHeader>
+              <S.ManualInput
+                aria-label="시상금"
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    prize: event.target.value,
+                  }))
+                }
+                placeholder="예: 총상금 1,000만원"
+                value={draft.prize}
+              />
+            </S.ManualField>
+
+            <S.ManualHint>
+              직접 입력한 항목이 있으면 미검증 상태로 게시되고, 운영진 확인 후
+              인증마크가 표시됩니다.
+            </S.ManualHint>
+          </S.EditScreen>
+        )}
+
+        {view !== "entry" && view !== "field-edit" && (
           <S.Screen>
             {view === "loading" && (
               <S.Heading>
@@ -208,6 +364,8 @@ export function ContestRegistrationPage() {
                         </S.StepCheck>
                       ) : stepState === "duplicate" ? (
                         <Icon name="warning" size={10} weight="fill" />
+                      ) : stepState === "partial" ? (
+                        <Icon name="warning" size={10} weight="fill" />
                       ) : stepState === "current" ? (
                         <S.StepSpinner aria-label="진행 중" />
                       ) : (
@@ -219,6 +377,8 @@ export function ContestRegistrationPage() {
                       <span>
                         {stepState === "duplicate"
                           ? "이미 등록된 공모전입니다"
+                          : stepState === "partial"
+                            ? "필수 항목 일부를 찾지 못했어요"
                           : stepState === "blocked"
                             ? "중복으로 중단됨"
                             : stepState === "complete"
@@ -325,8 +485,18 @@ export function ContestRegistrationPage() {
 
       {isResultView && (
         <S.Footer>
-          <S.ContinueButton type="button">
+          <S.ContinueButton
+            onClick={() => view === "partial" && setView("field-edit")}
+            type="button"
+          >
             {view === "partial" ? "직접 입력해서 계속하기" : "지금 게시하기"}
+          </S.ContinueButton>
+        </S.Footer>
+      )}
+      {view === "field-edit" && (
+        <S.Footer>
+          <S.ContinueButton onClick={() => navigate("/contests")} type="button">
+            등록하기
           </S.ContinueButton>
         </S.Footer>
       )}

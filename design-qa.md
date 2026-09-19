@@ -51,4 +51,12 @@
 - Browser-rendered evidence remains unavailable because the browser runtime returned `No browser is available`.
 - Partial extraction is an additional mock-data state for the `partial` URL keyword; it shows missing fields and a direct-input continuation action.
 
+## Direct-input form update
+
+- Additional source visual truth: the two supplied mobile screenshots showing the post-partial-extraction editable form.
+- Primary interaction: in the `partial` result state, select `직접 입력해서 계속하기` to open the auto-extracted field review form.
+- Implemented form state: four extracted fields are editable, category selection is interactive, the prize field accepts direct input, and `등록하기` returns to the contests list.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime remains unavailable, so the 282px-wide source layout, field-card spacing, and fixed registration footer could not be visually compared.
+- Code checks: `npm.cmd run lint` and `npm.cmd run build` passed after the direct-input form update.
+
 final result: blocked
