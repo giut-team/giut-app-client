@@ -53,8 +53,7 @@ export const S = {
   `,
   List: styled.div`
     display: grid;
-    gap: 8px;
-    padding: 8px 12px 24px;
+    padding: 0 16px 24px;
   `,
   NotificationCard: styled.button<{ $unread: boolean }>`
     position: relative;
@@ -62,10 +61,12 @@ export const S = {
     align-items: flex-start;
     width: 100%;
     min-height: 74px;
-    padding: 13px 12px;
+    padding: 14px 8px;
     gap: 10px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 13px;
+    border: 0;
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
+    border-left: 0;
+    border-radius: 0;
     background: ${tokens.color.neutral[50]};
     text-align: left;
     cursor: pointer;
