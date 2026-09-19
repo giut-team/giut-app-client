@@ -173,7 +173,7 @@ export const S = {
   ApplicationCancelDescription: styled.p<{ $hidden?: boolean }>`
     display: ${({ $hidden }) => ($hidden ? "none" : "block")};
     margin: 9px 0 14px;
-    color: ${tokens.color.neutral[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 10px;
     line-height: 1.55;
   `,

@@ -88,7 +88,9 @@ export function ApplicationReviewTeamDetailPage() {
             <S.ProgressValue $value={isAccepted ? 80 : 60} />
           </S.ProgressTrack>
           <S.Remaining>
-            {isAccepted ? "내가 합류해서 4/5명 · 1자리 남았어요" : "2자리 남았어요"}
+            {isAccepted
+              ? "내가 합류해서 4/5명 · 1자리 남았어요"
+              : "2자리 남았어요"}
           </S.Remaining>
         </S.Hero>
 
@@ -111,12 +113,14 @@ export function ApplicationReviewTeamDetailPage() {
               <time>09.08 지원</time>
             </S.ApplicationCardHeader>
             <S.ApplicationTitle>
-              {isAccepted ? "백엔드 개발자로 합류했어요" : "이미 지원한 팀이에요"}
+              {isAccepted
+                ? "백엔드 개발자로 합류했어요"
+                : "이미 지원한 팀이에요"}
             </S.ApplicationTitle>
             <S.ApplicationDescription>
               {isAccepted
                 ? "이제 이 팀은 마이페이지 · 내 팀에서 바로 볼 수 있어요."
-                : "팀장이 검토하는 중이에요. 결과가 나오면 알림으로 알려드릴게요. 결과 전까지 같은 팀에 다시 지원할 수 없어요."}
+                : "팀장이 검토하는 중이에요. 결과가 나오면 알림으로 알려드릴게요."}
             </S.ApplicationDescription>
             <S.Timeline aria-label="지원 진행 상태">
               <S.TimelineStep $state="complete">
@@ -161,7 +165,9 @@ export function ApplicationReviewTeamDetailPage() {
                 <strong>개발</strong>
                 <span>백엔드 개발자 1명 · 데이터 엔지니어 1명</span>
               </div>
-              <S.AppliedBadge>{isAccepted ? "내 포지션" : "내가 지원"}</S.AppliedBadge>
+              <S.AppliedBadge>
+                {isAccepted ? "내 포지션" : "내가 지원"}
+              </S.AppliedBadge>
             </S.PositionCard>
             <S.PositionCard $applied={false}>
               <div>
@@ -194,19 +200,23 @@ export function ApplicationReviewTeamDetailPage() {
             {isAccepted ? "팀원 4명 · 나 포함" : "팀원 3명"}
           </S.SectionTitle>
           <S.MemberList>
-            {(isAccepted ? [...members, currentMember] : members).map((member) => (
-              <S.Member key={member.name}>
-                <S.MemberAvatar $tone={member.tone}>{member.initial}</S.MemberAvatar>
-                <S.MemberContent>
-                  <S.MemberHeading>
-                    <S.MemberName>{member.name}</S.MemberName>
-                    <S.MemberRole>{member.role}</S.MemberRole>
-                  </S.MemberHeading>
-                  <S.MemberSpecialty>{member.specialty}</S.MemberSpecialty>
-                  <S.MemberSchool>{member.school}</S.MemberSchool>
-                </S.MemberContent>
-              </S.Member>
-            ))}
+            {(isAccepted ? [...members, currentMember] : members).map(
+              (member) => (
+                <S.Member key={member.name}>
+                  <S.MemberAvatar $tone={member.tone}>
+                    {member.initial}
+                  </S.MemberAvatar>
+                  <S.MemberContent>
+                    <S.MemberHeading>
+                      <S.MemberName>{member.name}</S.MemberName>
+                      <S.MemberRole>{member.role}</S.MemberRole>
+                    </S.MemberHeading>
+                    <S.MemberSpecialty>{member.specialty}</S.MemberSpecialty>
+                    <S.MemberSchool>{member.school}</S.MemberSchool>
+                  </S.MemberContent>
+                </S.Member>
+              ),
+            )}
           </S.MemberList>
         </S.Section>
       </S.Content>
