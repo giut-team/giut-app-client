@@ -204,7 +204,10 @@ export function ContestsPage() {
 
       <S.Content>
         <S.ListControls>
-          <S.RegisterButton type="button">
+          <S.RegisterButton
+            onClick={() => navigate("/contests/register")}
+            type="button"
+          >
             <Icon name="plus" size={10} weight="bold" />
             공모전 등록
           </S.RegisterButton>
