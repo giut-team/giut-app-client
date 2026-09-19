@@ -29,7 +29,7 @@ export const S = {
   `,
   Description: styled.p`
     margin: 10px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 11px;
     letter-spacing: -0.25px;
     line-height: 1.65;
