@@ -11,7 +11,7 @@ export const S = {
     width: min(100%, 453px);
     min-height: 100svh;
     margin: 0 auto;
-    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    padding-bottom: calc(88px + var(--app-safe-bottom));
     background: ${tokens.color.neutral[50]};
   `,
   Hero: styled.section`
@@ -90,6 +90,31 @@ export const S = {
     font-weight: 700;
 
     &:hover:not(:disabled) { background: ${({ $active }) => $active ? tokens.color.primary[100] : tokens.color.neutral[50]}; }
+  `,
+  AppliedFilters: styled.div`
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 10px;
+  `,
+  AppliedFilter: styled.button`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 18%);
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+
+    span { font-size: 16px; font-weight: 400; line-height: 1; }
   `,
   Results: styled.section`
     padding: 23px 20px 20px;
@@ -381,6 +406,218 @@ export const S = {
     font-weight: 800;
     letter-spacing: -0.8px;
     cursor: pointer;
+  `,
+  StatusSheetHeader: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0 14px;
+  `,
+  StatusSheetTitle: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  `,
+  StatusSheetClose: styled.button`
+    display: grid;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: ${tokens.color.neutral[900]};
+    cursor: pointer;
+  `,
+  StatusSheetDescription: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 16px;
+    letter-spacing: -0.6px;
+  `,
+  StatusOptionList: styled.div`
+    margin-top: 24px;
+  `,
+  StatusOption: styled.button<{ $selected: boolean }>`
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    width: 100%;
+    min-height: 76px;
+    padding: 12px 0;
+    align-items: center;
+    border: 0;
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
+    background: transparent;
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:first-of-type { border-top: 1px solid ${tokens.color.neutral[200]}; }
+    &:focus-visible { outline: 2px solid ${tokens.color.primary[500]}; outline-offset: -2px; }
+
+    strong { display: block; font-size: 18px; font-weight: 800; letter-spacing: -0.8px; }
+    small { display: block; margin-top: 5px; color: ${tokens.color.neutral[500]}; font-size: 13px; letter-spacing: -0.5px; }
+  `,
+  StatusRadio: styled.span<{ $selected: boolean }>`
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 2px solid ${({ $selected }) => $selected ? tokens.color.primary[500] : "#b6becd"};
+    border-radius: 50%;
+
+    &::after {
+      width: ${({ $selected }) => $selected ? "18px" : "0"};
+      height: ${({ $selected }) => $selected ? "18px" : "0"};
+      border-radius: 50%;
+      background: ${tokens.color.primary[500]};
+      content: "";
+      transition: width 150ms ease, height 150ms ease;
+    }
+  `,
+  StatusSheetFooter: styled.div`
+    display: grid;
+    grid-template-columns: .7fr 1.55fr;
+    gap: 16px;
+    align-items: center;
+  `,
+  ResetStatusButton: styled.button`
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: ${tokens.color.primary[500]};
+    font: inherit;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ViewStatusButton: styled.button`
+    height: 62px;
+    border: 0;
+    border-radius: 18px;
+    background: ${tokens.color.primary[500]};
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  DepartmentFooter: styled.div`
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    padding-top: 8px;
+    background: ${tokens.color.neutral[50]};
+
+    button { width: 100%; }
+  `,
+  SelectedGradeList: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 20px;
+  `,
+  SelectedGrade: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid #91b0ff;
+    border-radius: 999px;
+    background: #f4f7ff;
+    color: ${tokens.color.primary[500]};
+    font-size: 14px;
+    font-weight: 800;
+
+    button { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; font-size: 20px; line-height: .7; cursor: pointer; }
+  `,
+  DepartmentHeading: styled.h3`
+    margin: 20px 0 12px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 20px;
+    font-weight: 800;
+  `,
+  GradeGrid: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  `,
+  GradeButton: styled.button<{ $selected: boolean }>`
+    min-width: 74px;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid ${({ $selected }) => $selected ? tokens.color.primary[500] : tokens.color.neutral[200]};
+    border-radius: 13px;
+    background: ${({ $selected }) => $selected ? tokens.color.primary[500] : tokens.color.neutral[50]};
+    color: ${({ $selected }) => $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  `,
+  DepartmentSearch: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 56px;
+    padding: 0 17px;
+    border-radius: 14px;
+    background: #f2f5fb;
+    color: ${tokens.color.neutral[500]};
+    font-size: 15px;
+
+    input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: ${tokens.color.neutral[900]}; font: inherit; }
+    input::placeholder { color: ${tokens.color.neutral[500]}; }
+  `,
+  DepartmentTabs: styled.div`
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 10px 12px;
+    border-bottom: 1px solid ${tokens.color.neutral[200]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 14px;
+
+  `,
+  DepartmentTab: styled.button<{ $active: boolean }>`
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: ${({ $active }) => $active ? tokens.color.primary[500] : tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: ${({ $active }) => $active ? 800 : 500};
+    cursor: pointer;
+  `,
+  DepartmentList: styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    max-height: 142px;
+    overflow-y: auto;
+  `,
+  DepartmentRow: styled.button<{ $selected?: boolean }>`
+    position: relative;
+    display: flex;
+    min-width: 0;
+    width: 100%;
+    min-height: 64px;
+    padding: 10px 34px 10px 10px;
+    align-items: flex-start;
+    border: 2px solid ${({ $selected }) => $selected ? tokens.color.primary[500] : tokens.color.neutral[200]};
+    border-radius: 10px;
+    background: ${({ $selected }) => $selected ? "#f5f8ff" : tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+
+    > span { position: absolute; top: 9px; right: 9px; display: grid; width: 24px; height: 24px; place-items: center; border: 2px solid ${({ $selected }) => $selected ? tokens.color.primary[500] : "#aeb7c8"}; border-radius: 50%; background: ${({ $selected }) => $selected ? tokens.color.primary[500] : "transparent"}; color: ${tokens.color.neutral[50]}; }
+
+    &:focus-visible { outline: 3px solid ${tokens.color.primary[500]}; outline-offset: 2px; }
   `,
   EmptyState: styled.p`
     margin: 0;
