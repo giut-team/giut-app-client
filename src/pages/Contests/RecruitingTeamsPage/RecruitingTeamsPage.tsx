@@ -8,8 +8,11 @@ import { S } from "./RecruitingTeamsPage.styles";
 type TeamCategory = "전체" | "개발" | "기획" | "디자인" | "마케팅";
 
 type Team = {
+  applicationReview?: boolean;
+  memberOfTeam?: boolean;
   category: Exclude<TeamCategory, "전체">;
   id: string;
+  isOwner?: boolean;
   leader: string;
   members: string;
   positions: string[];
@@ -22,12 +25,35 @@ const categories: TeamCategory[] = ["전체", "개발", "기획", "디자인", "
 
 const teams: Team[] = [
   {
-    id: "data-seoul",
+    id: "my-data-seoul",
+    category: "기획",
+    title: "데이터로 서울을",
+    leader: "이서연 팀장 · 온라인 + 오프라인 · 주 1회",
+    members: "3/5명",
+    positions: ["백엔드 개발자 모집중", "데이터 엔지니어 모집중"],
+    status: "open",
+    timeAgo: "방금 전",
+    isOwner: true,
+  },
+  {
+    id: "applied-data-seoul",
+    applicationReview: true,
     category: "개발",
     title: "데이터로 서울을",
     leader: "이수현 팀장 · 온라인 + 오프라인 · 주 1회",
     members: "3/5명",
     positions: ["백엔드 모집중", "프론트엔드 마감", "기획 마감"],
+    status: "open",
+    timeAgo: "2일 전",
+  },
+  {
+    id: "joined-data-seoul",
+    memberOfTeam: true,
+    category: "개발",
+    title: "데이터로 서울을",
+    leader: "이수연 팀장 · 온라인 + 오프라인 · 주 1회",
+    members: "4/5명",
+    positions: ["백엔드 개발자 모집중", "데이터 엔지니어 모집중"],
     status: "open",
     timeAgo: "2일 전",
   },
@@ -77,24 +103,37 @@ function TeamCard({
   favorite,
   onToggleFavorite,
   onSelect,
-  selected,
+  onView,
   team,
 }: {
   favorite: boolean;
   onToggleFavorite: () => void;
   onSelect: () => void;
-  selected: boolean;
+  onView: () => void;
   team: Team;
 }) {
   const isOpen = team.status === "open";
 
   return (
     <S.TeamCard
-      $selected={isOpen && selected}
+      $selected={false}
       onClick={isOpen ? onSelect : undefined}
+      onKeyDown={(event) => {
+        if (isOpen && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      role={isOpen ? "button" : undefined}
+      tabIndex={isOpen ? 0 : undefined}
     >
       <S.TeamTopline>
         <S.TeamCount $closed={!isOpen}>{team.members}</S.TeamCount>
+        {team.applicationReview && (
+          <S.ApplicationReviewBadge>지원 검토 중</S.ApplicationReviewBadge>
+        )}
+        {team.memberOfTeam && <S.MemberOfTeamBadge>내 팀</S.MemberOfTeamBadge>}
+        {team.isOwner && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
         {team.id === "blending-3" && <S.LastSeat>한 자리</S.LastSeat>}
         <S.TimeAgo>{team.timeAgo}</S.TimeAgo>
       </S.TeamTopline>
@@ -112,7 +151,14 @@ function TeamCard({
         </S.PositionList>
       )}
       <S.TeamActions $closed={!isOpen}>
-        <S.DetailButton disabled={!isOpen} type="button">
+          <S.DetailButton
+            disabled={!isOpen}
+            onClick={(event) => {
+              event.stopPropagation();
+              onView();
+            }}
+            type="button"
+          >
           {isOpen ? (
             <>
               상세 보기 <Icon name="caret-right" size={14} weight="bold" />
@@ -126,7 +172,10 @@ function TeamCard({
             $favorite={favorite}
             aria-label={team.title + " 찜하기"}
             aria-pressed={favorite}
-            onClick={onToggleFavorite}
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggleFavorite();
+            }}
             type="button"
           >
             <Icon
@@ -146,7 +195,6 @@ export function RecruitingTeamsPage() {
   const { contestId = "seoul-data" } = useParams();
   const [activeCategory, setActiveCategory] = useState<TeamCategory>("전체");
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
-  const [selectedTeamId, setSelectedTeamId] = useState("data-seoul");
 
   const visibleTeams = useMemo(
     () =>
@@ -165,6 +213,10 @@ export function RecruitingTeamsPage() {
         : [...current, teamId],
     );
   };
+  const getDetailPath = (team: Team) =>
+    team.isOwner
+      ? `/contests/${contestId}/teams/${team.id}/manage`
+      : `/contests/${contestId}/teams/${team.id}`;
 
   return (
     <S.Page>
@@ -202,9 +254,9 @@ export function RecruitingTeamsPage() {
               <TeamCard
                 favorite={favoriteIds.includes(team.id)}
                 key={team.id}
-                onSelect={() => setSelectedTeamId(team.id)}
+                onSelect={() => navigate(getDetailPath(team))}
+                onView={() => navigate(getDetailPath(team))}
                 onToggleFavorite={() => toggleFavorite(team.id)}
-                selected={selectedTeamId === team.id}
                 team={team}
               />
             ))}
@@ -221,9 +273,9 @@ export function RecruitingTeamsPage() {
                 <TeamCard
                   favorite={favoriteIds.includes(team.id)}
                   key={team.id}
-                  onSelect={() => setSelectedTeamId(team.id)}
+                onSelect={() => navigate(getDetailPath(team))}
+                onView={() => navigate(getDetailPath(team))}
                   onToggleFavorite={() => toggleFavorite(team.id)}
-                  selected={selectedTeamId === team.id}
                   team={team}
                 />
               ))}

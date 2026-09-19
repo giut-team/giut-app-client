@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Icon } from "../../../components/icons";
+import { Modal } from "../../../components/Modal/Modal";
 import { Toast } from "../../../components/Toast/Toast";
 import { S } from "./ContestDetailPage.styles";
 
 type DetailTab = "overview" | "guide";
 
 const recruitTeams = [
+  {
+    id: "my-data-seoul",
+    title: "데이터로 서울을",
+    leader: "이서연 팀장 · 온라인 + 오프라인",
+    members: "3/5명",
+    positions: ["백엔드 개발자 모집", "데이터 엔지니어 모집"],
+    isOwner: true,
+  },
   {
     id: "data-seoul",
     title: "데이터로 서울을",
@@ -36,20 +45,16 @@ export function ContestDetailPage() {
   const { contestId = "seoul-data" } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [isSaved, setIsSaved] = useState(false);
-  const teamCreationState = location.state as
-    | {
-        fromTeamCreation?: boolean;
-        backPath?: string;
-        teamRegistered?: boolean;
-      }
-    | null;
-  const [toastMessage, setToastMessage] = useState(() =>
-    teamCreationState?.teamRegistered ? "팀이 등록되었습니다!" : "",
-  );
+  const [isTeamCreationModalOpen, setIsTeamCreationModalOpen] = useState(false);
+  const teamCreationState = location.state as {
+    fromTeamCreation?: boolean;
+    backPath?: string;
+  } | null;
+  const [toastMessage, setToastMessage] = useState("");
   useEffect(() => {
     if (!toastMessage) return;
 
-    const timeoutId = window.setTimeout(() => setToastMessage(""), 1800);
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
 
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
@@ -77,11 +82,12 @@ export function ContestDetailPage() {
 
       await navigator.clipboard?.writeText(window.location.href);
       setToastMessage("링크를 복사했어요.");
-      window.setTimeout(() => setToastMessage(""), 1800);
     } catch {
       // 공유 시트를 닫은 경우에는 별도의 피드백을 표시하지 않습니다.
     }
   };
+  const getTeamPath = (team: (typeof recruitTeams)[number]) =>
+    team.isOwner ? `teams/${team.id}/manage` : `teams/${team.id}`;
 
   return (
     <S.Page>
@@ -159,10 +165,6 @@ export function ContestDetailPage() {
               <strong>총 상금 3,000만원</strong>
             </S.InfoRow>
             <S.InfoRow>
-              <span>수집 경로</span>
-              <strong>서울시립대 공지 RSS · 자동</strong>
-            </S.InfoRow>
-            <S.InfoRow>
               <span>원문</span>
               <S.SourceLink
                 href="https://contest.seoul.go.kr"
@@ -229,18 +231,34 @@ export function ContestDetailPage() {
         <S.TeamsSection>
           <S.TeamList>
             {recruitTeams.map((team) => (
-              <S.TeamCard key={team.id}>
+              <S.TeamCard
+                key={team.id}
+                onClick={() => navigate(getTeamPath(team))}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(getTeamPath(team));
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <S.TeamTitleRow>
-                  <S.TeamTitle>{team.title}</S.TeamTitle>
+                  <S.TeamTitleGroup>
+                    <S.TeamTitle>{team.title}</S.TeamTitle>
+                    {team.isOwner && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
+                  </S.TeamTitleGroup>
                   <S.TeamCount>{team.members}</S.TeamCount>
                 </S.TeamTitleRow>
                 <S.TeamMeta>{team.leader}</S.TeamMeta>
                 <S.PositionList>
-                  {team.positions.map((position, index) => (
-                    <S.PositionBadge $open={index === 0} key={position}>
-                      {position}
-                    </S.PositionBadge>
-                  ))}
+                  {team.positions
+                    .filter((position) => position.includes("모집"))
+                    .map((position) => (
+                      <S.PositionBadge $open key={position}>
+                        {position}
+                      </S.PositionBadge>
+                    ))}
                 </S.PositionList>
               </S.TeamCard>
             ))}
@@ -250,14 +268,32 @@ export function ContestDetailPage() {
 
       <S.ActionBar>
         <S.ApplyButton
-          onClick={() =>
-            window.location.assign(`/contests/${contestId}/teams/create?from=detail`)
-          }
+          onClick={() => setIsTeamCreationModalOpen(true)}
           type="button"
         >
           팀 구성하기
         </S.ApplyButton>
       </S.ActionBar>
+      <Modal
+        description="팀을 만들고 함께할 팀원을 모집해 보세요."
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setIsTeamCreationModalOpen(false)}
+        open={isTeamCreationModalOpen}
+        primaryAction={{
+          label: "팀 만들기",
+          onClick: () => {
+            setIsTeamCreationModalOpen(false);
+            navigate(`/contests/${contestId}/teams/create?from=detail`);
+          },
+        }}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => setIsTeamCreationModalOpen(false),
+        }}
+        title="팀을 만들까요?"
+      />
       <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );

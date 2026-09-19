@@ -9,6 +9,7 @@ import {
   Check,
   ChatCircleDots,
   Code,
+  DotsThree,
   Eye,
   EyeSlash,
   FolderSimple,
@@ -17,8 +18,8 @@ import {
   Lightning,
   House,
   LockKey,
-  MagnifyingGlass,
   Megaphone,
+  MagnifyingGlass,
   Minus,
   Palette,
   Plus,
@@ -27,11 +28,13 @@ import {
   RocketLaunch,
   ShieldCheck,
   ShareNetwork,
+  Trash,
   UserCircle,
   UserPlus,
   UsersThree,
   Star,
   DotsThree,
+  Warning,
   X,
   type IconProps as PhosphorIconProps,
 } from "@phosphor-icons/react";
@@ -48,6 +51,8 @@ export type IconName =
   | "check"
   | "chat"
   | "code"
+  | "more"
+  | "megaphone"
   | "eye"
   | "eye-slash"
   | "folder"
@@ -57,13 +62,13 @@ export type IconName =
   | "lightning"
   | "lock"
   | "minus"
-  | "megaphone"
   | "palette"
   | "plus"
   | "paper-plane"
   | "edit"
   | "search"
   | "share"
+  | "trash"
   | "shield-check"
   | "rocket"
   | "user"
@@ -71,6 +76,7 @@ export type IconName =
   | "users"
   | "star"
   | "more"
+  | "warning"
   | "x";
 
 type IconComponentProps = PhosphorIconProps & { name: IconName };
@@ -86,6 +92,8 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   check: Check,
   chat: ChatCircleDots,
   code: Code,
+  more: DotsThree,
+  megaphone: Megaphone,
   eye: Eye,
   "eye-slash": EyeSlash,
   folder: FolderSimple,
@@ -95,13 +103,13 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   lightning: Lightning,
   lock: LockKey,
   minus: Minus,
-  megaphone: Megaphone,
   palette: Palette,
   plus: Plus,
   "paper-plane": PaperPlaneTilt,
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,
+  trash: Trash,
   "shield-check": ShieldCheck,
   rocket: RocketLaunch,
   user: UserCircle,
@@ -109,6 +117,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   users: UsersThree,
   star: Star,
   more: DotsThree,
+  warning: Warning,
   x: X,
 };
 
