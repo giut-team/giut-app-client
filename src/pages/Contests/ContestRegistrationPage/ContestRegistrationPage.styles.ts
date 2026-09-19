@@ -2,7 +2,7 @@ import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import { tokens } from "../../../design-system/tokens.generated";
 
-type StepState = "complete" | "current" | "pending" | "blocked";
+type StepState = "complete" | "current" | "pending" | "blocked" | "duplicate";
 
 const revealStep = keyframes`
   from {
@@ -47,6 +47,10 @@ const stepColors: Record<StepState, { background: string; color: string }> = {
   blocked: {
     background: tokens.color.neutral[200],
     color: tokens.color.neutral[500],
+  },
+  duplicate: {
+    background: tokens.color.danger[500],
+    color: tokens.color.neutral[50],
   },
 };
 
@@ -94,11 +98,36 @@ export const S = {
     animation: ${spin} 850ms linear infinite;
     box-sizing: border-box;
   `,
-  Description: styled.p`
+  Description: styled.p<{ $emphasized?: boolean }>`
     margin: 6px 0 14px;
     color: ${tokens.color.neutral[700]};
     font-size: 9px;
+    font-weight: ${({ $emphasized }) => ($emphasized ? 600 : 400)};
     line-height: 1.55;
+  `,
+  DuplicateIntro: styled.div`
+    margin-top: 2px;
+
+    strong,
+    span {
+      display: block;
+    }
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.45;
+    }
+
+    span {
+      margin-top: 6px;
+      color: ${tokens.color.neutral[700]};
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
   `,
   UrlBar: styled.div<{ $compact?: boolean }>`
     display: flex;
@@ -114,11 +143,21 @@ export const S = {
       border-color: ${tokens.color.primary[500]};
     }
   `,
+  UrlIcon: styled.span`
+    display: grid;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 28px;
+    padding-left: 4px;
+    place-items: center;
+    color: ${tokens.color.neutral[500]};
+    box-sizing: border-box;
+  `,
   UrlInput: styled.input`
     min-width: 0;
     flex: 1;
     height: 28px;
-    padding: 0 6px;
+    padding: 0 2px;
     border: 0;
     outline: 0;
     background: transparent;
@@ -154,7 +193,7 @@ export const S = {
     padding: 7px 8px;
     border: 0;
     border-radius: 7px;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
     color: ${tokens.color.primary[500]};
     font: inherit;
     font-size: 8px;
@@ -203,6 +242,8 @@ export const S = {
       background: ${({ $state }) =>
         $state === "complete"
           ? "#16b879"
+          : $state === "duplicate"
+            ? tokens.color.danger[500]
           : tokens.color.neutral[200]};
       content: "";
     }
@@ -216,6 +257,8 @@ export const S = {
       color: ${({ $state }) =>
         $state === "current"
           ? tokens.color.primary[500]
+          : $state === "duplicate"
+            ? tokens.color.danger[500]
           : tokens.color.neutral[900]};
       font-size: 10px;
       font-weight: 800;
@@ -223,8 +266,12 @@ export const S = {
 
     div > span {
       margin-top: 4px;
-      color: ${tokens.color.neutral[700]};
+      color: ${({ $state }) =>
+        $state === "duplicate"
+          ? tokens.color.danger[500]
+          : tokens.color.neutral[700]};
       font-size: 9px;
+      font-weight: ${({ $state }) => ($state === "duplicate" ? 700 : 400)};
       line-height: 1.35;
     }
   `,
@@ -312,6 +359,7 @@ export const S = {
     position: relative;
     margin-top: 10px;
     padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 12px;
     background: ${tokens.color.neutral[50]};
 
@@ -326,7 +374,13 @@ export const S = {
       margin: 0;
       color: ${tokens.color.neutral[700]};
       font-size: 8px;
+      font-weight: 600;
     }
+  `,
+  BadgeRow: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
   `,
   ResultCard: styled.article<{ $partial: boolean }>`
     margin-top: 10px;
@@ -346,49 +400,75 @@ export const S = {
       margin: 3px 0;
       color: ${tokens.color.neutral[900]};
       font-size: 8px;
+      font-weight: 600;
       line-height: 1.35;
     }
   `,
-  ResultBadge: styled.span<{ $partial?: boolean }>`
+  ResultBadge: styled.span<{ $partial?: boolean; $category?: boolean }>`
     display: inline-flex;
+    align-items: center;
+    gap: 3px;
     padding: 5px 6px;
     border-radius: 5px;
-    background: ${({ $partial }) =>
-      $partial ? tokens.color.warning[100] : "#dff5ec"};
-    color: ${({ $partial }) =>
-      $partial ? tokens.color.warning[500] : tokens.color.success[500]};
+    background: ${({ $partial, $category }) =>
+      $category
+        ? tokens.color.primary[100]
+        : $partial
+          ? tokens.color.warning[100]
+          : "#dff5ec"};
+    color: ${({ $partial, $category }) =>
+      $category
+        ? tokens.color.primary[500]
+        : $partial
+          ? tokens.color.warning[500]
+          : tokens.color.success[500]};
     font-size: 8px;
     font-weight: 800;
   `,
-  DDay: styled.span`
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 5px 6px;
-    border-radius: 5px;
-    background: ${tokens.color.orange[100]};
-    color: ${tokens.color.danger[500]};
-    font-size: 8px;
-    font-weight: 800;
+  SourceUrl: styled.p`
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 8px 0 0 !important;
+    color: ${tokens.color.neutral[700]} !important;
+    font-size: 8px !important;
+    font-weight: 700;
+
+    svg {
+      flex: 0 0 auto;
+      color: ${tokens.color.neutral[500]};
+    }
   `,
   CardDivider: styled.div`
     height: 1px;
     margin: 10px 0;
     background: ${tokens.color.neutral[100]};
   `,
-  PrimaryCardButton: styled.button`
+  CardActionRow: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  `,
+  CardActionHint: styled.span`
+    margin-right: auto;
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    font-weight: 600;
+  `,
+  SecondaryCardButton: styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 32px;
-    gap: 5px;
-    border: 0;
-    border-radius: 8px;
-    background: ${tokens.color.primary[500]};
-    color: ${tokens.color.neutral[50]};
+    height: 28px;
+    gap: 4px;
+    padding: 0 9px;
+    border: 1px solid ${tokens.color.primary[500]};
+    border-radius: 7px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.primary[500]};
     font: inherit;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
     cursor: pointer;
   `,

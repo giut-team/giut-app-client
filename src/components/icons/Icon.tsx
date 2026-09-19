@@ -15,6 +15,7 @@ import {
   FolderSimple,
   Heart,
   Lightning,
+  Link,
   House,
   LockKey,
   Megaphone,
@@ -55,6 +56,7 @@ export type IconName =
   | "home"
   | "heart"
   | "lightning"
+  | "link"
   | "lock"
   | "minus"
   | "palette"
@@ -92,6 +94,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   home: House,
   heart: Heart,
   lightning: Lightning,
+  link: Link,
   lock: LockKey,
   minus: Minus,
   palette: Palette,

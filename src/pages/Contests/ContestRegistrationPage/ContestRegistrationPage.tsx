@@ -7,12 +7,12 @@ import { S } from "./ContestRegistrationPage.styles";
 
 type ResultState = "complete" | "duplicate" | "partial";
 type ViewState = "entry" | "loading" | ResultState;
-type StepState = "complete" | "current" | "pending" | "blocked";
+type StepState = "complete" | "current" | "pending" | "blocked" | "duplicate";
 
 const getResultState = (url: string): ResultState => {
   const normalizedUrl = url.toLowerCase();
 
-  if (normalizedUrl.includes("data-contest-2024")) return "duplicate";
+  if (normalizedUrl.includes("data-contest-2026")) return "duplicate";
   if (normalizedUrl.includes("partial")) return "partial";
 
   return "complete";
@@ -23,7 +23,7 @@ const getStepState = (
   activeStep: number,
   view: ViewState,
 ): StepState => {
-  if (view === "duplicate" && index === 1) return "complete";
+  if (view === "duplicate" && index === 1) return "duplicate";
   if (view === "duplicate" && index > 1) return "blocked";
   if (view === "complete") return "complete";
   if (view === "partial" && index < 4) return "complete";
@@ -36,7 +36,9 @@ const getStepState = (
 export function ContestRegistrationPage() {
   const navigate = useNavigate();
   const sequenceRef = useRef(0);
-  const [url, setUrl] = useState("https://contest.example.kr/fintech-12");
+  const [url, setUrl] = useState(
+    "https://contest.example.kr/data-contest-2026",
+  );
   const [view, setView] = useState<ViewState>("entry");
   const [activeStep, setActiveStep] = useState(1);
 
@@ -79,11 +81,23 @@ export function ContestRegistrationPage() {
   };
 
   const steps = [
-    ["중복 검사", "중복 없음 · 새 공모전으로 진행"],
-    ["원문 링크 확인", "주최기관 공식 페이지를 확인 중입니다"],
-    ["자동 필드 추출", "필수 6개 항목을 추출 중이에요"],
-    ["인증마크 판정", "관리자 검증 없이 즉시 게시 가능"],
+    "중복 검사",
+    "원문 링크 확인",
+    "자동 필드 추출",
+    "인증마크 판정",
   ] as const;
+  const processingDescriptions = [
+    "등록된 공모전과 중복 여부를 확인 중입니다",
+    "주최기관 공식 페이지를 확인 중입니다",
+    "필수 항목을 추출 중입니다",
+    "인증마크 여부를 판정 중입니다",
+  ];
+  const pendingDescriptions = [
+    "중복 검사를 준비 중입니다",
+    "중복 검사 후 원문 링크를 확인합니다",
+    "원문 링크 확인 후 필드를 추출합니다",
+    "필드 추출 후 인증마크를 판정합니다",
+  ];
   const completedDescriptions = [
     "중복 없음 · 새 공모전으로 진행",
     "금융위원회 공식 페이지 확인",
@@ -132,7 +146,7 @@ export function ContestRegistrationPage() {
             {view === "complete" && (
               <>
                 <S.Heading>필수 항목을 모두 찾았어요</S.Heading>
-                <S.Description>
+                <S.Description $emphasized>
                   직접 입력한 항목이 없이 바로 게시할 수 있어요.
                 </S.Description>
               </>
@@ -146,8 +160,17 @@ export function ContestRegistrationPage() {
                 </S.Description>
               </>
             )}
+            {view === "duplicate" && (
+              <S.DuplicateIntro>
+                <strong>이미 등록된 공모전이에요</strong>
+                <span>같은 URL로 등록된 공모전을 찾았어요.</span>
+              </S.DuplicateIntro>
+            )}
 
             <S.UrlBar $compact={view !== "loading"}>
+              <S.UrlIcon>
+                <Icon name="link" size={12} weight="bold" />
+              </S.UrlIcon>
               <S.UrlInput aria-label="공모전 모집 URL" readOnly value={url} />
               {view === "loading" ? (
                 <S.LoadingLabel>불러오는 중</S.LoadingLabel>
@@ -167,21 +190,8 @@ export function ContestRegistrationPage() {
               </S.ProgressTrack>
             )}
 
-            {view === "duplicate" && (
-              <S.DuplicateNotice>
-                <Icon name="warning" size={14} weight="fill" />
-                <div>
-                  <strong>중복 검사 · 이미 등록된 공모전</strong>
-                  <span>
-                    같은 모집 URL로 등록된 공모전을 찾았어요. 새로 등록하지
-                    않아도 바로 팀을 찾을 수 있어요.
-                  </span>
-                </div>
-              </S.DuplicateNotice>
-            )}
-
             <S.StepList>
-              {steps.map(([title, description], index) => {
+              {steps.map((title, index) => {
                 const stepNumber = index + 1;
                 const stepState = getStepState(stepNumber, activeStep, view);
 
@@ -196,6 +206,8 @@ export function ContestRegistrationPage() {
                         <S.StepCheck>
                           <Icon name="check" size={10} weight="bold" />
                         </S.StepCheck>
+                      ) : stepState === "duplicate" ? (
+                        <Icon name="warning" size={10} weight="fill" />
                       ) : stepState === "current" ? (
                         <S.StepSpinner aria-label="진행 중" />
                       ) : (
@@ -205,11 +217,15 @@ export function ContestRegistrationPage() {
                     <div>
                       <strong>{title}</strong>
                       <span>
-                        {stepState === "blocked"
-                          ? "중복으로 중단됨"
-                          : view === "complete"
-                            ? completedDescriptions[index]
-                            : description}
+                        {stepState === "duplicate"
+                          ? "이미 등록된 공모전입니다"
+                          : stepState === "blocked"
+                            ? "중복으로 중단됨"
+                            : stepState === "complete"
+                              ? completedDescriptions[index]
+                              : stepState === "pending"
+                                ? pendingDescriptions[index]
+                                : processingDescriptions[index]}
                       </span>
                     </div>
                   </S.StepCard>
@@ -228,18 +244,32 @@ export function ContestRegistrationPage() {
 
             {view === "duplicate" && (
               <S.DuplicateCard>
-                <S.ResultBadge>IT/과학</S.ResultBadge>
-                <S.DDay>D-15</S.DDay>
-                <h2>2024 서울시 데이터 활용 공모전</h2>
+                <S.BadgeRow>
+                  <S.ResultBadge $category>IT/과학</S.ResultBadge>
+                  <S.ResultBadge>
+                    <Icon name="check" size={10} weight="bold" />
+                    인증
+                  </S.ResultBadge>
+                </S.BadgeRow>
+                <h2>2026 서울시 데이터 활용 공모전</h2>
                 <p>서울특별시 · 2026.05.12 등록</p>
+                <S.SourceUrl>
+                  <Icon name="link" size={11} weight="bold" />
+                  {url.replace(/^https?:\/\//, "")}
+                </S.SourceUrl>
                 <S.CardDivider />
-                <S.PrimaryCardButton
-                  onClick={() => navigate("/contests/seoul-data")}
-                  type="button"
-                >
-                  해당 공모전으로 이동
-                  <Icon name="arrow-right" size={14} weight="bold" />
-                </S.PrimaryCardButton>
+                <S.CardActionRow>
+                  <S.CardActionHint>
+                    해당 공모전의 팀을 찾아보세요.
+                  </S.CardActionHint>
+                  <S.SecondaryCardButton
+                    onClick={() => navigate("/contests/seoul-data")}
+                    type="button"
+                  >
+                    공모전 보기
+                    <Icon name="arrow-right" size={12} weight="bold" />
+                  </S.SecondaryCardButton>
+                </S.CardActionRow>
                 <S.HelpRow>
                   <div>
                     <strong>내용이 달라졌나요?</strong>
