@@ -21,9 +21,22 @@ type TeamStatus = "전체" | "바로 합류 가능" | "제안 검토 중" | "일
 type Grade = 1 | 2 | 3 | 4;
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
 
-type Profile = {
+export const ProfileStatus = {
+  LookingForTeam: "팀 찾는 중",
+  AvailableToJoin: "바로 합류 가능",
+  ReviewingOffers: "제안 검토 중",
+  SchedulingNeeded: "일정 조율 필요",
+} as const;
+
+export type ProfileStatus = (typeof ProfileStatus)[keyof typeof ProfileStatus];
+
+export type GiutHubProfile = {
+  profileNumber: number;
   id: string;
   category: Exclude<Category, "전체">;
+  role: Position;
+  detailRole: string;
+  status: ProfileStatus;
   name: string;
   available: boolean;
   summary: string;
@@ -31,6 +44,8 @@ type Profile = {
   tags: string[];
   projectCount: number;
   lastActiveAt: string;
+  lastResponseAt: string;
+  recommendationCount: number;
   avatarFallback: string;
   avatarTone: "blue" | "purple" | "orange" | "green";
   avatarSrc?: string;
@@ -65,7 +80,7 @@ const departments: { name: string; category: DepartmentCategory }[] = [
 const mockRecentAccessAt = (hoursAgo: number) =>
   new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
 
-const getResponseStatus = (lastActiveAt: string) => {
+export const getResponseStatus = (lastActiveAt: string) => {
   const elapsedHours = Math.max(
     0,
     Math.floor((Date.now() - new Date(lastActiveAt).getTime()) / (60 * 60 * 1000)),
@@ -73,30 +88,40 @@ const getResponseStatus = (lastActiveAt: string) => {
 
   return {
     elapsedHours,
-    isFast: elapsedHours <= 12,
-    label: elapsedHours <= 12 ? "응답 빠름" : "응답 느림",
+    isFast: elapsedHours <= 3,
+    label: elapsedHours <= 3 ? "응답 빠름" : "응답 느림",
   };
 };
 
-const profiles: Profile[] = [
+export const giutHubProfiles: GiutHubProfile[] = [
   {
+    profileNumber: 1,
     id: "minjae",
     category: "개발" as const,
+    role: "개발",
+    detailRole: "데이터 분석",
+    status: ProfileStatus.LookingForTeam,
     name: "김민재",
     available: true,
     summary: "개발 · 컴퓨터과학부 3학년",
     introduction: "AI로 더 편리한 캠퍼스 서비스를 만들고 싶어요.\n포트폴리오 프로젝트에 관심 있어요.",
     tags: ["AI/ML", "프론트엔드"],
     projectCount: 2,
-    // 최근 접속 12시간 전: 목업 기준 '응답 빠름'으로 표시됩니다.
+    // 마지막 답장 2시간 전: 목업 기준 '응답 빠름'으로 표시됩니다.
     lastActiveAt: mockRecentAccessAt(12),
+    lastResponseAt: mockRecentAccessAt(2),
+    recommendationCount: 3,
     avatarFallback: "김",
     avatarTone: "blue",
     avatarSrc: developerMale,
   },
   {
+    profileNumber: 2,
     id: "seoyeon",
     category: "기획" as const,
+    role: "기획",
+    detailRole: "서비스 기획",
+    status: ProfileStatus.AvailableToJoin,
     name: "이서연",
     available: true,
     summary: "기획 · 경영학부 3학년",
@@ -104,13 +129,19 @@ const profiles: Profile[] = [
     tags: ["서비스 기획", "시장 분석"],
     projectCount: 4,
     lastActiveAt: mockRecentAccessAt(4),
+    lastResponseAt: mockRecentAccessAt(1),
+    recommendationCount: 5,
     avatarFallback: "이",
     avatarTone: "purple",
     avatarSrc: plannerFemale,
   },
   {
+    profileNumber: 3,
     id: "jiwoo",
     category: "디자인" as const,
+    role: "디자인",
+    detailRole: "UX/UI 디자인",
+    status: ProfileStatus.ReviewingOffers,
     name: "박지우",
     available: false,
     summary: "디자인 · 산업디자인학과 2학년",
@@ -118,13 +149,19 @@ const profiles: Profile[] = [
     tags: ["UX/UI", "Figma"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(18),
+    lastResponseAt: mockRecentAccessAt(8),
+    recommendationCount: 2,
     avatarFallback: "박",
     avatarTone: "orange",
     avatarSrc: designerFemale,
   },
   {
+    profileNumber: 4,
     id: "junseo",
     category: "개발",
+    role: "개발",
+    detailRole: "백엔드 개발",
+    status: ProfileStatus.SchedulingNeeded,
     name: "최준서",
     available: true,
     summary: "개발 · 소프트웨어학부 2학년",
@@ -132,13 +169,19 @@ const profiles: Profile[] = [
     tags: ["백엔드", "Spring"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(9),
+    lastResponseAt: mockRecentAccessAt(3),
+    recommendationCount: 4,
     avatarFallback: "최",
     avatarTone: "blue",
     avatarSrc: developerFemale,
   },
   {
+    profileNumber: 5,
     id: "dohyun",
     category: "기획",
+    role: "기획",
+    detailRole: "서비스 기획",
+    status: ProfileStatus.ReviewingOffers,
     name: "정도현",
     available: true,
     summary: "기획 · 행정학과 4학년",
@@ -146,13 +189,19 @@ const profiles: Profile[] = [
     tags: ["서비스 기획", "리서치"],
     projectCount: 5,
     lastActiveAt: mockRecentAccessAt(13),
+    lastResponseAt: mockRecentAccessAt(5),
+    recommendationCount: 6,
     avatarFallback: "정",
     avatarTone: "purple",
     avatarSrc: plannerMale,
   },
   {
+    profileNumber: 6,
     id: "hayoon",
     category: "디자인",
+    role: "디자인",
+    detailRole: "브랜딩",
+    status: ProfileStatus.LookingForTeam,
     name: "김하윤",
     available: true,
     summary: "디자인 · 시각디자인학과 3학년",
@@ -160,13 +209,19 @@ const profiles: Profile[] = [
     tags: ["브랜딩", "UI 디자인"],
     projectCount: 2,
     lastActiveAt: mockRecentAccessAt(2),
+    lastResponseAt: mockRecentAccessAt(2),
+    recommendationCount: 4,
     avatarFallback: "김",
     avatarTone: "orange",
     avatarSrc: designerMale,
   },
   {
+    profileNumber: 7,
     id: "soomin",
     category: "마케팅",
+    role: "마케팅",
+    detailRole: "콘텐츠 마케팅",
+    status: ProfileStatus.AvailableToJoin,
     name: "한수민",
     available: true,
     summary: "마케팅 · 경영학부 2학년",
@@ -174,13 +229,19 @@ const profiles: Profile[] = [
     tags: ["콘텐츠", "SNS 마케팅"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(12),
+    lastResponseAt: mockRecentAccessAt(3),
+    recommendationCount: 3,
     avatarFallback: "한",
     avatarTone: "green",
     avatarSrc: marketingFemale,
   },
   {
+    profileNumber: 8,
     id: "minho",
     category: "마케팅",
+    role: "마케팅",
+    detailRole: "데이터 마케팅",
+    status: ProfileStatus.SchedulingNeeded,
     name: "이민호",
     available: false,
     summary: "마케팅 · 경제학부 3학년",
@@ -188,6 +249,8 @@ const profiles: Profile[] = [
     tags: ["데이터 분석", "광고 기획"],
     projectCount: 4,
     lastActiveAt: mockRecentAccessAt(24),
+    lastResponseAt: mockRecentAccessAt(12),
+    recommendationCount: 1,
     avatarFallback: "이",
     avatarTone: "green",
     avatarSrc: marketingMale,
@@ -207,8 +270,8 @@ const profileFilterData: Record<string, { grade: Grade; department: string; team
 
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
-  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
   { key: "hub", label: "기웃허브", icon: "users" as const },
+  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 
@@ -226,7 +289,7 @@ export function GiutHubPage() {
   const [departmentQuery, setDepartmentQuery] = useState("");
 
   const visibleProfiles = useMemo(
-    () => profiles.filter((profile) => {
+    () => giutHubProfiles.filter((profile) => {
       const filterData = profileFilterData[profile.id];
       const matchesCategory = activeCategory === "전체" || profile.category === activeCategory;
       const matchesPosition = selectedPositions.length === 0 || selectedPositions.includes(profile.category);
@@ -348,7 +411,11 @@ export function GiutHubPage() {
 
           <S.ProfileList>
             {visibleProfiles.map((profile) => (
-              <ProfileCard key={profile.id} profile={profile} />
+              <ProfileCard
+                key={profile.id}
+                onView={() => navigate(`/giut-hub/${profile.profileNumber}`)}
+                profile={profile}
+              />
             ))}
             {visibleProfiles.length === 0 && <S.EmptyState>선택한 분야의 팀원을 준비하고 있어요.</S.EmptyState>}
           </S.ProfileList>
@@ -496,8 +563,8 @@ export function GiutHubPage() {
   );
 }
 
-function ProfileCard({ profile }: { profile: Profile }) {
-  const responseStatus = getResponseStatus(profile.lastActiveAt);
+function ProfileCard({ profile, onView }: { profile: GiutHubProfile; onView: () => void }) {
+  const responseStatus = getResponseStatus(profile.lastResponseAt);
 
   return (
     <S.ProfileCard>
@@ -515,7 +582,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
           </S.ProfileHeader>
           <S.ProfileSummary>{profile.summary}</S.ProfileSummary>
         </S.ProfileIdentity>
-        <S.DetailButton aria-label={`${profile.name} 프로필 보기`} type="button">
+        <S.DetailButton aria-label={`${profile.name} 프로필 보기`} onClick={onView} type="button">
           <Icon name="caret-right" size={20} weight="bold" />
         </S.DetailButton>
       </S.ProfileTop>
@@ -526,7 +593,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
         </span>
         <S.ResponseMeta
           $fast={responseStatus.isFast}
-          aria-label={`최근 접속 ${responseStatus.elapsedHours}시간 전, ${responseStatus.label}`}
+          aria-label={`최근 답장 ${responseStatus.elapsedHours}시간 전, ${responseStatus.label}`}
         >
           <Icon name="lightning" size={14} weight="fill" />{responseStatus.label}
         </S.ResponseMeta>
@@ -536,7 +603,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
         <S.TagList aria-label={`${profile.name} 관심 분야`}>
           {profile.tags.map((tag) => <S.Tag key={tag}>#{tag}</S.Tag>)}
         </S.TagList>
-        <S.ProfileLink type="button">프로필 보기 <Icon name="arrow-right" size={16} weight="bold" /></S.ProfileLink>
+        <S.ProfileLink onClick={onView} type="button">프로필 보기 <Icon name="arrow-right" size={16} weight="bold" /></S.ProfileLink>
       </S.CardFooter>
     </S.ProfileCard>
   );
