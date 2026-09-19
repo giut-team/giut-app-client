@@ -199,6 +199,7 @@ export function PositionTeamsPage() {
           setActiveNavigation(key);
           if (key === "home") navigate("/home");
           if (key === "hub") navigate("/giut-hub");
+          if (key === "chat") navigate("/chat");
         }}
       />
     </S.Page>

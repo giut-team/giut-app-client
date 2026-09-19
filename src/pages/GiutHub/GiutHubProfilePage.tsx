@@ -61,6 +61,7 @@ export const detailsByProfileId: Record<string, ProfileDetail> = {
   hayoon: { skills: ["브랜딩", "UI 디자인", "Figma", "그래픽"], portfolios: portfolio(["브랜드 아이덴티티 제작", "앱 UI 디자인", "공모전 홍보물", "디자인 가이드"], ["시각 언어를 만들었어요", "핵심 화면을 설계했어요", "콘텐츠를 디자인했어요", "일관된 스타일을 정리했어요"]) },
   soomin: { skills: ["SNS 마케팅", "콘텐츠", "카피라이팅", "분석"], portfolios: portfolio(["교내 행사 SNS 캠페인", "브랜드 콘텐츠 기획", "참여율 분석 리포트", "공모전 홍보 프로젝트"], ["콘텐츠 전략을 수립했어요", "타깃별 콘텐츠를 만들었어요", "성과를 분석했어요", "홍보 채널을 운영했어요"]) },
   minho: { skills: ["데이터 분석", "광고 기획", "GA", "콘텐츠"], portfolios: portfolio(["광고 성과 분석", "캠페인 기획안", "소비자 조사", "브랜드 협업 프로젝트"], ["데이터 기반 개선안을 냈어요", "타깃 전략을 설계했어요", "인사이트를 도출했어요", "제안 자료를 만들었어요"]) },
+  yujin: { skills: ["사업 기획", "시장 분석", "서비스 기획", "리서치"], portfolios: portfolio(["예비창업패키지 사업 계획", "청년 창업 서비스 기획", "시장 검증 리서치", "팀 협업 로드맵"], ["아이디어를 사업 계획으로 구체화했어요", "사용자 문제를 정의하고 해결안을 설계했어요", "시장과 경쟁 서비스를 분석했어요", "팀의 실행 계획을 정리했어요"]) },
 };
 
 const activitiesByProfileId: Record<string, Activity[]> = {
@@ -72,6 +73,7 @@ const activitiesByProfileId: Record<string, Activity[]> = {
   hayoon: [{ title: "브랜딩 디자인 프로젝트", description: "디자인 · 3인 팀" }, { title: "교내 전시 홍보물 제작", description: "그래픽 · UI 디자인" }],
   soomin: [{ title: "SNS 캠페인 기획 및 운영", description: "마케팅 · 4인 팀" }, { title: "콘텐츠 마케팅 스터디", description: "카피라이팅 · 분석" }],
   minho: [{ title: "데이터 마케팅 공모전 수상", description: "마케팅 · 4인 팀" }, { title: "광고 성과 분석 프로젝트", description: "GA · 데이터 분석" }],
+  yujin: [{ title: "예비창업패키지 청년 트랙", description: "사업 기획 · 4인 팀" }, { title: "청년 창업 아이디어톤 본선", description: "기획 · 서비스 설계" }],
 };
 
 export function TeamProposalBottomSheet({

@@ -60,3 +60,39 @@
 - Code checks: `npm.cmd run lint` and `npm.cmd run build` passed after the direct-input form update.
 
 final result: blocked
+
+## Chat-room detail update
+
+- Source visual truth: the two mobile chat-room screenshots supplied in this conversation for 이서연 and 최유진.
+- Implementation routes: `/chat/seoul-data` and `/chat/startup-package`.
+- Intended state: an open chat room with profile header, conversation-origin card, today marker, left/right message bubbles, and a fixed message composer.
+- Implemented interactions: selecting a chat from `/chat` opens its room; back returns to the list; message text can be entered and sent into the current thread; contextual action buttons open their matching team, contest, or profile route; the more menu toggles chat notifications, confirms reports, and confirms leaving the room; the attachment control is visual-only.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime returned `No browser is available`, so no same-viewport full-view or focused-region comparison could be captured.
+- Code checks: `npm.cmd run build` passed. The existing lint blocker remains the five pre-existing `react-refresh/only-export-components` errors in GiutHub files.
+
+**Findings**
+- [P1] Visual fidelity is unverified.
+  Location: chat-room detail routes.
+  Evidence: source screenshots are available, but no browser-rendered implementation screenshot can be captured.
+  Impact: exact message-wrap width, header rhythm, context-card height, and composer placement cannot be compared.
+  Fix: capture both routes at the supplied mobile viewport when a browser runtime is available and iterate on any visible P1/P2 differences.
+
+**Required fidelity surfaces**
+- Fonts and typography: existing product tokens and type conventions are used; visual comparison is blocked.
+- Spacing and layout rhythm: mobile-width header, thread, and fixed composer were implemented; visual comparison is blocked.
+- Colors and visual tokens: neutral, primary, success, orange, and purple product colors are used.
+- Image quality and asset fidelity: no raster or custom image assets are present in the supplied chat-room screens; existing icon components are used for controls.
+- Copy and content: the supplied Korean sample conversations and labels were implemented for the matching participants.
+
+final result: blocked
+
+## Chat list update
+
+- Source visual truth: mobile chat-list screenshot supplied in this conversation.
+- Implementation route: `/chat`.
+- Implemented surfaces: chat header and search affordance, all/unread tabs, three chat previews, the unread count badge, and the fixed bottom navigation with the chat tab active.
+- Primary interactions: the unread tab filters the list; opening the unread conversation clears its unread state; the search icon opens an inline search field that filters by name or team title; bottom navigation links to Home, GiutHub, and My Page.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime remains unavailable, so the supplied 355px-wide reference cannot be visually overlaid against the implementation.
+- Code checks: `npm.cmd run build` passed. `npm.cmd run lint` remains blocked by five pre-existing `react-refresh/only-export-components` errors in `GiutHubPage.tsx` and `GiutHubProfilePage.tsx`; no chat-page lint errors were reported.
+
+final result: blocked

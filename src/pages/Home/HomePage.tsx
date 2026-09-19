@@ -265,6 +265,7 @@ export function HomePage() {
         onChange={(key) => {
           setActiveNavigation(key);
           if (key === "hub") navigate("/giut-hub");
+          if (key === "chat") navigate("/chat");
           if (key === "mypage") navigate("/my-team");
         }}
       />

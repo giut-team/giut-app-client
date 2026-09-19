@@ -255,6 +255,26 @@ export const giutHubProfiles: GiutHubProfile[] = [
     avatarTone: "green",
     avatarSrc: marketingMale,
   },
+  {
+    profileNumber: 9,
+    id: "yujin",
+    category: "기획",
+    role: "기획",
+    detailRole: "사업 기획",
+    status: ProfileStatus.ReviewingOffers,
+    name: "최유진",
+    available: true,
+    summary: "기획 · 경영학부 4학년",
+    introduction: "아이디어를 실제 서비스로 만드는 과정에 관심이 많아요. 함께 실행할 팀원을 찾고 있어요.",
+    tags: ["사업 기획", "시장 분석"],
+    projectCount: 3,
+    lastActiveAt: mockRecentAccessAt(2),
+    lastResponseAt: mockRecentAccessAt(1),
+    recommendationCount: 4,
+    avatarFallback: "최",
+    avatarTone: "purple",
+    avatarSrc: plannerFemale,
+  },
 ];
 
 const profileFilterData: Record<string, { grade: Grade; department: string; teamStatus: TeamStatus }> = {
@@ -266,6 +286,7 @@ const profileFilterData: Record<string, { grade: Grade; department: string; team
   hayoon: { grade: 3, department: "디자인학과", teamStatus: "바로 합류 가능" },
   soomin: { grade: 2, department: "경영학부", teamStatus: "바로 합류 가능" },
   minho: { grade: 3, department: "경제학부", teamStatus: "일정 조율 필요" },
+  yujin: { grade: 4, department: "경영학부", teamStatus: "제안 검토 중" },
 };
 
 const navigationItems = [
@@ -427,6 +448,7 @@ export function GiutHubPage() {
         items={navigationItems}
         onChange={(key) => {
           if (key === "home") navigate("/home");
+          if (key === "chat") navigate("/chat");
           if (key === "mypage") navigate("/my-team");
         }}
       />
