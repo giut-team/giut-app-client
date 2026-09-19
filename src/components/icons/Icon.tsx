@@ -16,6 +16,7 @@ import {
   Heart,
   ImageSquare,
   Lightning,
+  Link,
   House,
   LockKey,
   Megaphone,
@@ -60,6 +61,7 @@ export type IconName =
   | "heart"
   | "image"
   | "lightning"
+  | "link"
   | "lock"
   | "minus"
   | "palette"
@@ -101,6 +103,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   heart: Heart,
   image: ImageSquare,
   lightning: Lightning,
+  link: Link,
   lock: LockKey,
   minus: Minus,
   palette: Palette,

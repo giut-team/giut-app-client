@@ -6,6 +6,7 @@ import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
+import { ContestRegistrationPage } from "./pages/Contests/ContestRegistrationPage/ContestRegistrationPage";
 import { ApplicationReviewTeamDetailPage } from "./pages/Contests/ApplicationReviewTeamDetailPage/ApplicationReviewTeamDetailPage";
 import { RecruitingTeamsPage } from "./pages/Contests/RecruitingTeamsPage/RecruitingTeamsPage";
 import { TeamDetailPage } from "./pages/Contests/TeamDetailPage/TeamDetailPage";
@@ -36,6 +37,7 @@ export function AppRouter() {
         <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />
         <Route element={<ContestsPage />} path="/contests" />
+        <Route element={<ContestRegistrationPage />} path="/contests/register" />
         <Route element={<ContestDetailPage />} path="/contests/:contestId" />
         <Route
           element={<RecruitingTeamsPage />}
