@@ -25,6 +25,7 @@ import { NotificationsPage } from "./pages/Notifications/NotificationsPage";
 import { PositionTeamsPage } from "./pages/PositionTeams/PositionTeamsPage";
 import { StudentVerificationPage } from "./pages/StudentVerification/StudentVerificationPage";
 import { ChatPage } from "./pages/Chat/ChatPage";
+import { ChatRoomPage } from "./pages/Chat/ChatRoomPage";
 
 export function AppRouter() {
   return (
@@ -34,6 +35,7 @@ export function AppRouter() {
         <Route element={<LoginPage />} path="/login" />
         <Route element={<HomePage />} path="/home" />
         <Route element={<ChatPage />} path="/chat" />
+        <Route element={<ChatRoomPage />} path="/chat/:chatId" />
         <Route element={<GiutHubPage />} path="/giut-hub" />
         <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
         <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />

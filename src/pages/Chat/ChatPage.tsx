@@ -90,6 +90,7 @@ export function ChatPage() {
     if (chat.unread && !readChatIds.includes(chat.id)) {
       setReadChatIds((ids) => [...ids, chat.id]);
     }
+    navigate(`/chat/${chat.id}`);
   };
 
   return (

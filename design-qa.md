@@ -61,6 +61,31 @@
 
 final result: blocked
 
+## Chat-room detail update
+
+- Source visual truth: the two mobile chat-room screenshots supplied in this conversation for 이서연 and 최유진.
+- Implementation routes: `/chat/seoul-data` and `/chat/startup-package`.
+- Intended state: an open chat room with profile header, conversation-origin card, today marker, left/right message bubbles, and a fixed message composer.
+- Implemented interactions: selecting a chat from `/chat` opens its room; back returns to the list; message text can be entered and sent into the current thread; contextual action buttons open their matching team, contest, or profile route; the attachment/menu controls are visual-only.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime returned `No browser is available`, so no same-viewport full-view or focused-region comparison could be captured.
+- Code checks: `npm.cmd run build` passed. The existing lint blocker remains the five pre-existing `react-refresh/only-export-components` errors in GiutHub files.
+
+**Findings**
+- [P1] Visual fidelity is unverified.
+  Location: chat-room detail routes.
+  Evidence: source screenshots are available, but no browser-rendered implementation screenshot can be captured.
+  Impact: exact message-wrap width, header rhythm, context-card height, and composer placement cannot be compared.
+  Fix: capture both routes at the supplied mobile viewport when a browser runtime is available and iterate on any visible P1/P2 differences.
+
+**Required fidelity surfaces**
+- Fonts and typography: existing product tokens and type conventions are used; visual comparison is blocked.
+- Spacing and layout rhythm: mobile-width header, thread, and fixed composer were implemented; visual comparison is blocked.
+- Colors and visual tokens: neutral, primary, success, orange, and purple product colors are used.
+- Image quality and asset fidelity: no raster or custom image assets are present in the supplied chat-room screens; existing icon components are used for controls.
+- Copy and content: the supplied Korean sample conversations and labels were implemented for the matching participants.
+
+final result: blocked
+
 ## Chat list update
 
 - Source visual truth: mobile chat-list screenshot supplied in this conversation.
