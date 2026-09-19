@@ -10,7 +10,7 @@ import { S } from "./HomePage.styles";
 const popularContests = [
   {
     id: "seoul-data",
-    category: "IT",
+    category: "IT/과학",
     categoryTone: "blue" as const,
     dDay: "D-15",
     title: "2026 서울시 데이터 활용 공모전",

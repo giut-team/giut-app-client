@@ -293,7 +293,7 @@ export const S = {
     font-weight: 800;
   `,
   ShortcutDescription: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: -0.1px;
@@ -320,7 +320,7 @@ export const S = {
     padding: 0;
     border: 0;
     background: transparent;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font: inherit;
     font-size: 10px;
     font-weight: 500;
@@ -405,7 +405,7 @@ export const S = {
   `,
   ContestOrganization: styled.p`
     margin: 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: -0.1px;

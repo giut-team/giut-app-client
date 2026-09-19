@@ -114,7 +114,7 @@ export const S = {
   `,
   Greeting: styled.p`
     margin: 22px 0 0;
-    color: #000;
+    color: ${tokens.color.neutral[500]};
     font-size: 10px;
     font-weight: 500;
     letter-spacing: -0.1px;
