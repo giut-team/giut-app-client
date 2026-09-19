@@ -34,7 +34,7 @@ export const S = {
     width: min(100%, 480px);
     min-height: 100svh;
     margin: 0 auto;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
   `,
   MarkAllReadButton: styled.button`
     padding: 0;
@@ -64,9 +64,7 @@ export const S = {
     min-height: 74px;
     padding: 13px 12px;
     gap: 10px;
-    border: 1px solid
-      ${({ $unread }) =>
-        $unread ? tokens.color.primary[100] : tokens.color.neutral[50]};
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
     text-align: left;
@@ -108,7 +106,7 @@ export const S = {
   `,
   NotificationDescription: styled.span`
     overflow: hidden;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     font-weight: 500;
     letter-spacing: -0.1px;

@@ -33,7 +33,7 @@ const notifications: NotificationItem[] = [
     icon: envelopeIcon,
     tone: "yellow",
     title: "최유진님이 팀 제안을 보냈어요",
-    description: "마이페이지에서 제안 내용 · 작업 포지션",
+    description: "예비창업패키지 청년 트랙 · 백엔드 개발자",
     receivedAt: "1시간 전",
   },
   {
