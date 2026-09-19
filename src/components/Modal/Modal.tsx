@@ -13,9 +13,11 @@ type ModalProps = {
   onClose: () => void;
   title: string;
   description?: ReactNode;
+  emphasizeDescription?: boolean;
   icon?: ReactNode;
   primaryAction?: ModalAction;
   secondaryAction?: ModalAction;
+  emphasizeSecondaryAction?: boolean;
   children?: ReactNode;
 };
 
@@ -24,9 +26,11 @@ export function Modal({
   onClose,
   title,
   description,
+  emphasizeDescription = false,
   icon = <LockKey aria-hidden="true" size={22} weight="bold" />,
   primaryAction,
   secondaryAction,
+  emphasizeSecondaryAction = false,
   children,
 }: ModalProps) {
   const titleId = useId();
@@ -41,7 +45,11 @@ export function Modal({
       <S.Content>
         <S.Icon>{icon}</S.Icon>
         <S.Title id={titleId}>{title}</S.Title>
-        {description && <S.Description>{description}</S.Description>}
+        {description && (
+          <S.Description $emphasized={emphasizeDescription}>
+            {description}
+          </S.Description>
+        )}
         {children}
         {(primaryAction || secondaryAction) && ( // 주버튼 또는 보조버튼이 존재할 때만 Actions 렌더링
           <S.Actions>
@@ -52,6 +60,7 @@ export function Modal({
             )}
             {secondaryAction && (
               <S.SecondaryButton
+                $emphasized={emphasizeSecondaryAction}
                 onClick={secondaryAction.onClick}
                 type="button"
               >

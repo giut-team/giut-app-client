@@ -169,10 +169,10 @@ export const S = {
       display: none;
     }
   `,
-  TeamCard: styled.button<{ $selected: boolean; $pending: boolean }>`
+  TeamCard: styled.article<{ $selected: boolean; $pending: boolean }>`
+    position: relative;
     flex: 0 0 204px;
     min-height: 128px;
-    padding: 14px 12px 12px;
     border: 1px solid
       ${({ $pending, $selected }) =>
         $pending
@@ -183,10 +183,6 @@ export const S = {
     border-style: ${({ $pending }) => ($pending ? "dashed" : "solid")};
     border-radius: 14px;
     background: ${tokens.color.neutral[50]};
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
     scroll-snap-align: start;
     transition:
       border-color 180ms ease,
@@ -200,6 +196,21 @@ export const S = {
         box-shadow: 0 0 0 2px color-mix(in srgb, ${tokens.color.primary[500]} 12%, transparent);
       `}
 
+  `,
+  TeamSelectButton: styled.button`
+    display: block;
+    width: 100%;
+    min-height: 126px;
+    padding: 14px 40px 12px 12px;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 180ms ease;
+
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 2px;
@@ -208,6 +219,35 @@ export const S = {
     &:active {
       transform: scale(0.98);
     }
+  `,
+  ContestShortcut: styled.button`
+    position: absolute;
+    top: 10px;
+    right: 9px;
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: ${tokens.color.primary[500]};
+    cursor: pointer;
+
+    &:hover {
+      background: ${tokens.color.primary[100]};
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
+  ContestShortcutIcon: styled.img`
+    width: 16px;
+    height: 16px;
   `,
   TeamBadges: styled.div`
     display: flex;
@@ -287,31 +327,6 @@ export const S = {
     color: ${tokens.color.warning[500]};
     font-size: 9px;
     font-weight: 600;
-  `,
-  CreateTeamCard: styled.button`
-    display: flex;
-    flex: 0 0 98px;
-    min-height: 128px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: 1px dashed
-      color-mix(in srgb, ${tokens.color.primary[500]} 28%, transparent);
-    border-radius: 14px;
-    background: transparent;
-    color: ${tokens.color.primary[500]};
-    font: inherit;
-    font-size: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    scroll-snap-align: start;
-
-    &:focus-visible {
-      outline: 2px solid ${tokens.color.primary[500]};
-      outline-offset: 2px;
-    }
   `,
   ApplicationSection: styled.section`
     width: min(100%, 480px);
@@ -499,15 +514,6 @@ export const S = {
       background: ${tokens.color.neutral[100]};
     }
   `,
-  MemberInfoNote: styled.p`
-    margin: 9px 0 0;
-    padding: 12px;
-    border-radius: 10px;
-    background: ${tokens.color.primary[100]};
-    color: ${tokens.color.neutral[500]};
-    font-size: 8px;
-    line-height: 1.5;
-  `,
   ApplicationHeader: styled.div`
     padding: 0 1px 10px;
   `,
@@ -666,14 +672,5 @@ export const S = {
       background: ${tokens.color.primary[100]};
       opacity: 0.85;
     }
-  `,
-  InfoNote: styled.p`
-    margin: 13px 0 0;
-    padding: 12px;
-    border-radius: 10px;
-    background: ${tokens.color.neutral[50]};
-    color: ${tokens.color.neutral[500]};
-    font-size: 9px;
-    line-height: 1.6;
   `,
 };

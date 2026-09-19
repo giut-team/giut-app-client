@@ -153,7 +153,17 @@ export function PositionTeamsPage() {
                   <S.TeamTitle>{team.title}</S.TeamTitle>
                   <S.TeamDescription>{team.description}</S.TeamDescription>
                   <S.TeamActions>
-                    <S.ApplyButton type="button">
+                    <S.ApplyButton
+                      onClick={
+                        team.id === "data-seoul"
+                          ? () =>
+                              navigate(
+                                "/contests/seoul-data/teams/data-seoul",
+                              )
+                          : undefined
+                      }
+                      type="button"
+                    >
                       상세 보기&nbsp;→
                     </S.ApplyButton>
                     <S.FavoriteButton

@@ -186,9 +186,9 @@ function ApplicationCancelContent({
       <S.ApplicationCancelTitle>
         {isComplete ? "지원을 취소했어요" : "이 팀 지원을\n취소할까요?"}
       </S.ApplicationCancelTitle>
-      <S.ApplicationCancelDescription>
+      <S.ApplicationCancelDescription $hidden={!isComplete}>
         {isComplete
-          ? "이 팀은 다시 팀 지원하기로 돌아갔어요. 모집 마감 전까지는 언제든 다시 지원할 수 있어요."
+          ? "모집 마감 전까지는 언제든 다시 지원할 수 있어요."
           : "취소하면 팀장에게 전달된 지원서가 사라지고, 작성한 답변도 저장되지 않아요. 더는 지원하려면 처음부터 작성해야 해요."}
       </S.ApplicationCancelDescription>
 
@@ -431,7 +431,9 @@ export function BottomSheet({
           <S.Footer $variant="action">
             <S.DecisionFooterActions>
               <S.DecisionConfirmButton
-                $mode={applicationCancelState === "complete" ? "accept" : "reject"}
+                $mode={
+                  applicationCancelState === "complete" ? "accept" : "reject"
+                }
                 onClick={
                   applicationCancelState === "complete"
                     ? (onApplicationCancelComplete ?? onClose)

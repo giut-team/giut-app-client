@@ -9,6 +9,7 @@ import {
 import { Icon } from "../../../components/icons";
 import { SearchOverlay } from "../../../components/SearchOverlay/SearchOverlay";
 import giutLogo from "../../../assets/giut-logo.svg";
+import informationIcon from "../../../assets/information.svg";
 import {
   applicants,
   type Applicant,
@@ -19,6 +20,7 @@ type TeamKind = "leader" | "member" | "pending";
 
 type Team = {
   id: string;
+  contestId: string;
   kind: TeamKind;
   status: string;
   title: string;
@@ -32,6 +34,7 @@ type Team = {
 const teams: Team[] = [
   {
     id: "pending-esg",
+    contestId: "esg-campaign",
     kind: "pending",
     status: "지원 대기",
     elapsed: "3일 경과",
@@ -41,6 +44,7 @@ const teams: Team[] = [
   },
   {
     id: "data-seoul",
+    contestId: "seoul-data",
     kind: "leader",
     status: "팀장",
     newApplications: "새 지원 3",
@@ -51,6 +55,7 @@ const teams: Team[] = [
   },
   {
     id: "esg-campaign",
+    contestId: "esg-campaign",
     kind: "member",
     status: "팀원",
     title: "ESG 캠페인 프로젝트",
@@ -170,38 +175,48 @@ export function MyTeamPage() {
             <S.TeamCard
               $pending={team.kind === "pending"}
               $selected={team.id === selectedTeam.id}
-              aria-pressed={team.id === selectedTeam.id}
               key={team.id}
-              onClick={() => setSelectedTeamId(team.id)}
-              type="button"
             >
-              <S.TeamBadges>
-                <S.TeamStatus $tone={team.tone}>{team.status}</S.TeamStatus>
-                {team.newApplications && (
-                  <S.NewApplications>{team.newApplications}</S.NewApplications>
+              <S.TeamSelectButton
+                aria-pressed={team.id === selectedTeam.id}
+                onClick={() => setSelectedTeamId(team.id)}
+                type="button"
+              >
+                <S.TeamBadges>
+                  <S.TeamStatus $tone={team.tone}>{team.status}</S.TeamStatus>
+                  {team.newApplications && (
+                    <S.NewApplications>{team.newApplications}</S.NewApplications>
+                  )}
+                  {team.elapsed && (
+                    <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>
+                  )}
+                </S.TeamBadges>
+                <S.TeamTitle>{team.title}</S.TeamTitle>
+                <S.TeamDescription>{team.description}</S.TeamDescription>
+                {team.kind === "pending" ? (
+                  <S.PendingMessage>팀장이 마지막 확인 중이에요</S.PendingMessage>
+                ) : (
+                  <S.ProgressTrack>
+                    <S.ProgressBar
+                      $progress={team.progress ?? 0}
+                      $tone={team.tone}
+                    />
+                  </S.ProgressTrack>
                 )}
-                {team.elapsed && (
-                  <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>
-                )}
-              </S.TeamBadges>
-              <S.TeamTitle>{team.title}</S.TeamTitle>
-              <S.TeamDescription>{team.description}</S.TeamDescription>
-              {team.kind === "pending" ? (
-                <S.PendingMessage>팀장이 마지막 확인 중이에요</S.PendingMessage>
-              ) : (
-                <S.ProgressTrack>
-                  <S.ProgressBar
-                    $progress={team.progress ?? 0}
-                    $tone={team.tone}
-                  />
-                </S.ProgressTrack>
-              )}
+              </S.TeamSelectButton>
+              <S.ContestShortcut
+                aria-label={`${team.title} 공모전 정보 보기`}
+                onClick={() => navigate(`/contests/${team.contestId}`)}
+                type="button"
+              >
+                <S.ContestShortcutIcon
+                  alt=""
+                  aria-hidden="true"
+                  src={informationIcon}
+                />
+              </S.ContestShortcut>
             </S.TeamCard>
           ))}
-          <S.CreateTeamCard type="button">
-            <Icon name="plus" size={19} weight="bold" />
-            <span>팀 만들기</span>
-          </S.CreateTeamCard>
         </S.TeamScroller>
       </S.TeamSection>
 
@@ -256,7 +271,7 @@ export function MyTeamPage() {
 
             <S.MemberQuestion>
               <S.MemberQuestionTitle>
-                Q1. 이 팀에 지원한 이유
+                Q1. 이 팀에 지원한 이유를 알려주세요
               </S.MemberQuestionTitle>
               <S.MemberAnswer>
                 캠페인 성과를 숫자로 보여주는 일에 관심이 많았습니다. ESG 주제는
@@ -266,7 +281,7 @@ export function MyTeamPage() {
             </S.MemberQuestion>
             <S.MemberQuestion>
               <S.MemberQuestionTitle>
-                Q2. 맡을 수 있는 역할
+                Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?
               </S.MemberQuestionTitle>
               <S.MemberAnswer>
                 데이터 수집·정제와 시각화를 맡을 수 있습니다. Python·SQL로
@@ -308,11 +323,6 @@ export function MyTeamPage() {
               팀장님에게 대화하러 가기
             </S.MemberChatButton>
           )}
-          <S.MemberInfoNote>
-            {isPendingTeam
-              ? "팀장이 수락하면 알림으로 알려드립니다."
-              : "팀원으로 합류한 팀에서는 내가 보낸 지원서를 확인할 수 있어요."}
-          </S.MemberInfoNote>
         </S.MemberApplicationSection>
       ) : (
         <>
@@ -380,10 +390,6 @@ export function MyTeamPage() {
             >
               지원 {selectedApplicants.length}건 관리하기
             </S.ManageButton>
-            <S.InfoNote>
-              팀에 소속되면 홈은 내 팀 중심으로 바뀌어요. 공모전 탐색은 하단
-              공모전 탭에서 계속할 수 있습니다.
-            </S.InfoNote>
           </S.ApplicationSection>
         </>
       )}

@@ -150,9 +150,9 @@ export const S = {
   `,
   ApplicationCancelIcon: styled.div<{ $complete: boolean }>`
     display: grid;
-    width: 42px;
-    height: 42px;
-    margin-bottom: 15px;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 12px;
     place-items: center;
     border-radius: 12px;
     background: ${({ $complete }) =>
@@ -163,23 +163,22 @@ export const S = {
       $complete ? tokens.color.primary[500] : tokens.color.danger[500]};
   `,
   ApplicationCancelTitle: styled.h2`
-    margin: 0;
+    margin: 0 0 13px;
     color: ${tokens.color.neutral[900]};
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 800;
     letter-spacing: -0.55px;
     line-height: 1.35;
-    white-space: pre-line;
   `,
-  ApplicationCancelDescription: styled.p`
+  ApplicationCancelDescription: styled.p<{ $hidden?: boolean }>`
+    display: ${({ $hidden }) => ($hidden ? "none" : "block")};
     margin: 9px 0 14px;
-    color: ${tokens.color.neutral[500]};
+    color: ${tokens.color.neutral[900]};
     font-size: 10px;
     line-height: 1.55;
   `,
   ApplicationCancelDetails: styled.div`
     display: grid;
-    gap: 9px;
     padding: 11px;
     border-radius: 10px;
     background: ${tokens.color.neutral[100]};
@@ -189,8 +188,17 @@ export const S = {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    color: ${tokens.color.neutral[500]};
+    padding: 7px 0;
+    color: ${tokens.color.neutral[900]};
     font-size: 9px;
+
+    & + & {
+      border-top: 1px solid ${tokens.color.neutral[200]};
+    }
+
+    span {
+      color: ${tokens.color.neutral[900]};
+    }
 
     strong {
       color: ${tokens.color.neutral[900]};
@@ -203,7 +211,8 @@ export const S = {
     font-weight: 800;
   `,
   ApplicationCancelNotice: styled.p`
-    margin: 10px 0 0;
+    display: none;
+    margin: 0;
     padding: 10px 11px;
     border-radius: 10px;
     background: ${tokens.color.primary[100]};

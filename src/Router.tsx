@@ -4,7 +4,11 @@ import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
 import { ContestDetailPage } from "./pages/Contests/ContestDetailPage/ContestDetailPage";
+import { ApplicationReviewTeamDetailPage } from "./pages/Contests/ApplicationReviewTeamDetailPage/ApplicationReviewTeamDetailPage";
 import { RecruitingTeamsPage } from "./pages/Contests/RecruitingTeamsPage/RecruitingTeamsPage";
+import { TeamDetailPage } from "./pages/Contests/TeamDetailPage/TeamDetailPage";
+import { TeamApplicationPage } from "./pages/Contests/TeamApplicationPage/TeamApplicationPage";
+import { OwnerTeamDetailPage } from "./pages/Contests/OwnerTeamDetailPage/OwnerTeamDetailPage";
 import { TeamCreationPage } from "./pages/Contests/TeamCreationPage/TeamCreationPage";
 import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCreationContext";
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
@@ -34,12 +38,43 @@ export function AppRouter() {
           path="/contests/:contestId/teams"
         />
         <Route
+          element={<TeamDetailPage />}
+          path="/contests/:contestId/teams/:teamId"
+        />
+        <Route
+          element={<ApplicationReviewTeamDetailPage />}
+          path="/contests/:contestId/teams/applied-data-seoul"
+        />
+        <Route
+          element={<ApplicationReviewTeamDetailPage />}
+          path="/contests/:contestId/teams/joined-data-seoul"
+        />
+        <Route
+          element={<TeamApplicationPage />}
+          path="/contests/:contestId/teams/:teamId/apply"
+        />
+        <Route
+          element={<OwnerTeamDetailPage />}
+          path="/contests/:contestId/teams/:teamId/manage"
+        />
+        <Route
           element={
             <TeamCreationProvider>
               <Outlet />
             </TeamCreationProvider>
           }
           path="/contests/:contestId/teams/create"
+        >
+          <Route index element={<TeamCreationPage />} />
+          <Route element={<TeamCreationPage />} path=":step" />
+        </Route>
+        <Route
+          element={
+            <TeamCreationProvider>
+              <Outlet />
+            </TeamCreationProvider>
+          }
+          path="/contests/:contestId/teams/:teamId/edit"
         >
           <Route index element={<TeamCreationPage />} />
           <Route element={<TeamCreationPage />} path=":step" />

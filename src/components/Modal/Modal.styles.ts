@@ -22,9 +22,10 @@ export const S = {
     font-weight: 800;
     letter-spacing: -0.6px;
   `,
-  Description: styled.p`
+  Description: styled.p<{ $emphasized: boolean }>`
     margin: 0;
-    color: ${tokens.color.neutral[500]};
+    color: ${({ $emphasized }) =>
+      $emphasized ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font-size: 13px;
     line-height: 1.7;
     letter-spacing: -0.35px;
@@ -51,11 +52,12 @@ export const S = {
       outline-offset: 3px;
     }
   `,
-  SecondaryButton: styled.button`
+  SecondaryButton: styled.button<{ $emphasized: boolean }>`
     min-height: 25px;
     border: 0;
     background: transparent;
-    color: ${tokens.color.neutral[500]};
+    color: ${({ $emphasized }) =>
+      $emphasized ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font: inherit;
     font-size: 13px;
     cursor: pointer;

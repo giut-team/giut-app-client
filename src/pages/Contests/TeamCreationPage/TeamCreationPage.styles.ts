@@ -1,5 +1,17 @@
+import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import { tokens } from "../../../design-system/tokens.generated";
+
+const creationSuccessIconEnter = keyframes`
+  from { opacity: 0; transform: scale(0.55); }
+  70% { opacity: 1; transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
+`;
+
+const creationSuccessCheckEnter = keyframes`
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
+`;
 
 export const S = {
   Page: styled.main`
@@ -873,6 +885,139 @@ export const S = {
     background: color-mix(in srgb, ${tokens.color.primary[100]} 55%, ${tokens.color.neutral[50]});
     font-size: 8px;
     line-height: 1.5;
+  `,
+  CreationCompleteContent: styled.section`
+    min-height: calc(100svh - 76px);
+    padding: 76px 14px 28px;
+    box-sizing: border-box;
+    text-align: center;
+  `,
+  CreationSuccessIcon: styled.span`
+    display: grid;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    animation: ${creationSuccessIconEnter} 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    svg {
+      animation: ${creationSuccessCheckEnter} 360ms 260ms ease-out both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+
+      svg {
+        animation: none;
+      }
+    }
+  `,
+  CreationCompleteTitle: styled.h1`
+    margin: 19px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 16px;
+    font-weight: 800;
+  `,
+  CreationCompleteDescription: styled.p`
+    margin: 8px 0 23px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 9px;
+    font-weight: 600;
+  `,
+  CreationSummary: styled.dl`
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 15px 14px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${tokens.color.neutral[50]};
+    text-align: left;
+
+    div {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    dt,
+    dd {
+      margin: 0;
+      color: ${tokens.color.neutral[900]};
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    dd {
+      font-weight: 800;
+      text-align: right;
+    }
+  `,
+  CreationNextSteps: styled.section`
+    margin-top: 11px;
+    padding: 14px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${tokens.color.neutral[50]};
+    text-align: left;
+  `,
+  CreationNextStepsTitle: styled.h2`
+    margin: 0 0 10px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 10px;
+    font-weight: 800;
+  `,
+  CreationNextStep: styled.div<{ $active?: boolean }>`
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 5px 0;
+
+    div {
+      display: grid;
+      gap: 3px;
+    }
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    span {
+      color: ${tokens.color.neutral[900]};
+      font-size: 8px;
+      font-weight: 600;
+    }
+  `,
+  CreationStepMark: styled.span<{ $active?: boolean }>`
+    display: grid;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    background: ${({ $active }) =>
+      $active ? tokens.color.primary[500] : tokens.color.neutral[100]};
+    color: ${({ $active }) =>
+      $active ? tokens.color.neutral[50] : tokens.color.neutral[500]};
+    font-size: 7px;
+    font-weight: 800;
+  `,
+  CreationCompleteNotice: styled.p`
+    margin: 15px 0 0;
+    padding: 12px;
+    border-radius: 10px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.neutral[900]};
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.55;
+    text-align: left;
   `,
   ActionBar: styled.div`
     position: fixed;

@@ -236,6 +236,15 @@ export const S = {
     border-radius: 16px;
     background: ${tokens.color.neutral[50]};
     box-shadow: 0 3px 10px rgb(16 21 34 / 6%);
+
+    &[role="button"] {
+      cursor: pointer;
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
   `,
   TeamTitleRow: styled.div`
     display: flex;
@@ -243,11 +252,31 @@ export const S = {
     justify-content: space-between;
     gap: 8px;
   `,
+  TeamTitleGroup: styled.div`
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 5px;
+  `,
   TeamTitle: styled.h3`
     margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 10px;
     font-weight: 800;
+  `,
+  OwnerBadge: styled.span`
+    flex: 0 0 auto;
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: color-mix(
+      in srgb,
+      ${tokens.color.success[500]} 12%,
+      ${tokens.color.neutral[50]}
+    );
+    color: ${tokens.color.success[500]};
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
   `,
   TeamCount: styled.span`
     padding: 4px 6px;
