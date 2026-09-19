@@ -145,7 +145,7 @@ export const S = {
   `,
   DecisionDescription: styled.p`
     margin: 9px 0 14px;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     line-height: 1.55;
   `,
@@ -269,7 +269,7 @@ export const S = {
   DecisionSummary: styled.div`
     display: grid;
     gap: 9px;
-    margin-top: 10px;
+    margin-top: 0;
     padding: 11px;
     border-radius: 10px;
     background: ${tokens.color.neutral[100]};

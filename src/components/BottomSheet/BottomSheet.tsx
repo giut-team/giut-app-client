@@ -56,7 +56,6 @@ const rejectReasons = [
   "이미 인원이 찼어요",
   "포지션이 맞지 않아요",
   "활동 시간이 안 맞아요",
-  "직접 입력",
 ];
 
 function DecisionContent({
@@ -70,7 +69,6 @@ function DecisionContent({
   mode: DecisionMode;
   completed: boolean;
 }) {
-  const [selectedRole, setSelectedRole] = useState(applicantRole);
   const [selectedReason, setSelectedReason] = useState("");
   const isAccepting = mode === "accept";
 
@@ -112,26 +110,6 @@ function DecisionContent({
 
       {isAccepting ? (
         <>
-          <S.DecisionFieldHeader>
-            <S.DecisionFieldLabel>포지션 선택</S.DecisionFieldLabel>
-            <S.DecisionFieldHint>2개 지원</S.DecisionFieldHint>
-          </S.DecisionFieldHeader>
-          <S.DecisionOptionGroup aria-label="수락 포지션 선택">
-            {[applicantRole, "프론트엔드 개발자"].map((role) => (
-              <S.DecisionOptionButton
-                $selected={selectedRole === role}
-                aria-pressed={selectedRole === role}
-                key={role}
-                onClick={() => setSelectedRole(role)}
-                type="button"
-              >
-                {selectedRole === role && (
-                  <Icon name="check" size={12} weight="bold" />
-                )}
-                {role}
-              </S.DecisionOptionButton>
-            ))}
-          </S.DecisionOptionGroup>
           <S.DecisionSummary>
             <S.DecisionSummaryRow>
               <span>팀 인원</span>
@@ -139,7 +117,7 @@ function DecisionContent({
             </S.DecisionSummaryRow>
             <S.DecisionSummaryRow>
               <span>남은 자리</span>
-              <strong>2건</strong>
+              <strong>1건</strong>
             </S.DecisionSummaryRow>
           </S.DecisionSummary>
         </>

@@ -206,7 +206,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   TeamsSection: styled.section`
-    padding: 0 20px 96px;
+    padding: 0 12px 96px;
     background: ${tokens.color.neutral[50]};
   `,
   SectionHeader: styled.div`

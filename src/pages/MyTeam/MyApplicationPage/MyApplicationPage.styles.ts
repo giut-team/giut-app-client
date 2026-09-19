@@ -49,7 +49,7 @@ export const S = {
   `,
   TeamMeta: styled.p`
     margin: 5px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     line-height: 1.5;
   `,
@@ -57,7 +57,9 @@ export const S = {
     display: flex;
     align-items: center;
     margin-top: 12px;
-    padding: 0 2px;
+    padding: 10px 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
   `,
   TimelineStep: styled.div<{ $state: TimelineState }>`
     display: inline-flex;
@@ -89,12 +91,86 @@ export const S = {
   ApplicationContent: styled.div`
     flex: 1;
     padding: 14px 12px 88px;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
   `,
-  ProfileCard: styled.section`
+  ApplicationPositionCard: styled.section`
     padding: 14px 13px;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 14px;
     background: ${tokens.color.neutral[50]};
+  `,
+  PositionHeading: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  `,
+  PositionSectionTitle: styled.h2`
+    margin: 0;
+    color: #000;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -0.35px;
+  `,
+  PositionSummary: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 9px;
+  `,
+  PositionBadge: styled.span`
+    padding: 6px 9px;
+    border: 1px solid ${tokens.color.primary[100]};
+    border-radius: 8px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    line-height: 1;
+  `,
+  PositionMeta: styled.span`
+    color: #000;
+    font-size: 10px;
+  `,
+  PositionVacancy: styled.span`
+    color: ${tokens.color.primary[500]};
+    font-size: 10px;
+    font-weight: 700;
+  `,
+  PositionDivider: styled.div`
+    height: 1px;
+    margin: 13px 0 11px;
+    background: ${tokens.color.neutral[200]};
+  `,
+  PositionInfoList: styled.dl`
+    display: grid;
+    gap: 9px;
+    margin: 0;
+  `,
+  PositionInfoRow: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    span {
+      color: #000;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    strong {
+      overflow: hidden;
+      color: #000;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `,
+  ProfileCard: styled.section`
+    display: none;
   `,
   Profile: styled.div`
     display: flex;
@@ -138,37 +214,49 @@ export const S = {
     line-height: 1;
   `,
   School: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
+    font-weight: 400;
   `,
   QuestionList: styled.div`
     display: grid;
     gap: 12px;
   `,
   QuestionCard: styled.section`
-    margin-top: 8px;
-    padding: 14px 13px;
-    border-radius: 14px;
-    background: ${tokens.color.neutral[50]};
+    margin-top: 12px;
+    padding: 0;
+    background: transparent;
   `,
   Question: styled.section`
     display: grid;
-    gap: 5px;
+    gap: 6px;
+  `,
+  AnswerField: styled.div`
+    padding: 14px 13px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 14px;
+    background: ${tokens.color.neutral[50]};
   `,
   QuestionTitle: styled.h2`
     margin: 0;
     color: ${tokens.color.primary[500]};
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
   `,
   Answer: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 8px;
+    font-size: 9px;
     line-height: 1.6;
   `,
+  CharacterCount: styled.span`
+    justify-self: end;
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    line-height: 1;
+  `,
   Notice: styled.p`
-    margin: 9px 0 0;
+    margin: 18px 0 0;
     padding: 10px 12px;
     border: 1px solid ${tokens.color.primary[100]};
     border-radius: 10px;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../../components/BottomNavigation/BottomNavigation";
 import {
@@ -10,10 +10,7 @@ import { Icon } from "../../../components/icons";
 import { SearchOverlay } from "../../../components/SearchOverlay/SearchOverlay";
 import giutLogo from "../../../assets/giut-logo.svg";
 import informationIcon from "../../../assets/information.svg";
-import {
-  applicants,
-  type Applicant,
-} from "../myTeam.data";
+import { applicants, type Applicant } from "../myTeam.data";
 import { S } from "./MyTeamPage.styles";
 
 type TeamKind = "leader" | "member" | "pending";
@@ -37,9 +34,8 @@ const teams: Team[] = [
     contestId: "esg-campaign",
     kind: "pending",
     status: "지원 대기",
-    elapsed: "3일 경과",
     title: "ESG 임팩트 캠페인",
-    description: "한국디자인진흥원 · 3/4명 · 모집 중",
+    description: "디자인으로 만드는 ESG 캠페인 · 3/4명",
     tone: "pending",
   },
   {
@@ -49,7 +45,7 @@ const teams: Team[] = [
     status: "팀장",
     newApplications: "새 지원 3",
     title: "데이터로 서울을",
-    description: "서울시 데이터 공모전 · 3/5명",
+    description: "2026 서울시 데이터 활용 공모전 · 3/5명",
     progress: 60,
     tone: "primary" as const,
   },
@@ -59,7 +55,7 @@ const teams: Team[] = [
     kind: "member",
     status: "팀원",
     title: "ESG 캠페인 프로젝트",
-    description: "한국디자인진흥원 · 4/4명 · 진행 중",
+    description: "디자인으로 만드는 ESG 캠페인 · 4/4명",
     progress: 100,
     tone: "success" as const,
   },
@@ -82,6 +78,10 @@ export function MyTeamPage() {
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState("pending-esg");
+  const [teamScrollProgress, setTeamScrollProgress] = useState(0);
+  const teamScrollerRef = useRef<HTMLDivElement>(null);
+  const teamScrollTrackRef = useRef<HTMLDivElement>(null);
+  const teamScrollGrabOffsetRef = useRef(72);
   const [hasPendingApplication, setHasPendingApplication] = useState(
     () => !wasPendingApplicationCancelled,
   );
@@ -104,6 +104,28 @@ export function MyTeamPage() {
   const teamCount = visibleTeams.filter(
     (team) => team.kind !== "pending",
   ).length;
+  const updateTeamScroll = (nextProgress: number) => {
+    const scroller = teamScrollerRef.current;
+    if (!scroller) return;
+
+    const progress = Math.min(100, Math.max(0, nextProgress));
+    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+    scroller.scrollLeft = (maxScroll * progress) / 100;
+    setTeamScrollProgress(progress);
+  };
+  const moveTeamScrollThumb = (clientX: number) => {
+    const track = teamScrollTrackRef.current;
+    if (!track) return;
+
+    const thumbWidth = 144;
+    const { left, width } = track.getBoundingClientRect();
+    const availableWidth = width - thumbWidth;
+    const thumbOffset = Math.min(
+      availableWidth,
+      Math.max(0, clientX - left - teamScrollGrabOffsetRef.current),
+    );
+    updateTeamScroll((thumbOffset / availableWidth) * 100);
+  };
 
   return (
     <S.Page>
@@ -170,7 +192,18 @@ export function MyTeamPage() {
           </S.SectionTitle>
         </S.SectionHeader>
 
-        <S.TeamScroller aria-label="내 팀 목록">
+        <S.TeamScroller
+          aria-label="내 팀 목록"
+          onScroll={(event) => {
+            const { clientWidth, scrollLeft, scrollWidth } =
+              event.currentTarget;
+            const maxScroll = scrollWidth - clientWidth;
+            setTeamScrollProgress(
+              maxScroll ? (scrollLeft / maxScroll) * 100 : 0,
+            );
+          }}
+          ref={teamScrollerRef}
+        >
           {visibleTeams.map((team) => (
             <S.TeamCard
               $pending={team.kind === "pending"}
@@ -185,7 +218,9 @@ export function MyTeamPage() {
                 <S.TeamBadges>
                   <S.TeamStatus $tone={team.tone}>{team.status}</S.TeamStatus>
                   {team.newApplications && (
-                    <S.NewApplications>{team.newApplications}</S.NewApplications>
+                    <S.NewApplications>
+                      {team.newApplications}
+                    </S.NewApplications>
                   )}
                   {team.elapsed && (
                     <S.ElapsedBadge>{team.elapsed}</S.ElapsedBadge>
@@ -194,7 +229,9 @@ export function MyTeamPage() {
                 <S.TeamTitle>{team.title}</S.TeamTitle>
                 <S.TeamDescription>{team.description}</S.TeamDescription>
                 {team.kind === "pending" ? (
-                  <S.PendingMessage>팀장이 마지막 확인 중이에요</S.PendingMessage>
+                  <S.PendingMessage>
+                    팀장이 마지막 확인 중이에요
+                  </S.PendingMessage>
                 ) : (
                   <S.ProgressTrack>
                     <S.ProgressBar
@@ -218,6 +255,52 @@ export function MyTeamPage() {
             </S.TeamCard>
           ))}
         </S.TeamScroller>
+        {visibleTeams.length >= 3 && (
+          <S.TeamScrollTrack ref={teamScrollTrackRef}>
+            <S.TeamScrollRail />
+            <S.TeamScrollThumb
+              aria-label="내 팀 목록 가로 이동"
+              aria-valuemax={100}
+              aria-valuemin={0}
+              aria-valuenow={Math.round(teamScrollProgress)}
+              $progress={teamScrollProgress}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowLeft") {
+                  event.preventDefault();
+                  updateTeamScroll(teamScrollProgress - 10);
+                }
+
+                if (event.key === "ArrowRight") {
+                  event.preventDefault();
+                  updateTeamScroll(teamScrollProgress + 10);
+                }
+              }}
+              onPointerDown={(event) => {
+                const track = teamScrollTrackRef.current;
+                if (track) {
+                  const thumbWidth = 144;
+                  const { left, width } = track.getBoundingClientRect();
+                  const thumbLeft =
+                    (teamScrollProgress / 100) * (width - thumbWidth);
+                  teamScrollGrabOffsetRef.current = Math.min(
+                    thumbWidth,
+                    Math.max(0, event.clientX - left - thumbLeft),
+                  );
+                }
+
+                event.currentTarget.setPointerCapture(event.pointerId);
+                moveTeamScrollThumb(event.clientX);
+              }}
+              onPointerMove={(event) => {
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                  moveTeamScrollThumb(event.clientX);
+                }
+              }}
+              role="slider"
+              tabIndex={0}
+            />
+          </S.TeamScrollTrack>
+        )}
       </S.TeamSection>
 
       {isMemberTeam || isPendingTeam ? (
@@ -225,58 +308,38 @@ export function MyTeamPage() {
           <S.MemberSectionTitle>
             {selectedTeam.title} · 내가 쓴 지원서
           </S.MemberSectionTitle>
-          <S.MemberSectionSubtitle>
+          {/* <S.MemberSectionSubtitle>
             {isPendingTeam
               ? "2월 15일에 보냈어요 · 팀장이 2월 16일에 열람했습니다"
               : "2월 15일에 보낸 지원서예요 · 팀장이 수락해 팀에 합류했어요"}
-          </S.MemberSectionSubtitle>
-
-          {isPendingTeam && (
-            <S.MemberTimeline aria-label="지원 진행 상태">
-              <S.MemberTimelineStep $state="complete">
-                <S.MemberTimelineDot />
-                제출 2/15
-              </S.MemberTimelineStep>
-              <S.MemberTimelineLine />
-              <S.MemberTimelineStep $state="complete">
-                <S.MemberTimelineDot />
-                열람 2/16
-              </S.MemberTimelineStep>
-              <S.MemberTimelineLine />
-              <S.MemberTimelineStep $state="pending">
-                <S.MemberTimelineDot />
-                결과 대기
-              </S.MemberTimelineStep>
-            </S.MemberTimeline>
-          )}
+          </S.MemberSectionSubtitle> */}
 
           <S.MemberApplicationCard>
-            <S.MemberApplicationHeader>
-              {isPendingTeam ? (
-                <S.PendingStatus>대기 중</S.PendingStatus>
-              ) : (
-                <S.MemberStatus>수락됨</S.MemberStatus>
-              )}
-              <S.MemberRole>데이터 시각화</S.MemberRole>
-              <S.MemberReceivedAt>2월 15일 지원</S.MemberReceivedAt>
-            </S.MemberApplicationHeader>
-
             <S.MemberProfile>
               <S.MemberAvatar>이</S.MemberAvatar>
               <S.MemberIdentity>
-                <S.MemberName>이루매 · 데이터 시각화</S.MemberName>
-                <S.MemberSchool>서울시립대 컴퓨터과학부 3학년</S.MemberSchool>
+                <S.MemberNameRow>
+                  <S.MemberName>이루매</S.MemberName>
+                  <S.MemberRole>데이터 시각화</S.MemberRole>
+                </S.MemberNameRow>
+                <S.MemberSchool>컴퓨터과학부 3학년</S.MemberSchool>
               </S.MemberIdentity>
             </S.MemberProfile>
 
+            <S.MemberQuestion>
+              <S.MemberQuestionTitle>간단한 자기소개</S.MemberQuestionTitle>
+              <S.MemberAnswer>
+                공공데이터를 활용한 서비스 개발에 관심이 있으며, 데이터 분석과
+                시각화 경험을 바탕으로 팀에 기여하고 싶습니다.
+              </S.MemberAnswer>
+            </S.MemberQuestion>
             <S.MemberQuestion>
               <S.MemberQuestionTitle>
                 Q1. 이 팀에 지원한 이유를 알려주세요
               </S.MemberQuestionTitle>
               <S.MemberAnswer>
-                캠페인 성과를 숫자로 보여주는 일에 관심이 많았습니다. ESG 주제는
-                데이터가 준비된 큰 과제라고 생각해서, 기획 단계부터 지표를 함께
-                잡아보고 싶어 지원했습니다.
+                서울시 교통 공공데이터를 다루는 경험이 있어 이번 공모전 주제와 잘
+                맞을 것 같아 지원했습니다.
               </S.MemberAnswer>
             </S.MemberQuestion>
             <S.MemberQuestion>
@@ -284,18 +347,10 @@ export function MyTeamPage() {
                 Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?
               </S.MemberQuestionTitle>
               <S.MemberAnswer>
-                데이터 수집·정제와 시각화를 맡을 수 있습니다. Python·SQL로
-                공공데이터를 다뤄봤고, 발표용 대시보드까지 정리해 본 경험이
-                있습니다.
+                Spring·PostgreSQL로 공공데이터 API 2개를 만들어봤어요. 맡은
+                역할은 기획 단계부터 마무리까지 책임지고 수행하겠습니다.
               </S.MemberAnswer>
             </S.MemberQuestion>
-            <S.MemberQuestion>
-              <S.MemberQuestionTitle>Q3. 참여 가능 시간</S.MemberQuestionTitle>
-              <S.MemberAnswer>
-                주 10시간 이상 · 평일 저녁, 주말 오후 참여 가능
-              </S.MemberAnswer>
-            </S.MemberQuestion>
-
             <S.MemberOriginalLink
               onClick={() =>
                 navigate(
@@ -318,7 +373,11 @@ export function MyTeamPage() {
               지원 취소하기
             </S.MemberCancelButton>
           ) : (
-            <S.MemberChatButton type="button" width="100%">
+            <S.MemberChatButton
+              onClick={() => navigate("/chat/esg-campaign")}
+              type="button"
+              width="100%"
+            >
               <Icon name="chat" size={14} weight="fill" />
               팀장님에게 대화하러 가기
             </S.MemberChatButton>
@@ -357,6 +416,9 @@ export function MyTeamPage() {
                       <Icon name="caret-right" size={13} weight="bold" />
                     </S.DetailButton>
                   </S.ApplicantHeader>
+                  <S.ApplicantIntroductionLabel>
+                    간단한 자기소개
+                  </S.ApplicantIntroductionLabel>
                   <S.ApplicantMessage>{applicant.message}</S.ApplicantMessage>
                   <S.ReasonLabel>{applicant.reason}</S.ReasonLabel>
                   <S.ApplicantAnswer>{applicant.answer}</S.ApplicantAnswer>

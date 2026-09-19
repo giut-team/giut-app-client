@@ -49,7 +49,7 @@ export function TeamApplicationPage() {
   const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
   const [introduction, setIntroduction] = useState(introductionDefault);
-  const [weeklyHours, setWeeklyHours] = useState("15");
+  const [weeklyHours, setWeeklyHours] = useState("");
   const [questionAnswers, setQuestionAnswers] = useState(() =>
     questions.map(() => ""),
   );
@@ -69,10 +69,7 @@ export function TeamApplicationPage() {
   };
 
   const handleNext = () => {
-    if (
-      (step === 1 && !selectedField) ||
-      (step === 2 && !selectedPosition)
-    ) {
+    if ((step === 1 && !selectedField) || (step === 2 && !selectedPosition)) {
       return;
     }
 
@@ -107,30 +104,34 @@ export function TeamApplicationPage() {
           ? "지원 메시지 작성"
           : "지원 완료";
   const canContinue =
-    step === 1 ? Boolean(selectedField) : step === 2 ? Boolean(selectedPosition) : true;
+    step === 1
+      ? Boolean(selectedField)
+      : step === 2
+        ? Boolean(selectedPosition)
+        : true;
 
   return (
     <S.Page>
       <S.Content>
         {step <= totalSteps && (
           <>
-        <S.Header>
-          {step <= totalSteps && (
-            <S.BackButton
-              aria-label="뒤로 가기"
-              onClick={handleBack}
-              type="button"
-            >
-              <Icon name="arrow-left" size={18} weight="regular" />
-            </S.BackButton>
-          )}
-          <S.HeaderTitle>{headerTitle}</S.HeaderTitle>
-        </S.Header>
-        <S.Progress aria-label={`총 ${totalSteps}단계 중 ${step}단계`}>
-          {Array.from({ length: totalSteps }, (_, index) => (
-            <S.ProgressSegment $active={index < step} key={index} />
-          ))}
-        </S.Progress>
+            <S.Header>
+              {step <= totalSteps && (
+                <S.BackButton
+                  aria-label="뒤로 가기"
+                  onClick={handleBack}
+                  type="button"
+                >
+                  <Icon name="arrow-left" size={18} weight="regular" />
+                </S.BackButton>
+              )}
+              <S.HeaderTitle>{headerTitle}</S.HeaderTitle>
+            </S.Header>
+            <S.Progress aria-label={`총 ${totalSteps}단계 중 ${step}단계`}>
+              {Array.from({ length: totalSteps }, (_, index) => (
+                <S.ProgressSegment $active={index < step} key={index} />
+              ))}
+            </S.Progress>
           </>
         )}
 
@@ -262,18 +263,18 @@ export function TeamApplicationPage() {
                     Q{index + 1}. {question.title}
                   </S.QuestionNumber>
                   <S.QuestionPreviewCard>
-                  <S.QuestionAnswerInput
-                    aria-label={`질문 ${index + 1} 답변`}
-                    maxLength={300}
-                    onChange={(event) =>
-                      setQuestionAnswers((answers) =>
-                        answers.map((answer, answerIndex) =>
-                          answerIndex === index ? event.target.value : answer,
-                        ),
-                      )
-                    }
-                    value={questionAnswers[index]}
-                  />
+                    <S.QuestionAnswerInput
+                      aria-label={`질문 ${index + 1} 답변`}
+                      maxLength={300}
+                      onChange={(event) =>
+                        setQuestionAnswers((answers) =>
+                          answers.map((answer, answerIndex) =>
+                            answerIndex === index ? event.target.value : answer,
+                          ),
+                        )
+                      }
+                      value={questionAnswers[index]}
+                    />
                   </S.QuestionPreviewCard>
                   <S.QuestionCharacterCount>
                     {questionAnswers[index].length}/300
@@ -344,7 +345,11 @@ export function TeamApplicationPage() {
         )}
       </S.Content>
       <S.ActionBar>
-        <S.NextButton disabled={!canContinue} onClick={handleNext} type="button">
+        <S.NextButton
+          disabled={!canContinue}
+          onClick={handleNext}
+          type="button"
+        >
           {step === 3 ? "지원 보내기" : step === 4 ? "확인" : "다음으로 가기"}
         </S.NextButton>
       </S.ActionBar>

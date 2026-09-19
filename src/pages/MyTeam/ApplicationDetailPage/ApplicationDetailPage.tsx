@@ -27,21 +27,25 @@ export function ApplicationDetailPage() {
             <S.ProfileIdentity>
               <S.Name>{applicant.name}</S.Name>
               <S.School>{applicant.school}</S.School>
-              <S.ProfileLink type="button">프로필 전체 보기</S.ProfileLink>
+              <S.ProfileLink
+                onClick={() => navigate(`/giut-hub/${applicant.profileNumber}`)}
+                type="button"
+              >
+                프로필 전체 보기
+              </S.ProfileLink>
             </S.ProfileIdentity>
-            <S.Caret aria-hidden="true">
+            <S.Caret
+              aria-label={`${applicant.name} 프로필 전체 보기`}
+              onClick={() => navigate(`/giut-hub/${applicant.profileNumber}`)}
+              type="button"
+            >
               <Icon name="caret-right" size={15} weight="bold" />
             </S.Caret>
           </S.ProfileHeader>
         </S.ProfileCard>
 
         <S.InformationCard>
-          <S.PositionLabel>지원 포지션</S.PositionLabel>
-          <S.PositionValue>
-            <S.RoleBadge $tone={applicant.tone}>{applicant.role}</S.RoleBadge>
-            <S.PositionText>모집 인원 2명</S.PositionText>
-            <S.OpeningText>1자리 남음</S.OpeningText>
-          </S.PositionValue>
+          <S.PositionLabel>지원 포지션 - 백엔드 개발자</S.PositionLabel>
 
           <S.InformationList>
             <S.InformationRow>
@@ -50,9 +54,7 @@ export function ApplicationDetailPage() {
             </S.InformationRow>
             <S.InformationRow>
               <S.InformationLabel>지원 일시</S.InformationLabel>
-              <S.InformationValue>
-                8월 31일 오후 1:31 (10분 전)
-              </S.InformationValue>
+              <S.InformationValue>8월 31일 오후 1:31</S.InformationValue>
             </S.InformationRow>
             <S.InformationRow>
               <S.InformationLabel>참여 가능</S.InformationLabel>
@@ -63,10 +65,22 @@ export function ApplicationDetailPage() {
 
         <S.QuestionCard>
           <S.QuestionHeader>
-            <S.QuestionTitle>Q1. 이 팀에 지원한 이유를 알려주세요</S.QuestionTitle>
-            <S.CharacterCount>96 / 300</S.CharacterCount>
+            <S.QuestionTitle>간단한 자기소개</S.QuestionTitle>
           </S.QuestionHeader>
-          <S.Answer>{applicant.answer}</S.Answer>
+          <S.AnswerField>
+            <S.Answer>{applicant.introduction}</S.Answer>
+          </S.AnswerField>
+          <S.CharacterCount>{applicant.introduction.length} / 300</S.CharacterCount>
+        </S.QuestionCard>
+
+        <S.QuestionCard>
+          <S.QuestionHeader>
+            <S.QuestionTitle>Q1. 이 팀에 지원한 이유를 알려주세요</S.QuestionTitle>
+          </S.QuestionHeader>
+          <S.AnswerField>
+            <S.Answer>{applicant.answer}</S.Answer>
+          </S.AnswerField>
+          <S.CharacterCount>96 / 300</S.CharacterCount>
         </S.QuestionCard>
 
         <S.QuestionCard>
@@ -74,17 +88,16 @@ export function ApplicationDetailPage() {
             <S.QuestionTitle>
               Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?
             </S.QuestionTitle>
-            <S.CharacterCount>78 / 300</S.CharacterCount>
           </S.QuestionHeader>
-          <S.Answer>
-            {applicant.message} 팀의 목표에 맞춰 맡은 역할을 끝까지 책임지고
-            수행하겠습니다.
-          </S.Answer>
+          <S.AnswerField>
+            <S.Answer>
+              {applicant.message} 팀의 목표에 맞춰 맡은 역할을 끝까지 책임지고
+              수행하겠습니다.
+            </S.Answer>
+          </S.AnswerField>
+          <S.CharacterCount>78 / 300</S.CharacterCount>
         </S.QuestionCard>
 
-        <S.Notice>
-          수락하면 팀 채팅방에 자동 초대되고, 지원자에게 알림이 갑니다.
-        </S.Notice>
       </S.Content>
 
       <S.ActionBar>

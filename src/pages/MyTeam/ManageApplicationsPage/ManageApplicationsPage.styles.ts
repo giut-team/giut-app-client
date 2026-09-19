@@ -66,7 +66,7 @@ export const S = {
   `,
   ApplicantHeader: styled.div`
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
   `,
   Avatar: styled.span<{ $tone: ApplicantTone }>`
@@ -98,19 +98,20 @@ export const S = {
   ProfileLine: styled.span`
     display: block;
     margin-top: 4px;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 500;
   `,
-  ReceivedAt: styled.time`
-    flex: 0 0 auto;
-    padding-top: 2px;
-    color: ${tokens.color.neutral[500]};
+  ApplicantIntroductionLabel: styled.strong`
+    display: block;
+    margin-top: 11px;
+    color: ${tokens.color.primary[500]};
     font-size: 8px;
+    font-weight: 800;
   `,
   ApplicantMessage: styled.p`
-    margin: 11px 0 6px;
-    color: ${tokens.color.neutral[700]};
+    margin: 4px 0 6px;
+    color: #000;
     font-size: 9px;
     font-weight: 500;
     line-height: 1.45;
@@ -125,7 +126,7 @@ export const S = {
     display: -webkit-box;
     margin: 4px 0 0;
     overflow: hidden;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     line-height: 1.5;
     -webkit-box-orient: vertical;
@@ -144,11 +145,11 @@ export const S = {
     gap: 3px;
   `,
   ApplicationMetaLabel: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
   `,
   ApplicationMetaValue: styled.strong`
-    color: ${tokens.color.neutral[700]};
+    color: #000;
     font-size: 9px;
     font-weight: 700;
   `,
@@ -164,7 +165,7 @@ export const S = {
     border: 0;
     border-radius: 50%;
     background: transparent;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     cursor: pointer;
 
     &:hover {

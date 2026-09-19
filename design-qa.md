@@ -61,6 +61,31 @@
 
 final result: blocked
 
+## Pending application-detail update
+
+- Source visual truth: the supplied pending-application screenshot showing a timeline followed by a support-position summary card, two question-and-answer cards, and an informational notice.
+- Implementation route: `/my-team/my-application/pending`.
+- Implemented state: the timeline remains above the content; below it, the page now presents a `데이터 시각화` position summary with team, submission time, and weekly availability, followed by separate Q1 and Q2 answer cards and the pending-state notice.
+- Primary interaction: the fixed cancellation action remains available for a pending application.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime is unavailable in this chat, so the supplied reference and the rendered route could not be compared at a matching viewport.
+- Code checks: `npm.cmd run build` passed.
+
+**Findings**
+- [P1] Visual fidelity is unverified.
+  Location: pending application-detail route.
+  Evidence: the source screenshot is available but no browser-rendered implementation screenshot can be captured.
+  Impact: exact card heights, typography, timeline spacing, and fixed-footer placement may still differ from the reference.
+  Fix: when browser rendering is available, capture `/my-team/my-application/pending` at the reference viewport and compare the full page plus the position-summary region.
+
+**Required fidelity surfaces**
+- Fonts and typography: uses the existing product type system; visual comparison is blocked.
+- Spacing and layout rhythm: implements the supplied timeline-to-summary-to-question-card hierarchy; visual comparison is blocked.
+- Colors and visual tokens: primary and neutral product tokens are used for bordered cards, position state, and the informational notice.
+- Image quality and asset fidelity: no non-standard raster assets are visible in the supplied target.
+- Copy and content: the pending application retains the current data-visualization role and sample application data while adopting the supplied structure.
+
+final result: blocked
+
 ## Recruiting-teams page update
 
 - Source visual truth: the 822px-wide recruiting-teams screenshot supplied in this conversation.

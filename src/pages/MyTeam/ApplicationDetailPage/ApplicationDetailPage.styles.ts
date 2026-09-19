@@ -31,7 +31,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   PageIndicator: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     font-weight: 500;
   `,
@@ -44,13 +44,13 @@ export const S = {
   `,
   ProfileCard: styled.section`
     padding: 12px;
-    border: 1px solid ${tokens.color.primary[500]};
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
   `,
   ProfileHeader: styled.div`
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
   `,
   Avatar: styled.span<{ $tone: ApplicantTone }>`
@@ -76,7 +76,7 @@ export const S = {
     font-weight: 800;
   `,
   School: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     font-weight: 500;
   `,
@@ -91,12 +91,24 @@ export const S = {
     font-weight: 700;
     cursor: pointer;
   `,
-  Caret: styled.span`
+  Caret: styled.button`
     display: grid;
     place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
     margin-left: auto;
-    color: ${tokens.color.neutral[500]};
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #000;
     line-height: 1;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
   `,
   InformationCard: styled.section`
     padding: 12px;
@@ -106,7 +118,7 @@ export const S = {
   `,
   PositionLabel: styled.p`
     margin: 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     font-weight: 700;
   `,
@@ -126,7 +138,7 @@ export const S = {
     line-height: 1;
   `,
   PositionText: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     font-weight: 500;
   `,
@@ -163,27 +175,22 @@ export const S = {
     gap: 10px;
   `,
   InformationLabel: styled.dt`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
   `,
   InformationValue: styled.dd`
     margin: 0;
-    color: ${tokens.color.neutral[700]};
+    color: #000;
     font-size: 9px;
     font-weight: 500;
     text-align: right;
   `,
   QuestionCard: styled.section`
-    padding: 12px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 13px;
-    background: ${tokens.color.neutral[50]};
+    display: grid;
+    gap: 7px;
   `,
   QuestionHeader: styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    display: block;
   `,
   QuestionTitle: styled.h2`
     margin: 0;
@@ -192,12 +199,22 @@ export const S = {
     font-weight: 800;
   `,
   CharacterCount: styled.span`
-    color: ${tokens.color.neutral[500]};
+    justify-self: end;
+    color: #000;
     font-size: 8px;
   `,
+  AnswerField: styled.div`
+    display: grid;
+    gap: 4px;
+    min-height: 74px;
+    padding: 11px 12px 7px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 13px;
+    background: ${tokens.color.neutral[50]};
+  `,
   Answer: styled.p`
-    margin: 7px 0 0;
-    color: ${tokens.color.neutral[700]};
+    margin: 0;
+    color: #000;
     font-size: 9px;
     line-height: 1.65;
   `,
@@ -207,7 +224,7 @@ export const S = {
     border: 1px solid ${tokens.color.primary[100]};
     border-radius: 10px;
     background: ${tokens.color.primary[100]};
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     line-height: 1.5;
   `,

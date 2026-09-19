@@ -26,6 +26,28 @@ const applicationQuestions = [
   },
 ];
 
+const submittedApplicationContent = [
+  {
+    title: "간단한 자기소개",
+    answer:
+      "공공데이터를 활용한 서비스 개발에 관심이 있으며, 데이터 분석과 시각화 경험을 바탕으로 팀에 기여하고 싶습니다.",
+  },
+  {
+    title: "Q1. 이 팀에 지원한 이유를 알려주세요",
+    answer:
+      "서울시 교통 공공데이터를 다루는 경험이 있어 이번 공모전 주제와 잘 맞을 것 같아 지원했습니다.",
+  },
+  {
+    title: "Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?",
+    answer:
+      "Spring·PostgreSQL로 공공데이터 API 2개를 만들어봤어요. 맡은 역할은 기획 단계부터 마무리까지 책임지고 수행하겠습니다.",
+  },
+  {
+    title: "한 주당 참여 가능한 시간",
+    answer: "15시간",
+  },
+] satisfies Array<(typeof applicationQuestions)[number]>;
+
 export function MyApplicationPage() {
   const navigate = useNavigate();
   const { applicationStatus } = useParams();
@@ -49,9 +71,7 @@ export function MyApplicationPage() {
       <S.TopContent>
         <S.TeamSummary>
           <S.TeamTitle>{teamName}</S.TeamTitle>
-          <S.TeamMeta>
-            한국디자인진흥원 · 데이터 시각화 포지션 · 2월 15일 오후 9:12 제출
-          </S.TeamMeta>
+          <S.TeamMeta>디자인으로 만드는 ESG 캠페인 · 3/4명</S.TeamMeta>
         </S.TeamSummary>
 
         <S.ProgressTimeline aria-label="지원 진행 상태">
@@ -67,12 +87,36 @@ export function MyApplicationPage() {
           <S.TimelineLine />
           <S.TimelineStep $state={isPending ? "pending" : "accepted"}>
             <S.TimelineDot />
-            <S.TimelineLabel>{isPending ? "결과 대기" : "수락 2/17"}</S.TimelineLabel>
+            <S.TimelineLabel>
+              {isPending ? "결과 대기" : "수락 2/17"}
+            </S.TimelineLabel>
           </S.TimelineStep>
         </S.ProgressTimeline>
       </S.TopContent>
 
       <S.ApplicationContent>
+        <S.ApplicationPositionCard>
+          <S.PositionHeading>
+            <S.PositionSectionTitle>
+              지원 포지션 - 데이터 시각화
+            </S.PositionSectionTitle>
+          </S.PositionHeading>
+          <S.PositionDivider />
+          <S.PositionInfoList>
+            <S.PositionInfoRow>
+              <span>지원한 팀</span>
+              <strong>{teamName}</strong>
+            </S.PositionInfoRow>
+            <S.PositionInfoRow>
+              <span>지원 일시</span>
+              <strong>8월 31일 오후 1:31</strong>
+            </S.PositionInfoRow>
+            <S.PositionInfoRow>
+              <span>참여 가능</span>
+              <strong>주 15시간</strong>
+            </S.PositionInfoRow>
+          </S.PositionInfoList>
+        </S.ApplicationPositionCard>
         <S.ProfileCard>
           <S.Profile>
             <S.Avatar>루</S.Avatar>
@@ -81,27 +125,26 @@ export function MyApplicationPage() {
                 <S.Name>이루매</S.Name>
                 <S.RoleBadge>데이터 시각화</S.RoleBadge>
               </S.NameRow>
-              <S.School>서울시립대 컴퓨터과학부 3학년 · 학교 인증</S.School>
+              <S.School>컴퓨터과학부 3학년</S.School>
             </S.ProfileIdentity>
           </S.Profile>
         </S.ProfileCard>
 
         <S.QuestionCard>
           <S.QuestionList>
-            {applicationQuestions.map((question) => (
+            {submittedApplicationContent
+              .filter((question) => question.title !== "한 주당 참여 가능한 시간")
+              .map((question) => (
               <S.Question key={question.title}>
                 <S.QuestionTitle>{question.title}</S.QuestionTitle>
-                <S.Answer>{question.answer}</S.Answer>
+                <S.AnswerField>
+                  <S.Answer>{question.answer}</S.Answer>
+                </S.AnswerField>
+                <S.CharacterCount>{question.answer.length} / 300</S.CharacterCount>
               </S.Question>
-            ))}
+              ))}
           </S.QuestionList>
         </S.QuestionCard>
-
-        <S.Notice>
-          {isPending
-            ? "팀장이 지원서를 검토 중이에요. 결과가 나오면 알림으로 알려드릴게요."
-            : "제출한 지원서는 읽기 전용이에요. 수정이 필요하면 팀장에게 직접 이야기해주세요."}
-        </S.Notice>
       </S.ApplicationContent>
 
       <S.ActionBar>
@@ -113,7 +156,11 @@ export function MyApplicationPage() {
             지원 취소하기
           </S.CancelButton>
         ) : (
-          <S.ChatButton onClick={() => undefined} type="button" width="100%">
+          <S.ChatButton
+            onClick={() => navigate("/chat/esg-campaign")}
+            type="button"
+            width="100%"
+          >
             <Icon name="chat" size={14} weight="fill" />
             팀장님이랑 대화하러 가기
           </S.ChatButton>

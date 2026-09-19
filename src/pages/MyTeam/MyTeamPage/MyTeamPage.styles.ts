@@ -114,7 +114,7 @@ export const S = {
   `,
   Greeting: styled.p`
     margin: 22px 0 0;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: -0.1px;
@@ -162,11 +162,60 @@ export const S = {
     overflow-x: auto;
     padding: 0 14px 2px;
     scroll-padding-inline: 28px;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: none;
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
       display: none;
+    }
+  `,
+  TeamScrollTrack: styled.div`
+    position: relative;
+    width: calc(100% - 28px);
+    height: 22px;
+    margin: 11px 14px 0;
+  `,
+  TeamScrollRail: styled.span`
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: 5px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: ${tokens.color.neutral[200]};
+  `,
+  TeamScrollThumb: styled.span<{ $progress: number }>`
+    position: absolute;
+    top: 50%;
+    left: ${({ $progress }) => $progress}%;
+    width: 144px;
+    height: 28px;
+    transform: translate(-${({ $progress }) => $progress}%, -50%);
+    border-radius: 999px;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+
+    &::after {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      left: 0;
+      height: 9px;
+      transform: translateY(-50%);
+      border-radius: inherit;
+      background: ${tokens.color.neutral[700]};
+      content: "";
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
     }
   `,
   TeamCard: styled.article<{ $selected: boolean; $pending: boolean }>`
@@ -209,15 +258,10 @@ export const S = {
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: transform 180ms ease;
 
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 2px;
-    }
-
-    &:active {
-      transform: scale(0.98);
     }
   `,
   ContestShortcut: styled.button`
@@ -300,10 +344,13 @@ export const S = {
   `,
   TeamDescription: styled.p`
     margin: 0;
-    color: ${tokens.color.neutral[500]};
+    overflow: hidden;
+    color: #000;
     font-size: 10px;
-    font-weight: 500;
+    font-weight: 400;
     letter-spacing: -0.15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   `,
   ProgressTrack: styled.div`
     height: 5px;
@@ -337,14 +384,13 @@ export const S = {
   MemberApplicationSection: styled.section<{ $pending: boolean }>`
     width: min(100%, 480px);
     margin: 0 auto;
-    padding: 16px 8px 88px;
-    background: ${({ $pending }) =>
-      $pending ? tokens.color.neutral[100] : tokens.color.neutral[50]};
+    padding: 13px 16px 88px;
+    background: ${tokens.color.neutral[50]};
   `,
   MemberSectionTitle: styled.h2`
-    margin: 0;
+    margin: 0 0 10px;
     color: ${tokens.color.neutral[900]};
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
     letter-spacing: -0.25px;
   `,
@@ -359,6 +405,7 @@ export const S = {
     align-items: center;
     margin: 0 0 9px;
     padding: 10px 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 10px;
     background: ${tokens.color.neutral[50]};
   `,
@@ -387,7 +434,8 @@ export const S = {
     background: ${tokens.color.neutral[200]};
   `,
   MemberApplicationCard: styled.article`
-    padding: 13px 12px 11px;
+    padding: 4px 12px 11px;
+    border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 14px;
     background: ${tokens.color.neutral[50]};
   `,
@@ -449,14 +497,20 @@ export const S = {
     display: grid;
     gap: 3px;
   `,
+  MemberNameRow: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  `,
   MemberName: styled.strong`
     color: ${tokens.color.neutral[900]};
     font-size: 10px;
     font-weight: 800;
   `,
   MemberSchool: styled.span`
-    color: ${tokens.color.neutral[500]};
-    font-size: 8px;
+    color: #000;
+    font-size: 9px;
+    font-weight: 500;
   `,
   MemberQuestion: styled.section`
     margin-top: 11px;
@@ -464,13 +518,13 @@ export const S = {
   MemberQuestionTitle: styled.h3`
     margin: 0;
     color: ${tokens.color.primary[500]};
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
   `,
   MemberAnswer: styled.p`
     margin: 4px 0 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 8px;
+    font-size: 9px;
     line-height: 1.55;
   `,
   MemberOriginalLink: styled.button`
@@ -547,7 +601,7 @@ export const S = {
   `,
   ApplicantHeader: styled.div`
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 9px;
     color: ${tokens.color.neutral[500]};
   `,
@@ -588,12 +642,19 @@ export const S = {
   `,
   ApplicantSchool: styled.span`
     flex-basis: 100%;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     font-weight: 500;
   `,
+  ApplicantIntroductionLabel: styled.strong`
+    display: block;
+    margin-top: 12px;
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 800;
+  `,
   ApplicantMessage: styled.p`
-    margin: 12px 0 7px;
+    margin: 4px 0 7px;
     color: ${tokens.color.neutral[700]};
     font-size: 10px;
     font-weight: 500;
@@ -609,7 +670,7 @@ export const S = {
     display: -webkit-box;
     margin: 4px 0 0;
     overflow: hidden;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 9px;
     line-height: 1.55;
     -webkit-box-orient: vertical;

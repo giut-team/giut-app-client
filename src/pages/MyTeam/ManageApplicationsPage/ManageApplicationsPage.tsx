@@ -58,14 +58,16 @@ export function ManageApplicationsPage() {
                 <S.ApplicantHeader>
                   <S.Avatar $tone={applicant.tone}>{applicant.initial}</S.Avatar>
                     <S.Identity>
-                      <S.NameRow>
-                        <S.Name>{applicant.name}</S.Name>
-                      </S.NameRow>
+                    <S.NameRow>
+                      <S.Name>{applicant.name}</S.Name>
+                    </S.NameRow>
                     <S.ProfileLine>{applicant.school}</S.ProfileLine>
                   </S.Identity>
-                  <S.ReceivedAt>{applicant.receivedAt}</S.ReceivedAt>
                 </S.ApplicantHeader>
 
+                <S.ApplicantIntroductionLabel>
+                  간단한 자기소개
+                </S.ApplicantIntroductionLabel>
                 <S.ApplicantMessage>{applicant.message}</S.ApplicantMessage>
                 <S.ReasonLabel>{applicant.reason}</S.ReasonLabel>
                 <S.ApplicantAnswer>{applicant.answer}</S.ApplicantAnswer>
