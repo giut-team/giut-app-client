@@ -1,13 +1,15 @@
+import { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MarkdownContent } from "../../components/MarkdownContent";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
 import { giutHubProfiles } from "./GiutHubPage";
-import { detailsByProfileId, getSkillIcon } from "./GiutHubProfilePage";
+import { detailsByProfileId, getSkillIcon, TeamProposalBottomSheet } from "./GiutHubProfilePage";
 import { S } from "./PortfolioDetailPage.styles";
 
 export function PortfolioDetailPage() {
   const navigate = useNavigate();
+  const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const { profileNumber, portfolioNumber } = useParams();
   const profile = giutHubProfiles.find((item) => item.profileNumber === Number(profileNumber));
   const portfolio = profile && detailsByProfileId[profile.id]?.portfolios[Number(portfolioNumber) - 1];
@@ -36,7 +38,8 @@ export function PortfolioDetailPage() {
           <S.StackList>{detailsByProfileId[profile.id].skills.slice(0, 3).map((skill, index) => <S.Stack $index={index} key={skill}>{getSkillIcon(skill) && <img alt="" src={getSkillIcon(skill)} />}{skill}</S.Stack>)}</S.StackList>
         </S.Body>
       </S.Content>
-      <S.ProposalBar><S.ProposalButton type="button"><Icon name="users" size={23} weight="regular" />{profile.name}에게 팀 제안하기</S.ProposalButton></S.ProposalBar>
+      <S.ProposalBar><S.ProposalButton onClick={() => setIsProposalSheetOpen(true)} type="button"><Icon name="users" size={23} weight="regular" />{profile.name}에게 팀 제안하기</S.ProposalButton></S.ProposalBar>
+      <TeamProposalBottomSheet onClose={() => setIsProposalSheetOpen(false)} open={isProposalSheetOpen} profileName={profile.name} />
     </S.Page>
   );
 }

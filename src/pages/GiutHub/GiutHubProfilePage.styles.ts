@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
 import { tokens } from "../../design-system/tokens.generated";
 
+const giutHubPrimary = "#1C4EA3";
+
 type AvatarTone = "blue" | "purple" | "orange" | "green";
 
 export const S = {
@@ -166,7 +168,7 @@ export const S = {
     padding: 0 16px 30px;
     background: ${tokens.color.neutral[50]};
 
-    > button:first-of-type { height: auto; gap: 9px; padding: 14px 12px; border-radius: 14px; font-size: 16px; }
+    > button:first-of-type { height: auto; gap: 9px; padding: 14px 12px; border-radius: 14px; background: ${giutHubPrimary}; font-size: 16px; }
   `,
   MessageButton: styled.button`
     display: inline-flex;
@@ -279,7 +281,7 @@ export const S = {
     padding: 6px 9px;
     border-radius: 8px;
     background: ${tokens.color.primary[100]};
-    color: ${tokens.color.primary[500]};
+    color: ${giutHubPrimary};
     font-size: 11px;
     font-weight: 700;
   `,
@@ -333,7 +335,7 @@ export const S = {
     height: 16px;
     margin-top: 3px;
     border-radius: 50%;
-    background: ${tokens.color.primary[500]};
+    background: ${giutHubPrimary};
   `,
   ActivityCopy: styled.div`
     min-width: 0;
@@ -357,5 +359,101 @@ export const S = {
     padding: 64px 20px;
     color: ${tokens.color.neutral[500]};
     text-align: center;
+  `,
+  ProposalHeading: styled.h2`
+    margin: 4px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.7px;
+  `,
+  ProposalDescription: styled.p`
+    margin: 8px 0 14px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 11px;
+    letter-spacing: -.4px;
+  `,
+  ProposalTeamList: styled.div`
+    display: grid;
+    gap: 9px;
+  `,
+  ProposalTeamCard: styled.button<{ $selected: boolean; $disabled: boolean }>`
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 12px;
+    border: 1px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${({ $selected }) => $selected ? "#f3f6ff" : tokens.color.neutral[50]};
+    color: ${({ $disabled }) => $disabled ? tokens.color.neutral[500] : tokens.color.neutral[900]};
+    font: inherit;
+    text-align: left;
+    cursor: ${({ $disabled }) => $disabled ? "not-allowed" : "pointer"};
+
+    > span { display: grid; gap: 5px; min-width: 0; }
+    strong { font-size: 13px; font-weight: 800; letter-spacing: -.5px; }
+    small { color: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[500]}; font-size: 10px; letter-spacing: -.35px; line-height: 1.35; }
+    em { padding: 6px 8px; border-radius: 7px; background: ${tokens.color.neutral[100]}; color: ${tokens.color.neutral[500]}; font-size: 9px; font-style: normal; }
+  `,
+  ProposalRadio: styled.span<{ $selected: boolean }>`
+    display: grid;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+    border: 1.5px solid ${({ $selected }) => $selected ? giutHubPrimary : "#b7c0d0"};
+    border-radius: 50%;
+    background: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[50]};
+  `,
+  ProposalPositionTitle: styled.h3`
+    margin: 16px 0 9px;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    font-weight: 800;
+  `,
+  ProposalPositionList: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  `,
+  ProposalPosition: styled.button<{ $selected: boolean }>`
+    padding: 10px 14px;
+    border: 1px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border-radius: 999px;
+    background: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[50]};
+    color: ${({ $selected }) => $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  `,
+  ProposalFooter: styled.div`
+    display: grid;
+    grid-template-columns: .65fr 1.85fr;
+    gap: 10px;
+  `,
+  ProposalCancelButton: styled.button`
+    padding: 13px 10px;
+    border: 0;
+    border-radius: 11px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  `,
+  ProposalConfirmButton: styled.button`
+    padding: 13px 10px;
+    border: 0;
+    border-radius: 11px;
+    background: ${giutHubPrimary};
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
   `,
 };

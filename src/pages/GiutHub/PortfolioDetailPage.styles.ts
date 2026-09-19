@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
 import { tokens } from "../../design-system/tokens.generated";
 
+const giutHubPrimary = "#1C4EA3";
+
 type AvatarTone = "blue" | "purple" | "orange" | "green";
 
 export const S = {
@@ -52,7 +54,7 @@ export const S = {
     place-items: center;
     border-radius: 14px;
     background: ${({ $tone }) => ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[$tone]};
-    color: ${tokens.color.primary[500]};
+    color: ${giutHubPrimary};
     font-size: 24px;
     font-weight: 800;
     img { width: 100%; height: 100%; object-fit: cover; }
@@ -77,7 +79,7 @@ export const S = {
     h2 { margin: 0; padding-top: 21px; color: ${tokens.color.neutral[900]}; font-size: 20px; font-weight: 800; letter-spacing: -.8px; }
     p { margin: 14px 0 0; color: ${tokens.color.neutral[700]}; font-size: 15px; letter-spacing: -.45px; line-height: 1.65; }
     ul { display: grid; gap: 8px; margin: 14px 0 0; padding: 0 0 20px 19px; border-bottom: 1px solid ${tokens.color.neutral[200]}; color: ${tokens.color.neutral[700]}; font-size: 15px; line-height: 1.5; }
-    li::marker { color: ${tokens.color.primary[500]}; }
+    li::marker { color: ${giutHubPrimary}; }
     strong { font-weight: 800; }
   `,
   StackTitle: styled.h2`

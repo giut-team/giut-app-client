@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
+import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
 import dataDashboard from "../../assets/portfolio/data-dashboard.png";
@@ -13,6 +14,15 @@ import { S } from "./GiutHubProfilePage.styles";
 export type Portfolio = { title: string; description: string; image: string; markdown: string };
 export type ProfileDetail = { skills: string[]; portfolios: Portfolio[] };
 type Activity = { title: string; description: string };
+type ProposalTeam = { id: string; name: string; summary: string; disabled?: boolean };
+
+const proposalTeams: ProposalTeam[] = [
+  { id: "data-seoul", name: "데이터로 서울을", summary: "서울시 데이터 공모전 · 3/5명 · 백엔드 개발자 1자리" },
+  { id: "calendar-hackathon", name: "캘린더 해커톤 4팀", summary: "제 12회 캘린더 해커톤 · 2/5명 · 백엔드 개발자 2자리" },
+  { id: "greentech", name: "그린테크 스터디팀", summary: "모집 마감 · 남은 자리 없음", disabled: true },
+];
+
+const proposalPositions = ["백엔드 개발자", "데이터 엔지니어"];
 
 const skillIconFileNames: Record<string, string> = {
   Python: "python", SQL: "sql", "데이터 시각화": "data-visualization", 프론트엔드: "frontend",
@@ -64,11 +74,48 @@ const activitiesByProfileId: Record<string, Activity[]> = {
   minho: [{ title: "데이터 마케팅 공모전 수상", description: "마케팅 · 4인 팀" }, { title: "광고 성과 분석 프로젝트", description: "GA · 데이터 분석" }],
 };
 
+export function TeamProposalBottomSheet({
+  open,
+  profileName,
+  onClose,
+}: {
+  open: boolean;
+  profileName: string;
+  onClose: () => void;
+}) {
+  const [selectedProposalTeam, setSelectedProposalTeam] = useState("data-seoul");
+  const [selectedProposalPosition, setSelectedProposalPosition] = useState(proposalPositions[0]);
+
+  return (
+    <BottomSheet
+      footer={<S.ProposalFooter><S.ProposalCancelButton onClick={onClose} type="button">취소</S.ProposalCancelButton><S.ProposalConfirmButton onClick={onClose} type="button">이 팀으로 제안 보내기</S.ProposalConfirmButton></S.ProposalFooter>}
+      footerVariant="action"
+      minHeight="min(76svh, 570px)"
+      onClose={onClose}
+      open={open}
+      showHeaderDivider={false}
+      variant="compact"
+    >
+      <S.ProposalHeading>어느 팀으로 제안할까요?</S.ProposalHeading>
+      <S.ProposalDescription>{profileName}님에게 보낼 팀을 골라주세요. 내가 팀장인 팀만 보여요.</S.ProposalDescription>
+      <S.ProposalTeamList aria-label="제안할 팀 선택">
+        {proposalTeams.map((team) => {
+          const selected = selectedProposalTeam === team.id;
+          return <S.ProposalTeamCard $disabled={team.disabled === true} $selected={selected} aria-pressed={selected} disabled={team.disabled} key={team.id} onClick={() => setSelectedProposalTeam(team.id)} type="button"><S.ProposalRadio $selected={selected}>{selected && <Icon name="check" size={13} weight="bold" />}</S.ProposalRadio><span><strong>{team.name}</strong><small>{team.summary}</small></span>{team.disabled && <em>선택 불가</em>}</S.ProposalTeamCard>;
+        })}
+      </S.ProposalTeamList>
+      <S.ProposalPositionTitle>제안할 포지션</S.ProposalPositionTitle>
+      <S.ProposalPositionList>{proposalPositions.map((position) => <S.ProposalPosition $selected={selectedProposalPosition === position} aria-pressed={selectedProposalPosition === position} key={position} onClick={() => setSelectedProposalPosition(position)} type="button">{position}</S.ProposalPosition>)}</S.ProposalPositionList>
+    </BottomSheet>
+  );
+}
+
 export function GiutHubProfilePage() {
   const navigate = useNavigate();
   const { profileNumber } = useParams();
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
   const [isScrapped, setIsScrapped] = useState(false);
+  const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const profile = giutHubProfiles.find((item) => item.profileNumber === Number(profileNumber));
   if (!profile) return <Navigate replace to="/giut-hub" />;
 
@@ -98,7 +145,7 @@ export function GiutHubProfilePage() {
         </S.Metrics>
         <S.SkillList aria-label="보유 기술">{detail.skills.map((skill, index) => <S.Skill $index={index} key={skill}>{getSkillIcon(skill) && <img alt="" src={getSkillIcon(skill)} />}{skill}</S.Skill>)}</S.SkillList>
         <S.ActionRow>
-          <Button onClick={() => undefined} type="button" width="100%"><Icon name="paper-plane" size={19} weight="fill" />팀 제안 보내기</Button>
+          <Button onClick={() => setIsProposalSheetOpen(true)} type="button" width="100%"><Icon name="paper-plane" size={19} weight="fill" />팀 제안 보내기</Button>
           <S.MessageButton onClick={() => undefined} type="button"><Icon name="chat" size={20} weight="regular" />메시지 보내기</S.MessageButton>
           <S.FavoriteButton $active={isScrapped} aria-label="관심 프로필에 추가" onClick={() => setIsScrapped((current) => !current)} type="button"><Icon name="star" size={21} weight={isScrapped ? "fill" : "regular"} /></S.FavoriteButton>
         </S.ActionRow>
@@ -117,6 +164,7 @@ export function GiutHubProfilePage() {
           </S.PortfolioContent>
         ) : <S.ActivityList>{activities.map((activity, index) => <S.ActivityItem $last={index === activities.length - 1} key={activity.title}><S.ActivityDot /><S.ActivityCopy><S.ActivityTitle>{activity.title}</S.ActivityTitle><S.ActivityDescription>{activity.description}</S.ActivityDescription></S.ActivityCopy></S.ActivityItem>)}</S.ActivityList>}
       </S.Content>
+      <TeamProposalBottomSheet onClose={() => setIsProposalSheetOpen(false)} open={isProposalSheetOpen} profileName={profile.name} />
     </S.Page>
   );
 }
