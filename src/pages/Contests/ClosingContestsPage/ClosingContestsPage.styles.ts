@@ -145,7 +145,7 @@ export const S = {
     letter-spacing: -0.3px;
   `,
   SectionMeta: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 500;
   `,
@@ -234,7 +234,7 @@ export const S = {
   Organization: styled.p`
     margin: 0;
     overflow: hidden;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 8px;
     font-weight: 500;
     text-overflow: ellipsis;
@@ -263,7 +263,7 @@ export const S = {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    color: ${tokens.color.neutral[500]};
+    color: #000;
   `,
   Stat: styled.span`
     display: inline-flex;

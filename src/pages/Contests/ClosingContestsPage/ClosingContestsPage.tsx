@@ -214,8 +214,6 @@ export function ClosingContestsPage() {
       <PageHeader onBack={() => navigate(-1)} title="이번 주 마감" />
       <S.Content>
         <S.FilterArea>
-          <S.Intro>7일 안에 접수가 끝나는 공모전이에요</S.Intro>
-
           <S.FilterList aria-label="공모전 카테고리">
             {categories.map((category) => (
               <PillButton
