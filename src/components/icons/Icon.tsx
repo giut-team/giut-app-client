@@ -34,7 +34,6 @@ import {
   UserPlus,
   UsersThree,
   Star,
-  DotsThree,
   Warning,
   X,
   type IconProps as PhosphorIconProps,
@@ -77,7 +76,6 @@ export type IconName =
   | "user-plus"
   | "users"
   | "star"
-  | "more"
   | "warning"
   | "x";
 
@@ -119,7 +117,6 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "user-plus": UserPlus,
   users: UsersThree,
   star: Star,
-  more: DotsThree,
   warning: Warning,
   x: X,
 };
