@@ -60,3 +60,14 @@
 - Code checks: `npm.cmd run lint` and `npm.cmd run build` passed after the direct-input form update.
 
 final result: blocked
+
+## Chat list update
+
+- Source visual truth: mobile chat-list screenshot supplied in this conversation.
+- Implementation route: `/chat`.
+- Implemented surfaces: chat header and search affordance, all/unread tabs, three chat previews, the unread count badge, and the fixed bottom navigation with the chat tab active.
+- Primary interactions: the unread tab filters the list; opening the unread conversation clears its unread state; the search icon opens an inline search field that filters by name or team title; bottom navigation links to Home, GiutHub, and My Page.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime remains unavailable, so the supplied 355px-wide reference cannot be visually overlaid against the implementation.
+- Code checks: `npm.cmd run build` passed. `npm.cmd run lint` remains blocked by five pre-existing `react-refresh/only-export-components` errors in `GiutHubPage.tsx` and `GiutHubProfilePage.tsx`; no chat-page lint errors were reported.
+
+final result: blocked

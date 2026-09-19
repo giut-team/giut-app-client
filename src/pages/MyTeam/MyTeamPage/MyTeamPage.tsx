@@ -438,6 +438,7 @@ export function MyTeamPage() {
           setActiveNavigation(key);
           if (key === "home") navigate("/home");
           if (key === "hub") navigate("/giut-hub");
+          if (key === "chat") navigate("/chat");
         }}
       />
     </S.Page>
