@@ -409,6 +409,169 @@ export const S = {
     border: 0;
     background: ${tokens.color.neutral[200]};
   `,
+  ShareHeading: styled.h2`
+    margin: 4px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.8px;
+  `,
+  ShareDescription: styled.p`
+    margin: 12px 0 20px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 14px;
+    letter-spacing: -.45px;
+  `,
+  ShareLinkBox: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 13px 12px 19px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 18px;
+    background: ${tokens.color.neutral[100]};
+
+    code { min-width: 0; color: ${tokens.color.neutral[700]}; overflow: hidden; font-family: inherit; font-size: 14px; letter-spacing: -.3px; text-overflow: ellipsis; white-space: nowrap; }
+  `,
+  CopyButton: styled.button`
+    flex: 0 0 auto;
+    padding: 11px 17px;
+    border: 0;
+    border-radius: 12px;
+    background: ${giutHubPrimary};
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ShareChannelList: styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 22px 0 28px;
+  `,
+  ShareChannel: styled.button`
+    display: grid;
+    place-items: center;
+    gap: 10px;
+    padding: 17px 6px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:active { background: ${tokens.color.neutral[100]}; }
+  `,
+  ShareChannelIcon: styled.span`
+    display: grid;
+    width: 48px;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 15px;
+    background: #edf2fb;
+    color: ${giutHubPrimary};
+  `,
+  KakaoMark: styled.span`
+    display: grid;
+    width: 48px;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 15px;
+    background: #ffe500;
+    color: #371d1e;
+  `,
+  ShareCloseButton: styled.button`
+    width: 100%;
+    padding: 17px 12px calc(17px + var(--app-safe-bottom));
+    border: 0;
+    border-radius: 18px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ReportReasonList: styled.div`
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+  `,
+  ReportReason: styled.button<{ $selected: boolean }>`
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 17px 18px;
+    border: 2px solid ${({ $selected }) => $selected ? tokens.color.danger[500] : tokens.color.neutral[200]};
+    border-radius: 16px;
+    background: ${({ $selected }) => $selected ? "#fff4f4" : tokens.color.neutral[50]};
+    color: ${({ $selected }) => $selected ? "#ce292f" : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -.45px;
+    text-align: left;
+    cursor: pointer;
+  `,
+  ReportRadio: styled.span<{ $selected: boolean }>`
+    display: grid;
+    width: 22px;
+    aspect-ratio: 1;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 2px solid ${({ $selected }) => $selected ? tokens.color.danger[500] : "#cbd3e0"};
+    border-radius: 50%;
+    background: ${({ $selected }) => $selected ? tokens.color.danger[500] : "transparent"};
+
+    &::after { width: 6px; aspect-ratio: 1; border-radius: 50%; background: ${tokens.color.neutral[50]}; content: ${({ $selected }) => $selected ? '""' : "none"}; }
+  `,
+  BlockNotice: styled.div`
+    display: grid;
+    gap: 10px;
+    margin-top: 24px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -.4px;
+  `,
+  DangerDialogActions: styled.div`
+    display: grid;
+    grid-template-columns: .95fr 1.35fr;
+    gap: 12px;
+    margin-top: 26px;
+  `,
+  DialogCancelButton: styled.button`
+    padding: 16px 10px;
+    border: 0;
+    border-radius: 16px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  DialogDangerButton: styled.button`
+    padding: 16px 10px;
+    border: 0;
+    border-radius: 16px;
+    background: ${tokens.color.danger[500]};
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
   ProposalHeading: styled.h2`
     margin: 4px 0 0;
     color: ${tokens.color.neutral[900]};

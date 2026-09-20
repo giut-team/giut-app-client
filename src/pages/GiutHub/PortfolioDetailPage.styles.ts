@@ -42,6 +42,104 @@ export const S = {
     border: 0;
     background: transparent;
     color: ${tokens.color.neutral[900]};
+    cursor: pointer;
+  `,
+  SharePreview: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 26px;
+    padding: 19px 20px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 18px;
+    background: ${tokens.color.neutral[100]};
+
+    span { display: grid; min-width: 0; gap: 6px; }
+    strong { overflow: hidden; color: ${tokens.color.neutral[900]}; font-size: 15px; font-weight: 800; letter-spacing: -.55px; text-overflow: ellipsis; white-space: nowrap; }
+    small { color: ${tokens.color.neutral[500]}; font-size: 13px; letter-spacing: -.4px; }
+  `,
+  SharePreviewThumbnail: styled.span`
+    display: block;
+    width: 58px;
+    aspect-ratio: 1;
+    flex: 0 0 auto;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #d6e8ff, #a6c9f8);
+  `,
+  ShareLinkBox: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 12px 13px 12px 18px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 18px;
+    background: ${tokens.color.neutral[100]};
+
+    code { min-width: 0; overflow: hidden; color: ${tokens.color.neutral[700]}; font-family: inherit; font-size: 14px; letter-spacing: -.3px; text-overflow: ellipsis; white-space: nowrap; }
+  `,
+  CopyButton: styled.button`
+    flex: 0 0 auto;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 12px;
+    background: ${giutHubPrimary};
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ShareChannelList: styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 22px 0 28px;
+  `,
+  ShareChannel: styled.button`
+    display: grid;
+    place-items: center;
+    gap: 9px;
+    padding: 17px 5px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  `,
+  ShareChannelIcon: styled.span`
+    display: grid;
+    width: 48px;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 15px;
+    background: #edf2fb;
+    color: ${giutHubPrimary};
+  `,
+  KakaoMark: styled.span`
+    display: grid;
+    width: 48px;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 15px;
+    background: #ffe500;
+    color: #371d1e;
+  `,
+  ShareCloseButton: styled.button`
+    width: 100%;
+    padding: 17px 12px;
+    border: 0;
+    border-radius: 18px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
   `,
   HeroImage: styled.div`
     aspect-ratio: 1.58;

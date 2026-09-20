@@ -112,6 +112,7 @@ export const giutHubProfiles: GiutHubProfile[] = [
     recommendationCount: 2,
     avatarFallback: "최",
     avatarTone: "green",
+    avatarSrc: designerFemale
   },
   {
     profileNumber: 11,
@@ -131,6 +132,7 @@ export const giutHubProfiles: GiutHubProfile[] = [
     recommendationCount: 2,
     avatarFallback: "박",
     avatarTone: "purple",
+    avatarSrc: developerMale,
   },
   {
     profileNumber: 10,
@@ -150,6 +152,7 @@ export const giutHubProfiles: GiutHubProfile[] = [
     recommendationCount: 3,
     avatarFallback: "김",
     avatarTone: "blue",
+    avatarSrc: developerMale,
   },
   {
     profileNumber: 1,
@@ -335,6 +338,9 @@ export const giutHubProfiles: GiutHubProfile[] = [
 ];
 
 const profileFilterData: Record<string, { grade: Grade; department: string; teamStatus: TeamStatus }> = {
+  "kim-hyeonjin": { grade: 3, department: "컴퓨터과학부", teamStatus: "바로 합류 가능" },
+  "park-seojun": { grade: 4, department: "통계학과", teamStatus: "바로 합류 가능" },
+  "choi-yuna": { grade: 3, department: "디자인학과", teamStatus: "바로 합류 가능" },
   minjae: { grade: 3, department: "컴퓨터과학부", teamStatus: "바로 합류 가능" },
   seoyeon: { grade: 3, department: "경영학부", teamStatus: "바로 합류 가능" },
   jiwoo: { grade: 2, department: "디자인학과", teamStatus: "제안 검토 중" },
