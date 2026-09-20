@@ -512,7 +512,7 @@ export function GiutHubPage() {
         onChange={(key) => {
           if (key === "home") navigate("/home");
           if (key === "chat") navigate("/chat");
-          if (key === "mypage") navigate("/my-team");
+          if (key === "mypage") navigate("/my-profile");
         }}
       />
       <BottomSheet

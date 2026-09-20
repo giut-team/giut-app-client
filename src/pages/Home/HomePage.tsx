@@ -94,7 +94,7 @@ export function HomePage() {
     if (isTeamButtonAnimating) return;
 
     setIsTeamButtonAnimating(true);
-    window.setTimeout(() => navigate("/my-team"), 180);
+    window.setTimeout(() => navigate("/my-profile"), 180);
   };
 
   return (
@@ -266,7 +266,7 @@ export function HomePage() {
           setActiveNavigation(key);
           if (key === "hub") navigate("/giut-hub");
           if (key === "chat") navigate("/chat");
-          if (key === "mypage") navigate("/my-team");
+          if (key === "mypage") navigate("/my-profile");
         }}
       />
     </S.Page>
