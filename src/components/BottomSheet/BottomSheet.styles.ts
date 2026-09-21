@@ -71,9 +71,10 @@ export const S = {
     line-height: 1;
     cursor: pointer;
   `,
-  Content: styled.div`
+  Content: styled.div<{ $fill?: boolean }>`
     min-height: 0;
     flex: 1;
+    ${({ $fill }) => $fill && "display: flex; flex-direction: column; overflow: hidden;"}
   `,
   Options: styled.div`
     border-bottom: 1px solid ${tokens.color.neutral[200]};

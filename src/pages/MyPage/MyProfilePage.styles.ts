@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { tokens } from "../../design-system/tokens.generated";
 
 const primary = "#24449a";
+type ScrapTone = "green" | "blue" | "purple" | "pink" | "orange";
 
 export const S = {
   Page: styled.main`
@@ -278,5 +279,154 @@ export const S = {
   SimpleCopy: styled.div`
     display: grid;
     gap: 7px;
+  `,
+  ScrapContent: styled.section`
+    padding: 14px 12px 28px;
+  `,
+  ScrapFilterList: styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 6px;
+    border-radius: 18px;
+    background: #e9ecf4;
+  `,
+  ScrapFilterButton: styled.button<{ $active: boolean }>`
+    padding: 13px 5px;
+    border: 0;
+    border-radius: 13px;
+    background: ${({ $active }) => $active ? tokens.color.neutral[50] : "transparent"};
+    box-shadow: ${({ $active }) => $active ? "0 2px 5px rgb(38 50 71 / 12%)" : "none"};
+    color: ${({ $active }) => $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  ScrapGroup: styled.section`
+    margin-top: 23px;
+  `,
+  ScrapGroupTitle: styled.h2`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 13px;
+    color: ${tokens.color.neutral[700]};
+  `,
+  ScrapGroupLabel: styled.span<{ $team?: boolean }>`
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+
+    > span { width: 11px; aspect-ratio: 1; border-radius: 50%; background: ${({ $team }) => $team ? "#7a4bd3" : "#2b57ed"}; }
+    em { color: ${tokens.color.neutral[500]}; font-style: normal; }
+  `,
+  ViewAllButton: styled.button`
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  `,
+  ScrapCardList: styled.div`
+    display: grid;
+    gap: 14px;
+  `,
+  ScrapPostCard: styled.article`
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 13px;
+    min-height: 96px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  ScrapThumbnail: styled.span<{ $tone: ScrapTone }>`
+    width: 56px;
+    aspect-ratio: 1;
+    border-radius: 13px;
+    background: ${({ $tone }) => ({ green: "linear-gradient(135deg, #d1f4df, #93d8b5)", blue: "linear-gradient(135deg, #d9e9ff, #99c4f5)", purple: "linear-gradient(135deg, #e4ddff, #aea0ef)", pink: "linear-gradient(135deg, #ffe0ef, #eca5c7)", orange: "linear-gradient(135deg, #ffe7c4, #f6bf77)" })[$tone]};
+  `,
+  ScrapPostCopy: styled.div`
+    display: grid;
+    min-width: 0;
+    gap: 5px;
+
+    > span { display: flex; align-items: center; gap: 9px; }
+    > span > small { color: ${tokens.color.neutral[500]}; font-size: 10px; }
+    strong { overflow: hidden; color: ${tokens.color.neutral[900]}; font-size: 13px; font-weight: 800; letter-spacing: -.55px; text-overflow: ellipsis; white-space: nowrap; }
+    p { margin: 0; color: ${tokens.color.neutral[500]}; font-size: 10px; }
+  `,
+  ScrapCategory: styled.span<{ $tone: ScrapTone }>`
+    width: fit-content;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: ${({ $tone }) => ({ green: "#e3f8ea", blue: "#e3efff", purple: "#f0e9ff", pink: "#fee9f5", orange: "#fff0dc" })[$tone]};
+    color: ${({ $tone }) => ({ green: "#14884d", blue: "#2b57ed", purple: "#7544cb", pink: "#d54391", orange: "#bd6b0d" })[$tone]};
+    font-size: 9px;
+    font-weight: 800;
+  `,
+  ScrapPostAction: styled.div`
+    display: grid;
+    align-content: center;
+    justify-items: end;
+    gap: 12px;
+    color: #2b57ed;
+
+    b { color: ${tokens.color.danger[500]}; font-size: 11px; font-weight: 800; }
+  `,
+  ScrapTeamCard: styled.article`
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 13px;
+    min-height: 96px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  TeamThumbnail: styled.span`
+    display: grid;
+    width: 56px;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 13px;
+    background: ${tokens.color.neutral[100]};
+    color: #66728a;
+  `,
+  ScrapTeamCopy: styled.div`
+    display: grid;
+    min-width: 0;
+    gap: 5px;
+
+    > span { display: flex; align-items: center; gap: 8px; }
+    > span > small { color: #16845b; font-size: 10px; font-weight: 700; }
+    strong { color: ${tokens.color.neutral[900]}; font-size: 13px; font-weight: 800; }
+    p { margin: 0; color: ${tokens.color.neutral[500]}; font-size: 10px; }
+  `,
+  TeamBadge: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #f0e9ff;
+    color: #7544cb;
+    font-size: 9px;
+    font-weight: 800;
+  `,
+  ScrapTeamAction: styled.span`
+    display: grid;
+    gap: 9px;
+    color: #2b57ed;
+
+    svg:last-child { color: #a8b1c0; }
   `,
 };

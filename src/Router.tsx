@@ -27,6 +27,7 @@ import { StudentVerificationPage } from "./pages/StudentVerification/StudentVeri
 import { ChatPage } from "./pages/Chat/ChatPage";
 import { ChatRoomPage } from "./pages/Chat/ChatRoomPage";
 import { MyProfilePage } from "./pages/MyPage/MyProfilePage";
+import { ProfileEditPage, ProfileRoleDetailPage } from "./pages/MyPage/ProfileEditPage";
 
 export function AppRouter() {
   return (
@@ -96,6 +97,8 @@ export function AppRouter() {
         <Route element={<MatchedTeamsPage />} path="/matched-teams" />
         <Route element={<MyTeamPage />} path="/my-team" />
         <Route element={<MyProfilePage />} path="/my-profile" />
+        <Route element={<ProfileEditPage />} path="/my-profile/edit" />
+        <Route element={<ProfileRoleDetailPage />} path="/my-profile/edit/roles/:roleId" />
         <Route
           element={<MyApplicationPage />}
           path="/my-team/my-application/:applicationStatus?"
