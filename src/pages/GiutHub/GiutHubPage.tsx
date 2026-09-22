@@ -17,7 +17,11 @@ import { S } from "./GiutHubPage.styles";
 type Category = "전체" | "기획" | "디자인" | "개발" | "마케팅";
 type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
 type Position = "기획" | "디자인" | "개발" | "마케팅";
-type TeamStatus = "전체" | "바로 합류 가능" | "제안 검토 중" | "일정 조율 필요";
+type TeamStatus =
+  | "전체"
+  | "바로 합류 가능"
+  | "제안 검토 중"
+  | "일정 조율 필요";
 type Grade = 1 | 2 | 3 | 4;
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
 
@@ -52,7 +56,10 @@ export type GiutHubProfile = {
 };
 
 const categories: Category[] = ["전체", "기획", "디자인", "개발", "마케팅"];
-const positionOptions: { value: Position; icon: "edit" | "palette" | "code" | "megaphone" }[] = [
+const positionOptions: {
+  value: Position;
+  icon: "edit" | "palette" | "code" | "megaphone";
+}[] = [
   { value: "기획", icon: "edit" },
   { value: "디자인", icon: "palette" },
   { value: "개발", icon: "code" },
@@ -71,11 +78,47 @@ const gradeOptions: { value: Grade; label: string }[] = [
   { value: 4, label: "4학년 이상" },
 ];
 const departments: { name: string; category: DepartmentCategory }[] = [
-  ["행정학과", "전체"], ["국제관계학과", "전체"], ["경제학부", "경영·경제"], ["사회복지학과", "전체"], ["세무학과", "경영·경제"], ["경영학부", "경영·경제"],
-  ["전자전기컴퓨터공학부", "IT·공학"], ["화학공학과", "IT·공학"], ["기계정보공학과", "IT·공학"], ["신소재공학과", "IT·공학"], ["토목공학과", "IT·공학"],
-  ["영어영문학과", "전체"], ["국어국문학과", "전체"], ["국사학과", "전체"], ["철학과", "전체"], ["중국어문화학과", "전체"], ["수학과", "전체"], ["통계학과", "전체"], ["물리학과", "전체"], ["생명과학과", "전체"], ["환경원예학과", "IT·공학"], ["융합응용화학과", "IT·공학"],
-  ["건축학부 건축공학전공", "IT·공학"], ["건축학부 건축학전공", "IT·공학"], ["도시공학과", "IT·공학"], ["교통공학과", "IT·공학"], ["조경학과", "디자인"], ["도시행정학과", "전체"], ["도시사회학과", "전체"], ["공간정보공학과", "IT·공학"], ["환경공학부", "IT·공학"], ["소방방재학과", "IT·공학"],
-  ["음악학과", "디자인"], ["디자인학과", "디자인"], ["조각학과", "디자인"], ["스포츠과학과", "전체"], ["자유전공학부", "전체"], ["융합전공학부", "전체"], ["컴퓨터과학부", "IT·공학"], ["인공지능학과", "IT·공학"], ["첨단융합학부", "IT·공학"],
+  ["행정학과", "전체"],
+  ["국제관계학과", "전체"],
+  ["경제학부", "경영·경제"],
+  ["사회복지학과", "전체"],
+  ["세무학과", "경영·경제"],
+  ["경영학부", "경영·경제"],
+  ["전자전기컴퓨터공학부", "IT·공학"],
+  ["화학공학과", "IT·공학"],
+  ["기계정보공학과", "IT·공학"],
+  ["신소재공학과", "IT·공학"],
+  ["토목공학과", "IT·공학"],
+  ["영어영문학과", "전체"],
+  ["국어국문학과", "전체"],
+  ["국사학과", "전체"],
+  ["철학과", "전체"],
+  ["중국어문화학과", "전체"],
+  ["수학과", "전체"],
+  ["통계학과", "전체"],
+  ["물리학과", "전체"],
+  ["생명과학과", "전체"],
+  ["환경원예학과", "IT·공학"],
+  ["융합응용화학과", "IT·공학"],
+  ["건축학부 건축공학전공", "IT·공학"],
+  ["건축학부 건축학전공", "IT·공학"],
+  ["도시공학과", "IT·공학"],
+  ["교통공학과", "IT·공학"],
+  ["조경학과", "디자인"],
+  ["도시행정학과", "전체"],
+  ["도시사회학과", "전체"],
+  ["공간정보공학과", "IT·공학"],
+  ["환경공학부", "IT·공학"],
+  ["소방방재학과", "IT·공학"],
+  ["음악학과", "디자인"],
+  ["디자인학과", "디자인"],
+  ["조각학과", "디자인"],
+  ["스포츠과학과", "전체"],
+  ["자유전공학부", "전체"],
+  ["융합전공학부", "전체"],
+  ["컴퓨터과학부", "IT·공학"],
+  ["인공지능학과", "IT·공학"],
+  ["첨단융합학부", "IT·공학"],
 ].map(([name, category]) => ({ name, category: category as DepartmentCategory }));
 const mockRecentAccessAt = (hoursAgo: number) =>
   new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
@@ -104,7 +147,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "최유나",
     available: true,
     summary: "디자인 · 산업디자인학과 3학년",
-    introduction: "사용자에게 필요한 정보를 직관적인 화면으로 전달하는 일을 좋아해요.",
+    introduction:
+      "사용자에게 필요한 정보를 직관적인 화면으로 전달하는 일을 좋아해요.",
     tags: ["UI 디자인", "Figma", "발표 자료"],
     projectCount: 2,
     lastActiveAt: mockRecentAccessAt(4),
@@ -112,7 +156,7 @@ export const giutHubProfiles: GiutHubProfile[] = [
     recommendationCount: 2,
     avatarFallback: "최",
     avatarTone: "green",
-    avatarSrc: designerFemale
+    avatarSrc: designerFemale,
   },
   {
     profileNumber: 11,
@@ -124,7 +168,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "박서준",
     available: true,
     summary: "개발 · 통계학과 4학년",
-    introduction: "데이터 속 패턴을 찾아 팀의 의사결정에 도움이 되는 분석을 만들고 싶어요.",
+    introduction:
+      "데이터 속 패턴을 찾아 팀의 의사결정에 도움이 되는 분석을 만들고 싶어요.",
     tags: ["데이터 분석", "Python", "시각화"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(5),
@@ -144,7 +189,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "김현진",
     available: true,
     summary: "개발 · 컴퓨터과학부 3학년",
-    introduction: "공공데이터를 활용해 문제를 해결하는 서비스 개발에 관심이 있어요.",
+    introduction:
+      "공공데이터를 활용해 문제를 해결하는 서비스 개발에 관심이 있어요.",
     tags: ["Spring", "PostgreSQL", "공공데이터"],
     projectCount: 2,
     lastActiveAt: mockRecentAccessAt(3),
@@ -164,7 +210,9 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "김민재",
     available: true,
     summary: "개발 · 컴퓨터과학부 3학년",
-    introduction: "AI로 더 편리한 캠퍼스 서비스를 만들고 싶어요.\n포트폴리오 프로젝트에 관심 있어요.",
+    introduction:
+      "AI로 더 편리한 캠퍼스 서비스를 만들고 싶어요.\n" +
+      "포트폴리오 프로젝트에 관심 있어요.",
     tags: ["AI/ML", "프론트엔드"],
     projectCount: 2,
     // 마지막 답장 2시간 전: 목업 기준 '응답 빠름'으로 표시됩니다.
@@ -205,7 +253,9 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "박지우",
     available: false,
     summary: "디자인 · 산업디자인학과 2학년",
-    introduction: "아이디어를 이해하기 쉬운 경험으로 만드는 데 관심 있어요.\n다음 공모전을 천천히 둘러보고 있어요.",
+    introduction:
+      "아이디어를 이해하기 쉬운 경험으로 만드는 데 관심 있어요.\n" +
+      "다음 공모전을 천천히 둘러보고 있어요.",
     tags: ["UX/UI", "Figma"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(18),
@@ -225,7 +275,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "최준서",
     available: true,
     summary: "개발 · 소프트웨어학부 2학년",
-    introduction: "완성도 높은 서비스를 함께 만들 동료를 찾고 있어요.",
+    introduction:
+      "완성도 높은 서비스를 함께 만들 동료를 찾고 있어요.",
     tags: ["백엔드", "Spring"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(9),
@@ -245,7 +296,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "정도현",
     available: true,
     summary: "기획 · 행정학과 4학년",
-    introduction: "팀의 방향을 함께 찾고 끝까지 실행하는 걸 좋아해요.",
+    introduction:
+      "팀의 방향을 함께 찾고 끝까지 실행하는 걸 좋아해요.",
     tags: ["서비스 기획", "리서치"],
     projectCount: 5,
     lastActiveAt: mockRecentAccessAt(13),
@@ -265,7 +317,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "김하윤",
     available: true,
     summary: "디자인 · 시각디자인학과 3학년",
-    introduction: "브랜드의 이야기를 설득력 있는 화면으로 풀어내고 싶어요.",
+    introduction:
+      "브랜드의 이야기를 설득력 있는 화면으로 풀어내고 싶어요.",
     tags: ["브랜딩", "UI 디자인"],
     projectCount: 2,
     lastActiveAt: mockRecentAccessAt(2),
@@ -285,7 +338,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "한수민",
     available: true,
     summary: "마케팅 · 경영학부 2학년",
-    introduction: "사람들의 마음을 움직이는 캠페인을 만들어 보고 싶어요.",
+    introduction:
+      "사람들의 마음을 움직이는 캠페인을 만들어 보고 싶어요.",
     tags: ["콘텐츠", "SNS 마케팅"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(12),
@@ -305,7 +359,8 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "이민호",
     available: false,
     summary: "마케팅 · 경제학부 3학년",
-    introduction: "데이터와 아이디어를 연결하는 마케팅을 좋아합니다.",
+    introduction:
+      "데이터와 아이디어를 연결하는 마케팅을 좋아합니다.",
     tags: ["데이터 분석", "광고 기획"],
     projectCount: 4,
     lastActiveAt: mockRecentAccessAt(24),
@@ -325,7 +380,9 @@ export const giutHubProfiles: GiutHubProfile[] = [
     name: "최유진",
     available: true,
     summary: "기획 · 경영학부 4학년",
-    introduction: "아이디어를 실제 서비스로 만드는 과정에 관심이 많아요. 함께 실행할 팀원을 찾고 있어요.",
+    introduction:
+      "아이디어를 실제 서비스로 만드는 과정에 관심이 많아요. " +
+      "함께 실행할 팀원을 찾고 있어요.",
     tags: ["사업 기획", "시장 분석"],
     projectCount: 3,
     lastActiveAt: mockRecentAccessAt(2),
@@ -337,14 +394,37 @@ export const giutHubProfiles: GiutHubProfile[] = [
   },
 ];
 
-const profileFilterData: Record<string, { grade: Grade; department: string; teamStatus: TeamStatus }> = {
-  "kim-hyeonjin": { grade: 3, department: "컴퓨터과학부", teamStatus: "바로 합류 가능" },
-  "park-seojun": { grade: 4, department: "통계학과", teamStatus: "바로 합류 가능" },
-  "choi-yuna": { grade: 3, department: "디자인학과", teamStatus: "바로 합류 가능" },
-  minjae: { grade: 3, department: "컴퓨터과학부", teamStatus: "바로 합류 가능" },
+const profileFilterData: Record<
+  string,
+  { grade: Grade; department: string; teamStatus: TeamStatus }
+> = {
+  "kim-hyeonjin": {
+    grade: 3,
+    department: "컴퓨터과학부",
+    teamStatus: "바로 합류 가능",
+  },
+  "park-seojun": {
+    grade: 4,
+    department: "통계학과",
+    teamStatus: "바로 합류 가능",
+  },
+  "choi-yuna": {
+    grade: 3,
+    department: "디자인학과",
+    teamStatus: "바로 합류 가능",
+  },
+  minjae: {
+    grade: 3,
+    department: "컴퓨터과학부",
+    teamStatus: "바로 합류 가능",
+  },
   seoyeon: { grade: 3, department: "경영학부", teamStatus: "바로 합류 가능" },
   jiwoo: { grade: 2, department: "디자인학과", teamStatus: "제안 검토 중" },
-  junseo: { grade: 2, department: "전자전기컴퓨터공학부", teamStatus: "일정 조율 필요" },
+  junseo: {
+    grade: 2,
+    department: "전자전기컴퓨터공학부",
+    teamStatus: "일정 조율 필요",
+  },
   dohyun: { grade: 4, department: "행정학과", teamStatus: "제안 검토 중" },
   hayoon: { grade: 3, department: "디자인학과", teamStatus: "바로 합류 가능" },
   soomin: { grade: 2, department: "경영학부", teamStatus: "바로 합류 가능" },
@@ -369,21 +449,41 @@ export function GiutHubPage() {
   const [selectedTeamStatus, setSelectedTeamStatus] = useState<TeamStatus>("전체");
   const [selectedGrades, setSelectedGrades] = useState<Grade[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
-  const [departmentCategory, setDepartmentCategory] = useState<DepartmentCategory>("전체");
+  const [departmentCategory, setDepartmentCategory] =
+    useState<DepartmentCategory>("전체");
   const [departmentQuery, setDepartmentQuery] = useState("");
 
   const visibleProfiles = useMemo(
-    () => giutHubProfiles.filter((profile) => {
-      const filterData = profileFilterData[profile.id];
-      const matchesCategory = activeCategory === "전체" || profile.category === activeCategory;
-      const matchesPosition = selectedPositions.length === 0 || selectedPositions.includes(profile.category);
-      const matchesStatus = selectedTeamStatus === "전체" || filterData.teamStatus === selectedTeamStatus;
-      const matchesGrade = selectedGrades.length === 0 || selectedGrades.includes(filterData.grade);
-      const matchesDepartment = selectedDepartments.length === 0 || selectedDepartments.includes(filterData.department);
+    () =>
+      giutHubProfiles.filter((profile) => {
+        const filterData = profileFilterData[profile.id];
+        const matchesCategory =
+          activeCategory === "전체" || profile.category === activeCategory;
+        const matchesPosition =
+          selectedPositions.length === 0 || selectedPositions.includes(profile.category);
+        const matchesStatus =
+          selectedTeamStatus === "전체" || filterData.teamStatus === selectedTeamStatus;
+        const matchesGrade =
+          selectedGrades.length === 0 || selectedGrades.includes(filterData.grade);
+        const matchesDepartment =
+          selectedDepartments.length === 0 ||
+          selectedDepartments.includes(filterData.department);
 
-      return matchesCategory && matchesPosition && matchesStatus && matchesGrade && matchesDepartment;
-    }),
-    [activeCategory, selectedDepartments, selectedGrades, selectedPositions, selectedTeamStatus],
+        return (
+          matchesCategory &&
+          matchesPosition &&
+          matchesStatus &&
+          matchesGrade &&
+          matchesDepartment
+        );
+      }),
+    [
+      activeCategory,
+      selectedDepartments,
+      selectedGrades,
+      selectedPositions,
+      selectedTeamStatus,
+    ],
   );
 
   const resetFilters = () => {
@@ -403,15 +503,25 @@ export function GiutHubPage() {
   };
 
   const toggleGrade = (grade: Grade) => {
-    setSelectedGrades((current) => current.includes(grade) ? current.filter((item) => item !== grade) : [...current, grade]);
+    setSelectedGrades((current) =>
+      current.includes(grade)
+        ? current.filter((item) => item !== grade)
+        : [...current, grade],
+    );
   };
 
   const toggleDepartment = (department: string) => {
-    setSelectedDepartments((current) => current.includes(department) ? current.filter((item) => item !== department) : [...current, department]);
+    setSelectedDepartments((current) =>
+      current.includes(department)
+        ? current.filter((item) => item !== department)
+        : [...current, department],
+    );
   };
 
-  const visibleDepartments = departments.filter(({ name, category }) =>
-    (departmentCategory === "전체" || category === departmentCategory) && name.includes(departmentQuery.trim()),
+  const visibleDepartments = departments.filter(
+    ({ name, category }) =>
+      (departmentCategory === "전체" || category === departmentCategory) &&
+      name.includes(departmentQuery.trim()),
   );
 
   const recommendationTitle =
@@ -421,7 +531,8 @@ export function GiutHubPage() {
 
   const isFilterApplied = (filter: FilterName) =>
     (filter === "포지션" && selectedPositions.length > 0) ||
-    (filter === "학과 및 학년" && (selectedGrades.length > 0 || selectedDepartments.length > 0)) ||
+    (filter === "학과 및 학년" &&
+      (selectedGrades.length > 0 || selectedDepartments.length > 0)) ||
     (filter === "현재 상태" && selectedTeamStatus !== "전체");
 
   return (
@@ -439,7 +550,8 @@ export function GiutHubPage() {
             필터 초기화
           </S.ResetButton>
           <S.FilterPanel aria-label="팀원 탐색 필터">
-            {(["포지션", "학과 및 학년", "현재 상태"] as FilterName[]).map((filter) => (
+            {(["포지션", "학과 및 학년", "현재 상태"] as FilterName[]).map(
+              (filter) => (
               <S.FilterButton
                 $active={isFilterApplied(filter)}
                 aria-pressed={isFilterApplied(filter)}
@@ -466,14 +578,49 @@ export function GiutHubPage() {
               >
                 {filter}
               </S.FilterButton>
-            ))}
+              ),
+            )}
           </S.FilterPanel>
-          {(selectedPositions.length > 0 || selectedGrades.length > 0 || selectedDepartments.length > 0 || selectedTeamStatus !== "전체") && (
+          {(selectedPositions.length > 0 ||
+            selectedGrades.length > 0 ||
+            selectedDepartments.length > 0 ||
+            selectedTeamStatus !== "전체") && (
             <S.AppliedFilters aria-label="적용된 필터">
-              {selectedPositions.map((position) => <S.AppliedFilter key={position} onClick={() => togglePosition(position)} type="button">{position} <span>×</span></S.AppliedFilter>)}
-              {selectedGrades.map((grade) => <S.AppliedFilter key={grade} onClick={() => toggleGrade(grade)} type="button">{typeof grade === "string" ? grade : `${grade}학년`} <span>×</span></S.AppliedFilter>)}
-              {selectedDepartments.map((department) => <S.AppliedFilter key={department} onClick={() => toggleDepartment(department)} type="button">{department} <span>×</span></S.AppliedFilter>)}
-              {selectedTeamStatus !== "전체" && <S.AppliedFilter onClick={() => setSelectedTeamStatus("전체")} type="button">{selectedTeamStatus} <span>×</span></S.AppliedFilter>}
+              {selectedPositions.map((position) => (
+                <S.AppliedFilter
+                  key={position}
+                  onClick={() => togglePosition(position)}
+                  type="button"
+                >
+                  {position} <span>×</span>
+                </S.AppliedFilter>
+              ))}
+              {selectedGrades.map((grade) => (
+                <S.AppliedFilter
+                  key={grade}
+                  onClick={() => toggleGrade(grade)}
+                  type="button"
+                >
+                  {typeof grade === "string" ? grade : `${grade}학년`} <span>×</span>
+                </S.AppliedFilter>
+              ))}
+              {selectedDepartments.map((department) => (
+                <S.AppliedFilter
+                  key={department}
+                  onClick={() => toggleDepartment(department)}
+                  type="button"
+                >
+                  {department} <span>×</span>
+                </S.AppliedFilter>
+              ))}
+              {selectedTeamStatus !== "전체" && (
+                <S.AppliedFilter
+                  onClick={() => setSelectedTeamStatus("전체")}
+                  type="button"
+                >
+                  {selectedTeamStatus} <span>×</span>
+                </S.AppliedFilter>
+              )}
             </S.AppliedFilters>
           )}
         </S.Hero>
@@ -501,7 +648,11 @@ export function GiutHubPage() {
                 profile={profile}
               />
             ))}
-            {visibleProfiles.length === 0 && <S.EmptyState>선택한 분야의 팀원을 준비하고 있어요.</S.EmptyState>}
+            {visibleProfiles.length === 0 && (
+              <S.EmptyState>
+                선택한 분야의 팀원을 준비하고 있어요.
+              </S.EmptyState>
+            )}
           </S.ProfileList>
         </S.Results>
       </S.Content>
@@ -518,7 +669,10 @@ export function GiutHubPage() {
       <BottomSheet
         footer={
           <S.PositionSheetFooter>
-            <S.ViewPositionsButton onClick={() => setIsPositionSheetOpen(false)} type="button">
+            <S.ViewPositionsButton
+              onClick={() => setIsPositionSheetOpen(false)}
+              type="button"
+            >
               {visibleProfiles.length}명 보기
             </S.ViewPositionsButton>
           </S.PositionSheetFooter>
@@ -531,13 +685,21 @@ export function GiutHubPage() {
         variant="compact"
       >
         <S.PositionSheetHeader>
-          <S.PositionSheetClose aria-label="닫기" onClick={() => setIsPositionSheetOpen(false)} type="button">
+          <S.PositionSheetClose
+            aria-label="닫기"
+            onClick={() => setIsPositionSheetOpen(false)}
+            type="button"
+          >
             <Icon name="x" size={30} weight="regular" />
           </S.PositionSheetClose>
           <S.PositionSheetTitle>포지션</S.PositionSheetTitle>
         </S.PositionSheetHeader>
-        <S.PositionSheetHeading>어떤 역할을 찾고 있나요?</S.PositionSheetHeading>
-        <S.PositionSheetDescription>여러 포지션을 선택할 수 있어요.</S.PositionSheetDescription>
+        <S.PositionSheetHeading>
+          어떤 역할을 찾고 있나요?
+        </S.PositionSheetHeading>
+        <S.PositionSheetDescription>
+          여러 포지션을 선택할 수 있어요.
+        </S.PositionSheetDescription>
         <S.PositionGrid aria-label="찾는 포지션 선택">
           {positionOptions.map((option) => {
             const selected = selectedPositions.includes(option.value);
@@ -550,7 +712,11 @@ export function GiutHubPage() {
                 onClick={() => togglePosition(option.value)}
                 type="button"
               >
-                {selected && <S.PositionCheck><Icon name="check" size={16} weight="bold" /></S.PositionCheck>}
+                {selected && (
+                  <S.PositionCheck>
+                    <Icon name="check" size={16} weight="bold" />
+                  </S.PositionCheck>
+                )}
                 <Icon name={option.icon} size={38} weight="regular" />
                 <span>{option.value}</span>
               </S.PositionOption>
@@ -561,7 +727,10 @@ export function GiutHubPage() {
       <BottomSheet
         footer={
           <S.StatusSheetFooter>
-            <S.ResetStatusButton onClick={() => setSelectedTeamStatus("전체")} type="button">
+            <S.ResetStatusButton
+              onClick={() => setSelectedTeamStatus("전체")}
+              type="button"
+            >
               초기화
             </S.ResetStatusButton>
             <S.ViewStatusButton onClick={() => setIsStatusSheetOpen(false)} type="button">
@@ -578,11 +747,17 @@ export function GiutHubPage() {
       >
         <S.StatusSheetHeader>
           <S.StatusSheetTitle>현재 상태</S.StatusSheetTitle>
-          <S.StatusSheetClose aria-label="닫기" onClick={() => setIsStatusSheetOpen(false)} type="button">
+          <S.StatusSheetClose
+            aria-label="닫기"
+            onClick={() => setIsStatusSheetOpen(false)}
+            type="button"
+          >
             <Icon name="x" size={28} weight="regular" />
           </S.StatusSheetClose>
         </S.StatusSheetHeader>
-        <S.StatusSheetDescription>지금 팀 활동을 시작할 수 있는 사람을 찾아보세요.</S.StatusSheetDescription>
+        <S.StatusSheetDescription>
+          지금 팀 활동을 시작할 수 있는 사람을 찾아보세요.
+        </S.StatusSheetDescription>
         <S.StatusOptionList aria-label="현재 상태 선택" role="radiogroup">
           {teamStatusOptions.map((option) => {
             const selected = selectedTeamStatus === option.value;
@@ -607,7 +782,16 @@ export function GiutHubPage() {
         </S.StatusOptionList>
       </BottomSheet>
       <BottomSheet
-        footer={<S.DepartmentFooter><S.ViewStatusButton onClick={() => setIsDepartmentSheetOpen(false)} type="button">결과 {visibleProfiles.length}명 보기</S.ViewStatusButton></S.DepartmentFooter>}
+        footer={
+          <S.DepartmentFooter>
+            <S.ViewStatusButton
+              onClick={() => setIsDepartmentSheetOpen(false)}
+              type="button"
+            >
+              결과 {visibleProfiles.length}명 보기
+            </S.ViewStatusButton>
+          </S.DepartmentFooter>
+        }
         footerVariant="action"
         minHeight="min(84svh, 620px)"
         onClose={() => {
@@ -619,28 +803,95 @@ export function GiutHubPage() {
       >
         <S.StatusSheetHeader>
           <S.StatusSheetTitle>학과 및 학년</S.StatusSheetTitle>
-          <S.StatusSheetClose aria-label="닫기" onClick={() => setIsDepartmentSheetOpen(false)} type="button"><Icon name="x" size={28} weight="regular" /></S.StatusSheetClose>
+          <S.StatusSheetClose
+            aria-label="닫기"
+            onClick={() => setIsDepartmentSheetOpen(false)}
+            type="button"
+          >
+            <Icon name="x" size={28} weight="regular" />
+          </S.StatusSheetClose>
         </S.StatusSheetHeader>
-        {selectedGrades.length > 0 && <S.SelectedGradeList>{selectedGrades.map((grade) => <S.SelectedGrade key={grade}>{`${grade}학년`} <button aria-label={`${grade} 선택 해제`} onClick={() => toggleGrade(grade)} type="button">×</button></S.SelectedGrade>)}</S.SelectedGradeList>}
+        {selectedGrades.length > 0 && (
+          <S.SelectedGradeList>
+            {selectedGrades.map((grade) => (
+              <S.SelectedGrade key={grade}>
+                {`${grade}학년`}{" "}
+                <button
+                  aria-label={`${grade} 선택 해제`}
+                  onClick={() => toggleGrade(grade)}
+                  type="button"
+                >
+                  ×
+                </button>
+              </S.SelectedGrade>
+            ))}
+          </S.SelectedGradeList>
+        )}
         <S.DepartmentHeading>학년</S.DepartmentHeading>
         <S.GradeGrid>
-          <S.GradeButton $selected={selectedGrades.length === 0} onClick={() => setSelectedGrades([])} type="button">전체</S.GradeButton>
-          {gradeOptions.map((option) => <S.GradeButton $selected={selectedGrades.includes(option.value)} key={option.value} onClick={() => toggleGrade(option.value)} type="button">{option.label}</S.GradeButton>)}
+          <S.GradeButton
+            $selected={selectedGrades.length === 0}
+            onClick={() => setSelectedGrades([])}
+            type="button"
+          >
+            전체
+          </S.GradeButton>
+          {gradeOptions.map((option) => (
+            <S.GradeButton
+              $selected={selectedGrades.includes(option.value)}
+              key={option.value}
+              onClick={() => toggleGrade(option.value)}
+              type="button"
+            >
+              {option.label}
+            </S.GradeButton>
+          ))}
         </S.GradeGrid>
         <S.DepartmentHeading>학과</S.DepartmentHeading>
         <S.DepartmentSearch>
           <Icon name="search" size={22} weight="regular" />
-          <input aria-label="학과명 검색" onChange={(event) => setDepartmentQuery(event.target.value)} placeholder="학과명 검색" value={departmentQuery} />
+          <input
+            aria-label="학과명 검색"
+            onChange={(event) => setDepartmentQuery(event.target.value)}
+            placeholder="학과명 검색"
+            value={departmentQuery}
+          />
         </S.DepartmentSearch>
         <S.DepartmentTabs>
-          {(["전체", "IT·공학", "경영·경제", "디자인"] as DepartmentCategory[]).map((category) => (
-            <S.DepartmentTab $active={departmentCategory === category} key={category} onClick={() => setDepartmentCategory(category)} type="button">{category}</S.DepartmentTab>
-          ))}
+          {(
+            [
+              "전체",
+              "IT·공학",
+              "경영·경제",
+              "디자인",
+            ] as DepartmentCategory[]
+          ).map(
+            (category) => (
+              <S.DepartmentTab
+                $active={departmentCategory === category}
+                key={category}
+                onClick={() => setDepartmentCategory(category)}
+                type="button"
+              >
+                {category}
+              </S.DepartmentTab>
+            ),
+          )}
         </S.DepartmentTabs>
         <S.DepartmentList aria-label="학과 선택 목록">
           {visibleDepartments.map((department) => {
             const selected = selectedDepartments.includes(department.name);
-            return <S.DepartmentRow $selected={selected} key={department.name} onClick={() => toggleDepartment(department.name)} type="button"><span>{selected && <Icon name="check" size={14} weight="bold" />}</span>{department.name}</S.DepartmentRow>;
+            return (
+              <S.DepartmentRow
+                $selected={selected}
+                key={department.name}
+                onClick={() => toggleDepartment(department.name)}
+                type="button"
+              >
+                <span>{selected && <Icon name="check" size={14} weight="bold" />}</span>
+                {department.name}
+              </S.DepartmentRow>
+            );
           })}
         </S.DepartmentList>
       </BottomSheet>
@@ -648,26 +899,42 @@ export function GiutHubPage() {
   );
 }
 
-function ProfileCard({ profile, onView }: { profile: GiutHubProfile; onView: () => void }) {
+function ProfileCard({
+  profile,
+  onView,
+}: {
+  profile: GiutHubProfile;
+  onView: () => void;
+}) {
   const responseStatus = getResponseStatus(profile.lastResponseAt);
 
   return (
     <S.ProfileCard>
       <S.ProfileTop>
         <S.Avatar $tone={profile.avatarTone}>
-          {profile.avatarSrc ? <img alt={`${profile.name} 프로필`} src={profile.avatarSrc} /> : profile.avatarFallback}
+          {profile.avatarSrc ? (
+            <img alt={`${profile.name} 프로필`} src={profile.avatarSrc} />
+          ) : (
+            profile.avatarFallback
+          )}
         </S.Avatar>
         <S.ProfileIdentity>
           <S.ProfileHeader>
             <S.Name>{profile.name}</S.Name>
             <S.Availability $available={profile.available}>
               <S.AvailabilityDot $available={profile.available} />
-              {profile.available ? "합류 가능" : "현재 팀을 찾고 있지 않아요"}
+              {profile.available
+                ? "합류 가능"
+                : "현재 팀을 찾고 있지 않아요"}
             </S.Availability>
           </S.ProfileHeader>
           <S.ProfileSummary>{profile.summary}</S.ProfileSummary>
         </S.ProfileIdentity>
-        <S.DetailButton aria-label={`${profile.name} 프로필 보기`} onClick={onView} type="button">
+        <S.DetailButton
+          aria-label={`${profile.name} 프로필 보기`}
+          onClick={onView}
+          type="button"
+        >
           <Icon name="caret-right" size={20} weight="bold" />
         </S.DetailButton>
       </S.ProfileTop>
@@ -678,17 +945,25 @@ function ProfileCard({ profile, onView }: { profile: GiutHubProfile; onView: () 
         </span>
         <S.ResponseMeta
           $fast={responseStatus.isFast}
-          aria-label={`최근 답장 ${responseStatus.elapsedHours}시간 전, ${responseStatus.label}`}
+          aria-label={
+            `최근 답장 ${responseStatus.elapsedHours}시간 전, ` +
+            responseStatus.label
+          }
         >
-          <Icon name="lightning" size={14} weight="fill" />{responseStatus.label}
+          <Icon name="lightning" size={14} weight="fill" />
+          {responseStatus.label}
         </S.ResponseMeta>
       </S.ProfileMeta>
       <S.Introduction>{profile.introduction}</S.Introduction>
       <S.CardFooter>
         <S.TagList aria-label={`${profile.name} 관심 분야`}>
-          {profile.tags.map((tag) => <S.Tag key={tag}>#{tag}</S.Tag>)}
+          {profile.tags.map((tag) => (
+            <S.Tag key={tag}>#{tag}</S.Tag>
+          ))}
         </S.TagList>
-        <S.ProfileLink onClick={onView} type="button">프로필 보기 <Icon name="arrow-right" size={16} weight="bold" /></S.ProfileLink>
+        <S.ProfileLink onClick={onView} type="button">
+          프로필 보기 <Icon name="arrow-right" size={16} weight="bold" />
+        </S.ProfileLink>
       </S.CardFooter>
     </S.ProfileCard>
   );

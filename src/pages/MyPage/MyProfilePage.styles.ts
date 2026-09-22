@@ -58,8 +58,14 @@ export const S = {
     border-radius: 22px;
     color: #858585;
 
-    span { color: ${tokens.color.neutral[700]}; font-size: 15px; }
-    small { color: ${tokens.color.neutral[700]}; font-size: 13px; }
+    span {
+      color: ${tokens.color.neutral[700]};
+      font-size: 15px;
+    }
+    small {
+      color: ${tokens.color.neutral[700]};
+      font-size: 13px;
+    }
   `,
   ProfileInfo: styled.div`
     min-width: 0;
@@ -77,10 +83,16 @@ export const S = {
     gap: 6px;
     margin: 0 0 10px;
     font-size: 14px;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
 
-    span { color: ${tokens.color.neutral[500]}; }
-    strong { color: ${tokens.color.neutral[900]}; font-weight: 700; white-space: nowrap; }
+    span {
+      color: ${tokens.color.neutral[500]};
+    }
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-weight: 700;
+      white-space: nowrap;
+    }
   `,
   Status: styled.span`
     display: inline-flex;
@@ -142,9 +154,22 @@ export const S = {
     place-items: center;
     padding: 0 8px;
 
-    + div { border-left: 1px solid ${tokens.color.neutral[200]}; }
-    span { display: grid; gap: 7px; color: ${tokens.color.neutral[500]}; font-size: 13px; text-align: center; white-space: nowrap; }
-    strong { color: ${({ $primary }) => $primary ? primary : tokens.color.neutral[900]}; font-size: 22px; font-weight: 800; }
+    + div {
+      border-left: 1px solid ${tokens.color.neutral[200]};
+    }
+    span {
+      display: grid;
+      gap: 7px;
+      color: ${tokens.color.neutral[500]};
+      font-size: 13px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    strong {
+      color: ${({ $primary }) => ($primary ? primary : tokens.color.neutral[900])};
+      font-size: 22px;
+      font-weight: 800;
+    }
   `,
   TabList: styled.div`
     display: grid;
@@ -158,13 +183,22 @@ export const S = {
     padding: 21px 4px 19px;
     border: 0;
     background: transparent;
-    color: ${({ $active }) => $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
+    color: ${({ $active }) =>
+      $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font: inherit;
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
 
-    &::after { position: absolute; right: 8px; bottom: -1px; left: 8px; height: 3px; background: ${tokens.color.neutral[900]}; content: ${({ $active }) => $active ? '""' : "none"}; }
+    &::after {
+      position: absolute;
+      right: 8px;
+      bottom: -1px;
+      left: 8px;
+      height: 3px;
+      background: ${tokens.color.neutral[900]};
+      content: ${({ $active }) => ($active ? '""' : "none")};
+    }
   `,
   TabContent: styled.section`
     padding: 22px 20px;
@@ -193,15 +227,34 @@ export const S = {
     border-radius: 13px;
     color: #888;
 
-    span { color: ${tokens.color.neutral[700]}; font-size: 13px; }
-    small { color: ${tokens.color.neutral[700]}; font-size: 11px; }
+    span {
+      color: ${tokens.color.neutral[700]};
+      font-size: 13px;
+    }
+    small {
+      color: ${tokens.color.neutral[700]};
+      font-size: 11px;
+    }
   `,
   PortfolioCopy: styled.span`
     display: grid;
     min-width: 0;
     gap: 8px;
-    strong { overflow: hidden; color: ${tokens.color.neutral[900]}; font-size: 15px; font-weight: 800; letter-spacing: -.65px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
-    small { color: ${tokens.color.neutral[500]}; font-size: 12px; letter-spacing: -.4px; }
+    strong {
+      overflow: hidden;
+      color: ${tokens.color.neutral[900]};
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.65px;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    small {
+      color: ${tokens.color.neutral[500]};
+      font-size: 12px;
+      letter-spacing: -0.4px;
+    }
   `,
   RepresentativeLabel: styled.span`
     width: fit-content;
@@ -232,13 +285,15 @@ export const S = {
     color: #aab3c3;
     text-align: left;
     cursor: pointer;
-    &:last-child { border-bottom: 0; }
+    &:last-child {
+      border-bottom: 0;
+    }
   `,
   ListDot: styled.span`
     width: 12px;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: #cbd3e0;
+    background: #24449a;
   `,
   SkillList: styled.div`
     display: flex;
@@ -251,13 +306,18 @@ export const S = {
     gap: 5px;
     padding: 9px 8px;
     border-radius: 12px;
-    background: ${({ $index }) => ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
+    background: ${({ $index }) =>
+      ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
     color: white;
     font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
 
-    img { width: 14px; height: 14px; filter: brightness(0) invert(1); }
+    img {
+      width: 14px;
+      height: 14px;
+      filter: brightness(0) invert(1);
+    }
   `,
   SimpleList: styled.div`
     overflow: hidden;
@@ -272,9 +332,18 @@ export const S = {
     min-height: 88px;
     padding: 16px 18px;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
-    &:last-child { border-bottom: 0; }
-    strong { color: ${tokens.color.neutral[900]}; font-size: 15px; font-weight: 800; }
-    small { color: ${tokens.color.neutral[500]}; font-size: 12px; }
+    &:last-child {
+      border-bottom: 0;
+    }
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 15px;
+      font-weight: 800;
+    }
+    small {
+      color: ${tokens.color.neutral[500]};
+      font-size: 12px;
+    }
   `,
   SimpleCopy: styled.div`
     display: grid;
@@ -294,9 +363,10 @@ export const S = {
     padding: 13px 5px;
     border: 0;
     border-radius: 13px;
-    background: ${({ $active }) => $active ? tokens.color.neutral[50] : "transparent"};
-    box-shadow: ${({ $active }) => $active ? "0 2px 5px rgb(38 50 71 / 12%)" : "none"};
-    color: ${({ $active }) => $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
+    background: ${({ $active }) => ($active ? tokens.color.neutral[50] : "transparent")};
+    box-shadow: ${({ $active }) => ($active ? "0 2px 5px rgb(38 50 71 / 12%)" : "none")};
+    color: ${({ $active }) =>
+      $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font: inherit;
     font-size: 14px;
     font-weight: 800;
@@ -319,8 +389,16 @@ export const S = {
     font-size: 15px;
     font-weight: 800;
 
-    > span { width: 11px; aspect-ratio: 1; border-radius: 50%; background: ${({ $team }) => $team ? "#7a4bd3" : "#2b57ed"}; }
-    em { color: ${tokens.color.neutral[500]}; font-style: normal; }
+    > span {
+      width: 11px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: ${({ $team }) => ($team ? "#7a4bd3" : "#2b57ed")};
+    }
+    em {
+      color: ${tokens.color.neutral[500]};
+      font-style: normal;
+    }
   `,
   ViewAllButton: styled.button`
     display: inline-flex;
@@ -352,24 +430,64 @@ export const S = {
     width: 56px;
     aspect-ratio: 1;
     border-radius: 13px;
-    background: ${({ $tone }) => ({ green: "linear-gradient(135deg, #d1f4df, #93d8b5)", blue: "linear-gradient(135deg, #d9e9ff, #99c4f5)", purple: "linear-gradient(135deg, #e4ddff, #aea0ef)", pink: "linear-gradient(135deg, #ffe0ef, #eca5c7)", orange: "linear-gradient(135deg, #ffe7c4, #f6bf77)" })[$tone]};
+    background: ${({ $tone }) =>
+      ({
+        green: "linear-gradient(135deg, #d1f4df, #93d8b5)",
+        blue: "linear-gradient(135deg, #d9e9ff, #99c4f5)",
+        purple: "linear-gradient(135deg, #e4ddff, #aea0ef)",
+        pink: "linear-gradient(135deg, #ffe0ef, #eca5c7)",
+        orange: "linear-gradient(135deg, #ffe7c4, #f6bf77)",
+      })[$tone]};
   `,
   ScrapPostCopy: styled.div`
     display: grid;
     min-width: 0;
     gap: 5px;
 
-    > span { display: flex; align-items: center; gap: 9px; }
-    > span > small { color: ${tokens.color.neutral[500]}; font-size: 10px; }
-    strong { overflow: hidden; color: ${tokens.color.neutral[900]}; font-size: 13px; font-weight: 800; letter-spacing: -.55px; text-overflow: ellipsis; white-space: nowrap; }
-    p { margin: 0; color: ${tokens.color.neutral[500]}; font-size: 10px; }
+    > span {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    > span > small {
+      color: ${tokens.color.neutral[500]};
+      font-size: 10px;
+    }
+    strong {
+      overflow: hidden;
+      color: ${tokens.color.neutral[900]};
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.55px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    p {
+      margin: 0;
+      color: ${tokens.color.neutral[500]};
+      font-size: 10px;
+    }
   `,
   ScrapCategory: styled.span<{ $tone: ScrapTone }>`
     width: fit-content;
     padding: 4px 6px;
     border-radius: 6px;
-    background: ${({ $tone }) => ({ green: "#e3f8ea", blue: "#e3efff", purple: "#f0e9ff", pink: "#fee9f5", orange: "#fff0dc" })[$tone]};
-    color: ${({ $tone }) => ({ green: "#14884d", blue: "#2b57ed", purple: "#7544cb", pink: "#d54391", orange: "#bd6b0d" })[$tone]};
+    background: ${({ $tone }) =>
+      ({
+        green: "#e3f8ea",
+        blue: "#e3efff",
+        purple: "#f0e9ff",
+        pink: "#fee9f5",
+        orange: "#fff0dc",
+      })[$tone]};
+    color: ${({ $tone }) =>
+      ({
+        green: "#14884d",
+        blue: "#2b57ed",
+        purple: "#7544cb",
+        pink: "#d54391",
+        orange: "#bd6b0d",
+      })[$tone]};
     font-size: 9px;
     font-weight: 800;
   `,
@@ -380,7 +498,11 @@ export const S = {
     gap: 12px;
     color: #2b57ed;
 
-    b { color: ${tokens.color.danger[500]}; font-size: 11px; font-weight: 800; }
+    b {
+      color: ${tokens.color.danger[500]};
+      font-size: 11px;
+      font-weight: 800;
+    }
   `,
   ScrapTeamCard: styled.article`
     display: grid;
@@ -406,10 +528,26 @@ export const S = {
     min-width: 0;
     gap: 5px;
 
-    > span { display: flex; align-items: center; gap: 8px; }
-    > span > small { color: #16845b; font-size: 10px; font-weight: 700; }
-    strong { color: ${tokens.color.neutral[900]}; font-size: 13px; font-weight: 800; }
-    p { margin: 0; color: ${tokens.color.neutral[500]}; font-size: 10px; }
+    > span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    > span > small {
+      color: #16845b;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 13px;
+      font-weight: 800;
+    }
+    p {
+      margin: 0;
+      color: ${tokens.color.neutral[500]};
+      font-size: 10px;
+    }
   `,
   TeamBadge: styled.span`
     display: inline-flex;
@@ -427,6 +565,8 @@ export const S = {
     gap: 9px;
     color: #2b57ed;
 
-    svg:last-child { color: #a8b1c0; }
+    svg:last-child {
+      color: #a8b1c0;
+    }
   `,
 };
