@@ -42,7 +42,7 @@ export const S = {
     color: #a9b9ec;
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: -.4px;
+    letter-spacing: -0.4px;
   `,
   Title: styled.h1`
     position: relative;
@@ -84,14 +84,19 @@ export const S = {
     height: 47px;
     min-width: 0;
     padding: 0 6px;
-    border: 1px solid ${({ $active }) => $active ? giutHubPrimary : tokens.color.neutral[200]};
+    border: 1px solid
+      ${({ $active }) => ($active ? giutHubPrimary : tokens.color.neutral[200])};
     border-radius: 999px;
-    background: ${({ $active }) => $active ? tokens.color.primary[100] : tokens.color.neutral[50]};
-    color: ${({ $active }) => $active ? giutHubPrimary : tokens.color.neutral[700]};
+    background: ${({ $active }) =>
+      $active ? tokens.color.primary[100] : tokens.color.neutral[50]};
+    color: ${({ $active }) => ($active ? giutHubPrimary : tokens.color.neutral[700])};
     font-size: 13px;
     font-weight: 700;
 
-    &:hover:not(:disabled) { background: ${({ $active }) => $active ? tokens.color.primary[100] : tokens.color.neutral[50]}; }
+    &:hover:not(:disabled) {
+      background: ${({ $active }) =>
+        $active ? tokens.color.primary[100] : tokens.color.neutral[50]};
+    }
   `,
   AppliedFilters: styled.div`
     position: relative;
@@ -116,7 +121,11 @@ export const S = {
     font-weight: 700;
     cursor: pointer;
 
-    span { font-size: 16px; font-weight: 400; line-height: 1; }
+    span {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1;
+    }
   `,
   Results: styled.section`
     padding: 23px 20px 20px;
@@ -127,7 +136,7 @@ export const S = {
     color: ${tokens.color.neutral[900]};
     font-size: 18px;
     font-weight: 800;
-    letter-spacing: -.65px;
+    letter-spacing: -0.65px;
     line-height: 1.35;
   `,
   CategoryList: styled.div`
@@ -191,12 +200,22 @@ export const S = {
     overflow: hidden;
     place-items: center;
     border-radius: 50%;
-    background: ${({ $tone }) => ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[$tone]};
-    color: ${({ $tone }) => ({ blue: "#2b57d9", purple: "#6845d8", orange: "#db6e2d", green: "#16845b" })[$tone]};
+    background: ${({ $tone }) =>
+      ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[
+        $tone
+      ]};
+    color: ${({ $tone }) =>
+      ({ blue: "#2b57d9", purple: "#6845d8", orange: "#db6e2d", green: "#16845b" })[
+        $tone
+      ]};
     font-size: 30px;
     font-weight: 800;
 
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   `,
   ProfileHeader: styled.div`
     display: flex;
@@ -212,17 +231,18 @@ export const S = {
     color: ${tokens.color.neutral[900]};
     font-size: 18px;
     font-weight: 800;
-    letter-spacing: -.7px;
+    letter-spacing: -0.7px;
     line-height: 1.2;
   `,
   Availability: styled.span<{ $available: boolean }>`
     display: flex;
     align-items: center;
     gap: 7px;
-    color: ${({ $available }) => $available ? tokens.color.success[500] : tokens.color.neutral[500]};
+    color: ${({ $available }) =>
+      $available ? tokens.color.success[500] : tokens.color.neutral[500]};
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: -.3px;
+    letter-spacing: -0.3px;
     white-space: nowrap;
   `,
   AvailabilityDot: styled.span<{ $available: boolean }>`
@@ -231,7 +251,7 @@ export const S = {
     margin: 0;
     border: 0;
     border-radius: 50%;
-    background: ${({ $available }) => $available ? "currentColor" : "transparent"};
+    background: ${({ $available }) => ($available ? "currentColor" : "transparent")};
   `,
   ProfileSummary: styled.p`
     margin: 7px 0 0;
@@ -239,7 +259,7 @@ export const S = {
     overflow: hidden;
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: -.35px;
+    letter-spacing: -0.35px;
     line-height: 1.4;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -248,7 +268,7 @@ export const S = {
     margin: 16px 0 0;
     color: ${tokens.color.neutral[700]};
     font-size: 13px;
-    letter-spacing: -.35px;
+    letter-spacing: -0.35px;
     line-height: 1.5;
   `,
   DetailButton: styled.button`
@@ -272,13 +292,21 @@ export const S = {
     font-size: 12px;
     font-weight: 600;
 
-    span { display: inline-flex; align-items: center; gap: 6px; }
-    span:nth-of-type(3) svg { color: #16845b; }
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    span:nth-of-type(3) svg {
+      color: #16845b;
+    }
   `,
   ResponseMeta: styled.span<{ $fast: boolean }>`
-    color: ${({ $fast }) => $fast ? "#188353" : tokens.color.neutral[500]};
+    color: ${({ $fast }) => ($fast ? "#188353" : tokens.color.neutral[500])};
 
-    svg { color: currentColor; }
+    svg {
+      color: currentColor;
+    }
   `,
   CardFooter: styled.div`
     display: flex;
@@ -370,16 +398,24 @@ export const S = {
     padding: 14px 12px;
     place-content: center;
     gap: 10px;
-    border: 2px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border: 2px solid
+      ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
     border-radius: 20px;
-    background: ${({ $selected }) => $selected ? "#f5f8ff" : tokens.color.neutral[50]};
-    color: ${({ $selected }) => $selected ? "#213f87" : tokens.color.neutral[700]};
+    background: ${({ $selected }) => ($selected ? "#f5f8ff" : tokens.color.neutral[50])};
+    color: ${({ $selected }) => ($selected ? "#213f87" : tokens.color.neutral[700])};
     font: inherit;
     cursor: pointer;
 
-    span { font-size: 18px; font-weight: 800; letter-spacing: -0.8px; }
+    span {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
 
-    &:focus-visible { outline: 3px solid ${giutHubPrimary}; outline-offset: 2px; }
+    &:focus-visible {
+      outline: 3px solid ${giutHubPrimary};
+      outline-offset: 2px;
+    }
   `,
   PositionCheck: styled.span`
     position: absolute;
@@ -457,32 +493,50 @@ export const S = {
     text-align: left;
     cursor: pointer;
 
-    &:first-of-type { border-top: 1px solid ${tokens.color.neutral[200]}; }
-    &:focus-visible { outline: 2px solid ${giutHubPrimary}; outline-offset: -2px; }
+    &:first-of-type {
+      border-top: 1px solid ${tokens.color.neutral[200]};
+    }
+    &:focus-visible {
+      outline: 2px solid ${giutHubPrimary};
+      outline-offset: -2px;
+    }
 
-    strong { display: block; font-size: 18px; font-weight: 800; letter-spacing: -0.8px; }
-    small { display: block; margin-top: 5px; color: ${tokens.color.neutral[500]}; font-size: 13px; letter-spacing: -0.5px; }
+    strong {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
+    small {
+      display: block;
+      margin-top: 5px;
+      color: ${tokens.color.neutral[500]};
+      font-size: 13px;
+      letter-spacing: -0.5px;
+    }
   `,
   StatusRadio: styled.span<{ $selected: boolean }>`
     display: grid;
     width: 32px;
     height: 32px;
     place-items: center;
-    border: 2px solid ${({ $selected }) => $selected ? giutHubPrimary : "#b6becd"};
+    border: 2px solid ${({ $selected }) => ($selected ? giutHubPrimary : "#b6becd")};
     border-radius: 50%;
 
     &::after {
-      width: ${({ $selected }) => $selected ? "18px" : "0"};
-      height: ${({ $selected }) => $selected ? "18px" : "0"};
+      width: ${({ $selected }) => ($selected ? "18px" : "0")};
+      height: ${({ $selected }) => ($selected ? "18px" : "0")};
       border-radius: 50%;
       background: ${giutHubPrimary};
       content: "";
-      transition: width 150ms ease, height 150ms ease;
+      transition:
+        width 150ms ease,
+        height 150ms ease;
     }
   `,
   StatusSheetFooter: styled.div`
     display: grid;
-    grid-template-columns: .7fr 1.55fr;
+    grid-template-columns: 0.7fr 1.55fr;
     gap: 16px;
     align-items: center;
   `,
@@ -514,7 +568,9 @@ export const S = {
     padding-top: 8px;
     background: ${tokens.color.neutral[50]};
 
-    button { width: 100%; }
+    button {
+      width: 100%;
+    }
   `,
   SelectedGradeList: styled.div`
     display: flex;
@@ -534,7 +590,16 @@ export const S = {
     font-size: 14px;
     font-weight: 800;
 
-    button { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; font-size: 20px; line-height: .7; cursor: pointer; }
+    button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 20px;
+      line-height: 0.7;
+      cursor: pointer;
+    }
   `,
   DepartmentHeading: styled.h3`
     margin: 20px 0 12px;
@@ -551,10 +616,13 @@ export const S = {
     min-width: 74px;
     height: 42px;
     padding: 0 14px;
-    border: 1px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border: 1px solid
+      ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
     border-radius: 13px;
-    background: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[50]};
-    color: ${({ $selected }) => $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
+    background: ${({ $selected }) =>
+      $selected ? giutHubPrimary : tokens.color.neutral[50]};
+    color: ${({ $selected }) =>
+      $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
     font: inherit;
     font-size: 15px;
     font-weight: 700;
@@ -571,8 +639,18 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     font-size: 15px;
 
-    input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: ${tokens.color.neutral[900]}; font: inherit; }
-    input::placeholder { color: ${tokens.color.neutral[500]}; }
+    input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: ${tokens.color.neutral[900]};
+      font: inherit;
+    }
+    input::placeholder {
+      color: ${tokens.color.neutral[500]};
+    }
   `,
   DepartmentTabs: styled.div`
     display: flex;
@@ -581,16 +659,15 @@ export const S = {
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     color: ${tokens.color.neutral[500]};
     font-size: 14px;
-
   `,
   DepartmentTab: styled.button<{ $active: boolean }>`
     padding: 0;
     border: 0;
     background: transparent;
-    color: ${({ $active }) => $active ? giutHubPrimary : tokens.color.neutral[500]};
+    color: ${({ $active }) => ($active ? giutHubPrimary : tokens.color.neutral[500])};
     font: inherit;
     font-size: 14px;
-    font-weight: ${({ $active }) => $active ? 800 : 500};
+    font-weight: ${({ $active }) => ($active ? 800 : 500)};
     cursor: pointer;
   `,
   DepartmentList: styled.div`
@@ -608,18 +685,34 @@ export const S = {
     min-height: 64px;
     padding: 10px 34px 10px 10px;
     align-items: flex-start;
-    border: 2px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border: 2px solid
+      ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
     border-radius: 10px;
-    background: ${({ $selected }) => $selected ? "#f5f8ff" : tokens.color.neutral[50]};
+    background: ${({ $selected }) => ($selected ? "#f5f8ff" : tokens.color.neutral[50])};
     color: ${tokens.color.neutral[900]};
     font: inherit;
     font-size: 13px;
     font-weight: 700;
     text-align: left;
 
-    > span { position: absolute; top: 9px; right: 9px; display: grid; width: 24px; height: 24px; place-items: center; border: 2px solid ${({ $selected }) => $selected ? giutHubPrimary : "#aeb7c8"}; border-radius: 50%; background: ${({ $selected }) => $selected ? giutHubPrimary : "transparent"}; color: ${tokens.color.neutral[50]}; }
+    > span {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border: 2px solid ${({ $selected }) => ($selected ? giutHubPrimary : "#aeb7c8")};
+      border-radius: 50%;
+      background: ${({ $selected }) => ($selected ? giutHubPrimary : "transparent")};
+      color: ${tokens.color.neutral[50]};
+    }
 
-    &:focus-visible { outline: 3px solid ${giutHubPrimary}; outline-offset: 2px; }
+    &:focus-visible {
+      outline: 3px solid ${giutHubPrimary};
+      outline-offset: 2px;
+    }
   `,
   EmptyState: styled.p`
     margin: 0;

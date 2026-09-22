@@ -34,6 +34,7 @@ type BottomSheetProps = {
   onClose: () => void;
   children?: ReactNode; // 바텀 시트의 내용
   footer?: ReactNode;
+  contentFill?: boolean;
   decisionMode?: DecisionMode;
   applicantName?: string;
   applicantRole?: string;
@@ -210,6 +211,7 @@ export function BottomSheet({
   onClose,
   children,
   footer,
+  contentFill = false,
   decisionMode,
   applicantName,
   applicantRole,
@@ -354,7 +356,7 @@ export function BottomSheet({
             )}
           </S.Header>
         )}
-        <S.Content>
+        <S.Content $fill={contentFill}>
           {decisionMode && applicantName && applicantRole ? (
             <DecisionContent
               applicantName={applicantName}

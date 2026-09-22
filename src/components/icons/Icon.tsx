@@ -15,6 +15,7 @@ import {
   EyeSlash,
   FolderSimple,
   FunnelSimple,
+  GearSix,
   Heart,
   ImageSquare,
   Lightning,
@@ -61,6 +62,7 @@ export type IconName =
   | "eye-slash"
   | "folder"
   | "filter"
+  | "settings"
   | "home"
   | "heart"
   | "image"
@@ -105,6 +107,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "eye-slash": EyeSlash,
   folder: FolderSimple,
   filter: FunnelSimple,
+  settings: GearSix,
   home: House,
   heart: Heart,
   image: ImageSquare,

@@ -12,7 +12,9 @@ type GiutHubDialogProps = {
   children: ReactNode;
 };
 
-/** 기웃허브의 공유·신고·차단처럼 상세한 내용을 담는 중앙 다이얼로그입니다. */
+/**
+ * 기웃허브의 공유·신고·차단처럼 상세한 내용을 담는 중앙 다이얼로그입니다.
+ */
 export function GiutHubDialog({
   open,
   onClose,
@@ -25,7 +27,12 @@ export function GiutHubDialog({
   const titleId = useId();
 
   return (
-    <OverlayShell ariaLabelledBy={titleId} onClose={onClose} open={open} placement="center">
+    <OverlayShell
+      ariaLabelledBy={titleId}
+      onClose={onClose}
+      open={open}
+      placement="center"
+    >
       <S.Content>
         {icon && <S.Icon $tone={tone}>{icon}</S.Icon>}
         <S.Title id={titleId}>{title}</S.Title>

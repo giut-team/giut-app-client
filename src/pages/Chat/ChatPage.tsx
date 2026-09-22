@@ -201,7 +201,7 @@ export function ChatPage() {
         onChange={(key) => {
           if (key === "home") navigate("/home");
           if (key === "hub") navigate("/giut-hub");
-          if (key === "mypage") navigate("/my-team");
+          if (key === "mypage") navigate("/my-profile");
         }}
       />
       <Toast message={toastMessage} open={Boolean(toastMessage)} />

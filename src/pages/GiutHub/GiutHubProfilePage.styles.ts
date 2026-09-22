@@ -27,10 +27,12 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[900]};
     cursor: pointer;
-    transition: transform .12s ease, background-color .12s ease;
+    transition:
+      transform 0.12s ease,
+      background-color 0.12s ease;
 
     &:active {
-      transform: scale(.9);
+      transform: scale(0.9);
       border-radius: 10px;
       background: ${tokens.color.neutral[100]};
     }
@@ -49,12 +51,22 @@ export const S = {
     overflow: hidden;
     place-items: center;
     border-radius: 22px;
-    background: ${({ $tone }) => ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[$tone]};
-    color: ${({ $tone }) => ({ blue: "#2b57d9", purple: "#6845d8", orange: "#db6e2d", green: "#16845b" })[$tone]};
+    background: ${({ $tone }) =>
+      ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[
+        $tone
+      ]};
+    color: ${({ $tone }) =>
+      ({ blue: "#2b57d9", purple: "#6845d8", orange: "#db6e2d", green: "#16845b" })[
+        $tone
+      ]};
     font-size: 38px;
     font-weight: 800;
 
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   `,
   ProfileInfo: styled.div`
     min-width: 0;
@@ -70,7 +82,12 @@ export const S = {
     font-weight: 800;
     letter-spacing: -1.2px;
 
-    svg { padding: 3px; border-radius: 50%; background: #18b887; color: white; }
+    svg {
+      padding: 3px;
+      border-radius: 50%;
+      background: #18b887;
+      color: white;
+    }
   `,
   DetailRow: styled.p`
     display: grid;
@@ -78,10 +95,16 @@ export const S = {
     gap: 6px;
     margin: 0 0 10px;
     font-size: 14px;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
 
-    span { color: ${tokens.color.neutral[500]}; }
-    strong { color: ${tokens.color.neutral[900]}; font-weight: 700; white-space: nowrap; }
+    span {
+      color: ${tokens.color.neutral[500]};
+    }
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-weight: 700;
+      white-space: nowrap;
+    }
   `,
   Status: styled.span`
     display: inline-flex;
@@ -110,13 +133,13 @@ export const S = {
     margin: 0;
     color: ${tokens.color.neutral[700]};
     font-size: 14px;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
     line-height: 1.65;
     white-space: pre-line;
   `,
   Metrics: styled.section`
     display: grid;
-    grid-template-columns: 1fr 1.25fr .8fr;
+    grid-template-columns: 1fr 1.25fr 0.8fr;
     margin: 0;
     padding: 20px 0;
     border-top: 1px solid ${tokens.color.neutral[200]};
@@ -132,11 +155,28 @@ export const S = {
     padding: 0 18px;
     color: #647087;
 
-    + div { border-left: 1px solid ${tokens.color.neutral[200]}; }
-    svg { flex: 0 0 auto; }
-    span { display: grid; gap: 3px; font-size: 12px; font-weight: 500; white-space: nowrap; }
-    strong { color: ${tokens.color.neutral[900]}; font-size: 17px; font-weight: 800; }
-    small { color: ${tokens.color.neutral[500]}; font-size: 11px; }
+    + div {
+      border-left: 1px solid ${tokens.color.neutral[200]};
+    }
+    svg {
+      flex: 0 0 auto;
+    }
+    span {
+      display: grid;
+      gap: 3px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 17px;
+      font-weight: 800;
+    }
+    small {
+      color: ${tokens.color.neutral[500]};
+      font-size: 11px;
+    }
 
     &:last-child span {
       text-align: center;
@@ -155,7 +195,8 @@ export const S = {
     gap: 5px;
     padding: 9px 8px;
     border-radius: 12px;
-    background: ${({ $index }) => ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
+    background: ${({ $index }) =>
+      ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
     color: white;
     font-size: 11px;
     font-weight: 700;
@@ -175,7 +216,14 @@ export const S = {
     padding: 0 16px 30px;
     background: ${tokens.color.neutral[50]};
 
-    > button:first-of-type { height: auto; gap: 9px; padding: 14px 12px; border-radius: 14px; background: ${giutHubPrimary}; font-size: 16px; }
+    > button:first-of-type {
+      height: auto;
+      gap: 9px;
+      padding: 14px 12px;
+      border-radius: 14px;
+      background: ${giutHubPrimary};
+      font-size: 16px;
+    }
   `,
   MessageButton: styled.button`
     display: inline-flex;
@@ -204,12 +252,15 @@ export const S = {
     border: 0;
     border-radius: 14px;
     background: ${tokens.color.neutral[100]};
-    color: ${({ $active }) => $active ? "#f1b900" : "#63718a"};
+    color: ${({ $active }) => ($active ? "#f1b900" : "#63718a")};
     cursor: pointer;
-    transition: transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+    transition:
+      transform 0.12s ease,
+      background-color 0.12s ease,
+      box-shadow 0.12s ease;
 
     &:active {
-      transform: scale(.9);
+      transform: scale(0.9);
       background: ${tokens.color.neutral[200]};
       box-shadow: inset 0 2px 4px rgb(38 50 71 / 12%);
     }
@@ -226,20 +277,29 @@ export const S = {
     height: 69px;
     border: 0;
     background: transparent;
-    color: ${({ $active }) => $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
+    color: ${({ $active }) =>
+      $active ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font: inherit;
     font-size: 16px;
     font-weight: 800;
     cursor: pointer;
 
-    &::after { position: absolute; right: 20px; bottom: -1px; left: 20px; height: 3px; background: ${tokens.color.neutral[900]}; content: ${({ $active }) => $active ? '""' : "none"}; }
+    &::after {
+      position: absolute;
+      right: 20px;
+      bottom: -1px;
+      left: 20px;
+      height: 3px;
+      background: ${tokens.color.neutral[900]};
+      content: ${({ $active }) => ($active ? '""' : "none")};
+    }
   `,
   PortfolioContent: styled.section`
     padding: 25px 22px 30px;
   `,
   FeaturedPortfolioCard: styled.article`
     display: grid;
-    grid-template-columns: minmax(108px, .9fr) minmax(0, 1fr) 20px;
+    grid-template-columns: minmax(108px, 0.9fr) minmax(0, 1fr) 20px;
     align-items: center;
     gap: 16px;
     min-height: 154px;
@@ -247,9 +307,14 @@ export const S = {
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
     cursor: pointer;
-    transition: transform .16s ease, box-shadow .16s ease;
+    transition:
+      transform 0.16s ease,
+      box-shadow 0.16s ease;
 
-    &:active { transform: scale(.985); box-shadow: 0 4px 12px rgb(38 50 71 / 9%); }
+    &:active {
+      transform: scale(0.985);
+      box-shadow: 0 4px 12px rgb(38 50 71 / 9%);
+    }
   `,
   FeaturedPortfolioImage: styled.div`
     align-self: center;
@@ -258,7 +323,11 @@ export const S = {
     border-radius: 13px;
     background: ${tokens.color.neutral[100]};
 
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   `,
   PortfolioList: styled.section`
     display: grid;
@@ -277,11 +346,18 @@ export const S = {
     padding: 14px 0;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     cursor: pointer;
-    transition: transform .16s ease, background-color .16s ease;
+    transition:
+      transform 0.16s ease,
+      background-color 0.16s ease;
 
-    &:active { transform: scale(.99); background: ${tokens.color.neutral[100]}; }
+    &:active {
+      transform: scale(0.99);
+      background: ${tokens.color.neutral[100]};
+    }
 
-    &:last-child { border-bottom: 0; }
+    &:last-child {
+      border-bottom: 0;
+    }
   `,
   PortfolioImage: styled.div`
     align-self: center;
@@ -290,7 +366,11 @@ export const S = {
     border-radius: 10px;
     background: ${tokens.color.neutral[100]};
 
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   `,
   PortfolioCopy: styled.div`
     min-width: 0;
@@ -310,14 +390,14 @@ export const S = {
     color: ${tokens.color.neutral[900]};
     font-size: 14px;
     font-weight: 800;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
     line-height: 1.45;
   `,
   PortfolioDescription: styled.p`
     margin: 8px 0 0;
     color: ${tokens.color.neutral[500]};
     font-size: 12px;
-    letter-spacing: -.4px;
+    letter-spacing: -0.4px;
     line-height: 1.45;
   `,
   PortfolioArrow: styled.span`
@@ -336,7 +416,7 @@ export const S = {
     display: grid;
     grid-template-columns: 18px minmax(0, 1fr);
     gap: 15px;
-    min-height: ${({ $last }) => $last ? "55px" : "82px"};
+    min-height: ${({ $last }) => ($last ? "55px" : "82px")};
 
     &::before {
       position: absolute;
@@ -344,7 +424,7 @@ export const S = {
       bottom: -4px;
       left: 8px;
       width: 2px;
-      background: ${({ $last }) => $last ? "transparent" : tokens.color.primary[100]};
+      background: ${({ $last }) => ($last ? "transparent" : tokens.color.primary[100])};
       content: "";
     }
   `,
@@ -365,14 +445,14 @@ export const S = {
     color: ${tokens.color.neutral[900]};
     font-size: 17px;
     font-weight: 800;
-    letter-spacing: -.7px;
+    letter-spacing: -0.7px;
     line-height: 1.4;
   `,
   ActivityDescription: styled.p`
     margin: 7px 0 0;
     color: ${tokens.color.neutral[500]};
     font-size: 15px;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
   `,
   EmptyTab: styled.p`
     margin: 0;
@@ -392,15 +472,18 @@ export const S = {
     padding: 15px 4px;
     border: 0;
     background: transparent;
-    color: ${({ $destructive }) => $destructive ? tokens.color.danger[500] : tokens.color.neutral[900]};
+    color: ${({ $destructive }) =>
+      $destructive ? tokens.color.danger[500] : tokens.color.neutral[900]};
     font: inherit;
     font-size: 15px;
     font-weight: 700;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
     text-align: left;
     cursor: pointer;
 
-    &:active { opacity: .6; }
+    &:active {
+      opacity: 0.6;
+    }
   `,
   ProfileMenuDivider: styled.hr`
     width: 100%;
@@ -414,13 +497,13 @@ export const S = {
     color: ${tokens.color.neutral[900]};
     font-size: 20px;
     font-weight: 800;
-    letter-spacing: -.8px;
+    letter-spacing: -0.8px;
   `,
   ShareDescription: styled.p`
     margin: 12px 0 20px;
     color: ${tokens.color.neutral[500]};
     font-size: 14px;
-    letter-spacing: -.45px;
+    letter-spacing: -0.45px;
   `,
   ShareLinkBox: styled.div`
     display: flex;
@@ -432,7 +515,16 @@ export const S = {
     border-radius: 18px;
     background: ${tokens.color.neutral[100]};
 
-    code { min-width: 0; color: ${tokens.color.neutral[700]}; overflow: hidden; font-family: inherit; font-size: 14px; letter-spacing: -.3px; text-overflow: ellipsis; white-space: nowrap; }
+    code {
+      min-width: 0;
+      color: ${tokens.color.neutral[700]};
+      overflow: hidden;
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: -0.3px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   `,
   CopyButton: styled.button`
     flex: 0 0 auto;
@@ -466,7 +558,9 @@ export const S = {
     font-weight: 700;
     cursor: pointer;
 
-    &:active { background: ${tokens.color.neutral[100]}; }
+    &:active {
+      background: ${tokens.color.neutral[100]};
+    }
   `,
   ShareChannelIcon: styled.span`
     display: grid;
@@ -509,14 +603,16 @@ export const S = {
     gap: 13px;
     width: 100%;
     padding: 17px 18px;
-    border: 2px solid ${({ $selected }) => $selected ? tokens.color.danger[500] : tokens.color.neutral[200]};
+    border: 2px solid
+      ${({ $selected }) =>
+        $selected ? tokens.color.danger[500] : tokens.color.neutral[200]};
     border-radius: 16px;
-    background: ${({ $selected }) => $selected ? "#fff4f4" : tokens.color.neutral[50]};
-    color: ${({ $selected }) => $selected ? "#ce292f" : tokens.color.neutral[700]};
+    background: ${({ $selected }) => ($selected ? "#fff4f4" : tokens.color.neutral[50])};
+    color: ${({ $selected }) => ($selected ? "#ce292f" : tokens.color.neutral[700])};
     font: inherit;
     font-size: 14px;
     font-weight: 700;
-    letter-spacing: -.45px;
+    letter-spacing: -0.45px;
     text-align: left;
     cursor: pointer;
   `,
@@ -526,11 +622,19 @@ export const S = {
     aspect-ratio: 1;
     flex: 0 0 auto;
     place-items: center;
-    border: 2px solid ${({ $selected }) => $selected ? tokens.color.danger[500] : "#cbd3e0"};
+    border: 2px solid
+      ${({ $selected }) => ($selected ? tokens.color.danger[500] : "#cbd3e0")};
     border-radius: 50%;
-    background: ${({ $selected }) => $selected ? tokens.color.danger[500] : "transparent"};
+    background: ${({ $selected }) =>
+      $selected ? tokens.color.danger[500] : "transparent"};
 
-    &::after { width: 6px; aspect-ratio: 1; border-radius: 50%; background: ${tokens.color.neutral[50]}; content: ${({ $selected }) => $selected ? '""' : "none"}; }
+    &::after {
+      width: 6px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: ${tokens.color.neutral[50]};
+      content: ${({ $selected }) => ($selected ? '""' : "none")};
+    }
   `,
   BlockNotice: styled.div`
     display: grid;
@@ -542,11 +646,11 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     font-size: 13px;
     font-weight: 600;
-    letter-spacing: -.4px;
+    letter-spacing: -0.4px;
   `,
   DangerDialogActions: styled.div`
     display: grid;
-    grid-template-columns: .95fr 1.35fr;
+    grid-template-columns: 0.95fr 1.35fr;
     gap: 12px;
     margin-top: 26px;
   `,
@@ -577,13 +681,13 @@ export const S = {
     color: ${tokens.color.neutral[900]};
     font-size: 18px;
     font-weight: 800;
-    letter-spacing: -.7px;
+    letter-spacing: -0.7px;
   `,
   ProposalDescription: styled.p`
     margin: 8px 0 14px;
     color: ${tokens.color.neutral[500]};
     font-size: 11px;
-    letter-spacing: -.4px;
+    letter-spacing: -0.4px;
   `,
   ProposalTeamList: styled.div`
     display: grid;
@@ -596,27 +700,51 @@ export const S = {
     gap: 10px;
     width: 100%;
     padding: 13px 12px;
-    border: 1px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border: 1px solid
+      ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
     border-radius: 12px;
-    background: ${({ $selected }) => $selected ? "#f3f6ff" : tokens.color.neutral[50]};
-    color: ${({ $disabled }) => $disabled ? tokens.color.neutral[500] : tokens.color.neutral[900]};
+    background: ${({ $selected }) => ($selected ? "#f3f6ff" : tokens.color.neutral[50])};
+    color: ${({ $disabled }) =>
+      $disabled ? tokens.color.neutral[500] : tokens.color.neutral[900]};
     font: inherit;
     text-align: left;
-    cursor: ${({ $disabled }) => $disabled ? "not-allowed" : "pointer"};
+    cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
 
-    > span { display: grid; gap: 5px; min-width: 0; }
-    strong { font-size: 13px; font-weight: 800; letter-spacing: -.5px; }
-    small { color: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[500]}; font-size: 10px; letter-spacing: -.35px; line-height: 1.35; }
-    em { padding: 6px 8px; border-radius: 7px; background: ${tokens.color.neutral[100]}; color: ${tokens.color.neutral[500]}; font-size: 9px; font-style: normal; }
+    > span {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+    strong {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    small {
+      color: ${({ $selected }) =>
+        $selected ? giutHubPrimary : tokens.color.neutral[500]};
+      font-size: 10px;
+      letter-spacing: -0.35px;
+      line-height: 1.35;
+    }
+    em {
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: ${tokens.color.neutral[100]};
+      color: ${tokens.color.neutral[500]};
+      font-size: 9px;
+      font-style: normal;
+    }
   `,
   ProposalRadio: styled.span<{ $selected: boolean }>`
     display: grid;
     width: 20px;
     height: 20px;
     place-items: center;
-    border: 1.5px solid ${({ $selected }) => $selected ? giutHubPrimary : "#b7c0d0"};
+    border: 1.5px solid ${({ $selected }) => ($selected ? giutHubPrimary : "#b7c0d0")};
     border-radius: 50%;
-    background: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[50]};
+    background: ${({ $selected }) =>
+      $selected ? giutHubPrimary : tokens.color.neutral[50]};
     color: ${tokens.color.neutral[50]};
   `,
   ProposalPositionTitle: styled.h3`
@@ -632,10 +760,13 @@ export const S = {
   `,
   ProposalPosition: styled.button<{ $selected: boolean }>`
     padding: 10px 14px;
-    border: 1px solid ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[200]};
+    border: 1px solid
+      ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
     border-radius: 999px;
-    background: ${({ $selected }) => $selected ? giutHubPrimary : tokens.color.neutral[50]};
-    color: ${({ $selected }) => $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
+    background: ${({ $selected }) =>
+      $selected ? giutHubPrimary : tokens.color.neutral[50]};
+    color: ${({ $selected }) =>
+      $selected ? tokens.color.neutral[50] : tokens.color.neutral[700]};
     font: inherit;
     font-size: 11px;
     font-weight: 700;
@@ -643,7 +774,7 @@ export const S = {
   `,
   ProposalFooter: styled.div`
     display: grid;
-    grid-template-columns: .65fr 1.85fr;
+    grid-template-columns: 0.65fr 1.85fr;
     gap: 10px;
   `,
   ProposalCancelButton: styled.button`

@@ -12,8 +12,8 @@ export const S = {
     margin: 0 auto 24px;
     place-items: center;
     border-radius: 50%;
-    background: ${({ $tone }) => $tone === "danger" ? "#fff0f1" : "#edf2fb"};
-    color: ${({ $tone }) => $tone === "danger" ? tokens.color.danger[500] : "#1C4EA3"};
+    background: ${({ $tone }) => ($tone === "danger" ? "#fff0f1" : "#edf2fb")};
+    color: ${({ $tone }) => ($tone === "danger" ? tokens.color.danger[500] : "#1C4EA3")};
   `,
   Title: styled.h2`
     margin: 0;
@@ -28,7 +28,7 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     font-size: 14px;
     font-weight: 500;
-    letter-spacing: -.45px;
+    letter-spacing: -0.45px;
     line-height: 1.7;
     white-space: pre-line;
   `,

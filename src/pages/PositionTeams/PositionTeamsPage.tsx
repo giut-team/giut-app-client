@@ -96,7 +96,7 @@ export function PositionTeamsPage() {
             <S.HeaderActions>
               <S.HeaderButton
                 aria-label="팀 페이지로 이동"
-                onClick={() => navigate("/my-team")}
+                onClick={() => navigate("/my-profile")}
                 type="button"
               >
                 <Icon name="users" size={16} weight="regular" />

@@ -61,6 +61,57 @@
 
 final result: blocked
 
+## Profile edit selection sheets update
+
+- Source visual truth: the supplied mobile screenshots for 학과 선택, 학년 선택, and 현재 상태 sheets.
+- Implementation route: `/my-profile/edit`.
+- Implemented interactions: the 학과, 학년, and 현재 상태 controls open their respective selection sheets; selections update the edit form and the footer confirms the current choice.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime returned `No browser is available`, so this update could not be compared against the supplied mobile captures at a matching viewport.
+- Code checks: `npm run build` passed.
+
+**Findings**
+
+- [P1] Visual fidelity is unverified because no browser-rendered implementation capture is available.
+
+final result: blocked
+
+## My profile reference-alignment update
+
+- Source visual truth: the supplied My Page screenshot showing the dashed profile-photo and featured-project upload areas, visible skill chips above the tabs, and the navy profile-edit action.
+- Implementation route: `/my-profile`.
+- Implemented state: profile and featured-project thumbnails use the referenced dashed upload treatment; the existing GiutHub skill chips now appear between the metrics and tab list; the local My Page primary action uses the reference navy tone.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime remains unavailable, so the updated image-free layout could not be compared to the reference at a matching viewport.
+- Code checks: `npm run build` passed.
+
+final result: blocked
+
+## My profile page update
+
+- Source visual truth: the supplied mobile screenshot (`스크린샷 2026-09-20 오후 11.17.25.png`) showing the My Page profile overview.
+- Implementation route: `/my-profile`.
+- Implemented state: the page reuses the GiutHub profile, portfolio, and skill-stack mock data. It provides the profile overview, edit/share controls, collaboration/proposal/recommendation metrics, and interactive portfolio, team, and saved-item tabs.
+- Primary interactions: all bottom-navigation My Page entries route to `/my-profile`; portfolio items retain the existing portfolio-detail navigation; the three tabs switch their content.
+- Browser-rendered implementation screenshot: unavailable. The browser runtime returned `No browser is available`, and no local preview could be captured at the reference mobile viewport.
+- Code checks: `npm run build` passed.
+
+**Findings**
+
+- [P1] Visual fidelity is unverified.
+  Location: `/my-profile`.
+  Evidence: the supplied reference is available, but no browser-rendered implementation screenshot could be captured for a same-viewport comparison.
+  Impact: profile-header height, portfolio-card image proportion, and tab spacing may differ from the target.
+  Fix: when a browser runtime is available, capture `/my-profile` at the supplied mobile viewport and compare the full page plus the profile and featured-project regions.
+
+**Required fidelity surfaces**
+
+- Fonts and typography: existing SUIT typography and GiutHub detail type hierarchy are reused; visual comparison is blocked.
+- Spacing and layout rhythm: the reference's profile/metrics/tabs/portfolio sequence is implemented; exact spacing is unverified.
+- Colors and visual tokens: the GiutHub primary `#1C4EA3` and existing neutral tokens are used.
+- Image quality and asset fidelity: existing profile and portfolio raster assets are reused; visual crop verification is blocked.
+- Copy and content: the screen uses existing GiutHub mock profile and portfolio data.
+
+final result: blocked
+
 ## Pending application-detail update
 
 - Source visual truth: the supplied pending-application screenshot showing a timeline followed by a support-position summary card, two question-and-answer cards, and an informational notice.

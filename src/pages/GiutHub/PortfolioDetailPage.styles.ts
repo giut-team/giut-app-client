@@ -20,7 +20,8 @@ export const S = {
   Page: styled.main<{ $isLeaving: boolean }>`
     min-height: 100svh;
     background: ${tokens.color.neutral[100]};
-    animation: ${({ $isLeaving }) => $isLeaving ? exitToRight : enterFromRight} .24s cubic-bezier(.2, .8, .2, 1) both;
+    animation: ${({ $isLeaving }) => ($isLeaving ? exitToRight : enterFromRight)} 0.24s
+      cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
     @media (prefers-reduced-motion: reduce) {
       animation: none;
@@ -54,9 +55,25 @@ export const S = {
     border-radius: 18px;
     background: ${tokens.color.neutral[100]};
 
-    span { display: grid; min-width: 0; gap: 6px; }
-    strong { overflow: hidden; color: ${tokens.color.neutral[900]}; font-size: 15px; font-weight: 800; letter-spacing: -.55px; text-overflow: ellipsis; white-space: nowrap; }
-    small { color: ${tokens.color.neutral[500]}; font-size: 13px; letter-spacing: -.4px; }
+    span {
+      display: grid;
+      min-width: 0;
+      gap: 6px;
+    }
+    strong {
+      overflow: hidden;
+      color: ${tokens.color.neutral[900]};
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.55px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    small {
+      color: ${tokens.color.neutral[500]};
+      font-size: 13px;
+      letter-spacing: -0.4px;
+    }
   `,
   SharePreviewThumbnail: styled.span`
     display: block;
@@ -77,7 +94,16 @@ export const S = {
     border-radius: 18px;
     background: ${tokens.color.neutral[100]};
 
-    code { min-width: 0; overflow: hidden; color: ${tokens.color.neutral[700]}; font-family: inherit; font-size: 14px; letter-spacing: -.3px; text-overflow: ellipsis; white-space: nowrap; }
+    code {
+      min-width: 0;
+      overflow: hidden;
+      color: ${tokens.color.neutral[700]};
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: -0.3px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   `,
   CopyButton: styled.button`
     flex: 0 0 auto;
@@ -146,7 +172,11 @@ export const S = {
     overflow: hidden;
     background: ${tokens.color.neutral[100]};
 
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   `,
   Body: styled.article`
     padding: 28px 24px 32px;
@@ -156,9 +186,19 @@ export const S = {
     align-items: center;
     gap: 13px;
 
-    span { display: grid; gap: 5px; }
-    strong { color: ${tokens.color.neutral[900]}; font-size: 18px; font-weight: 800; }
-    small { color: ${tokens.color.neutral[500]}; font-size: 14px; }
+    span {
+      display: grid;
+      gap: 5px;
+    }
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-size: 18px;
+      font-weight: 800;
+    }
+    small {
+      color: ${tokens.color.neutral[500]};
+      font-size: 14px;
+    }
   `,
   Avatar: styled.div<{ $tone: AvatarTone }>`
     display: grid;
@@ -167,11 +207,18 @@ export const S = {
     overflow: hidden;
     place-items: center;
     border-radius: 14px;
-    background: ${({ $tone }) => ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[$tone]};
+    background: ${({ $tone }) =>
+      ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[
+        $tone
+      ]};
     color: ${giutHubPrimary};
     font-size: 24px;
     font-weight: 800;
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   `,
   Title: styled.h1`
     margin: 26px 0 0;
@@ -190,11 +237,37 @@ export const S = {
     margin-top: 20px;
     border-top: 1px solid ${tokens.color.neutral[200]};
 
-    h2 { margin: 0; padding-top: 21px; color: ${tokens.color.neutral[900]}; font-size: 20px; font-weight: 800; letter-spacing: -.8px; }
-    p { margin: 14px 0 0; color: ${tokens.color.neutral[700]}; font-size: 15px; letter-spacing: -.45px; line-height: 1.65; }
-    ul { display: grid; gap: 8px; margin: 14px 0 0; padding: 0 0 20px 19px; border-bottom: 1px solid ${tokens.color.neutral[200]}; color: ${tokens.color.neutral[700]}; font-size: 15px; line-height: 1.5; }
-    li::marker { color: ${giutHubPrimary}; }
-    strong { font-weight: 800; }
+    h2 {
+      margin: 0;
+      padding-top: 21px;
+      color: ${tokens.color.neutral[900]};
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
+    p {
+      margin: 14px 0 0;
+      color: ${tokens.color.neutral[700]};
+      font-size: 15px;
+      letter-spacing: -0.45px;
+      line-height: 1.65;
+    }
+    ul {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding: 0 0 20px 19px;
+      border-bottom: 1px solid ${tokens.color.neutral[200]};
+      color: ${tokens.color.neutral[700]};
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    li::marker {
+      color: ${giutHubPrimary};
+    }
+    strong {
+      font-weight: 800;
+    }
   `,
   StackTitle: styled.h2`
     margin: 20px 0 0;
@@ -214,13 +287,18 @@ export const S = {
     gap: 5px;
     padding: 9px 8px;
     border-radius: 10px;
-    background: ${({ $index }) => ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
+    background: ${({ $index }) =>
+      ["#437b9c", "#2c4964", "#8953d9", "#2f3446"][$index % 4]};
     color: white;
     font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
 
-    img { width: 14px; height: 14px; filter: brightness(0) invert(1); }
+    img {
+      width: 14px;
+      height: 14px;
+      filter: brightness(0) invert(1);
+    }
   `,
   ProposalBar: styled.div`
     position: fixed;
