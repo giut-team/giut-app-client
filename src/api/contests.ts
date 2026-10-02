@@ -21,6 +21,22 @@ export type CompetitionResponse = {
   primaryUrl: string;
 };
 
+export type CompetitionUrl = {
+  id: number;
+  type: string;
+  url: string;
+  primary: boolean;
+};
+
+export type CompetitionDetailResponse = Omit<CompetitionResponse, "primaryUrl"> & {
+  primaryUrl?: string;
+  targetParticipant: string;
+  scrapped: boolean;
+  urls: CompetitionUrl[];
+  recruitingTeamCount: number;
+  teams: unknown[];
+};
+
 export type CompetitionsResponse = {
   competitions: CompetitionResponse[];
   page: number;
@@ -33,6 +49,11 @@ export type CompetitionsResponse = {
 export type Contest = CompetitionResponse & {
   categoryTone: CategoryTone;
   /** API의 applicationEndAt을 기준으로 프론트엔드에서 계산한 표시값 */
+  dDay: string;
+};
+
+export type ContestDetail = CompetitionDetailResponse & {
+  categoryTone: CategoryTone;
   dDay: string;
 };
 
@@ -107,6 +128,12 @@ const normalizeContest = (item: CompetitionResponse): Contest => ({
   dDay: calculateDday(item.applicationEndAt),
 });
 
+const normalizeContestDetail = (item: CompetitionDetailResponse): ContestDetail => ({
+  ...item,
+  categoryTone: categoryTones[item.category] ?? "blue",
+  dDay: calculateDday(item.applicationEndAt),
+});
+
 export const fetchContests = async (category: ContestCategory = "전체"): Promise<Contest[]> => {
   const { data } = await api.get<CompetitionsResponse>("/api/competitions", {
     params: {
@@ -120,4 +147,10 @@ export const fetchContests = async (category: ContestCategory = "전체"): Promi
   });
 
   return data.competitions.map(normalizeContest);
+};
+
+export const fetchContestDetail = async (contestId: string | number): Promise<ContestDetail> => {
+  const { data } = await api.get<CompetitionDetailResponse>(`/api/competitions/${contestId}`);
+
+  return normalizeContestDetail(data);
 };

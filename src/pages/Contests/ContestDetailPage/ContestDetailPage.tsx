@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { fetchContestDetail } from "../../../api/contests";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
@@ -51,9 +53,9 @@ const recruitTeams = [
 export function ContestDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { contestId = "seoul-data" } = useParams();
+  const { contestId } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
-  const [isSaved, setIsSaved] = useState(false);
+  const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [favoriteTeamIds, setFavoriteTeamIds] = useState<string[]>([]);
   const [applyTargetTeam, setApplyTargetTeam] = useState<
@@ -65,6 +67,15 @@ export function ContestDetailPage() {
     backPath?: string;
   } | null;
   const [toastMessage, setToastMessage] = useState("");
+  const {
+    data: contest,
+    isError: isContestError,
+    isPending: isContestLoading,
+  } = useQuery({
+    queryKey: ["contest", contestId],
+    queryFn: () => fetchContestDetail(contestId ?? ""),
+    enabled: Boolean(contestId),
+  });
   useEffect(() => {
     if (!toastMessage) return;
 
@@ -115,6 +126,17 @@ export function ContestDetailPage() {
   const getTeamPath = (team: (typeof recruitTeams)[number]) =>
     team.isOwner ? `teams/${team.id}/manage` : `teams/${team.id}`;
 
+  const formatDate = (value: string) => new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(value)).replaceAll(". ", ".").replace(".", ".");
+  const applicationPeriod = contest
+    ? `${formatDate(contest.applicationStartAt)} - ${formatDate(contest.applicationEndAt)}`
+    : "";
+  const sourceUrl = contest?.urls.find((url) => url.primary)?.url ?? contest?.primaryUrl;
+  const isSaved = savedOverride ?? contest?.scrapped ?? false;
+
   const toggleTeamFavorite = (teamId: string) => {
     setFavoriteTeamIds((current) =>
       current.includes(teamId)
@@ -122,6 +144,14 @@ export function ContestDetailPage() {
         : [...current, teamId],
     );
   };
+
+  if (isContestLoading) {
+    return <S.Page><S.Content><S.InfoSection>공모전 정보를 불러오는 중이에요.</S.InfoSection></S.Content></S.Page>;
+  }
+
+  if (isContestError || !contest) {
+    return <S.Page><S.Content><S.InfoSection>공모전 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</S.InfoSection></S.Content></S.Page>;
+  }
 
   return (
     <S.Page>
@@ -138,7 +168,7 @@ export function ContestDetailPage() {
             <S.HeaderButton
               aria-label={isSaved ? "찜 취소하기" : "공모전 찜하기"}
               aria-pressed={isSaved}
-              onClick={() => setIsSaved((current) => !current)}
+              onClick={() => setSavedOverride(!isSaved)}
               type="button"
             >
               <Icon
@@ -164,59 +194,47 @@ export function ContestDetailPage() {
 
         <S.Hero>
           <S.HeroTags>
-            <S.Category>IT/과학</S.Category>
-            <S.Verified>
-              <Icon name="check" size={8} weight="bold" />
-              인증
-            </S.Verified>
+            <S.Category>{contest.categoryName}</S.Category>
           </S.HeroTags>
           <S.HeroTitle>
-            2026 서울시
-            <br />
-            데이터 활용 공모전
+            {contest.title}
           </S.HeroTitle>
-          <S.Host>주최 · 서울특별시</S.Host>
+          <S.Host>주최 · {contest.hostOrganization}</S.Host>
           <S.HeroStats>
             <span>
               <Icon name="eye" size={11} weight="regular" />
-              41,852
+              {contest.viewCount.toLocaleString("ko-KR")}
             </span>
             <span>
               <Icon name="bookmark" size={11} weight="regular" />
-              128
+              {contest.scrapCount.toLocaleString("ko-KR")}
             </span>
           </S.HeroStats>
-          <S.DDay>D-15</S.DDay>
+          <S.DDay>{contest.dDay}</S.DDay>
         </S.Hero>
 
         <S.InfoSection>
           <S.InfoList>
             <S.InfoRow>
               <span>접수 기간</span>
-              <strong>2026.09.01 (화) - 09.30 (수)</strong>
+              <strong>{applicationPeriod}</strong>
             </S.InfoRow>
             <S.InfoRow>
               <span>참가 대상</span>
-              <strong>서울 소재 대학 재/휴학생</strong>
-            </S.InfoRow>
-            <S.InfoRow>
-              <span>시상 규모</span>
-              <strong>총 상금 3,000만원</strong>
+              <strong>{contest.targetParticipant}</strong>
             </S.InfoRow>
             <S.InfoRow>
               <span>원문</span>
-              <S.SourceLink
-                href="https://contest.seoul.go.kr"
-                rel="noreferrer"
-                target="_blank"
-              >
-                contest.seoul.go.kr ↗
-              </S.SourceLink>
+              {sourceUrl ? (
+                <S.SourceLink href={sourceUrl} rel="noreferrer" target="_blank">
+                  원문 보기 ↗
+                </S.SourceLink>
+              ) : <strong>원문 링크 없음</strong>}
             </S.InfoRow>
           </S.InfoList>
           <S.Notice>
-            서울시립대 공지사항 RSS에서 자동 수집된 공고입니다. 필수 항목이 모두
-            채워져 인증마크가 부여되었습니다.
+            {contest.recruitmentStatusName} 공모전입니다. 신청 마감일과 원문 링크를
+            확인해 주세요.
           </S.Notice>
         </S.InfoSection>
 
@@ -244,15 +262,11 @@ export function ContestDetailPage() {
         <S.TabContent role="tabpanel">
           {activeTab === "overview" ? (
             <S.Description>
-              서울시가 보유한 공공데이터를 활용해 시민 생활 문제를 해결하는
-              서비스·분석 아이디어를 제안하는 공모전입니다. 데이터 분석, 서비스
-              기획, 개발이 모두 필요해 3~5인 팀 단위 참가를 권장합니다.
+              {contest.summary}
             </S.Description>
           ) : (
             <S.Description>
-              1차 서면 심사 후 2차 발표 심사가 진행됩니다. 제출물은 기획서(PDF
-              10p 이내)와 시연 영상(3분 이내)이며, 수상팀은 서울시 실증 사업
-              참여 기회를 제공받습니다. 자세한 내용은 원문 링크를 확인하세요.
+              자세한 모집 요건과 제출 방법은 원문 링크에서 확인해 주세요.
             </S.Description>
           )}
         </S.TabContent>
@@ -260,7 +274,7 @@ export function ContestDetailPage() {
         <S.TeamsHeader>
           <S.SectionHeader>
             <S.SectionTitle>
-              모집 중인 팀 <S.TeamTotal>5</S.TeamTotal>
+              모집 중인 팀 <S.TeamTotal>{contest.recruitingTeamCount}</S.TeamTotal>
             </S.SectionTitle>
             <S.ViewAll onClick={() => navigate("teams")} type="button">
               전체 보기 ›
@@ -353,7 +367,7 @@ export function ContestDetailPage() {
         variant="compact"
       >
         <S.ShareLinkRow>
-          <S.ShareLinkText>giut.app/c/seoul-data-2026</S.ShareLinkText>
+          <S.ShareLinkText>{window.location.href}</S.ShareLinkText>
           <S.CopyButton onClick={copyShareLink} type="button">복사</S.CopyButton>
         </S.ShareLinkRow>
         <S.ShareActions>
