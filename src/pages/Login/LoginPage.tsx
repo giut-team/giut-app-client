@@ -1,9 +1,15 @@
 import { RiKakaoTalkFill } from "react-icons/ri";
+import { API_BASE_URL } from "../../api/client";
 import giutLogo from "../../assets/giut-logo.svg";
 import { Icon } from "../../components/icons";
 import { S } from "./LoginPage.styles";
 
 export function LoginPage() {
+  const handleKakaoLogin = () => {
+    sessionStorage.setItem("kakao-login-pending", "true");
+    window.location.assign(`${API_BASE_URL}/api/oauth/kakao/authorization`);
+  };
+
   return (
     <S.Page>
       <S.Logo aria-label="기웃">
@@ -21,7 +27,7 @@ export function LoginPage() {
       </S.Message>
 
       <S.Actions>
-        <S.KakaoButton type="button">
+        <S.KakaoButton onClick={handleKakaoLogin} type="button">
           <S.ProviderIcon>
             <RiKakaoTalkFill aria-hidden="true" size={14} />
           </S.ProviderIcon>

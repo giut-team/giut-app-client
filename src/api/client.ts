@@ -1,9 +1,10 @@
 import axios from "axios";
 
 const ACCESS_TOKEN_KEY = "accessToken";
+export const API_BASE_URL = "https://api.giut.store";
 
 export const api = axios.create({
-  baseURL: "https://api.giut.store",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

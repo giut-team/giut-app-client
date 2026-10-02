@@ -1,4 +1,6 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
@@ -29,13 +31,32 @@ import { ChatRoomPage } from "./pages/Chat/ChatRoomPage";
 import { MyProfilePage } from "./pages/MyPage/MyProfilePage";
 import { ProfileEditPage, ProfileRoleDetailPage } from "./pages/MyPage/ProfileEditPage";
 
+function HomeEntryPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
+  const loginPending = sessionStorage.getItem("kakao-login-pending") === "true";
+
+  useEffect(() => {
+    if (!loginPending || isLoading) return;
+
+    sessionStorage.removeItem("kakao-login-pending");
+
+    if (isAuthenticated) {
+      navigate("/student-verification", { replace: true });
+    }
+  }, [isAuthenticated, isLoading, loginPending, navigate]);
+
+  return loginPending && isLoading ? null : <HomePage />;
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<HomePage />} path="/" />
+        <Route element={<HomeEntryPage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
-        <Route element={<HomePage />} path="/home" />
+        <Route element={<Navigate replace to="/" />} path="/login/callback" />
+        <Route element={<HomeEntryPage />} path="/home" />
         <Route element={<ChatPage />} path="/chat" />
         <Route element={<ChatRoomPage />} path="/chat/:chatId" />
         <Route element={<GiutHubPage />} path="/giut-hub" />
