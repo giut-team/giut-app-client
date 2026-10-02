@@ -92,13 +92,15 @@ export function ContestDetailPage() {
         ? 0
         : response.scrapped ? 1 : -1;
 
-      queryClient.setQueriesData<Contest[]>({ queryKey: ["contests"] }, (contests) => (
-        contests?.map((item) => (
-          item.id === response.competitionId
-            ? { ...item, scrapCount: Math.max(0, item.scrapCount + scrapCountChange) }
-            : item
-        ))
-      ));
+      for (const queryKey of [["contests"], ["popularContests"]]) {
+        queryClient.setQueriesData<Contest[]>({ queryKey }, (contests) => (
+          contests?.map((item) => (
+            item.id === response.competitionId
+              ? { ...item, scrapCount: Math.max(0, item.scrapCount + scrapCountChange) }
+              : item
+          ))
+        ));
+      }
       setToastMessage(response.scrapped ? "스크랩했어요." : "스크랩을 취소했어요.");
     },
     onError: () => setToastMessage("스크랩 상태를 변경하지 못했어요. 잠시 후 다시 시도해 주세요."),
@@ -113,11 +115,13 @@ export function ContestDetailPage() {
   useEffect(() => {
     if (!contest) return;
 
-    queryClient.setQueriesData<Contest[]>({ queryKey: ["contests"] }, (contests) => (
-      contests?.map((item) => (
-        item.id === contest.id ? { ...item, viewCount: contest.viewCount } : item
-      ))
-    ));
+    for (const queryKey of [["contests"], ["popularContests"]]) {
+      queryClient.setQueriesData<Contest[]>({ queryKey }, (contests) => (
+        contests?.map((item) => (
+          item.id === contest.id ? { ...item, viewCount: contest.viewCount } : item
+        ))
+      ));
+    }
   }, [contest, queryClient]);
   const handleBack = () => {
     if (teamCreationState?.fromTeamCreation) {

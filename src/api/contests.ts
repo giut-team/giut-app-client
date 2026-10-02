@@ -1,7 +1,8 @@
 import { api } from "./client";
 
 export type ContestCategory = "전체" | keyof typeof categoryQueryValues;
-export type CompetitionCategory = (typeof categoryQueryValues)[keyof typeof categoryQueryValues];
+export type CompetitionCategory =
+  (typeof categoryQueryValues)[keyof typeof categoryQueryValues];
 type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow" | "pink";
 
 export type CompetitionResponse = {
@@ -33,7 +34,10 @@ export type CompetitionScrapResponse = {
   scrapped: boolean;
 };
 
-export type CompetitionDetailResponse = Omit<CompetitionResponse, "primaryUrl"> & {
+export type CompetitionDetailResponse = Omit<
+  CompetitionResponse,
+  "primaryUrl"
+> & {
   primaryUrl?: string;
   targetParticipant: string;
   scrapped: boolean;
@@ -111,16 +115,32 @@ const categoryTones: Record<CompetitionCategory, CategoryTone> = {
   ETC: "yellow",
 };
 
-/** 브라우저의 현재 날짜를 기준으로 마감일까지 남은 일수를 표시합니다. */
-export const calculateDday = (deadline: string | Date, today = new Date()): string => {
-  const endDate = typeof deadline === "string"
-    ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(deadline) ? `${deadline}T00:00:00` : deadline)
-    : deadline;
+export const calculateDday = (
+  deadline: string | Date,
+  today = new Date(),
+): string => {
+  const endDate =
+    typeof deadline === "string"
+      ? new Date(
+          /^\d{4}-\d{2}-\d{2}$/.test(deadline)
+            ? `${deadline}T00:00:00`
+            : deadline,
+        )
+      : deadline;
 
-  if (Number.isNaN(endDate.getTime()) || Number.isNaN(today.getTime())) return "-";
+  if (Number.isNaN(endDate.getTime()) || Number.isNaN(today.getTime()))
+    return "-";
 
-  const endDay = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-  const currentDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const endDay = Date.UTC(
+    endDate.getFullYear(),
+    endDate.getMonth(),
+    endDate.getDate(),
+  );
+  const currentDay = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
   const days = (endDay - currentDay) / 86_400_000;
 
   if (days < 0) return "마감";
@@ -133,13 +153,17 @@ const normalizeContest = (item: CompetitionResponse): Contest => ({
   dDay: calculateDday(item.applicationEndAt),
 });
 
-const normalizeContestDetail = (item: CompetitionDetailResponse): ContestDetail => ({
+const normalizeContestDetail = (
+  item: CompetitionDetailResponse,
+): ContestDetail => ({
   ...item,
   categoryTone: categoryTones[item.category] ?? "blue",
   dDay: calculateDday(item.applicationEndAt),
 });
 
-export const fetchContests = async (category: ContestCategory = "전체"): Promise<Contest[]> => {
+export const fetchContests = async (
+  category: ContestCategory = "전체",
+): Promise<Contest[]> => {
   const { data } = await api.get<CompetitionsResponse>("/api/competitions", {
     params: {
       page: 0,
@@ -154,8 +178,20 @@ export const fetchContests = async (category: ContestCategory = "전체"): Promi
   return data.competitions.map(normalizeContest);
 };
 
-export const fetchContestDetail = async (contestId: string | number): Promise<ContestDetail> => {
-  const { data } = await api.get<CompetitionDetailResponse>(`/api/competitions/${contestId}`);
+export const fetchPopularContests = async (): Promise<Contest[]> => {
+  const { data } = await api.get<CompetitionResponse[]>(
+    "/api/competitions/top5",
+  );
+
+  return data.map(normalizeContest);
+};
+
+export const fetchContestDetail = async (
+  contestId: string | number,
+): Promise<ContestDetail> => {
+  const { data } = await api.get<CompetitionDetailResponse>(
+    `/api/competitions/${contestId}`,
+  );
 
   return normalizeContestDetail(data);
 };
@@ -163,7 +199,9 @@ export const fetchContestDetail = async (contestId: string | number): Promise<Co
 export const addContestScrap = async (
   contestId: string | number,
 ): Promise<CompetitionScrapResponse> => {
-  const { data } = await api.post<CompetitionScrapResponse>(`/api/competitions/${contestId}/scrap`);
+  const { data } = await api.post<CompetitionScrapResponse>(
+    `/api/competitions/${contestId}/scrap`,
+  );
 
   return data;
 };
@@ -171,7 +209,9 @@ export const addContestScrap = async (
 export const removeContestScrap = async (
   contestId: string | number,
 ): Promise<CompetitionScrapResponse> => {
-  const { data } = await api.delete<CompetitionScrapResponse>(`/api/competitions/${contestId}/scrap`);
+  const { data } = await api.delete<CompetitionScrapResponse>(
+    `/api/competitions/${contestId}/scrap`,
+  );
 
   return data;
 };
