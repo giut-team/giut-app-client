@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { addContestScrap, fetchContestDetail, removeContestScrap } from "../../../api/contests";
+import {
+  addContestScrap,
+  fetchContestDetail,
+  removeContestScrap,
+  type Contest,
+} from "../../../api/contests";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
@@ -52,6 +57,7 @@ const recruitTeams = [
 
 export function ContestDetailPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const { contestId } = useParams();
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
@@ -80,8 +86,19 @@ export function ContestDetailPage() {
     mutationFn: (scrapped: boolean) => (
       scrapped ? removeContestScrap(contestId ?? "") : addContestScrap(contestId ?? "")
     ),
-    onSuccess: (response) => {
+    onSuccess: (response, wasScrapped) => {
       setSavedOverride(response.scrapped);
+      const scrapCountChange = response.scrapped === wasScrapped
+        ? 0
+        : response.scrapped ? 1 : -1;
+
+      queryClient.setQueriesData<Contest[]>({ queryKey: ["contests"] }, (contests) => (
+        contests?.map((item) => (
+          item.id === response.competitionId
+            ? { ...item, scrapCount: Math.max(0, item.scrapCount + scrapCountChange) }
+            : item
+        ))
+      ));
       setToastMessage(response.scrapped ? "스크랩했어요." : "스크랩을 취소했어요.");
     },
     onError: () => setToastMessage("스크랩 상태를 변경하지 못했어요. 잠시 후 다시 시도해 주세요."),
@@ -93,6 +110,15 @@ export function ContestDetailPage() {
 
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
+  useEffect(() => {
+    if (!contest) return;
+
+    queryClient.setQueriesData<Contest[]>({ queryKey: ["contests"] }, (contests) => (
+      contests?.map((item) => (
+        item.id === contest.id ? { ...item, viewCount: contest.viewCount } : item
+      ))
+    ));
+  }, [contest, queryClient]);
   const handleBack = () => {
     if (teamCreationState?.fromTeamCreation) {
       navigate(teamCreationState.backPath ?? "/", { replace: true });
