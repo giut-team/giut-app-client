@@ -94,7 +94,7 @@ export function HomePage() {
     if (isTeamButtonAnimating) return;
 
     setIsTeamButtonAnimating(true);
-    window.setTimeout(() => navigate("/my-profile"), 180);
+    window.setTimeout(() => navigate("/my-team"), 180);
   };
 
   return (
