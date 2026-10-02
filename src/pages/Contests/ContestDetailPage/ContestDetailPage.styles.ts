@@ -1,5 +1,12 @@
 import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import { tokens } from "../../../design-system/tokens.generated";
+
+const shimmer = keyframes`
+  100% {
+    transform: translateX(100%);
+  }
+`;
 
 export const S = {
   Page: styled.main`
@@ -46,6 +53,32 @@ export const S = {
     &[aria-pressed="true"] {
       background: transparent;
       color: ${tokens.color.neutral[700]};
+    }
+  `,
+  SkeletonContent: styled.div`
+    display: grid;
+    gap: 18px;
+    padding: 28px 18px 24px;
+  `,
+  SkeletonBlock: styled.div<{ $height: string }>`
+    position: relative;
+    height: ${({ $height }) => $height};
+    overflow: hidden;
+    border-radius: 12px;
+    background: ${tokens.color.neutral[100]};
+
+    &::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgb(255 255 255 / 65%) 50%,
+        transparent 100%
+      );
+      content: "";
+      transform: translateX(-100%);
+      animation: ${shimmer} 1.35s infinite;
     }
   `,
   Hero: styled.section`

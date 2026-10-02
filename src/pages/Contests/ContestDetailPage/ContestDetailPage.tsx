@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { fetchContestDetail } from "../../../api/contests";
+import { addContestScrap, fetchContestDetail, removeContestScrap } from "../../../api/contests";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
@@ -76,6 +76,16 @@ export function ContestDetailPage() {
     queryFn: () => fetchContestDetail(contestId ?? ""),
     enabled: Boolean(contestId),
   });
+  const { isPending: isScrapPending, mutate: toggleScrap } = useMutation({
+    mutationFn: (scrapped: boolean) => (
+      scrapped ? removeContestScrap(contestId ?? "") : addContestScrap(contestId ?? "")
+    ),
+    onSuccess: (response) => {
+      setSavedOverride(response.scrapped);
+      setToastMessage(response.scrapped ? "스크랩했어요." : "스크랩을 취소했어요.");
+    },
+    onError: () => setToastMessage("스크랩 상태를 변경하지 못했어요. 잠시 후 다시 시도해 주세요."),
+  });
   useEffect(() => {
     if (!toastMessage) return;
 
@@ -136,6 +146,14 @@ export function ContestDetailPage() {
     : "";
   const sourceUrl = contest?.urls.find((url) => url.primary)?.url ?? contest?.primaryUrl;
   const isSaved = savedOverride ?? contest?.scrapped ?? false;
+  const displayScrapCount = !contest
+    ? 0
+    : contest.scrapCount + (savedOverride === true && !contest.scrapped ? 1 : 0)
+      - (savedOverride === false && contest.scrapped ? 1 : 0);
+
+  const handleScrap = () => {
+    toggleScrap(isSaved);
+  };
 
   const toggleTeamFavorite = (teamId: string) => {
     setFavoriteTeamIds((current) =>
@@ -146,7 +164,35 @@ export function ContestDetailPage() {
   };
 
   if (isContestLoading) {
-    return <S.Page><S.Content><S.InfoSection>공모전 정보를 불러오는 중이에요.</S.InfoSection></S.Content></S.Page>;
+    return (
+      <S.Page aria-busy="true">
+        <S.Content>
+          <S.Header>
+            <S.HeaderButton
+              aria-label="뒤로 가기"
+              onClick={handleBack}
+              type="button"
+            >
+              <Icon name="arrow-left" size={20} weight="regular" />
+            </S.HeaderButton>
+            <S.HeaderActions>
+              <S.HeaderButton aria-label="공모전 스크랩" disabled type="button">
+                <Icon name="bookmark" size={18} weight="regular" />
+              </S.HeaderButton>
+              <S.HeaderButton aria-label="공유하기" disabled type="button">
+                <Icon name="share" size={18} weight="regular" />
+              </S.HeaderButton>
+            </S.HeaderActions>
+          </S.Header>
+          <S.SkeletonContent aria-label="공모전 정보를 불러오는 중">
+            <S.SkeletonBlock $height="24px" />
+            <S.SkeletonBlock $height="98px" />
+            <S.SkeletonBlock $height="132px" />
+            <S.SkeletonBlock $height="160px" />
+          </S.SkeletonContent>
+        </S.Content>
+      </S.Page>
+    );
   }
 
   if (isContestError || !contest) {
@@ -166,9 +212,10 @@ export function ContestDetailPage() {
           </S.HeaderButton>
           <S.HeaderActions>
             <S.HeaderButton
-              aria-label={isSaved ? "찜 취소하기" : "공모전 찜하기"}
+              aria-label={isSaved ? "공모전 스크랩 취소하기" : "공모전 스크랩하기"}
               aria-pressed={isSaved}
-              onClick={() => setSavedOverride(!isSaved)}
+              disabled={isScrapPending}
+              onClick={handleScrap}
               type="button"
             >
               <Icon
@@ -207,7 +254,7 @@ export function ContestDetailPage() {
             </span>
             <span>
               <Icon name="bookmark" size={11} weight="regular" />
-              {contest.scrapCount.toLocaleString("ko-KR")}
+              {displayScrapCount.toLocaleString("ko-KR")}
             </span>
           </S.HeroStats>
           <S.DDay>{contest.dDay}</S.DDay>

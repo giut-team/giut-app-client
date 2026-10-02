@@ -61,6 +61,23 @@ function ContestCard({
   );
 }
 
+function ContestCardSkeleton() {
+  return (
+    <S.SkeletonCard aria-hidden="true">
+      <S.SkeletonTopline>
+        <S.SkeletonLine $height="17px" $width="68px" />
+        <S.SkeletonLine $height="17px" $width="36px" />
+      </S.SkeletonTopline>
+      <S.SkeletonLine $height="14px" $width="64%" />
+      <S.SkeletonLine $height="9px" $width="40%" />
+      <S.SkeletonFooter>
+        <S.SkeletonLine $height="17px" $width="71px" />
+        <S.SkeletonLine $height="9px" $width="50px" />
+      </S.SkeletonFooter>
+    </S.SkeletonCard>
+  );
+}
+
 export function ContestsPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -149,7 +166,9 @@ export function ContestsPage() {
         </S.ListControls>
 
         <S.ContestList>
-          {isContestsLoading && <S.EmptyState>공모전 정보를 불러오는 중이에요.</S.EmptyState>}
+          {isContestsLoading && Array.from({ length: 4 }, (_, index) => (
+            <ContestCardSkeleton key={index} />
+          ))}
           {isContestsError && (
             <S.EmptyState>공모전 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</S.EmptyState>
           )}

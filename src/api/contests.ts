@@ -28,6 +28,11 @@ export type CompetitionUrl = {
   primary: boolean;
 };
 
+export type CompetitionScrapResponse = {
+  competitionId: number;
+  scrapped: boolean;
+};
+
 export type CompetitionDetailResponse = Omit<CompetitionResponse, "primaryUrl"> & {
   primaryUrl?: string;
   targetParticipant: string;
@@ -153,4 +158,20 @@ export const fetchContestDetail = async (contestId: string | number): Promise<Co
   const { data } = await api.get<CompetitionDetailResponse>(`/api/competitions/${contestId}`);
 
   return normalizeContestDetail(data);
+};
+
+export const addContestScrap = async (
+  contestId: string | number,
+): Promise<CompetitionScrapResponse> => {
+  const { data } = await api.post<CompetitionScrapResponse>(`/api/competitions/${contestId}/scrap`);
+
+  return data;
+};
+
+export const removeContestScrap = async (
+  contestId: string | number,
+): Promise<CompetitionScrapResponse> => {
+  const { data } = await api.delete<CompetitionScrapResponse>(`/api/competitions/${contestId}/scrap`);
+
+  return data;
 };
