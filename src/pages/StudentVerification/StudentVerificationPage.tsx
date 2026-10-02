@@ -96,7 +96,14 @@ export function StudentVerificationPage() {
       </S.Content>
 
       <S.BottomArea>
-        <S.LaterButton tone="secondary" type="button">
+        <S.LaterButton
+          onClick={() => {
+            sessionStorage.removeItem("kakao-login-pending");
+            navigate("/home", { replace: true });
+          }}
+          tone="secondary"
+          type="button"
+        >
           학생 인증 나중에 하기
         </S.LaterButton>
         <S.SubmitButton disabled={!canSubmit} type="button" width="100%">
