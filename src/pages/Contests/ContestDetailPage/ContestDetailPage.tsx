@@ -92,7 +92,7 @@ export function ContestDetailPage() {
         ? 0
         : response.scrapped ? 1 : -1;
 
-      for (const queryKey of [["contests"], ["popularContests"]]) {
+      for (const queryKey of [["contests"], ["popularContests"], ["closingSoonContests"]]) {
         queryClient.setQueriesData<Contest[]>({ queryKey }, (contests) => (
           contests?.map((item) => (
             item.id === response.competitionId
@@ -115,7 +115,7 @@ export function ContestDetailPage() {
   useEffect(() => {
     if (!contest) return;
 
-    for (const queryKey of [["contests"], ["popularContests"]]) {
+    for (const queryKey of [["contests"], ["popularContests"], ["closingSoonContests"]]) {
       queryClient.setQueriesData<Contest[]>({ queryKey }, (contests) => (
         contests?.map((item) => (
           item.id === contest.id ? { ...item, viewCount: contest.viewCount } : item

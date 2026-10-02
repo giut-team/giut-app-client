@@ -186,6 +186,12 @@ export const fetchPopularContests = async (): Promise<Contest[]> => {
   return data.map(normalizeContest);
 };
 
+export const fetchClosingSoonContests = async (): Promise<Contest[]> => {
+  const { data } = await api.get<CompetitionResponse[]>("/api/competitions/closing-soon");
+
+  return data.map(normalizeContest);
+};
+
 export const fetchContestDetail = async (
   contestId: string | number,
 ): Promise<ContestDetail> => {
