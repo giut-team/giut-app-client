@@ -622,7 +622,7 @@ export const S = {
     align-content: start;
     background: #f7f8fb;
     button {
-      padding: 18px 15px;
+      padding: 18px 30px;
       border: 0;
       border-left: 3px solid transparent;
       background: transparent;
@@ -653,6 +653,8 @@ export const S = {
     align-items: center;
     justify-content: center;
     width: 100%;
+    height: 47px;
+    margin: 0 10px;
     padding: 15px 54px;
     border: 1.5px solid
       ${({ $selected }) => ($selected ? "#2b57ed" : tokens.color.neutral[200])};

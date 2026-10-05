@@ -20,8 +20,8 @@ const MAX_LINKS = 5;
 
 export function PortfolioAddPage() {
     const navigate = useNavigate();
-    const [startDate, setStartDate] = useState("2026-07");
-    const [endDate, setEndDate] = useState("2026-09");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const [activeTab, setActiveTab] = useState<ParticipationType>("individual");
     const [memberCount, setMemberCount] = useState<number>(4);
     const [isRoleSheetOpen, setIsRoleSheetOpen] = useState(false);
@@ -108,12 +108,12 @@ export function PortfolioAddPage() {
                     </S.DurationLabels>
                     <S.DurationInput>
                         <S.DateInput
-                            type="month"
+                            type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)} />
                         <S.Seperator>-</S.Seperator>
                         <S.DateInput
-                            type="month"
+                            type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)} />
                     </S.DurationInput>
