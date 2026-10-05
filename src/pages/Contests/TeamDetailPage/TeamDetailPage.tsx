@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchContestDetail } from "../../../api/contests";
 import {
@@ -8,8 +8,10 @@ import {
   type ProfilePrimaryRole,
 } from "../../../api/profiles";
 import {
+  addTeamScrap,
   fetchTeamDetail,
   fetchTeamMembers,
+  removeTeamScrap,
 } from "../../../api/teams";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
@@ -105,6 +107,12 @@ export function TeamDetailPage() {
 
     navigate(`/contests/${contestId}/teams/${teamId}/manage`, { replace: true });
   }, [contestId, isMyTeam, navigate, teamId]);
+  const { isPending: isTeamScrapPending, mutate: toggleTeamScrap } = useMutation({
+    mutationFn: (scrapped: boolean) => (
+      scrapped ? removeTeamScrap(numericTeamId) : addTeamScrap(numericTeamId)
+    ),
+    onSuccess: (response) => setIsBookmarked(response.scrapped),
+  });
 
   if (isTeamLoading) {
     return (
@@ -161,7 +169,8 @@ export function TeamDetailPage() {
             <S.BookmarkButton
               aria-label={isBookmarked ? "팀 찜 해제" : "팀 찜하기"}
               aria-pressed={isBookmarked}
-              onClick={() => setIsBookmarked((current) => !current)}
+              disabled={isTeamScrapPending}
+              onClick={() => toggleTeamScrap(isBookmarked)}
               type="button"
             >
               <Icon

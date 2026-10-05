@@ -74,6 +74,11 @@ export type TeamMember = {
   joinedAt: string;
 };
 
+export type TeamScrapResponse = {
+  teamId: number;
+  scrapped: boolean;
+};
+
 type TeamMemberListResponse = {
   teamId: number;
   members: TeamMember[];
@@ -112,4 +117,22 @@ export const fetchTeamMembers = async (teamId: number): Promise<TeamMember[]> =>
   );
 
   return Array.isArray(data) ? data : data.members ?? [];
+};
+
+export const addTeamScrap = async (teamId: number): Promise<TeamScrapResponse> => {
+  const { data } = await api.post<TeamScrapResponse>(`/api/teams/${teamId}/scrap`);
+
+  return data;
+};
+
+export const removeTeamScrap = async (teamId: number): Promise<TeamScrapResponse> => {
+  const { data } = await api.delete<TeamScrapResponse>(`/api/teams/${teamId}/scrap`);
+
+  return data;
+};
+
+export const closeTeamRecruitment = async (teamId: number): Promise<TeamDetail> => {
+  const { data } = await api.patch<TeamDetail>(`/api/teams/${teamId}/close`);
+
+  return data;
 };

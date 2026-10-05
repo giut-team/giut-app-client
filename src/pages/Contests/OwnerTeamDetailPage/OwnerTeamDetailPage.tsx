@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchContestDetail } from "../../../api/contests";
 import {
@@ -7,7 +7,11 @@ import {
   getProfileRoleName,
   type ProfilePrimaryRole,
 } from "../../../api/profiles";
-import { fetchTeamDetail, fetchTeamMembers } from "../../../api/teams";
+import {
+  closeTeamRecruitment,
+  fetchTeamDetail,
+  fetchTeamMembers,
+} from "../../../api/teams";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
@@ -93,6 +97,7 @@ const getInviteExpiry = () => {
 
 export function OwnerTeamDetailPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { contestId = "", teamId = "" } = useParams();
   const numericTeamId = Number(teamId);
   const {
@@ -165,6 +170,20 @@ export function OwnerTeamDetailPage() {
     setToastMessage(message);
     window.setTimeout(() => setToastMessage(""), 3200);
   };
+  const { isPending: isClosingRecruitment, mutate: closeRecruitment } = useMutation({
+    mutationFn: () => closeTeamRecruitment(numericTeamId),
+    onSuccess: (closedTeam) => {
+      queryClient.setQueryData(["team", numericTeamId], closedTeam);
+      void queryClient.invalidateQueries({
+        queryKey: ["recruitingTeams", closedTeam.competitionId],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["contest", contestId] });
+      setIsRecruiting(false);
+      setIsCloseSheetOpen(false);
+      showToast("팀 모집을 마감했어요.");
+    },
+    onError: () => showToast("팀 모집 마감을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."),
+  });
   const isActionMenuOpen = actionMenuState === "opening";
   const toggleActionMenu = () => {
     setActionMenuState((current) =>
@@ -612,12 +631,8 @@ export function OwnerTeamDetailPage() {
           <S.SheetActions>
             <S.SheetButton
               $primary
-              disabled={!isCloseAcknowledged}
-              onClick={() => {
-                setIsRecruiting(false);
-                setIsCloseSheetOpen(false);
-                showToast("모집을 마감했어요.");
-              }}
+              disabled={!isCloseAcknowledged || isClosingRecruitment}
+              onClick={() => closeRecruitment()}
               type="button"
             >
               모집 마감하기

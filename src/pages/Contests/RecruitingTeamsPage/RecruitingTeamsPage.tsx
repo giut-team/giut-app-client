@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+  addTeamScrap,
   fetchRecruitingTeams,
   fetchTeamDetail,
+  removeTeamScrap,
   type RecruitingTeam,
 } from "../../../api/teams";
 import { fetchContestDetail } from "../../../api/contests";
@@ -53,6 +55,20 @@ export function RecruitingTeamsPage() {
       ),
     [teamDetailQueries],
   );
+  const { isPending: isTeamScrapPending, mutate: toggleTeamScrap } = useMutation({
+    mutationFn: ({ teamId, scrapped }: { teamId: number; scrapped: boolean }) => (
+      scrapped ? removeTeamScrap(teamId) : addTeamScrap(teamId)
+    ),
+    onSuccess: (response) => {
+      setFavoriteIds((current) => (
+        response.scrapped
+          ? current.includes(response.teamId)
+            ? current
+            : [...current, response.teamId]
+          : current.filter((teamId) => teamId !== response.teamId)
+      ));
+    },
+  });
 
   const isMyTeam = (teamId: number) => Boolean(
     contest?.teams.some(
@@ -63,11 +79,10 @@ export function RecruitingTeamsPage() {
     `/contests/${contestId}/teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
 
   const toggleFavorite = (teamId: number) => {
-    setFavoriteIds((current) =>
-      current.includes(teamId)
-        ? current.filter((id) => id !== teamId)
-        : [...current, teamId],
-    );
+    toggleTeamScrap({
+      teamId,
+      scrapped: favoriteIds.includes(teamId),
+    });
   };
 
   return (
@@ -135,6 +150,7 @@ export function RecruitingTeamsPage() {
                         $favorite={favorite}
                         aria-label={favorite ? "팀 찜 해제" : "팀 찜하기"}
                         aria-pressed={favorite}
+                        disabled={isTeamScrapPending}
                         onClick={(event) => {
                           event.stopPropagation();
                           toggleFavorite(team.teamId);

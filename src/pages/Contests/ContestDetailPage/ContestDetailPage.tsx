@@ -9,8 +9,10 @@ import {
   type Contest,
 } from "../../../api/contests";
 import {
+  addTeamScrap,
   fetchRecruitingTeams,
   fetchTeamDetail,
+  removeTeamScrap,
   type RecruitingTeam,
 } from "../../../api/teams";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
@@ -102,6 +104,22 @@ export function ContestDetailPage() {
     },
     onError: () => setToastMessage("스크랩 상태를 변경하지 못했어요. 잠시 후 다시 시도해 주세요."),
   });
+  const { isPending: isTeamScrapPending, mutate: toggleTeamScrap } = useMutation({
+    mutationFn: ({ teamId, scrapped }: { teamId: number; scrapped: boolean }) => (
+      scrapped ? removeTeamScrap(teamId) : addTeamScrap(teamId)
+    ),
+    onSuccess: (response) => {
+      setFavoriteTeamIds((current) => (
+        response.scrapped
+          ? current.includes(response.teamId)
+            ? current
+            : [...current, response.teamId]
+          : current.filter((teamId) => teamId !== response.teamId)
+      ));
+      setToastMessage(response.scrapped ? "팀을 스크랩했어요." : "팀 스크랩을 취소했어요.");
+    },
+    onError: () => setToastMessage("팀 스크랩 상태를 변경하지 못했어요. 잠시 후 다시 시도해 주세요."),
+  });
   useEffect(() => {
     if (!toastMessage) return;
 
@@ -188,11 +206,10 @@ export function ContestDetailPage() {
   };
 
   const toggleTeamFavorite = (teamId: number) => {
-    setFavoriteTeamIds((current) =>
-      current.includes(teamId)
-        ? current.filter((id) => id !== teamId)
-        : [...current, teamId],
-    );
+    toggleTeamScrap({
+      teamId,
+      scrapped: favoriteTeamIds.includes(teamId),
+    });
   };
 
   if (isContestLoading) {
@@ -399,6 +416,7 @@ export function ContestDetailPage() {
                         $favorite={favorite}
                         aria-label={favorite ? "팀 찜 해제" : "팀 찜하기"}
                         aria-pressed={favorite}
+                        disabled={isTeamScrapPending}
                         onClick={(event) => {
                           event.stopPropagation();
                           toggleTeamFavorite(team.teamId);
