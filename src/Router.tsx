@@ -28,6 +28,8 @@ import { ChatPage } from "./pages/Chat/ChatPage";
 import { ChatRoomPage } from "./pages/Chat/ChatRoomPage";
 import { MyProfilePage } from "./pages/MyPage/MyProfilePage";
 import { ProfileEditPage, ProfileRoleDetailPage } from "./pages/MyPage/ProfileEditPage";
+import { PortfolioManagePage } from "./pages/MyPage/PortfolioManagePage";
+import { PortfolioAddPage } from "./pages/MyPage/PortfolioAddPage";
 
 export function AppRouter() {
   return (
@@ -98,6 +100,8 @@ export function AppRouter() {
         <Route element={<MyTeamPage />} path="/my-team" />
         <Route element={<MyProfilePage />} path="/my-profile" />
         <Route element={<ProfileEditPage />} path="/my-profile/edit" />
+        <Route element={<PortfolioManagePage />} path="/my-profile/potfoliomanage" />
+        <Route element={<PortfolioAddPage/>} path="/my-profile/portfolioadd" />
         <Route element={<ProfileRoleDetailPage />} path="/my-profile/edit/roles/:roleId" />
         <Route
           element={<MyApplicationPage />}

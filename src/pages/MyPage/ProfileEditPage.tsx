@@ -715,7 +715,7 @@ function DirectSkillSheet({
   );
 }
 
-function RoleSelectSheet({
+export function RoleSelectSheet({
   open,
   onClose,
   roles,
