@@ -23,8 +23,8 @@ export function PortfolioManagePage() {
         () => detail?.portfolios.map((p) => p.title) ?? []
     );
     const [storage, setStorage] = useState<string[]>(storagePortfolio);
-    const [mainId, setMainId] = useState<string>(exposured[0] ?? "");
-
+    const [mainId, setMainId] = useState<string | null>(exposured[0] ?? "");
+    
     if (!profile || !detail) return null;
 
     const isFull = exposured.length >= 6;
@@ -42,7 +42,7 @@ export function PortfolioManagePage() {
         setExposured((prev) => [...prev, title]);
     };
     const handleSeletMain =(id: string)=>{
-        setMainId(id);
+        setMainId(prev=>(prev===id? null: id));
     };
 
     return (
