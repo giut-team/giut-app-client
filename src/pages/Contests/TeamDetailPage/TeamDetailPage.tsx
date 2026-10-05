@@ -11,6 +11,7 @@ import {
   addTeamScrap,
   fetchTeamDetail,
   fetchTeamMembers,
+  fetchTeamRecruitments,
   removeTeamScrap,
 } from "../../../api/teams";
 import { Icon } from "../../../components/icons";
@@ -70,6 +71,11 @@ export function TeamDetailPage() {
   const { data: members = [] } = useQuery({
     queryKey: ["teamMembers", numericTeamId],
     queryFn: () => fetchTeamMembers(numericTeamId),
+    enabled: Boolean(team),
+  });
+  const { data: recruitments = [] } = useQuery({
+    queryKey: ["teamRecruitments", numericTeamId],
+    queryFn: () => fetchTeamRecruitments(numericTeamId),
     enabled: Boolean(team),
   });
   const { data: contest } = useQuery({
@@ -157,7 +163,6 @@ export function TeamDetailPage() {
   const recruitmentProgress = team.maxMemberCount
     ? Math.min(100, (team.currentMemberCount / team.maxMemberCount) * 100)
     : 0;
-  const recruitments = Array.isArray(team.recruitments) ? team.recruitments : [];
   const teamMembers = Array.isArray(members) ? members : [];
 
   return (

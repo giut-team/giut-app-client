@@ -64,6 +64,11 @@ export type TeamRecruitment = {
   filledCount: number;
 };
 
+export type TeamRecruitmentsResponse = {
+  teamId: number;
+  recruitments: TeamRecruitment[];
+};
+
 export type TeamMember = {
   teamMemberId: number;
   userId: number;
@@ -117,6 +122,16 @@ export const fetchTeamMembers = async (teamId: number): Promise<TeamMember[]> =>
   );
 
   return Array.isArray(data) ? data : data.members ?? [];
+};
+
+export const fetchTeamRecruitments = async (
+  teamId: number,
+): Promise<TeamRecruitment[]> => {
+  const { data } = await api.get<TeamRecruitmentsResponse>(
+    `/api/teams/${teamId}/recruitments`,
+  );
+
+  return data.recruitments ?? [];
 };
 
 export const addTeamScrap = async (teamId: number): Promise<TeamScrapResponse> => {

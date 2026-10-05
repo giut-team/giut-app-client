@@ -11,6 +11,7 @@ import {
   closeTeamRecruitment,
   fetchTeamDetail,
   fetchTeamMembers,
+  fetchTeamRecruitments,
 } from "../../../api/teams";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Modal } from "../../../components/Modal/Modal";
@@ -117,6 +118,11 @@ export function OwnerTeamDetailPage() {
   const { data: teamMembers = [] } = useQuery({
     queryKey: ["teamMembers", numericTeamId],
     queryFn: () => fetchTeamMembers(numericTeamId),
+    enabled: Boolean(team),
+  });
+  const { data: recruitments = [] } = useQuery({
+    queryKey: ["teamRecruitments", numericTeamId],
+    queryFn: () => fetchTeamRecruitments(numericTeamId),
     enabled: Boolean(team),
   });
   const profileRoleQueries = useQueries({
@@ -499,7 +505,7 @@ export function OwnerTeamDetailPage() {
         <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
           <S.PositionList>
-            {(team.recruitments ?? []).map((recruitment) => {
+            {recruitments.map((recruitment) => {
               const open = isRecruitmentOpen
                 && recruitment.filledCount < recruitment.requiredCount;
 
@@ -524,7 +530,7 @@ export function OwnerTeamDetailPage() {
               </S.PositionCard>
               );
             })}
-            {!(team.recruitments ?? []).length && (
+            {!recruitments.length && (
               <S.Introduction>등록된 모집 분야가 없습니다.</S.Introduction>
             )}
           </S.PositionList>
