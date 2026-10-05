@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { keyframes } from "@emotion/react";
 import { tokens } from "../../design-system/tokens.generated";
 
 type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow" | "pink";
@@ -20,6 +21,12 @@ const categoryColors: Record<
     color: tokens.color.danger[500],
   },
 };
+
+const shimmer = keyframes`
+  100% {
+    transform: translateX(100%);
+  }
+`;
 
 export const S = {
   Page: styled.main`
@@ -88,6 +95,7 @@ export const S = {
   ContestList: styled.div`
     display: grid;
     gap: 8px;
+    margin-top: 6px;
   `,
   ContestCard: styled.button`
     position: relative;
@@ -193,6 +201,51 @@ export const S = {
     align-items: center;
     gap: 5px;
     color: #000;
+  `,
+  SkeletonCard: styled.div`
+    position: relative;
+    display: flex;
+    min-height: 132px;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    padding: 11px 13px 10px;
+    box-sizing: border-box;
+    border-radius: 13px;
+    background: ${tokens.color.neutral[50]};
+
+    &::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgb(255 255 255 / 65%) 50%,
+        transparent 100%
+      );
+      content: "";
+      transform: translateX(-100%);
+      animation: ${shimmer} 1.35s infinite;
+    }
+  `,
+  SkeletonLine: styled.span<{ $width: string; $height?: string }>`
+    display: block;
+    width: ${({ $width }) => $width};
+    height: ${({ $height = "9px" }) => $height};
+    border-radius: 6px;
+    background: ${tokens.color.neutral[200]};
+  `,
+  SkeletonTopline: styled.div`
+    display: flex;
+    justify-content: space-between;
+  `,
+  SkeletonFooter: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid ${tokens.color.neutral[100]};
   `,
   Stat: styled.span`
     display: inline-flex;

@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { tokens } from "../../../design-system/tokens.generated";
 
-type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow";
+type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow" | "pink";
 
 const categoryColors: Record<
   CategoryTone,
@@ -13,6 +13,10 @@ const categoryColors: Record<
   green: {
     background: `color-mix(in srgb, ${tokens.color.success[500]} 10%, ${tokens.color.neutral[50]})`,
     color: tokens.color.success[500],
+  },
+  pink: {
+    background: `color-mix(in srgb, ${tokens.color.danger[500]} 9%, ${tokens.color.neutral[50]})`,
+    color: tokens.color.danger[500],
   },
   yellow: { background: tokens.color.warning[100], color: tokens.color.warning[500] },
 };
