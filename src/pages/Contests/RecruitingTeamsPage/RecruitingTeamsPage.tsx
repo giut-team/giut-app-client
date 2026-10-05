@@ -1,150 +1,68 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  fetchRecruitingTeams,
+  fetchTeamDetail,
+  type RecruitingTeam,
+} from "../../../api/teams";
+import { fetchContestDetail } from "../../../api/contests";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
 import { S } from "./RecruitingTeamsPage.styles";
 
-type RecruitingTeam = {
-  category: "개발" | "기획" | "디자인" | "마케팅";
-  id: string;
-  description: string;
-  members: string;
-  relationship?: "applied" | "member" | "owner";
-  status: "closed" | "open";
-  title: string;
+const activityModeLabels = {
+  ONLINE: "온라인",
+  OFFLINE: "오프라인",
+  HYBRID: "온·오프라인 혼합",
 };
-
-type CategoryFilter = "전체" | RecruitingTeam["category"];
-
-const categoryFilters: CategoryFilter[] = [
-  "전체",
-  "기획",
-  "디자인",
-  "개발",
-  "마케팅",
-];
-
-const recruitingTeams: RecruitingTeam[] = [
-  {
-    id: "my-data-seoul",
-    category: "기획",
-    title: "데이터로 서울을",
-    description: "서울의 공공데이터로 시민이 체감할 수 있는 서비스를 기획하고 있어요.",
-    members: "3/5명",
-    status: "open",
-    relationship: "owner",
-  },
-  {
-    id: "applied-data-seoul",
-    category: "개발",
-    title: "데이터로 서울을",
-    description: "서울시 데이터를 분석해 생활 문제를 해결할 서비스를 만들고 있어요.",
-    members: "3/5명",
-    status: "open",
-    relationship: "applied",
-  },
-  {
-    id: "joined-data-seoul",
-    category: "개발",
-    title: "데이터로 서울을",
-    description: "공공 데이터를 바탕으로 더 편리한 생활 서비스를 개발하고 있어요.",
-    members: "4/5명",
-    status: "open",
-    relationship: "member",
-  },
-  {
-    id: "syrup-data-lab",
-    category: "기획",
-    title: "시립대 데이터랩",
-    description: "시립대 학생에게 필요한 데이터를 쉽고 친절하게 연결하는 팀입니다.",
-    members: "2/4명",
-    status: "open",
-  },
-  {
-    id: "blending-3",
-    category: "마케팅",
-    title: "열린데이터 3기",
-    description: "열린데이터를 활용한 캠페인 경험을 함께 만들어가고 있어요.",
-    members: "4/5명",
-    status: "open",
-  },
-  {
-    id: "data-squad",
-    category: "개발",
-    title: "공공데이터 스쿼드",
-    description: "공공데이터를 활용해 도시 문제를 해결하는 개발팀입니다.",
-    members: "5/5명",
-    status: "closed",
-  },
-  {
-    id: "seoul-ro",
-    category: "디자인",
-    title: "서울로 팀",
-    description: "서울의 일상을 더 편리하게 만드는 디자인 프로젝트를 진행합니다.",
-    members: "4/4명",
-    status: "closed",
-  },
-];
 
 export function RecruitingTeamsPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data" } = useParams();
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("전체");
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const competitionId = Number(contestId);
+  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const [applyTargetTeam, setApplyTargetTeam] = useState<RecruitingTeam | null>(
     null,
   );
-  const filterRef = useRef<HTMLDivElement>(null);
-  const visibleTeams = useMemo(
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ["recruitingTeams", competitionId],
+    queryFn: () => fetchRecruitingTeams(competitionId),
+    enabled: Number.isInteger(competitionId) && competitionId > 0,
+  });
+  const { data: contest } = useQuery({
+    queryKey: ["contest", contestId],
+    queryFn: () => fetchContestDetail(contestId),
+    enabled: Boolean(contestId),
+  });
+  const visibleTeams = data?.teams ?? [];
+  const teamDetailQueries = useQueries({
+    queries: visibleTeams.map((team) => ({
+      queryKey: ["team", team.teamId],
+      queryFn: () => fetchTeamDetail(team.teamId),
+      staleTime: Infinity,
+    })),
+  });
+  const teamDetailsById = useMemo(
     () =>
-      recruitingTeams.filter(
-        (team) =>
-          team.status === "open" &&
-          (selectedCategory === "전체" || team.category === selectedCategory),
+      Object.fromEntries(
+        teamDetailQueries.flatMap((query) =>
+          query.data ? [[query.data.teamId, query.data]] : [],
+        ),
       ),
-    [selectedCategory],
+    [teamDetailQueries],
   );
 
-  useEffect(() => {
-    if (!isFilterOpen) return;
-
-    const closeFilter = (event: PointerEvent) => {
-      if (!filterRef.current?.contains(event.target as Node)) {
-        setIsFilterOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", closeFilter);
-    return () => document.removeEventListener("pointerdown", closeFilter);
-  }, [isFilterOpen]);
-
+  const isMyTeam = (teamId: number) => Boolean(
+    contest?.teams.some(
+      (contestTeam) => contestTeam.teamId === teamId && contestTeam.myTeam,
+    ),
+  );
   const getTeamDetailPath = (team: RecruitingTeam) =>
-    team.relationship === "owner"
-      ? `/contests/${contestId}/teams/${team.id}/manage`
-      : `/contests/${contestId}/teams/${team.id}`;
+    `/contests/${contestId}/teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
 
-  const getRelationshipLabel = (
-    relationship: RecruitingTeam["relationship"],
-  ) => {
-    const labels = {
-      applied: "지원 검토 중",
-      member: "내 팀",
-      owner: "내가 만든 팀",
-    };
-
-    return relationship ? labels[relationship] : null;
-  };
-
-  const getActionLabel = (team: RecruitingTeam) => {
-    if (team.relationship === "owner") return "팀 관리";
-    if (team.relationship === "member") return "팀 보기";
-    if (team.relationship === "applied") return "지원 현황";
-    return "지원하기";
-  };
-
-  const toggleFavorite = (teamId: string) => {
+  const toggleFavorite = (teamId: number) => {
     setFavoriteIds((current) =>
       current.includes(teamId)
         ? current.filter((id) => id !== teamId)
@@ -171,63 +89,28 @@ export function RecruitingTeamsPage() {
               2026.09.30 (수) 마감
             </S.MetaItem>
             <S.DDay>D-15</S.DDay>
-            <S.MetaItem>
-              <Icon name="person" size={16} weight="regular" />
-              팀당 2~5인
-            </S.MetaItem>
           </S.ContestMeta>
         </S.ContestSummary>
 
         <S.TeamSection>
           <S.SectionHeader>
             <S.SectionTitle>팀원 모집 중 {visibleTeams.length}팀</S.SectionTitle>
-            <S.FilterControl ref={filterRef}>
-              <S.SortButton
-                aria-expanded={isFilterOpen}
-                aria-haspopup="listbox"
-                onClick={() => setIsFilterOpen((current) => !current)}
-                type="button"
-              >
-                모집 분야 · {selectedCategory}{" "}
-                <Icon name="filter" size={16} weight="bold" />
-              </S.SortButton>
-              {isFilterOpen && (
-                <S.FilterMenu aria-label="모집 분야 필터" role="listbox">
-                  {categoryFilters.map((category) => {
-                    const isSelected = selectedCategory === category;
-
-                    return (
-                      <S.FilterOption
-                        aria-selected={isSelected}
-                        key={category}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setIsFilterOpen(false);
-                        }}
-                        role="option"
-                        type="button"
-                        $selected={isSelected}
-                      >
-                        {category}
-                        {isSelected && (
-                          <Icon name="check" size={17} weight="bold" />
-                        )}
-                      </S.FilterOption>
-                    );
-                  })}
-                </S.FilterMenu>
-              )}
-            </S.FilterControl>
           </S.SectionHeader>
 
           <S.TeamList>
+            {isLoading && <S.TeamDescription>팀 목록을 불러오는 중입니다.</S.TeamDescription>}
+            {isError && <S.TeamDescription>팀 목록을 불러오지 못했습니다.</S.TeamDescription>}
+            {!isLoading && !isError && !visibleTeams.length && (
+              <S.TeamDescription>모집 중인 팀이 없습니다.</S.TeamDescription>
+            )}
             {visibleTeams.map((team) => {
-              const relationshipLabel = getRelationshipLabel(team.relationship);
-              const favorite = favoriteIds.includes(team.id);
+              const favorite = favoriteIds.includes(team.teamId);
+              const teamDetail = teamDetailsById[team.teamId];
+              const myTeam = isMyTeam(team.teamId);
 
               return (
                 <S.TeamCard
-                  key={team.id}
+                  key={team.teamId}
                   onClick={() => navigate(getTeamDetailPath(team))}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -241,10 +124,10 @@ export function RecruitingTeamsPage() {
                   <S.TicketTop>
                     <S.CardHeading>
                       <S.TitleGroup>
-                        <S.TeamTitle>{team.title}</S.TeamTitle>
-                        {relationshipLabel && (
-                          <S.RelationshipBadge $type={team.relationship}>
-                            {relationshipLabel}
+                        <S.TeamTitle>{team.name}</S.TeamTitle>
+                        {myTeam && (
+                          <S.RelationshipBadge $type="owner">
+                            내가 만든 팀
                           </S.RelationshipBadge>
                         )}
                       </S.TitleGroup>
@@ -254,7 +137,7 @@ export function RecruitingTeamsPage() {
                         aria-pressed={favorite}
                         onClick={(event) => {
                           event.stopPropagation();
-                          toggleFavorite(team.id);
+                          toggleFavorite(team.teamId);
                         }}
                         type="button"
                       >
@@ -265,7 +148,9 @@ export function RecruitingTeamsPage() {
                         />
                       </S.FavoriteButton>
                     </S.CardHeading>
-                    <S.TeamDescription>{team.description}</S.TeamDescription>
+                    <S.TeamDescription>
+                      {teamDetail?.description ?? `${activityModeLabels[team.activityMode]}으로 활동하는 팀입니다.`}
+                    </S.TeamDescription>
                   </S.TicketTop>
                   <S.TicketDivider aria-hidden="true">
                     <S.TicketNotch $side="left" />
@@ -274,12 +159,12 @@ export function RecruitingTeamsPage() {
                   <S.CardFooter>
                     <S.MemberCount>
                       <Icon name="person" size={17} weight="regular" />
-                      {team.members}
+                      {team.currentMemberCount}/{team.maxMemberCount}명
                     </S.MemberCount>
                     <S.ApplyButton
                       onClick={(event) => {
                         event.stopPropagation();
-                        if (team.relationship) {
+                        if (myTeam) {
                           navigate(getTeamDetailPath(team));
                           return;
                         }
@@ -288,7 +173,7 @@ export function RecruitingTeamsPage() {
                       }}
                       type="button"
                     >
-                      {getActionLabel(team)}
+                      {myTeam ? "팀 관리" : "지원하기"}
                     </S.ApplyButton>
                   </S.CardFooter>
                 </S.TeamCard>
@@ -308,7 +193,7 @@ export function RecruitingTeamsPage() {
           onClick: () => {
             if (!applyTargetTeam) return;
 
-            navigate(`/contests/${contestId}/teams/${applyTargetTeam.id}/apply`);
+            navigate(`/contests/${contestId}/teams/${applyTargetTeam.teamId}/apply`);
           },
         }}
         secondaryAction={{

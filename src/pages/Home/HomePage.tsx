@@ -1,38 +1,13 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { fetchPopularContests } from "../../api/contests";
 import giutLogo from "../../assets/giut-logo.svg";
 import trophyIcon from "../../assets/trophy.svg";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { SearchOverlay } from "../../components/SearchOverlay/SearchOverlay";
 import { S } from "./HomePage.styles";
-
-const popularContests = [
-  {
-    id: "seoul-data",
-    category: "IT/과학",
-    categoryTone: "blue" as const,
-    dDay: "D-15",
-    title: "2026 서울시 데이터 활용 공모전",
-    organization: "서울특별시",
-  },
-  {
-    id: "environment-idea",
-    category: "기획",
-    categoryTone: "orange" as const,
-    dDay: "D-3",
-    title: "대학생 환경 아이디어 챌린지",
-    organization: "환경부",
-  },
-  {
-    id: "esg-campaign",
-    category: "디자인",
-    categoryTone: "purple" as const,
-    dDay: "D-10",
-    title: "디자인으로 만드는 ESG 캠페인",
-    organization: "한국디자인진흥원",
-  },
-];
 
 const shortcuts = [
   {
@@ -66,6 +41,14 @@ export function HomePage() {
   const [activeBanner, setActiveBanner] = useState(0);
   const [isTeamButtonAnimating, setIsTeamButtonAnimating] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const {
+    data: popularContests = [],
+    isError: isPopularContestsError,
+    isLoading: isPopularContestsLoading,
+  } = useQuery({
+    queryKey: ["popularContests"],
+    queryFn: fetchPopularContests,
+  });
   const banners = [
     {
       eyebrow: "마감 임박",
@@ -227,7 +210,16 @@ export function HomePage() {
         </S.SectionHeader>
 
         <S.ContestList>
-          {popularContests.map((contest) => (
+          {isPopularContestsLoading && (
+            <S.EmptyState>인기 공모전을 불러오는 중입니다.</S.EmptyState>
+          )}
+          {isPopularContestsError && (
+            <S.EmptyState>인기 공모전을 불러오지 못했습니다.</S.EmptyState>
+          )}
+          {!isPopularContestsLoading && !isPopularContestsError && !popularContests.length && (
+            <S.EmptyState>모집 중인 인기 공모전이 없습니다.</S.EmptyState>
+          )}
+          {popularContests.slice(0, 3).map((contest) => (
             <S.ContestCard
               key={contest.id}
               onClick={() => navigate(`/contests/${contest.id}`)}
@@ -236,18 +228,14 @@ export function HomePage() {
               <S.ContestTopline>
                 <S.ContestCategoryGroup>
                   <S.Category $tone={contest.categoryTone}>
-                    {contest.category}
+                    {contest.categoryName}
                   </S.Category>
-                  <S.VerifiedBadge aria-label="인증된 공모전">
-                    <Icon name="check" size={8} weight="bold" />
-                    인증
-                  </S.VerifiedBadge>
                 </S.ContestCategoryGroup>
                 <S.DDay>{contest.dDay}</S.DDay>
               </S.ContestTopline>
               <S.ContestTitle>{contest.title}</S.ContestTitle>
               <S.ContestOrganization>
-                {contest.organization}
+                {contest.hostOrganization}
               </S.ContestOrganization>
             </S.ContestCard>
           ))}

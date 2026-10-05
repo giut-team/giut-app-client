@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
@@ -8,6 +8,11 @@ import {
   removeContestScrap,
   type Contest,
 } from "../../../api/contests";
+import {
+  fetchRecruitingTeams,
+  fetchTeamDetail,
+  type RecruitingTeam,
+} from "../../../api/teams";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
@@ -16,44 +21,11 @@ import { S } from "./ContestDetailPage.styles";
 
 type DetailTab = "overview" | "guide";
 
-const recruitTeams = [
-  {
-    id: "my-data-seoul",
-    title: "데이터로 서울을",
-    leader: "이서연 팀장 · 온라인 + 오프라인",
-    description:
-      "서울의 공공데이터로 시민이 체감할 수 있는 서비스를 기획하고 있어요.",
-    members: "3/5명",
-    positions: ["백엔드 개발자 모집", "데이터 엔지니어 모집"],
-    isOwner: true,
-  },
-  {
-    id: "data-seoul",
-    title: "데이터로 서울을",
-    leader: "이수현 팀장 · 온라인 + 오프라인",
-    description:
-      "서울시 데이터를 분석해 생활 문제를 해결할 서비스를 만들고 있어요.",
-    members: "3/5명",
-    positions: ["백엔드 모집", "프론트엔드 마감", "기획 마감"],
-  },
-  {
-    id: "syrup-data-lab",
-    title: "시립대 데이터랩",
-    leader: "최유진 팀장 · 온라인",
-    description:
-      "시립대 학생에게 필요한 데이터를 쉽고 친절하게 연결하는 팀입니다.",
-    members: "2/4명",
-    positions: ["기획 모집", "디자인 모집"],
-  },
-  {
-    id: "blending-3",
-    title: "열린데이터 3기",
-    leader: "박지윤 팀장 · 오프라인",
-    description: "열린데이터를 활용한 캠페인 경험을 함께 만들어가고 있어요.",
-    members: "4/5명",
-    positions: ["마케팅 모집"],
-  },
-];
+const activityModeLabels = {
+  ONLINE: "온라인",
+  OFFLINE: "오프라인",
+  HYBRID: "온·오프라인 혼합",
+};
 
 export function ContestDetailPage() {
   const navigate = useNavigate();
@@ -63,10 +35,8 @@ export function ContestDetailPage() {
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
-  const [favoriteTeamIds, setFavoriteTeamIds] = useState<string[]>([]);
-  const [applyTargetTeam, setApplyTargetTeam] = useState<
-    (typeof recruitTeams)[number] | null
-  >(null);
+  const [favoriteTeamIds, setFavoriteTeamIds] = useState<number[]>([]);
+  const [applyTargetTeam, setApplyTargetTeam] = useState<RecruitingTeam | null>(null);
   const [isTeamCreationModalOpen, setIsTeamCreationModalOpen] = useState(false);
   const teamCreationState = location.state as {
     fromTeamCreation?: boolean;
@@ -82,6 +52,33 @@ export function ContestDetailPage() {
     queryFn: () => fetchContestDetail(contestId ?? ""),
     enabled: Boolean(contestId),
   });
+  const competitionId = Number(contestId);
+  const {
+    data: recruitingTeams,
+    isError: isRecruitingTeamsError,
+    isLoading: isRecruitingTeamsLoading,
+  } = useQuery({
+    queryKey: ["recruitingTeams", competitionId],
+    queryFn: () => fetchRecruitingTeams(competitionId),
+    enabled: Number.isInteger(competitionId) && competitionId > 0,
+  });
+  const displayedTeams = recruitingTeams?.teams ?? [];
+  const teamDetailQueries = useQueries({
+    queries: displayedTeams.map((team) => ({
+      queryKey: ["team", team.teamId],
+      queryFn: () => fetchTeamDetail(team.teamId),
+      staleTime: Infinity,
+    })),
+  });
+  const teamDetailsById = useMemo(
+    () =>
+      Object.fromEntries(
+        teamDetailQueries.flatMap((query) =>
+          query.data ? [[query.data.teamId, query.data]] : [],
+        ),
+      ),
+    [teamDetailQueries],
+  );
   const { isPending: isScrapPending, mutate: toggleScrap } = useMutation({
     mutationFn: (scrapped: boolean) => (
       scrapped ? removeContestScrap(contestId ?? "") : addContestScrap(contestId ?? "")
@@ -163,8 +160,13 @@ export function ContestDetailPage() {
       // 공유 시트를 닫은 경우에는 별도의 피드백을 표시하지 않습니다.
     }
   };
-  const getTeamPath = (team: (typeof recruitTeams)[number]) =>
-    team.isOwner ? `teams/${team.id}/manage` : `teams/${team.id}`;
+  const isMyTeam = (teamId: number) => Boolean(
+    contest?.teams.some(
+      (contestTeam) => contestTeam.teamId === teamId && contestTeam.myTeam,
+    ),
+  );
+  const getTeamPath = (team: RecruitingTeam) =>
+    `teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
 
   const formatDate = (value: string) => new Intl.DateTimeFormat("ko-KR", {
     year: "numeric",
@@ -185,7 +187,7 @@ export function ContestDetailPage() {
     toggleScrap(isSaved);
   };
 
-  const toggleTeamFavorite = (teamId: string) => {
+  const toggleTeamFavorite = (teamId: number) => {
     setFavoriteTeamIds((current) =>
       current.includes(teamId)
         ? current.filter((id) => id !== teamId)
@@ -351,21 +353,32 @@ export function ContestDetailPage() {
         <S.TeamsHeader>
           <S.SectionHeader>
             <S.SectionTitle>
-              모집 중인 팀 <S.TeamTotal>{contest.recruitingTeamCount}</S.TeamTotal>
+              모집 중인 팀 <S.TeamTotal>{recruitingTeams?.totalElements ?? contest.recruitingTeamCount}</S.TeamTotal>
             </S.SectionTitle>
             <S.ViewAll onClick={() => navigate("teams")} type="button">
               전체 보기 ›
             </S.ViewAll>
           </S.SectionHeader>
         </S.TeamsHeader>
-        <S.TeamsSection>
+          <S.TeamsSection>
           <S.TeamList>
-            {recruitTeams.slice(0, 3).map((team) => {
-              const favorite = favoriteTeamIds.includes(team.id);
+            {isRecruitingTeamsLoading && (
+              <S.TeamDescription>팀 목록을 불러오는 중입니다.</S.TeamDescription>
+            )}
+            {isRecruitingTeamsError && (
+              <S.TeamDescription>팀 목록을 불러오지 못했습니다.</S.TeamDescription>
+            )}
+            {!isRecruitingTeamsLoading && !isRecruitingTeamsError && !displayedTeams.length && (
+              <S.TeamDescription>모집 중인 팀이 없습니다.</S.TeamDescription>
+            )}
+            {displayedTeams.slice(0, 3).map((team) => {
+              const favorite = favoriteTeamIds.includes(team.teamId);
+              const teamDetail = teamDetailsById[team.teamId];
+              const myTeam = isMyTeam(team.teamId);
 
               return (
                 <S.TeamCard
-                  key={team.id}
+                  key={team.teamId}
                   onClick={() => navigate(getTeamPath(team))}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -379,10 +392,8 @@ export function ContestDetailPage() {
                   <S.TeamTicketTop>
                     <S.TeamTitleRow>
                       <S.TeamTitleGroup>
-                        <S.TeamTitle>{team.title}</S.TeamTitle>
-                        {team.isOwner && (
-                          <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>
-                        )}
+                        <S.TeamTitle>{team.name}</S.TeamTitle>
+                        {myTeam && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
                       </S.TeamTitleGroup>
                       <S.TeamFavoriteButton
                         $favorite={favorite}
@@ -390,7 +401,7 @@ export function ContestDetailPage() {
                         aria-pressed={favorite}
                         onClick={(event) => {
                           event.stopPropagation();
-                          toggleTeamFavorite(team.id);
+                          toggleTeamFavorite(team.teamId);
                         }}
                         type="button"
                       >
@@ -401,7 +412,9 @@ export function ContestDetailPage() {
                         />
                       </S.TeamFavoriteButton>
                     </S.TeamTitleRow>
-                    <S.TeamDescription>{team.description}</S.TeamDescription>
+                    <S.TeamDescription>
+                      {teamDetail?.description ?? `${activityModeLabels[team.activityMode]}으로 활동하는 팀입니다.`}
+                    </S.TeamDescription>
                   </S.TeamTicketTop>
                   <S.TeamTicketDivider aria-hidden="true">
                     <S.TeamTicketNotch $side="left" />
@@ -410,12 +423,12 @@ export function ContestDetailPage() {
                   <S.TeamFooter>
                     <S.TeamMemberCount>
                       <Icon name="person" size={17} weight="regular" />
-                      {team.members}
+                      {team.currentMemberCount}/{team.maxMemberCount}명
                     </S.TeamMemberCount>
                     <S.TeamApplyButton
                       onClick={(event) => {
                         event.stopPropagation();
-                        if (team.isOwner) {
+                        if (myTeam) {
                           navigate(getTeamPath(team));
                           return;
                         }
@@ -424,7 +437,7 @@ export function ContestDetailPage() {
                       }}
                       type="button"
                     >
-                      {team.isOwner ? "팀 관리" : "지원하기"}
+                      {myTeam ? "팀 관리" : "지원하기"}
                     </S.TeamApplyButton>
                   </S.TeamFooter>
                 </S.TeamCard>

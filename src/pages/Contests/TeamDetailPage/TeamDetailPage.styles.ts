@@ -38,6 +38,17 @@ export const S = {
     padding: 15px 16px 16px;
     border-bottom: 8px solid ${tokens.color.neutral[100]};
   `,
+  OwnerBadge: styled.span`
+    display: inline-flex;
+    margin-bottom: 9px;
+    padding: 5px 8px;
+    border-radius: 7px;
+    background: #e1f6eb;
+    color: ${tokens.color.success[500]};
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   TitleRow: styled.div`
     display: flex;
     align-items: flex-start;
@@ -106,6 +117,10 @@ export const S = {
     padding: 14px;
     border-radius: 13px;
     background: ${tokens.color.primary[100]};
+
+    & + & {
+      margin-top: 8px;
+    }
   `,
   RecruitmentRole: styled.strong`
     display: block;

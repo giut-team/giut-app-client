@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Button } from "../../components/Button";
 import { tokens } from "../../design-system/tokens.generated";
 
-type CategoryTone = "blue" | "orange" | "purple";
+type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow" | "pink";
 type BannerCirclePosition = "top" | "bottom";
 type BannerTone = "primary" | "deep";
 
@@ -16,6 +16,18 @@ const categoryColors: Record<CategoryTone, { background: string; color: string }
     color: tokens.color.orange[500],
   },
   purple: {
+    background: tokens.color.purple[100],
+    color: tokens.color.purple[500],
+  },
+  green: {
+    background: "#e1f6eb",
+    color: tokens.color.success[500],
+  },
+  yellow: {
+    background: tokens.color.orange[100],
+    color: tokens.color.orange[500],
+  },
+  pink: {
     background: tokens.color.purple[100],
     color: tokens.color.purple[500],
   },
@@ -330,6 +342,13 @@ export const S = {
   ContestList: styled.div`
     display: grid;
     gap: 8px;
+  `,
+  EmptyState: styled.p`
+    margin: 0;
+    padding: 20px 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 12px;
+    text-align: center;
   `,
   ContestCard: styled.button`
     min-height: 86px;

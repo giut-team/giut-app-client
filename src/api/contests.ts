@@ -29,6 +29,16 @@ export type CompetitionUrl = {
   primary: boolean;
 };
 
+export type CompetitionTeam = {
+  teamId: number;
+  name: string;
+  myTeam: boolean;
+  description: string;
+  maxMemberCount: number;
+  currentMemberCount: number;
+  status: "RECRUITING" | "CLOSED" | "ARCHIVED";
+};
+
 export type CompetitionScrapResponse = {
   competitionId: number;
   scrapped: boolean;
@@ -43,7 +53,7 @@ export type CompetitionDetailResponse = Omit<
   scrapped: boolean;
   urls: CompetitionUrl[];
   recruitingTeamCount: number;
-  teams: unknown[];
+  teams: CompetitionTeam[];
 };
 
 export type CompetitionsResponse = {
@@ -183,7 +193,9 @@ export const fetchPopularContests = async (): Promise<Contest[]> => {
     "/api/competitions/top5",
   );
 
-  return data.map(normalizeContest);
+  return data
+    .filter((contest) => contest.recruitmentStatus === "OPEN")
+    .map(normalizeContest);
 };
 
 export const fetchClosingSoonContests = async (): Promise<Contest[]> => {

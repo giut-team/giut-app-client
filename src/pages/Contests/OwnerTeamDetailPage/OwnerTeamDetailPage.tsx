@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchContestDetail } from "../../../api/contests";
+import {
+  fetchProfileRoles,
+  getProfileRoleName,
+  type ProfilePrimaryRole,
+} from "../../../api/profiles";
+import { fetchTeamDetail, fetchTeamMembers } from "../../../api/teams";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
@@ -9,38 +17,39 @@ import idInviteIcon from "../../../assets/team-invite/id-invite.svg";
 import messageSendIcon from "../../../assets/team-invite/message-send.svg";
 import { S } from "./OwnerTeamDetailPage.styles";
 
-const positions = [
-  { name: "백엔드 개발자", info: "지원 3건 대기 중", open: true },
-  { name: "데이터 엔지니어", info: "지원 2건 대기 중", open: true },
-  { name: "기획", info: "모집이 마감되었어요", open: false },
+const activityModeLabels = {
+  ONLINE: "온라인",
+  OFFLINE: "오프라인",
+  HYBRID: "온라인 + 오프라인",
+};
+
+const meetingPlaceLabels = {
+  CAMPUS: "교내",
+  SEOUL: "서울 전체",
+  METROPOLITAN_AREA: "수도권",
+  ANYWHERE: "상관없음",
+};
+
+const avatarTones = ["green", "blue", "purple"] as const;
+const profilePrimaryRoles: ProfilePrimaryRole[] = [
+  "DEVELOPMENT",
+  "DESIGN",
+  "PLANNING",
+  "MARKETING",
 ];
 
-const members = [
-  {
-    initial: "서",
-    name: "이서연",
-    role: "팀장 · 기획",
-    school: "경영학부 3학년",
-    specialty: "서비스 기획 · 프로덕트 매니저",
-    tone: "green" as const,
-  },
-  {
-    initial: "민",
-    name: "김민재",
-    role: "개발",
-    school: "컴퓨터과학부 3학년",
-    specialty: "프론트엔드 개발 · 풀스택 개발자",
-    tone: "blue" as const,
-  },
-  {
-    initial: "지",
-    name: "박지윤",
-    role: "디자인",
-    school: "디자인학과 2학년",
-    specialty: "프로덕트 디자인 · BI/BX 디자이너",
-    tone: "purple" as const,
-  },
-];
+const formatDate = (value?: string) => {
+  if (!value) return "미정";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "미정";
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).format(date).replaceAll(". ", ".");
+};
 
 const inviteCandidates = [
   {
@@ -69,7 +78,6 @@ const inviteCandidates = [
   },
 ];
 
-const teamCapacity = 5;
 const defaultInviteMessage = "백엔드 파트 함께해요!";
 
 type ActionMenuState = "closed" | "opening";
@@ -85,6 +93,48 @@ const getInviteExpiry = () => {
 
 export function OwnerTeamDetailPage() {
   const navigate = useNavigate();
+  const { contestId = "", teamId = "" } = useParams();
+  const numericTeamId = Number(teamId);
+  const {
+    data: team,
+    isError: isTeamError,
+    isLoading: isTeamLoading,
+  } = useQuery({
+    queryKey: ["team", numericTeamId],
+    queryFn: () => fetchTeamDetail(numericTeamId),
+    enabled: Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+  const { data: contest } = useQuery({
+    queryKey: ["contest", contestId],
+    queryFn: () => fetchContestDetail(contestId),
+    enabled: Boolean(contestId),
+  });
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ["teamMembers", numericTeamId],
+    queryFn: () => fetchTeamMembers(numericTeamId),
+    enabled: Boolean(team),
+  });
+  const profileRoleQueries = useQueries({
+    queries: profilePrimaryRoles.map((primaryRole) => ({
+      queryKey: ["profileRoles", primaryRole],
+      queryFn: () => fetchProfileRoles(primaryRole),
+      enabled: Boolean(team),
+      staleTime: Infinity,
+    })),
+  });
+  const profileRoleNamesByCode = useMemo(
+    () =>
+      Object.fromEntries(
+        profileRoleQueries.flatMap((query) =>
+          (query.data ?? []).map(({ code, name }) => [code, name]),
+        ),
+      ),
+    [profileRoleQueries],
+  );
+  const getTeamRoleName = (roleCode: string | null | undefined) =>
+    roleCode
+      ? profileRoleNamesByCode[roleCode] ?? getProfileRoleName(roleCode)
+      : "역할 미정";
   const [toastMessage, setToastMessage] = useState("");
   const [isRecruiting, setIsRecruiting] = useState(true);
   const [isCloseSheetOpen, setIsCloseSheetOpen] = useState(false);
@@ -103,8 +153,12 @@ export function OwnerTeamDetailPage() {
   const [actionMenuState, setActionMenuState] =
     useState<ActionMenuState>("closed");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const isTeamFull = members.length >= teamCapacity;
-  const isRecruitmentOpen = isRecruiting && !isTeamFull;
+  const isTeamFull = Boolean(
+    team && team.currentMemberCount >= team.maxMemberCount,
+  );
+  const isRecruitmentOpen = Boolean(
+    team && team.status === "RECRUITING" && isRecruiting && !isTeamFull,
+  );
   const isRecruitmentClosed = !isRecruitmentOpen;
 
   const showToast = (message: string) => {
@@ -117,7 +171,7 @@ export function OwnerTeamDetailPage() {
       current === "closed" ? "opening" : "closed",
     );
   };
-  const inviteLink = "https://giut.app/t/seoul-data/QK7F2";
+  const inviteLink = `${window.location.origin}/contests/${contestId}/teams/${teamId}`;
   const inviteExpiry = getInviteExpiry();
   const filteredInviteCandidates = inviteCandidates.filter((candidate) => {
     const normalizedQuery = inviteQuery.trim().toLowerCase();
@@ -130,6 +184,28 @@ export function OwnerTeamDetailPage() {
       candidate.id.includes(idPrefix)
     );
   });
+
+  if (isTeamLoading) {
+    return (
+      <S.Page aria-busy="true">
+        <S.Content>
+          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <S.Section><S.Introduction>팀 정보를 불러오는 중입니다.</S.Introduction></S.Section>
+        </S.Content>
+      </S.Page>
+    );
+  }
+
+  if (isTeamError || !team) {
+    return (
+      <S.Page>
+        <S.Content>
+          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <S.Section><S.Introduction>팀 정보를 불러오지 못했습니다.</S.Introduction></S.Section>
+        </S.Content>
+      </S.Page>
+    );
+  }
   const openInviteConfirm = (candidate: (typeof inviteCandidates)[number]) => {
     setSelectedInviteCandidate(candidate);
     setInviteMessage("");
@@ -151,8 +227,8 @@ export function OwnerTeamDetailPage() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: "데이터로 서울을 팀 초대",
-          text: "데이터로 서울을 팀에 함께해요!",
+          title: `${team?.name ?? "팀"} 초대`,
+          text: `${team?.name ?? "팀"}에 함께해요!`,
           url: inviteLink,
         });
         return;
@@ -299,7 +375,9 @@ export function OwnerTeamDetailPage() {
             <S.SummaryRow $darkLabels>
               <dt>팀 인원</dt>
               <dd>
-                <S.IdInviteTeamCount>3명 → 4명 예정</S.IdInviteTeamCount>
+                <S.IdInviteTeamCount>
+                  {team.currentMemberCount}명 → {Math.min(team.maxMemberCount, team.currentMemberCount + 1)}명 예정
+                </S.IdInviteTeamCount>
               </dd>
             </S.SummaryRow>
           </S.Summary>
@@ -343,9 +421,7 @@ export function OwnerTeamDetailPage() {
                       $state={actionMenuState}
                       onClick={() => {
                         setActionMenuState("closed");
-                        navigate(
-                          "/contests/seoul-data/teams/my-data-seoul/edit",
-                        );
+                        navigate(`/contests/${contestId}/teams/${teamId}/edit`);
                       }}
                       role="menuitem"
                       type="button"
@@ -379,52 +455,59 @@ export function OwnerTeamDetailPage() {
               {isRecruitmentClosed ? "모집 마감" : "내가 만든 팀"}
             </S.OwnerBadge>
             <S.CountBadge $closed={isRecruitmentClosed}>
-              {members.length}/{teamCapacity}명
+              {team.currentMemberCount}/{team.maxMemberCount}명
             </S.CountBadge>
           </S.HeroTopline>
-          <S.TeamTitle>데이터로 서울을</S.TeamTitle>
-          <S.ContestName>2026 서울시 데이터 활용 공모전</S.ContestName>
+          <S.TeamTitle>{team.name}</S.TeamTitle>
+          <S.ContestName>{contest?.title ?? "공모전 정보"}</S.ContestName>
           <S.ProgressTrack aria-label="팀원 모집 진행률">
             <S.ProgressValue $closed={isRecruitmentClosed} />
           </S.ProgressTrack>
           <S.HeroMeta>
             {isRecruitmentClosed
               ? isTeamFull
-                ? "모든 자리가 찼어요 · 새 지원 3건"
+                ? "모든 자리가 찼어요"
                 : "모집이 마감되었어요"
-              : `${teamCapacity - members.length}자리 남았어요 · 새 지원 3건`}
+              : `${Math.max(0, team.maxMemberCount - team.currentMemberCount)}자리 남았어요`}
           </S.HeroMeta>
         </S.Hero>
 
         <S.Section>
           <S.SectionTitle>팀 소개</S.SectionTitle>
-          <S.Introduction>
-            서울시 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인
-            회의와 온라인 소통으로 함께해요.
-          </S.Introduction>
+          <S.Introduction>{team.description}</S.Introduction>
         </S.Section>
 
         <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
           <S.PositionList>
-            {positions.map((position) => (
+            {(team.recruitments ?? []).map((recruitment) => {
+              const open = isRecruitmentOpen
+                && recruitment.filledCount < recruitment.requiredCount;
+
+              return (
               <S.PositionCard
-                $open={position.open && isRecruitmentOpen}
-                key={position.name}
+                $open={open}
+                key={recruitment.recruitmentId}
               >
                 <div>
-                  <S.PositionName $open={position.open && isRecruitmentOpen}>
-                    {position.name}
+                  <S.PositionName $open={open}>
+                    {getTeamRoleName(recruitment.roleCode)}
                   </S.PositionName>
-                  {position.open && !isRecruitmentClosed && (
-                    <S.PositionInfo>{position.info}</S.PositionInfo>
+                  {open && (
+                    <S.PositionInfo>
+                      필요 {recruitment.requiredCount}명 · 현재 {recruitment.filledCount}명
+                    </S.PositionInfo>
                   )}
                 </div>
-                <S.PositionStatus $open={position.open && isRecruitmentOpen}>
-                  {position.open && isRecruitmentOpen ? "모집 중" : "마감"}
+                <S.PositionStatus $open={open}>
+                  {open ? "모집 중" : "마감"}
                 </S.PositionStatus>
               </S.PositionCard>
-            ))}
+              );
+            })}
+            {!(team.recruitments ?? []).length && (
+              <S.Introduction>등록된 모집 분야가 없습니다.</S.Introduction>
+            )}
           </S.PositionList>
         </S.Section>
 
@@ -432,35 +515,39 @@ export function OwnerTeamDetailPage() {
           <S.InfoGrid>
             <S.InfoItem>
               <dt>활동 방식</dt>
-              <dd>온라인 + 오프라인</dd>
+              <dd>{activityModeLabels[team.activityMode]}</dd>
             </S.InfoItem>
             <S.InfoItem>
               <dt>모집 마감</dt>
-              <dd>06.20 (목)</dd>
+              <dd>{formatDate(contest?.applicationEndAt)}</dd>
             </S.InfoItem>
             <S.InfoItem>
               <dt>주간 회의</dt>
-              <dd>주 1회</dd>
+              <dd>주 {team.weeklyMeetingCount}회 · {meetingPlaceLabels[team.meetingPlace]}</dd>
             </S.InfoItem>
           </S.InfoGrid>
         </S.Section>
 
         <S.Section $last>
-          <S.SectionTitle>팀원 3명</S.SectionTitle>
+          <S.SectionTitle>팀원 {teamMembers.length}명</S.SectionTitle>
           <S.MemberList>
-            {members.map((member) => (
-              <S.Member key={member.name}>
-                <S.Avatar $tone={member.tone}>{member.initial}</S.Avatar>
+            {teamMembers.map((member, index) => (
+              <S.Member key={member.teamMemberId}>
+                <S.Avatar $tone={avatarTones[index % avatarTones.length]}>
+                  {(member.nickname || "?").slice(0, 1)}
+                </S.Avatar>
                 <div>
                   <S.MemberHeading>
-                    <S.MemberName>{member.name}</S.MemberName>
-                    <S.RoleBadge>{member.role}</S.RoleBadge>
+                    <S.MemberName>{member.nickname || "알 수 없음"}</S.MemberName>
+                    <S.RoleBadge>{member.role === "LEADER" ? "팀장" : "팀원"}</S.RoleBadge>
                   </S.MemberHeading>
-                  <S.MemberRole>{member.specialty}</S.MemberRole>
-                  <S.MemberSchool>{member.school}</S.MemberSchool>
+                  <S.MemberRole>{getTeamRoleName(member.roleCode)}</S.MemberRole>
                 </div>
               </S.Member>
             ))}
+            {!teamMembers.length && (
+              <S.Introduction>등록된 팀원이 없습니다.</S.Introduction>
+            )}
             {inviteCandidates
               .filter((candidate) =>
                 sentInviteCandidateIds.includes(candidate.id),
@@ -501,7 +588,7 @@ export function OwnerTeamDetailPage() {
               onClick={() => navigate("/my-team/applications")}
               type="button"
             >
-              받은 지원 3건 보기 <S.NewBadge>NEW</S.NewBadge>
+              받은 지원 보기
             </S.ApplicationsButton>
             <S.SecondaryActions>
               <S.SecondaryButton
@@ -561,15 +648,11 @@ export function OwnerTeamDetailPage() {
         <S.Summary>
           <S.SummaryRow $darkLabels>
             <dt>현재 팀 인원</dt>
-            <dd>3 / 5명</dd>
-          </S.SummaryRow>
-          <S.SummaryRow $darkLabels>
-            <dt>대기 중인 지원</dt>
-            <S.Pending>3건</S.Pending>
+            <dd>{team.currentMemberCount} / {team.maxMemberCount}명</dd>
           </S.SummaryRow>
           <S.SummaryRow $darkLabels>
             <dt>남는 자리</dt>
-            <dd>2자리 → 마감</dd>
+            <dd>{Math.max(0, team.maxMemberCount - team.currentMemberCount)}자리 → 마감</dd>
           </S.SummaryRow>
         </S.Summary>
         <S.Acknowledgement>
@@ -602,13 +685,13 @@ export function OwnerTeamDetailPage() {
         </S.SheetIcon>
         <S.SheetTitle>팀원 초대하기</S.SheetTitle>
         <S.SheetDescription>
-          링크를 받은 사람은 지원서를 쓰지 않고 바로 합류해요. 남은 자리 2개까지
+          링크를 받은 사람은 지원서를 쓰지 않고 바로 합류해요. 남은 자리 {Math.max(0, team.maxMemberCount - team.currentMemberCount)}개까지
           초대할 수 있어요.
         </S.SheetDescription>
         <S.InviteLinkCard>
           <S.InviteLinkLabel>초대 링크</S.InviteLinkLabel>
           <S.InviteLinkRow>
-            <S.InviteLink>giut.app/t/seoul-data/QK7F2</S.InviteLink>
+            <S.InviteLink>{inviteLink}</S.InviteLink>
             <S.CopyButton
               onClick={() => {
                 setIsInviteSheetOpen(false);
@@ -663,7 +746,7 @@ export function OwnerTeamDetailPage() {
         open={isDeleteModalOpen}
         primaryAction={{
           label: "삭제하기",
-          onClick: () => navigate("/contests/seoul-data", { replace: true }),
+          onClick: () => navigate(`/contests/${contestId}`, { replace: true }),
         }}
         secondaryAction={{
           label: "취소",
