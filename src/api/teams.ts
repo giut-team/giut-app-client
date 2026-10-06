@@ -39,6 +39,8 @@ export type RecruitingTeam = {
   currentMemberCount: number;
   status: "RECRUITING" | "CLOSED" | "ARCHIVED";
   createdAt: string;
+  /** 현재 로그인 사용자의 팀 북마크 여부 */
+  scrapped: boolean;
 };
 
 export type RecruitingTeamsResponse = {

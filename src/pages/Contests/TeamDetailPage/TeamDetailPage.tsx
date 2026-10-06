@@ -57,7 +57,7 @@ export function TeamDetailPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [scrapOverride, setScrapOverride] = useState<boolean | null>(null);
   const numericTeamId = Number(teamId);
   const {
     data: team,
@@ -117,7 +117,7 @@ export function TeamDetailPage() {
     mutationFn: (scrapped: boolean) => (
       scrapped ? removeTeamScrap(numericTeamId) : addTeamScrap(numericTeamId)
     ),
-    onSuccess: (response) => setIsBookmarked(response.scrapped),
+    onSuccess: (response) => setScrapOverride(response.scrapped),
   });
 
   if (isTeamLoading) {
@@ -159,6 +159,7 @@ export function TeamDetailPage() {
     );
   }
 
+  const isBookmarked = scrapOverride ?? team.scrapped;
   const remainingSlots = Math.max(0, team.maxMemberCount - team.currentMemberCount);
   const recruitmentProgress = team.maxMemberCount
     ? Math.min(100, (team.currentMemberCount / team.maxMemberCount) * 100)

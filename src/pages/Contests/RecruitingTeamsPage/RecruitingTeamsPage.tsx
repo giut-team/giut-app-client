@@ -24,7 +24,7 @@ export function RecruitingTeamsPage() {
   const navigate = useNavigate();
   const { contestId = "seoul-data" } = useParams();
   const competitionId = Number(contestId);
-  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  const [scrapOverrides, setScrapOverrides] = useState<Record<number, boolean>>({});
   const [applyTargetTeam, setApplyTargetTeam] = useState<RecruitingTeam | null>(
     null,
   );
@@ -60,13 +60,10 @@ export function RecruitingTeamsPage() {
       scrapped ? removeTeamScrap(teamId) : addTeamScrap(teamId)
     ),
     onSuccess: (response) => {
-      setFavoriteIds((current) => (
-        response.scrapped
-          ? current.includes(response.teamId)
-            ? current
-            : [...current, response.teamId]
-          : current.filter((teamId) => teamId !== response.teamId)
-      ));
+      setScrapOverrides((current) => ({
+        ...current,
+        [response.teamId]: response.scrapped,
+      }));
     },
   });
 
@@ -78,10 +75,13 @@ export function RecruitingTeamsPage() {
   const getTeamDetailPath = (team: RecruitingTeam) =>
     `/contests/${contestId}/teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
 
-  const toggleFavorite = (teamId: number) => {
+  const getTeamScrapped = (team: RecruitingTeam) =>
+    scrapOverrides[team.teamId] ?? team.scrapped;
+
+  const toggleFavorite = (team: RecruitingTeam) => {
     toggleTeamScrap({
-      teamId,
-      scrapped: favoriteIds.includes(teamId),
+      teamId: team.teamId,
+      scrapped: getTeamScrapped(team),
     });
   };
 
@@ -119,7 +119,7 @@ export function RecruitingTeamsPage() {
               <S.TeamDescription>모집 중인 팀이 없습니다.</S.TeamDescription>
             )}
             {visibleTeams.map((team) => {
-              const favorite = favoriteIds.includes(team.teamId);
+              const favorite = getTeamScrapped(team);
               const teamDetail = teamDetailsById[team.teamId];
               const myTeam = isMyTeam(team.teamId);
 
@@ -153,7 +153,7 @@ export function RecruitingTeamsPage() {
                         disabled={isTeamScrapPending}
                         onClick={(event) => {
                           event.stopPropagation();
-                          toggleFavorite(team.teamId);
+                          toggleFavorite(team);
                         }}
                         type="button"
                       >

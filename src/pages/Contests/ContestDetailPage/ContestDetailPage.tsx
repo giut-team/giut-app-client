@@ -37,9 +37,10 @@ export function ContestDetailPage() {
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
-  const [favoriteTeamIds, setFavoriteTeamIds] = useState<number[]>([]);
+  const [teamScrapOverrides, setTeamScrapOverrides] = useState<Record<number, boolean>>({});
   const [applyTargetTeam, setApplyTargetTeam] = useState<RecruitingTeam | null>(null);
   const [isTeamCreationModalOpen, setIsTeamCreationModalOpen] = useState(false);
+  const [existingMyTeamId, setExistingMyTeamId] = useState<number | null>(null);
   const teamCreationState = location.state as {
     fromTeamCreation?: boolean;
     backPath?: string;
@@ -109,13 +110,10 @@ export function ContestDetailPage() {
       scrapped ? removeTeamScrap(teamId) : addTeamScrap(teamId)
     ),
     onSuccess: (response) => {
-      setFavoriteTeamIds((current) => (
-        response.scrapped
-          ? current.includes(response.teamId)
-            ? current
-            : [...current, response.teamId]
-          : current.filter((teamId) => teamId !== response.teamId)
-      ));
+      setTeamScrapOverrides((current) => ({
+        ...current,
+        [response.teamId]: response.scrapped,
+      }));
       setToastMessage(response.scrapped ? "팀을 스크랩했어요." : "팀 스크랩을 취소했어요.");
     },
     onError: () => setToastMessage("팀 스크랩 상태를 변경하지 못했어요. 잠시 후 다시 시도해 주세요."),
@@ -186,6 +184,19 @@ export function ContestDetailPage() {
   const getTeamPath = (team: RecruitingTeam) =>
     `teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
 
+  const handleTeamCreationClick = () => {
+    const existingTeam = contest?.teams.find(
+      (team) => team.myTeam && team.status === "RECRUITING",
+    );
+
+    if (existingTeam) {
+      setExistingMyTeamId(existingTeam.teamId);
+      return;
+    }
+
+    setIsTeamCreationModalOpen(true);
+  };
+
   const formatDate = (value: string) => new Intl.DateTimeFormat("ko-KR", {
     year: "numeric",
     month: "2-digit",
@@ -205,10 +216,13 @@ export function ContestDetailPage() {
     toggleScrap(isSaved);
   };
 
-  const toggleTeamFavorite = (teamId: number) => {
+  const getTeamScrapped = (team: RecruitingTeam) =>
+    teamScrapOverrides[team.teamId] ?? team.scrapped;
+
+  const toggleTeamFavorite = (team: RecruitingTeam) => {
     toggleTeamScrap({
-      teamId,
-      scrapped: favoriteTeamIds.includes(teamId),
+      teamId: team.teamId,
+      scrapped: getTeamScrapped(team),
     });
   };
 
@@ -389,7 +403,7 @@ export function ContestDetailPage() {
               <S.TeamDescription>모집 중인 팀이 없습니다.</S.TeamDescription>
             )}
             {displayedTeams.slice(0, 3).map((team) => {
-              const favorite = favoriteTeamIds.includes(team.teamId);
+              const favorite = getTeamScrapped(team);
               const teamDetail = teamDetailsById[team.teamId];
               const myTeam = isMyTeam(team.teamId);
 
@@ -419,7 +433,7 @@ export function ContestDetailPage() {
                         disabled={isTeamScrapPending}
                         onClick={(event) => {
                           event.stopPropagation();
-                          toggleTeamFavorite(team.teamId);
+                          toggleTeamFavorite(team);
                         }}
                         type="button"
                       >
@@ -508,7 +522,7 @@ export function ContestDetailPage() {
 
       <S.ActionBar>
         <S.ApplyButton
-          onClick={() => setIsTeamCreationModalOpen(true)}
+          onClick={handleTeamCreationClick}
           type="button"
         >
           팀 구성하기
@@ -533,6 +547,27 @@ export function ContestDetailPage() {
           onClick: () => setApplyTargetTeam(null),
         }}
         title="이 팀에 지원하시겠습니까?"
+      />
+      <Modal
+        description="이 공모전에는 이미 모집 중인 내가 만든 팀이 있어요."
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="check" size={22} weight="bold" />}
+        onClose={() => setExistingMyTeamId(null)}
+        open={existingMyTeamId !== null}
+        primaryAction={{
+          label: "팀 관리하기",
+          onClick: () => {
+            if (existingMyTeamId === null) return;
+
+            navigate(`/contests/${contestId}/teams/${existingMyTeamId}/manage`);
+          },
+        }}
+        secondaryAction={{
+          label: "확인",
+          onClick: () => setExistingMyTeamId(null),
+        }}
+        title="이미 만든 팀이 있어요"
       />
       <Modal
         description="팀을 만들고 함께할 팀원을 모집해 보세요."

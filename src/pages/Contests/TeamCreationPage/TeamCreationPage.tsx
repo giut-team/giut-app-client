@@ -66,6 +66,10 @@ const suggestedQuestions = [
 
 const getTeamCreationErrorMessage = (error: unknown) => {
   if (isAxiosError<{ message?: string }>(error)) {
+    if (error.response?.status === 409) {
+      return "이미 이 공모전에 모집 중인 내가 만든 팀이 있어요.";
+    }
+
     return error.response?.data.message ?? "팀 등록 요청을 처리하지 못했어요.";
   }
 
