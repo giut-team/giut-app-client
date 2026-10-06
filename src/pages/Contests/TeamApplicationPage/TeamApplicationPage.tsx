@@ -1,9 +1,13 @@
 import { useMemo, useState } from "react";
 import { isAxiosError } from "axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchContestDetail } from "../../../api/contests";
-import { getProfileRoleName } from "../../../api/profiles";
+import {
+  fetchProfileRoles,
+  getProfileRoleName,
+  type ProfilePrimaryRole,
+} from "../../../api/profiles";
 import {
   applyToTeam,
   fetchTeamDetail,
@@ -14,7 +18,19 @@ import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { S } from "./TeamApplicationPage.styles";
 
-const totalSteps = 2;
+const totalSteps = 3;
+
+const primaryRoleOptions = [
+  { code: "DEVELOPMENT", name: "개발", icon: "code", tone: "blue" },
+  { code: "DESIGN", name: "디자인", icon: "palette", tone: "purple" },
+  { code: "PLANNING", name: "기획", icon: "edit", tone: "gray" },
+  { code: "MARKETING", name: "마케팅", icon: "megaphone", tone: "gray" },
+] as const satisfies ReadonlyArray<{
+  code: ProfilePrimaryRole;
+  name: string;
+  icon: "code" | "palette" | "edit" | "megaphone";
+  tone: "blue" | "purple" | "gray";
+}>;
 
 const getApplicationErrorMessage = (error: unknown) => {
   if (!isAxiosError<{ message?: string }>(error)) {
@@ -34,8 +50,10 @@ export function TeamApplicationPage() {
   const { contestId = "", teamId = "" } = useParams();
   const numericTeamId = Number(teamId);
   const [step, setStep] = useState(1);
+  const [selectedPrimaryRole, setSelectedPrimaryRole] = useState<ProfilePrimaryRole | null>(null);
   const [selectedRoleCode, setSelectedRoleCode] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [weeklyAvailableHours, setWeeklyAvailableHours] = useState<number | "">("");
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -60,9 +78,30 @@ export function TeamApplicationPage() {
     queryFn: () => fetchTeamRecruitments(numericTeamId),
     enabled: Boolean(team),
   });
-  const availableRecruitments = useMemo(
-    () => recruitments.filter((recruitment) => recruitment.filledCount < recruitment.requiredCount),
-    [recruitments],
+  const profileRoleQueries = useQueries({
+    queries: primaryRoleOptions.map((primaryRole) => ({
+      queryKey: ["profileRoles", primaryRole.code],
+      queryFn: () => fetchProfileRoles(primaryRole.code),
+      enabled: Boolean(team),
+      staleTime: Infinity,
+    })),
+  });
+  const recruitmentGroups = useMemo(
+    () => primaryRoleOptions.map((primaryRole, index) => {
+      const roleCodes = new Set((profileRoleQueries[index]?.data ?? []).map((role) => role.code));
+      const groupedRecruitments = recruitments.filter(
+        (recruitment) => roleCodes.has(recruitment.roleCode),
+      );
+
+      return {
+        ...primaryRole,
+        recruitments: groupedRecruitments,
+        availableRecruitments: groupedRecruitments.filter(
+          (recruitment) => recruitment.filledCount < recruitment.requiredCount,
+        ),
+      };
+    }),
+    [profileRoleQueries, recruitments],
   );
   const applicationQuestions = useMemo(
     () => [...(team?.applicationQuestions ?? [])].sort(
@@ -93,7 +132,7 @@ export function TeamApplicationPage() {
         )],
       );
       setIsSubmitModalOpen(false);
-      setStep(3);
+      setStep(4);
     },
     onError: (error) => {
       setIsSubmitModalOpen(false);
@@ -105,16 +144,25 @@ export function TeamApplicationPage() {
     },
   });
 
-  const selectedRecruitment = availableRecruitments.find(
+  const selectedPrimaryRoleGroup = recruitmentGroups.find(
+    (primaryRole) => primaryRole.code === selectedPrimaryRole,
+  );
+  const selectedRecruitment = selectedPrimaryRoleGroup?.availableRecruitments.find(
     (recruitment) => recruitment.roleCode === selectedRoleCode,
   );
   const hasRequiredAnswers = applicationQuestions
     .filter((question) => question.required)
     .every((question) => Boolean(answers[question.questionId]?.trim()));
   const canContinue = step === 1
-    ? Boolean(selectedRoleCode)
-    : Boolean(message.trim()) && hasRequiredAnswers;
-  const headerTitle = step === 1 ? "지원 분야 선택" : "지원서 작성";
+    ? Boolean(selectedPrimaryRole)
+    : step === 2
+      ? Boolean(selectedRoleCode)
+      : Boolean(message.trim()) && hasRequiredAnswers;
+  const headerTitle = step === 1
+    ? "지원 분야 선택"
+    : step === 2
+      ? "지원 역할 선택"
+      : "지원 메시지 작성";
 
   const handleNext = () => {
     if (!canContinue) return;
@@ -124,12 +172,17 @@ export function TeamApplicationPage() {
       return;
     }
 
+    if (step === 2) {
+      setStep(3);
+      return;
+    }
+
     setIsSubmitModalOpen(true);
   };
 
   const handleBack = () => {
-    if (step === 2) {
-      setStep(1);
+    if (step > 1) {
+      setStep((current) => current - 1);
       return;
     }
 
@@ -194,12 +247,12 @@ export function TeamApplicationPage() {
               <S.ContestName>{contest?.title ?? "공모전"}</S.ContestName>
               <S.TeamSummary>
                 <div>
-                  <span>현재 인원</span>
-                  <strong>{team.currentMemberCount}/{team.maxMemberCount}명</strong>
+                  <span>총 모집</span>
+                  <strong>{team.maxMemberCount}명</strong>
                 </div>
                 <div>
-                  <span>모집 분야</span>
-                  <strong>{availableRecruitments.length}개</strong>
+                  <span>모집 마감</span>
+                  <strong>{contest?.dDay ?? "-"}</strong>
                 </div>
               </S.TeamSummary>
             </S.TeamCard>
@@ -207,7 +260,51 @@ export function TeamApplicationPage() {
             <S.QuestionTitle>어떤 분야로 지원할까요?</S.QuestionTitle>
             <S.QuestionHint>한 분야만 선택할 수 있어요.</S.QuestionHint>
             <S.RoleList>
-              {availableRecruitments.map((recruitment) => {
+              {recruitmentGroups.map((primaryRole) => {
+                const hasRecruitments = primaryRole.recruitments.length > 0;
+                const selectable = primaryRole.availableRecruitments.length > 0;
+                const selected = primaryRole.code === selectedPrimaryRole;
+
+                return (
+                  <S.FieldOption
+                    $disabled={!selectable}
+                    $selected={selected}
+                    aria-pressed={selected}
+                    disabled={!selectable}
+                    key={primaryRole.code}
+                    onClick={() => {
+                      setSelectedPrimaryRole(primaryRole.code);
+                      setSelectedRoleCode(null);
+                    }}
+                    type="button"
+                  >
+                    <S.FieldIcon $disabled={!selectable} $tone={primaryRole.tone}>
+                      <Icon name={primaryRole.icon} size={17} weight="bold" />
+                    </S.FieldIcon>
+                    <S.FieldName>{primaryRole.name}</S.FieldName>
+                    {selectable ? (
+                      <S.EmptyMark aria-hidden="true" />
+                    ) : (
+                      <S.FieldStatus>{hasRecruitments ? "마감" : "미모집"}</S.FieldStatus>
+                    )}
+                  </S.FieldOption>
+                );
+              })}
+            </S.RoleList>
+          </S.FormContent>
+        )}
+
+        {step === 2 && (
+          <S.FormContent>
+            <S.SelectedFieldBadge>
+              지원 분야 · {selectedPrimaryRoleGroup?.name}
+            </S.SelectedFieldBadge>
+            <S.RoleHeading>
+              <S.QuestionTitle>지원하는 역할</S.QuestionTitle>
+              <span>1개 선택</span>
+            </S.RoleHeading>
+            <S.RoleList>
+              {selectedPrimaryRoleGroup?.availableRecruitments.map((recruitment) => {
                 const selected = recruitment.roleCode === selectedRoleCode;
 
                 return (
@@ -221,30 +318,23 @@ export function TeamApplicationPage() {
                     <S.RoleRadio $selected={selected}>{selected && <span />}</S.RoleRadio>
                     <S.RoleCopy>
                       <strong>{getProfileRoleName(recruitment.roleCode)}</strong>
-                      <span>필요 {recruitment.requiredCount}명 · 현재 {recruitment.filledCount}명</span>
+                      <span>모집 중</span>
                     </S.RoleCopy>
                   </S.RoleOption>
                 );
               })}
             </S.RoleList>
-            {!availableRecruitments.length && (
-              <S.QuestionHint>현재 지원할 수 있는 모집 분야가 없습니다.</S.QuestionHint>
-            )}
           </S.FormContent>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <S.FormContent>
-            <S.SelectedFieldBadge>
-              지원 분야 · {selectedRecruitment && getProfileRoleName(selectedRecruitment.roleCode)}
-            </S.SelectedFieldBadge>
-            <S.MessageSectionTitle>팀장에게 보낼 메시지</S.MessageSectionTitle>
-            <S.IntroductionLabel htmlFor="application-message">지원 메시지</S.IntroductionLabel>
+            <S.MessageSectionTitle>팀장에게 보낼 내용이에요</S.MessageSectionTitle>
+            <S.IntroductionLabel htmlFor="application-message">간단한 자기소개</S.IntroductionLabel>
             <S.IntroductionTextarea
               id="application-message"
               maxLength={300}
               onChange={(event) => setMessage(event.target.value)}
-              placeholder="지원 동기와 함께하고 싶은 이유를 작성해 주세요."
               value={message}
             />
             <S.CharacterCount>{message.length}/300</S.CharacterCount>
@@ -252,7 +342,7 @@ export function TeamApplicationPage() {
             {applicationQuestions.length > 0 && (
               <>
                 <S.SectionDivider />
-                <S.MessageSectionTitle>팀이 남긴 질문</S.MessageSectionTitle>
+                <S.MessageSectionTitle>팀장이 남긴 질문</S.MessageSectionTitle>
                 <S.QuestionPreviewList>
                   {applicationQuestions.map((question, index) => (
                     <S.QuestionInputGroup key={question.questionId}>
@@ -278,10 +368,26 @@ export function TeamApplicationPage() {
                 </S.QuestionPreviewList>
               </>
             )}
+            <S.AvailabilityRow>
+              <span>한 주당 참여 가능한 시간</span>
+              <div>
+                <S.AvailabilityInput
+                  aria-label="한 주당 참여 가능한 시간"
+                  max={168}
+                  min={1}
+                  onChange={(event) => setWeeklyAvailableHours(
+                    event.target.value === "" ? "" : Number(event.target.value),
+                  )}
+                  type="number"
+                  value={weeklyAvailableHours}
+                />
+                <S.AvailabilityUnit>시간</S.AvailabilityUnit>
+              </div>
+            </S.AvailabilityRow>
           </S.FormContent>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <S.CompletionContent>
             <S.SuccessIcon>
               <Icon name="check" size={25} weight="bold" />
@@ -292,7 +398,7 @@ export function TeamApplicationPage() {
             </S.CompletionDescription>
             <S.ApplicationSummary>
               <div>
-                <dt>지원 분야</dt>
+                <dt>지원 역할</dt>
                 <dd>{selectedRecruitment && getProfileRoleName(selectedRecruitment.roleCode)}</dd>
               </div>
               <div>
@@ -302,6 +408,7 @@ export function TeamApplicationPage() {
             </S.ApplicationSummary>
           </S.CompletionContent>
         )}
+
       </S.Content>
 
       {step <= totalSteps && (
@@ -311,14 +418,16 @@ export function TeamApplicationPage() {
           </S.NextButton>
         </S.ActionBar>
       )}
-      {step === 3 && (
+      {step === 4 && (
         <S.ActionBar>
-          <S.NextButton onClick={() => navigate(`/contests/${contestId}`, { replace: true })} type="button">
+          <S.NextButton
+            onClick={() => navigate(`/contests/${contestId}/teams/${teamId}`, { replace: true })}
+            type="button"
+          >
             확인
           </S.NextButton>
         </S.ActionBar>
       )}
-
       <Modal
         emphasizeDescription
         emphasizeSecondaryAction

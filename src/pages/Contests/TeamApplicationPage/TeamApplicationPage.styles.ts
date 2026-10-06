@@ -44,7 +44,7 @@ export const S = {
   `,
   Header: styled.header`
     display: flex;
-    height: 48px;
+    height: 60px;
     align-items: center;
     gap: 5px;
     padding: 0 12px;
@@ -64,13 +64,13 @@ export const S = {
   HeaderTitle: styled.h1`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 800;
   `,
   StepCount: styled.span`
     margin-left: auto;
     color: ${applicationAccent};
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
   `,
   Progress: styled.div`
@@ -101,13 +101,13 @@ export const S = {
   TeamName: styled.h2`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 800;
   `,
   ContestName: styled.p`
     margin: 6px 0 10px;
     color: ${applicationAccent};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 700;
   `,
   TeamSummary: styled.div`
@@ -125,24 +125,24 @@ export const S = {
       color: ${tokens.color.neutral[900]};
     }
     span {
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
     }
     strong {
-      font-size: 9px;
+      font-size: 12px;
       font-weight: 800;
     }
   `,
   QuestionTitle: styled.h2`
     margin: 18px 0 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 800;
   `,
   QuestionHint: styled.p`
     margin: 5px 0 9px;
     color: ${tokens.color.neutral[900]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
   `,
   FieldList: styled.div`
@@ -152,12 +152,13 @@ export const S = {
   FieldOption: styled.button<{ $disabled: boolean; $selected: boolean }>`
     display: flex;
     width: 100%;
-    height: 50px;
+    height: 68px;
     align-items: center;
     gap: 10px;
     padding: 0 12px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 10px;
+    border: 1px solid
+      ${({ $selected }) => ($selected ? applicationAccent : tokens.color.neutral[200])};
+    border-radius: 12px;
     background: ${({ $disabled }) =>
       $disabled ? tokens.color.neutral[100] : tokens.color.neutral[50]};
     color: ${({ $disabled }) =>
@@ -167,28 +168,28 @@ export const S = {
   `,
   FieldIcon: styled.span<{
     $disabled: boolean;
-    $field: "개발" | "디자인" | "기획" | "마케팅";
+    $tone: "blue" | "purple" | "gray";
   }>`
     display: grid;
     width: 26px;
     height: 26px;
     place-items: center;
     border-radius: 7px;
-    background: ${({ $disabled, $field }) => {
+    background: ${({ $disabled, $tone }) => {
       if ($disabled) return tokens.color.neutral[200];
-      if ($field === "개발") return tokens.color.primary[100];
-      if ($field === "디자인") return tokens.color.purple[100];
+      if ($tone === "blue") return tokens.color.primary[100];
+      if ($tone === "purple") return tokens.color.purple[100];
       return tokens.color.neutral[100];
     }};
-    color: ${({ $disabled, $field }) => {
+    color: ${({ $disabled, $tone }) => {
       if ($disabled) return tokens.color.neutral[500];
-      if ($field === "개발") return tokens.color.primary[500];
-      if ($field === "디자인") return tokens.color.purple[500];
+      if ($tone === "blue") return tokens.color.primary[500];
+      if ($tone === "purple") return tokens.color.purple[500];
       return tokens.color.neutral[500];
     }};
   `,
   FieldName: styled.strong`
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 800;
   `,
   FieldStatus: styled.span`
@@ -197,7 +198,7 @@ export const S = {
     border-radius: 4px;
     background: ${tokens.color.neutral[200]};
     color: ${tokens.color.neutral[500]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 800;
   `,
   SelectedMark: styled.span`
@@ -225,7 +226,7 @@ export const S = {
     border-radius: 6px;
     background: ${tokens.color.primary[100]};
     color: ${applicationAccent};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
   `,
   RoleHeading: styled.div`
@@ -237,7 +238,7 @@ export const S = {
     }
     span {
       color: ${tokens.color.neutral[900]};
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 700;
     }
   `,
@@ -248,7 +249,7 @@ export const S = {
   `,
   RoleOption: styled.button<{ $selected: boolean }>`
     display: flex;
-    min-height: 45px;
+    min-height: 62px;
     align-items: center;
     gap: 10px;
     padding: 8px 11px;
@@ -284,30 +285,20 @@ export const S = {
     display: grid;
     gap: 3px;
     strong {
-      font-size: 8px;
+      font-size: 12px;
       font-weight: 800;
     }
     span {
       color: ${tokens.color.neutral[900]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
     }
   `,
   MessageSectionTitle: styled.h2`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 800;
-
-    &:first-of-type {
-      padding: 10px 12px;
-      border-left: 3px solid ${applicationAccent};
-      border-radius: 0 8px 8px 0;
-      background: ${tokens.color.primary[100]};
-      color: ${applicationAccent};
-      font-size: 13px;
-      font-weight: 700;
-    }
   `,
   AvailabilityRow: styled.div`
     display: flex;
@@ -321,9 +312,15 @@ export const S = {
     border-radius: 9px;
     background: ${tokens.color.neutral[50]};
     box-shadow: none;
+
+    div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
     span {
       color: ${tokens.color.neutral[900]};
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 800;
     }
   `,
@@ -339,7 +336,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     text-align: center !important;
     text-indent: 0;
@@ -359,14 +356,14 @@ export const S = {
   AvailabilityUnit: styled.strong`
     margin-left: 2px;
     color: ${tokens.color.neutral[900]};
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
   `,
   IntroductionLabel: styled.label`
     display: block;
     margin-top: 22px;
     color: ${tokens.color.neutral[900]};
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 800;
   `,
   IntroductionTextarea: styled.textarea`
@@ -382,7 +379,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     line-height: 1.7;
     resize: none;
@@ -390,7 +387,7 @@ export const S = {
   CharacterCount: styled.p`
     margin: 4px 0 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 600;
     text-align: right;
   `,
@@ -419,7 +416,7 @@ export const S = {
   QuestionNumber: styled.h3`
     margin: 0;
     color: ${applicationAccent};
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
   `,
   QuestionAnswerInput: styled.textarea`
@@ -434,7 +431,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
     line-height: 1.55;
     resize: none;
@@ -444,7 +441,7 @@ export const S = {
     margin-top: -3px;
     margin-right: 2px;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 600;
   `,
   CompletionContent: styled.section`
@@ -477,13 +474,13 @@ export const S = {
   CompletionTitle: styled.h2`
     margin: 18px 0 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 800;
   `,
   CompletionDescription: styled.p`
     margin: 7px 0 20px;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   ApplicationSummary: styled.dl`
@@ -504,7 +501,7 @@ export const S = {
     dd {
       margin: 0;
       color: ${tokens.color.neutral[900]};
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 700;
     }
     dd {
@@ -523,7 +520,7 @@ export const S = {
   NextStepsTitle: styled.h3`
     margin: 0 0 11px;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 700;
   `,
   NextStep: styled.div<{ $active?: boolean }>`
@@ -537,12 +534,12 @@ export const S = {
     }
     strong {
       color: ${tokens.color.neutral[900]};
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 800;
     }
     span {
       color: ${tokens.color.neutral[900]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
     }
   `,
@@ -557,7 +554,7 @@ export const S = {
       $active ? applicationAccent : tokens.color.neutral[100]};
     color: ${({ $active }) =>
       $active ? tokens.color.neutral[50] : tokens.color.neutral[500]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 800;
 
     svg {
@@ -572,7 +569,7 @@ export const S = {
     border-radius: 9px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.neutral[900]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 600;
     line-height: 1.55;
     text-align: left;
@@ -598,7 +595,7 @@ export const S = {
     background: ${applicationAccent};
     color: ${tokens.color.neutral[50]};
     font: inherit;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
 
