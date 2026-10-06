@@ -35,6 +35,7 @@ type BottomSheetProps = {
   children?: ReactNode; // 바텀 시트의 내용
   footer?: ReactNode;
   contentFill?: boolean;
+  contentPadding?: string;
   decisionMode?: DecisionMode;
   applicantName?: string;
   applicantRole?: string;
@@ -212,6 +213,7 @@ export function BottomSheet({
   children,
   footer,
   contentFill = false,
+  contentPadding,
   decisionMode,
   applicantName,
   applicantRole,
@@ -317,7 +319,7 @@ export function BottomSheet({
       dragOffset={dragOffset}
       isDragging={isDragging}
     >
-      <S.InnerPadding $compact={variant === "compact"}>
+      <S.InnerPadding $compact={variant === "compact"} $contentPadding={contentPadding}>
         <S.HandleWrapper
           $compact={variant === "compact"}
           onPointerCancel={resetDrag}

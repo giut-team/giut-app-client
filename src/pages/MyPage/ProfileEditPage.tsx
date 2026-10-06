@@ -749,6 +749,7 @@ export function RoleSelectSheet({
   return (
     <BottomSheet
       contentFill
+      contentPadding="12px 18px 20px 2px"
       footer={
         <S.SheetFooter>
           <S.SelectedRoles>

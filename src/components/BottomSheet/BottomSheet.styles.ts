@@ -8,12 +8,14 @@ const getDecisionAccent = (mode: DecisionMode) =>
   mode === "accept" ? tokens.color.primary[500] : tokens.color.danger[500];
 
 export const S = {
-  InnerPadding: styled.div<{ $compact: boolean }>`
+  InnerPadding: styled.div<{ $compact: boolean; $contentPadding?: string }>`
     display: flex;
     min-height: 0;
     flex: 1;
     flex-direction: column;
     padding: ${({ $compact }) => ($compact ? "12px 18px 20px" : "17px 27px 0")};
+  ${({ $contentPadding }) =>
+    $contentPadding !== undefined && `padding: ${$contentPadding};`}
   `,
   HandleWrapper: styled.div<{ $compact: boolean }>`
     display: flex;

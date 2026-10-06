@@ -555,6 +555,7 @@ export const S = {
   SheetHeader: styled.div`
     display: flex;
     align-items: center;
+    padding-left: 20px;
     justify-content: space-between;
     margin: 4px 0 17px;
     > span {
@@ -612,8 +613,8 @@ export const S = {
     display: grid;
     flex: 1;
     min-height: 0;
-    grid-template-columns: 105px minmax(0, 1fr);
-    margin: 0 -18px;
+    grid-template-columns: 90px minmax(0, 1fr);
+    margin: 0;
     border-top: 1px solid ${tokens.color.neutral[200]};
     border-bottom: 1px solid ${tokens.color.neutral[200]};
   `,
@@ -623,9 +624,9 @@ export const S = {
     background: #f7f8fb;
     button {
       display: flex;
-      padding: 18px 20px;
+      padding: 18px 8px 18px 16px;
       border: 0;
-      border-left: 23px solid transparent;
+      border-left: 4px solid transparent;
       background: transparent;
       color: ${tokens.color.neutral[500]};
       font: inherit;
@@ -838,6 +839,7 @@ export const S = {
   SheetFooter: styled.div`
     display: grid;
     gap: 14px;
+    padding-left: 20px;
     padding-bottom: var(--app-safe-bottom);
   `,
   GradeSheetFooter: styled.div`
