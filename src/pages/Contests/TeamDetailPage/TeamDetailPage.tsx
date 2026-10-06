@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchContestDetail } from "../../../api/contests";
 import {
@@ -9,6 +9,8 @@ import {
 } from "../../../api/profiles";
 import {
   addTeamScrap,
+  cancelTeamApplication,
+  fetchMyTeamApplications,
   fetchTeamDetail,
   fetchTeamMembers,
   fetchTeamRecruitments,
@@ -55,8 +57,10 @@ const formatDate = (value?: string) => {
 
 export function TeamDetailPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isApplicationCancelModalOpen, setIsApplicationCancelModalOpen] = useState(false);
   const [scrapOverride, setScrapOverride] = useState<boolean | null>(null);
   const numericTeamId = Number(teamId);
   const {
@@ -83,6 +87,11 @@ export function TeamDetailPage() {
     queryFn: () => fetchContestDetail(contestId),
     enabled: Boolean(contestId),
   });
+  const { data: myTeamApplications = [] } = useQuery({
+    queryKey: ["myTeamApplications"],
+    queryFn: fetchMyTeamApplications,
+    enabled: Boolean(team),
+  });
   const profileRoleQueries = useQueries({
     queries: profilePrimaryRoles.map((primaryRole) => ({
       queryKey: ["profileRoles", primaryRole],
@@ -107,6 +116,10 @@ export function TeamDetailPage() {
       (contestTeam) => contestTeam.teamId === numericTeamId && contestTeam.myTeam,
     ),
   );
+  const pendingApplication = myTeamApplications.find(
+    (application) => application.teamId === numericTeamId && application.status === "PENDING",
+  );
+  const isPendingApplication = Boolean(pendingApplication);
 
   useEffect(() => {
     if (!isMyTeam) return;
@@ -118,6 +131,24 @@ export function TeamDetailPage() {
       scrapped ? removeTeamScrap(numericTeamId) : addTeamScrap(numericTeamId)
     ),
     onSuccess: (response) => setScrapOverride(response.scrapped),
+  });
+  const { isPending: isApplicationCancelling, mutate: cancelApplication } = useMutation({
+    mutationFn: () => {
+      if (!pendingApplication) {
+        throw new Error("취소할 지원서를 찾을 수 없어요.");
+      }
+
+      return cancelTeamApplication(numericTeamId, pendingApplication.applicationId);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData<typeof myTeamApplications>(
+        ["myTeamApplications"],
+        (current = []) => current.filter(
+          (application) => application.applicationId !== pendingApplication?.applicationId,
+        ),
+      );
+      setIsApplicationCancelModalOpen(false);
+    },
   });
 
   if (isTeamLoading) {
@@ -190,6 +221,7 @@ export function TeamDetailPage() {
         />
 
         <S.Hero>
+          {isPendingApplication && <S.ApplicationBadge>지원 검토중</S.ApplicationBadge>}
           <S.TitleRow>
             <S.TeamTitle>{team.name}</S.TeamTitle>
             <S.CountBadge>{team.currentMemberCount}/{team.maxMemberCount}명</S.CountBadge>
@@ -205,6 +237,42 @@ export function TeamDetailPage() {
           <S.SectionTitle>팀 소개</S.SectionTitle>
           <S.Introduction>{team.description}</S.Introduction>
         </S.Section>
+
+        {pendingApplication && (
+          <S.ApplicationReviewSection>
+            <S.ApplicationReviewCard>
+              <S.ApplicationReviewHeader>
+                <S.ApplicationReviewBadge>지원 검토중</S.ApplicationReviewBadge>
+                <S.ApplicationReviewDate>
+                  {formatDate(pendingApplication.appliedAt)} 지원
+                </S.ApplicationReviewDate>
+              </S.ApplicationReviewHeader>
+              <S.ApplicationReviewTitle>이미 지원한 팀이에요</S.ApplicationReviewTitle>
+              <S.ApplicationReviewDescription>
+                팀장이 지원서를 검토하는 중이에요. 결과가 나오면 알림으로 알려드릴게요.
+              </S.ApplicationReviewDescription>
+              <S.ApplicationReviewSteps aria-label="팀 참가 신청 진행 상황">
+                <S.ApplicationReviewStep $active>
+                  <Icon name="check" size={10} weight="bold" />
+                  <span>지원 완료</span>
+                </S.ApplicationReviewStep>
+                <S.ApplicationReviewLine $active />
+                <S.ApplicationReviewStep $active>
+                  <Icon name="check" size={10} weight="bold" />
+                  <span>팀장 검토</span>
+                </S.ApplicationReviewStep>
+                <S.ApplicationReviewLine />
+                <S.ApplicationReviewStep>
+                  <span>결과 발표</span>
+                </S.ApplicationReviewStep>
+              </S.ApplicationReviewSteps>
+              <S.ApplicationRoleRow>
+                <span>지원 포지션</span>
+                <strong>{getTeamRoleName(pendingApplication.roleCode)}</strong>
+              </S.ApplicationRoleRow>
+            </S.ApplicationReviewCard>
+          </S.ApplicationReviewSection>
+        )}
 
         <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
@@ -269,9 +337,26 @@ export function TeamDetailPage() {
         <S.ChatButton aria-label="팀장에게 문의하기" type="button">
           <Icon name="chat" size={19} weight="regular" />
         </S.ChatButton>
-        <S.ApplyButton onClick={() => setIsApplyModalOpen(true)} type="button">
-          팀 지원하기
-        </S.ApplyButton>
+        {isPendingApplication ? (
+          <S.PendingApplicationActions>
+            <S.ViewApplicationButton
+              onClick={() => navigate("/my-team/my-application/pending")}
+              type="button"
+            >
+              내 지원서 보기
+            </S.ViewApplicationButton>
+            <S.CancelApplicationButton
+              onClick={() => setIsApplicationCancelModalOpen(true)}
+              type="button"
+            >
+              지원 취소하기
+            </S.CancelApplicationButton>
+          </S.PendingApplicationActions>
+        ) : (
+          <S.ApplyButton onClick={() => setIsApplyModalOpen(true)} type="button">
+            팀 지원하기
+          </S.ApplyButton>
+        )}
       </S.ActionBar>
       <Modal
         emphasizeDescription
@@ -289,6 +374,20 @@ export function TeamDetailPage() {
           onClick: () => setIsApplyModalOpen(false),
         }}
         title="이 팀에 지원하시겠습니까?"
+      />
+      <Modal
+        description="지원 취소 후에는 다시 지원서를 작성해야 해요."
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="x" size={22} weight="bold" />}
+        onClose={() => setIsApplicationCancelModalOpen(false)}
+        open={isApplicationCancelModalOpen}
+        primaryAction={{
+          label: isApplicationCancelling ? "취소 중..." : "지원 취소하기",
+          onClick: cancelApplication,
+        }}
+        secondaryAction={{ label: "그대로 두기", onClick: () => setIsApplicationCancelModalOpen(false) }}
+        title="지원을 취소할까요?"
       />
     </S.Page>
   );

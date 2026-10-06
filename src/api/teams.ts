@@ -57,6 +57,7 @@ export type TeamDetail = RecruitingTeam & {
   weeklyMeetingCount: number;
   meetingPlace: TeamMeetingPlace;
   recruitments?: TeamRecruitment[];
+  applicationQuestions: TeamApplicationQuestion[];
 };
 
 export type TeamRecruitment = {
@@ -64,6 +65,38 @@ export type TeamRecruitment = {
   roleCode: string;
   requiredCount: number;
   filledCount: number;
+};
+
+export type TeamApplicationQuestion = {
+  questionId: number;
+  question: string;
+  required: boolean;
+  displayOrder: number;
+};
+
+export type ApplyTeamAnswer = {
+  questionId: number;
+  answer: string;
+};
+
+export type ApplyTeamRequest = {
+  roleCode: string;
+  message: string;
+  answers: ApplyTeamAnswer[];
+};
+
+export type TeamApplicationResponse = {
+  applicationId: number;
+  teamId: number;
+  userId: number;
+  roleCode: string;
+  message: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELED";
+  appliedAt: string;
+};
+
+type MyTeamApplicationsResponse = {
+  applications: TeamApplicationResponse[];
 };
 
 export type TeamRecruitmentsResponse = {
@@ -134,6 +167,31 @@ export const fetchTeamRecruitments = async (
   );
 
   return data.recruitments ?? [];
+};
+
+export const applyToTeam = async (
+  teamId: number,
+  request: ApplyTeamRequest,
+): Promise<TeamApplicationResponse> => {
+  const { data } = await api.post<TeamApplicationResponse>(
+    `/api/teams/${teamId}/applications`,
+    request,
+  );
+
+  return data;
+};
+
+export const fetchMyTeamApplications = async (): Promise<TeamApplicationResponse[]> => {
+  const { data } = await api.get<MyTeamApplicationsResponse>("/api/teams/applications/me");
+
+  return data.applications ?? [];
+};
+
+export const cancelTeamApplication = async (
+  teamId: number,
+  applicationId: number,
+): Promise<void> => {
+  await api.delete(`/api/teams/${teamId}/applications/${applicationId}`);
 };
 
 export const addTeamScrap = async (teamId: number): Promise<TeamScrapResponse> => {

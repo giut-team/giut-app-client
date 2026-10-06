@@ -344,6 +344,16 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
+  ApplicationBadge: styled.span`
+    flex: 0 0 auto;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #fff4dc;
+    color: ${tokens.color.warning[500]};
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   TeamFavoriteButton: styled.button<{ $favorite: boolean }>`
     display: grid;
     width: 24px;

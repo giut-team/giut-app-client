@@ -10,6 +10,7 @@ import {
 } from "../../../api/contests";
 import {
   addTeamScrap,
+  fetchMyTeamApplications,
   fetchRecruitingTeams,
   fetchTeamDetail,
   removeTeamScrap,
@@ -64,6 +65,10 @@ export function ContestDetailPage() {
     queryKey: ["recruitingTeams", competitionId],
     queryFn: () => fetchRecruitingTeams(competitionId),
     enabled: Number.isInteger(competitionId) && competitionId > 0,
+  });
+  const { data: myTeamApplications = [] } = useQuery({
+    queryKey: ["myTeamApplications"],
+    queryFn: fetchMyTeamApplications,
   });
   const displayedTeams = recruitingTeams?.teams ?? [];
   const teamDetailQueries = useQueries({
@@ -180,6 +185,9 @@ export function ContestDetailPage() {
     contest?.teams.some(
       (contestTeam) => contestTeam.teamId === teamId && contestTeam.myTeam,
     ),
+  );
+  const isPendingApplication = (teamId: number) => myTeamApplications.some(
+    (application) => application.teamId === teamId && application.status === "PENDING",
   );
   const getTeamPath = (team: RecruitingTeam) =>
     `teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
@@ -406,6 +414,7 @@ export function ContestDetailPage() {
               const favorite = getTeamScrapped(team);
               const teamDetail = teamDetailsById[team.teamId];
               const myTeam = isMyTeam(team.teamId);
+              const pendingApplication = isPendingApplication(team.teamId);
 
               return (
                 <S.TeamCard
@@ -425,6 +434,9 @@ export function ContestDetailPage() {
                       <S.TeamTitleGroup>
                         <S.TeamTitle>{team.name}</S.TeamTitle>
                         {myTeam && <S.OwnerBadge>내가 만든 팀</S.OwnerBadge>}
+                        {!myTeam && pendingApplication && (
+                          <S.ApplicationBadge>지원 검토중</S.ApplicationBadge>
+                        )}
                       </S.TeamTitleGroup>
                       <S.TeamFavoriteButton
                         $favorite={favorite}
@@ -458,9 +470,10 @@ export function ContestDetailPage() {
                       {team.currentMemberCount}/{team.maxMemberCount}명
                     </S.TeamMemberCount>
                     <S.TeamApplyButton
+                      disabled={pendingApplication}
                       onClick={(event) => {
                         event.stopPropagation();
-                        if (myTeam) {
+                        if (myTeam || pendingApplication) {
                           navigate(getTeamPath(team));
                           return;
                         }
@@ -469,7 +482,7 @@ export function ContestDetailPage() {
                       }}
                       type="button"
                     >
-                      {myTeam ? "팀 관리" : "지원하기"}
+                      {myTeam ? "팀 관리" : pendingApplication ? "지원 검토중" : "지원하기"}
                     </S.TeamApplyButton>
                   </S.TeamFooter>
                 </S.TeamCard>

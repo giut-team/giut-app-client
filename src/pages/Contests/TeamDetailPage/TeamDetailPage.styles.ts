@@ -49,6 +49,17 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
+  ApplicationBadge: styled.span`
+    display: inline-flex;
+    margin-bottom: 9px;
+    padding: 5px 8px;
+    border-radius: 7px;
+    background: #fff4dc;
+    color: ${tokens.color.warning[500]};
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   TitleRow: styled.div`
     display: flex;
     align-items: flex-start;
@@ -175,6 +186,106 @@ export const S = {
     font-size: 10px;
     line-height: 1.75;
   `,
+  ApplicationReviewSection: styled.section`
+    padding: 16px;
+    border-bottom: 8px solid ${tokens.color.neutral[100]};
+  `,
+  ApplicationReviewCard: styled.article`
+    padding: 14px;
+    border: 1px solid #ffe5af;
+    border-radius: 14px;
+    background: #fff9eb;
+  `,
+  ApplicationReviewHeader: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  `,
+  ApplicationReviewBadge: styled.span`
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: #fff0cc;
+    color: ${tokens.color.warning[500]};
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+  `,
+  ApplicationReviewDate: styled.time`
+    color: ${tokens.color.neutral[700]};
+    font-size: 8px;
+    font-weight: 700;
+  `,
+  ApplicationReviewTitle: styled.h3`
+    margin: 12px 0 6px;
+    color: ${tokens.color.neutral[900]};
+    font-size: 12px;
+    font-weight: 800;
+  `,
+  ApplicationReviewDescription: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.55;
+  `,
+  ApplicationReviewSteps: styled.div`
+    display: flex;
+    align-items: flex-start;
+    margin: 16px 0 13px;
+  `,
+  ApplicationReviewStep: styled.div<{ $active?: boolean }>`
+    position: relative;
+    display: grid;
+    width: 42px;
+    flex: 0 0 42px;
+    justify-items: center;
+    gap: 5px;
+    color: ${({ $active }) => ($active ? tokens.color.primary[500] : tokens.color.neutral[500])};
+    font-size: 7px;
+    font-weight: 700;
+
+    &::before {
+      display: grid;
+      width: 16px;
+      height: 16px;
+      place-items: center;
+      border-radius: 50%;
+      background: ${({ $active }) => ($active ? tokens.color.primary[500] : tokens.color.neutral[200])};
+      color: ${tokens.color.neutral[50]};
+      content: "";
+    }
+
+    > svg {
+      position: absolute;
+      margin-top: 3px;
+      color: ${tokens.color.neutral[50]};
+    }
+
+    > span {
+      white-space: nowrap;
+    }
+  `,
+  ApplicationReviewLine: styled.span<{ $active?: boolean }>`
+    height: 2px;
+    flex: 1;
+    margin-top: 7px;
+    background: ${({ $active }) => ($active ? tokens.color.primary[500] : tokens.color.neutral[200])};
+  `,
+  ApplicationRoleRow: styled.div`
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0 0;
+    border-top: 1px solid #f1dba9;
+    color: ${tokens.color.neutral[700]};
+    font-size: 9px;
+    font-weight: 600;
+
+    strong {
+      color: ${tokens.color.neutral[900]};
+      font-weight: 800;
+    }
+  `,
   MemberList: styled.div`
     display: grid;
     gap: 15px;
@@ -273,6 +384,37 @@ export const S = {
     color: ${tokens.color.neutral[700]};
     cursor: pointer;
   `,
+  PendingApplicationActions: styled.div`
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    gap: 5px;
+  `,
+  ViewApplicationButton: styled.button`
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.primary[500]};
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+  `,
+  CancelApplicationButton: styled.button`
+    justify-self: center;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    background: transparent;
+    color: ${tokens.color.neutral[500]};
+    font: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+  `,
   ApplyButton: styled.button`
     flex: 1;
     height: 42px;
@@ -289,6 +431,12 @@ export const S = {
 
     &:hover {
       background: ${tokens.color.primary[600]};
+    }
+
+    &:disabled {
+      background: ${tokens.color.neutral[200]};
+      box-shadow: none;
+      cursor: default;
     }
   `,
 };

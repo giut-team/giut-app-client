@@ -3,6 +3,7 @@ import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   addTeamScrap,
+  fetchMyTeamApplications,
   fetchRecruitingTeams,
   fetchTeamDetail,
   removeTeamScrap,
@@ -38,6 +39,10 @@ export function RecruitingTeamsPage() {
     queryFn: () => fetchContestDetail(contestId),
     enabled: Boolean(contestId),
   });
+  const { data: myTeamApplications = [] } = useQuery({
+    queryKey: ["myTeamApplications"],
+    queryFn: fetchMyTeamApplications,
+  });
   const visibleTeams = data?.teams ?? [];
   const teamDetailQueries = useQueries({
     queries: visibleTeams.map((team) => ({
@@ -71,6 +76,9 @@ export function RecruitingTeamsPage() {
     contest?.teams.some(
       (contestTeam) => contestTeam.teamId === teamId && contestTeam.myTeam,
     ),
+  );
+  const isPendingApplication = (teamId: number) => myTeamApplications.some(
+    (application) => application.teamId === teamId && application.status === "PENDING",
   );
   const getTeamDetailPath = (team: RecruitingTeam) =>
     `/contests/${contestId}/teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
@@ -122,6 +130,7 @@ export function RecruitingTeamsPage() {
               const favorite = getTeamScrapped(team);
               const teamDetail = teamDetailsById[team.teamId];
               const myTeam = isMyTeam(team.teamId);
+              const pendingApplication = isPendingApplication(team.teamId);
 
               return (
                 <S.TeamCard
@@ -143,6 +152,11 @@ export function RecruitingTeamsPage() {
                         {myTeam && (
                           <S.RelationshipBadge $type="owner">
                             내가 만든 팀
+                          </S.RelationshipBadge>
+                        )}
+                        {!myTeam && pendingApplication && (
+                          <S.RelationshipBadge $type="applied">
+                            지원 검토중
                           </S.RelationshipBadge>
                         )}
                       </S.TitleGroup>
@@ -178,9 +192,10 @@ export function RecruitingTeamsPage() {
                       {team.currentMemberCount}/{team.maxMemberCount}명
                     </S.MemberCount>
                     <S.ApplyButton
+                      disabled={pendingApplication}
                       onClick={(event) => {
                         event.stopPropagation();
-                        if (myTeam) {
+                        if (myTeam || pendingApplication) {
                           navigate(getTeamDetailPath(team));
                           return;
                         }
@@ -189,7 +204,7 @@ export function RecruitingTeamsPage() {
                       }}
                       type="button"
                     >
-                      {myTeam ? "팀 관리" : "지원하기"}
+                      {myTeam ? "팀 관리" : pendingApplication ? "지원 검토중" : "지원하기"}
                     </S.ApplyButton>
                   </S.CardFooter>
                 </S.TeamCard>
