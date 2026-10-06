@@ -221,7 +221,12 @@ export function TeamDetailPage() {
         />
 
         <S.Hero>
-          {isPendingApplication && <S.ApplicationBadge>지원 검토중</S.ApplicationBadge>}
+          {(team.status === "RECRUITING" || isPendingApplication) && (
+            <S.StatusBadgeRow>
+              {team.status === "RECRUITING" && <S.RecruitingStatusBadge>모집 중</S.RecruitingStatusBadge>}
+              {isPendingApplication && <S.ApplicationBadge>지원 검토 중</S.ApplicationBadge>}
+            </S.StatusBadgeRow>
+          )}
           <S.TitleRow>
             <S.TeamTitle>{team.name}</S.TeamTitle>
             <S.CountBadge>{team.currentMemberCount}/{team.maxMemberCount}명</S.CountBadge>
@@ -276,19 +281,24 @@ export function TeamDetailPage() {
 
         <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
-          {recruitments.map((recruitment) => (
-            <S.RecruitmentCard key={recruitment.recruitmentId}>
-              <div>
-                <S.RecruitmentRole>{getTeamRoleName(recruitment.roleCode)}</S.RecruitmentRole>
-                <S.RecruitmentMeta>
-                  필요 {recruitment.requiredCount}명 · 현재 {recruitment.filledCount}명
-                </S.RecruitmentMeta>
-              </div>
-              <S.RecruitingBadge>
-                {recruitment.filledCount < recruitment.requiredCount ? "모집 중" : "모집 완료"}
-              </S.RecruitingBadge>
-            </S.RecruitmentCard>
-          ))}
+          {recruitments.map((recruitment) => {
+            const isRecruiting = recruitment.filledCount < recruitment.requiredCount;
+            const isAppliedRole = pendingApplication?.roleCode === recruitment.roleCode;
+
+            return (
+              <S.RecruitmentCard key={recruitment.recruitmentId}>
+                <div>
+                  <S.RecruitmentRole>{getTeamRoleName(recruitment.roleCode)}</S.RecruitmentRole>
+                  <S.RecruitmentMeta>
+                    필요 {recruitment.requiredCount}명 · 현재 {recruitment.filledCount}명
+                  </S.RecruitmentMeta>
+                </div>
+                <S.RecruitingBadge $applied={isAppliedRole} $recruiting={isRecruiting}>
+                  {isAppliedRole ? "내가 지원" : isRecruiting ? "모집 중" : "마감"}
+                </S.RecruitingBadge>
+              </S.RecruitmentCard>
+            );
+          })}
           {!recruitments.length && (
             <S.Introduction>등록된 모집 분야가 없습니다.</S.Introduction>
           )}
