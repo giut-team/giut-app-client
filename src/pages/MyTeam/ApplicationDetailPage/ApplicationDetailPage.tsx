@@ -1,20 +1,121 @@
 import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { getProfileRoleName } from "../../../api/profiles";
+import {
+  approveTeamApplication,
+  fetchTeamApplications,
+  fetchTeamDetail,
+  rejectTeamApplication,
+} from "../../../api/teams";
 import {
   BottomSheet,
   type DecisionMode,
 } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
-import { applicants } from "../myTeam.data";
 import { S } from "./ApplicationDetailPage.styles";
+
+const formatAppliedAt = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "지원일 미정";
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
+
+const getDecisionErrorMessage = (error: unknown) => {
+  if (isAxiosError<{ message?: string }>(error)) {
+    return (
+      error.response?.data.message ??
+      "지원 요청을 처리하지 못했어요. 잠시 후 다시 시도해주세요."
+    );
+  }
+
+  return "지원 요청을 처리하지 못했어요. 잠시 후 다시 시도해주세요.";
+};
 
 export function ApplicationDetailPage() {
   const navigate = useNavigate();
-  const { applicantId } = useParams();
-  const applicant =
-    applicants.find((item) => item.id === applicantId) ?? applicants[0];
+  const queryClient = useQueryClient();
+  const { applicationId = "", teamId = "" } = useParams();
+  const numericTeamId = Number(teamId);
+  const numericApplicationId = Number(applicationId);
   const [decisionMode, setDecisionMode] = useState<DecisionMode | null>(null);
+  const {
+    data: applications = [],
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["teamApplications", numericTeamId],
+    queryFn: () => fetchTeamApplications(numericTeamId),
+    enabled: Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+  const { data: team } = useQuery({
+    queryKey: ["team", numericTeamId],
+    queryFn: () => fetchTeamDetail(numericTeamId),
+    enabled: Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+  const application = applications.find(
+    (item) => item.applicationId === numericApplicationId,
+  );
+  const { mutateAsync: decideApplication } = useMutation({
+    mutationFn: async ({ mode, reason }: { mode: DecisionMode; reason?: string }) => {
+      if (!application) throw new Error("지원서를 찾을 수 없습니다.");
+
+      if (mode === "accept") {
+        await approveTeamApplication(numericTeamId, numericApplicationId, {
+          roleCode: application.roleCode,
+        });
+        return;
+      }
+
+      await rejectTeamApplication(numericTeamId, numericApplicationId, { reason });
+    },
+  });
+
+  const handleDecisionComplete = () => {
+    void Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["teamApplications", numericTeamId] }),
+      queryClient.invalidateQueries({ queryKey: ["team", numericTeamId] }),
+      queryClient.invalidateQueries({ queryKey: ["teamMembers", numericTeamId] }),
+      queryClient.invalidateQueries({ queryKey: ["teamRecruitments", numericTeamId] }),
+      queryClient.invalidateQueries({ queryKey: ["recruitingTeams"] }),
+      ...(team
+        ? [queryClient.invalidateQueries({ queryKey: ["contest", team.competitionId] })]
+        : []),
+    ]);
+    navigate(`/my-team/${numericTeamId}/applications`);
+  };
+
+  if (isLoading) {
+    return (
+      <S.Page>
+        <PageHeader onBack={() => navigate(-1)} title="지원서" />
+        <S.StateMessage>지원서를 불러오는 중이에요.</S.StateMessage>
+      </S.Page>
+    );
+  }
+
+  if (isError || !application) {
+    return (
+      <S.Page>
+        <PageHeader onBack={() => navigate(-1)} title="지원서" />
+        <S.StateMessage>지원서를 불러오지 못했어요.</S.StateMessage>
+      </S.Page>
+    );
+  }
+
+  const applicantName = `지원자 #${application.userId}`;
+  const roleName = getProfileRoleName(application.roleCode);
+  const answers = [...(application.answers ?? [])].sort(
+    (first, second) => first.displayOrder - second.displayOrder,
+  );
 
   return (
     <S.Page>
@@ -23,20 +124,20 @@ export function ApplicationDetailPage() {
       <S.Content>
         <S.ProfileCard>
           <S.ProfileHeader>
-            <S.Avatar $tone={applicant.tone}>{applicant.initial}</S.Avatar>
+            <S.Avatar $tone="blue">{String(application.userId).slice(-1)}</S.Avatar>
             <S.ProfileIdentity>
-              <S.Name>{applicant.name}</S.Name>
-              <S.School>{applicant.school}</S.School>
+              <S.Name>{applicantName}</S.Name>
+              <S.School>사용자 ID {application.userId}</S.School>
               <S.ProfileLink
-                onClick={() => navigate(`/giut-hub/${applicant.profileNumber}`)}
+                onClick={() => navigate(`/giut-hub/${application.userId}`)}
                 type="button"
               >
                 프로필 전체 보기
               </S.ProfileLink>
             </S.ProfileIdentity>
             <S.Caret
-              aria-label={`${applicant.name} 프로필 전체 보기`}
-              onClick={() => navigate(`/giut-hub/${applicant.profileNumber}`)}
+              aria-label={`${applicantName} 프로필 전체 보기`}
+              onClick={() => navigate(`/giut-hub/${application.userId}`)}
               type="button"
             >
               <Icon name="caret-right" size={15} weight="bold" />
@@ -45,20 +146,20 @@ export function ApplicationDetailPage() {
         </S.ProfileCard>
 
         <S.InformationCard>
-          <S.PositionLabel>지원 포지션 - 백엔드 개발자</S.PositionLabel>
+          <S.PositionLabel>지원 포지션 · {roleName}</S.PositionLabel>
 
           <S.InformationList>
             <S.InformationRow>
               <S.InformationLabel>지원한 팀</S.InformationLabel>
-              <S.InformationValue>데이터로 서울을</S.InformationValue>
+              <S.InformationValue>{team?.name ?? `팀 #${numericTeamId}`}</S.InformationValue>
             </S.InformationRow>
             <S.InformationRow>
               <S.InformationLabel>지원 일시</S.InformationLabel>
-              <S.InformationValue>8월 31일 오후 1:31</S.InformationValue>
+              <S.InformationValue>{formatAppliedAt(application.appliedAt)}</S.InformationValue>
             </S.InformationRow>
             <S.InformationRow>
-              <S.InformationLabel>참여 가능</S.InformationLabel>
-              <S.InformationValue>주 15시간</S.InformationValue>
+              <S.InformationLabel>신청 상태</S.InformationLabel>
+              <S.InformationValue>승인 대기</S.InformationValue>
             </S.InformationRow>
           </S.InformationList>
         </S.InformationCard>
@@ -68,43 +169,26 @@ export function ApplicationDetailPage() {
             <S.QuestionTitle>간단한 자기소개</S.QuestionTitle>
           </S.QuestionHeader>
           <S.AnswerField>
-            <S.Answer>{applicant.introduction}</S.Answer>
+            <S.Answer>{application.message || "작성한 소개가 없어요."}</S.Answer>
           </S.AnswerField>
-          <S.CharacterCount>{applicant.introduction.length} / 300</S.CharacterCount>
+          <S.CharacterCount>{application.message.length} / 300</S.CharacterCount>
         </S.QuestionCard>
 
-        <S.QuestionCard>
-          <S.QuestionHeader>
-            <S.QuestionTitle>Q1. 이 팀에 지원한 이유를 알려주세요</S.QuestionTitle>
-          </S.QuestionHeader>
-          <S.AnswerField>
-            <S.Answer>{applicant.answer}</S.Answer>
-          </S.AnswerField>
-          <S.CharacterCount>96 / 300</S.CharacterCount>
-        </S.QuestionCard>
-
-        <S.QuestionCard>
-          <S.QuestionHeader>
-            <S.QuestionTitle>
-              Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?
-            </S.QuestionTitle>
-          </S.QuestionHeader>
-          <S.AnswerField>
-            <S.Answer>
-              {applicant.message} 팀의 목표에 맞춰 맡은 역할을 끝까지 책임지고
-              수행하겠습니다.
-            </S.Answer>
-          </S.AnswerField>
-          <S.CharacterCount>78 / 300</S.CharacterCount>
-        </S.QuestionCard>
-
+        {answers.map((answer, index) => (
+          <S.QuestionCard key={answer.questionId}>
+            <S.QuestionHeader>
+              <S.QuestionTitle>Q{index + 1}. {answer.question}</S.QuestionTitle>
+            </S.QuestionHeader>
+            <S.AnswerField>
+              <S.Answer>{answer.answer}</S.Answer>
+            </S.AnswerField>
+            <S.CharacterCount>{answer.answer.length} / 300</S.CharacterCount>
+          </S.QuestionCard>
+        ))}
       </S.Content>
 
       <S.ActionBar>
-        <S.AcceptButton
-          onClick={() => setDecisionMode("accept")}
-          type="button"
-        >
+        <S.AcceptButton onClick={() => setDecisionMode("accept")} type="button">
           수락
         </S.AcceptButton>
         <S.RejectButton
@@ -118,11 +202,18 @@ export function ApplicationDetailPage() {
 
       {decisionMode && (
         <BottomSheet
-          applicantName={applicant.name}
-          applicantRole={applicant.role}
+          applicantName={applicantName}
+          applicantRole={roleName}
           decisionMode={decisionMode}
           onClose={() => setDecisionMode(null)}
-          onDecisionConfirm={() => setDecisionMode(null)}
+          onDecisionConfirm={handleDecisionComplete}
+          onDecisionSubmit={async (reason) => {
+            try {
+              await decideApplication({ mode: decisionMode, reason });
+            } catch (error) {
+              throw new Error(getDecisionErrorMessage(error), { cause: error });
+            }
+          }}
           open
         />
       )}

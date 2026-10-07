@@ -610,7 +610,7 @@ export function OwnerTeamDetailPage() {
         ) : (
           <>
             <S.ApplicationsButton
-              onClick={() => navigate("/my-team/applications")}
+              onClick={() => navigate(`/my-team/${numericTeamId}/applications`)}
               type="button"
             >
               받은 지원 보기

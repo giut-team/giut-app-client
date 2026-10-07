@@ -312,6 +312,13 @@ export const S = {
       outline-offset: 2px;
     }
   `,
+  DecisionError: styled.p`
+    margin: 10px 0 0;
+    color: ${tokens.color.danger[500]};
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+  `,
   DecisionFooterActions: styled.div`
     display: grid;
     grid-template-columns: 1.7fr 1fr;

@@ -90,12 +90,45 @@ export type TeamApplicationResponse = {
   teamId: number;
   userId: number;
   roleCode: string;
+  assignedRoleCode?: string | null;
+  rejectionReason?: string | null;
   message: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELED";
   appliedAt: string;
+  decidedAt?: string | null;
+  answers?: TeamApplicationAnswerResponse[];
+};
+
+export type TeamApplicationAnswerResponse = {
+  questionId: number;
+  question: string;
+  answer: string;
+  displayOrder: number;
+};
+
+export type ApproveTeamApplicationRequest = {
+  roleCode: string;
+};
+
+export type ApproveTeamApplicationResponse = {
+  applicationId: number;
+  teamId: number;
+  userId: number;
+  status: "APPROVED";
+  roleCode: string;
+  teamMemberId: number;
+};
+
+export type RejectTeamApplicationRequest = {
+  reason?: string;
 };
 
 type MyTeamApplicationsResponse = {
+  applications: TeamApplicationResponse[];
+};
+
+type TeamApplicationsResponse = {
+  teamId: number;
   applications: TeamApplicationResponse[];
 };
 
@@ -187,11 +220,47 @@ export const fetchMyTeamApplications = async (): Promise<TeamApplicationResponse
   return data.applications ?? [];
 };
 
+export const fetchTeamApplications = async (
+  teamId: number,
+): Promise<TeamApplicationResponse[]> => {
+  const { data } = await api.get<TeamApplicationsResponse>(
+    `/api/teams/${teamId}/applications`,
+  );
+
+  return data.applications ?? [];
+};
+
 export const cancelTeamApplication = async (
   teamId: number,
   applicationId: number,
 ): Promise<void> => {
   await api.delete(`/api/teams/${teamId}/applications/${applicationId}`);
+};
+
+export const approveTeamApplication = async (
+  teamId: number,
+  applicationId: number,
+  request: ApproveTeamApplicationRequest,
+): Promise<ApproveTeamApplicationResponse> => {
+  const { data } = await api.post<ApproveTeamApplicationResponse>(
+    `/api/teams/${teamId}/applications/${applicationId}/approve`,
+    request,
+  );
+
+  return data;
+};
+
+export const rejectTeamApplication = async (
+  teamId: number,
+  applicationId: number,
+  request: RejectTeamApplicationRequest = {},
+): Promise<TeamApplicationResponse> => {
+  const { data } = await api.post<TeamApplicationResponse>(
+    `/api/teams/${teamId}/applications/${applicationId}/reject`,
+    request,
+  );
+
+  return data;
 };
 
 export const addTeamScrap = async (teamId: number): Promise<TeamScrapResponse> => {

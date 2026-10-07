@@ -126,11 +126,11 @@ export function AppRouter() {
         />
         <Route
           element={<ManageApplicationsPage />}
-          path="/my-team/applications"
+          path="/my-team/:teamId/applications"
         />
         <Route
           element={<ApplicationDetailPage />}
-          path="/my-team/applications/:applicantId"
+          path="/my-team/:teamId/applications/:applicationId"
         />
         <Route
           element={<StudentVerificationPage />}
