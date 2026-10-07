@@ -555,6 +555,7 @@ export const S = {
   SheetHeader: styled.div`
     display: flex;
     align-items: center;
+    padding-left: 20px;
     justify-content: space-between;
     margin: 4px 0 17px;
     > span {
@@ -612,8 +613,8 @@ export const S = {
     display: grid;
     flex: 1;
     min-height: 0;
-    grid-template-columns: 105px minmax(0, 1fr);
-    margin: 0 -18px;
+    grid-template-columns: 90px minmax(0, 1fr);
+    margin: 0;
     border-top: 1px solid ${tokens.color.neutral[200]};
     border-bottom: 1px solid ${tokens.color.neutral[200]};
   `,
@@ -622,9 +623,10 @@ export const S = {
     align-content: start;
     background: #f7f8fb;
     button {
-      padding: 18px 15px;
+      display: flex;
+      padding: 18px 8px 18px 16px;
       border: 0;
-      border-left: 3px solid transparent;
+      border-left: 4px solid transparent;
       background: transparent;
       color: ${tokens.color.neutral[500]};
       font: inherit;
@@ -632,49 +634,61 @@ export const S = {
       font-weight: 700;
       text-align: left;
       cursor: pointer;
+      white-space: nowrap;
       &[data-active="true"] {
         border-left-color: #2b57ed;
-        background: #eaf0ff;
+        background: ${tokens.color.neutral[50]};
         color: #2857d9;
       }
     }
   `,
+  CategoryCount: styled.div`
+    display: inline-grid;
+    place-items: center;
+    min-width: 15px;
+    height: 15px;
+    margin-left: 6px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: ${primary};
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  `,
   RoleOptionList: styled.div`
     display: grid;
-    gap: 10px;
     align-content: start;
     min-height: 0;
-    padding: 16px 18px 16px 0;
+    padding: 0 18px 16px 0;
     overflow-y: auto;
   `,
   RoleOption: styled.button<{ $selected: boolean }>`
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
-    padding: 15px 54px;
-    border: 1.5px solid
-      ${({ $selected }) => ($selected ? "#2b57ed" : tokens.color.neutral[200])};
-    border-radius: 14px;
+    height: 53px;
+    padding: 15px 15px;
+    border: 0;
+    border-bottom: 1.5px solid ${tokens.color.neutral[200]};
     background: ${({ $selected }) => ($selected ? "#eef3ff" : tokens.color.neutral[50])};
-    color: ${tokens.color.neutral[700]};
+    color: ${({ $selected }) => ($selected ? primary : tokens.color.neutral[900])};
     font: inherit;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
     text-align: center;
     cursor: pointer;
     > span {
       position: absolute;
-      left: 15px;
+      right: 15px;
       display: grid;
       width: 24px;
       aspect-ratio: 1;
       place-items: center;
-      border: 1.5px solid ${({ $selected }) => ($selected ? "#2b57ed" : "#c8d1df")};
-      border-radius: 7px;
-      background: ${({ $selected }) => ($selected ? "#2b57ed" : "transparent")};
-      color: white;
+      border: 0;
+      color: ${primary};
     }
     em {
       position: absolute;
@@ -825,6 +839,7 @@ export const S = {
   SheetFooter: styled.div`
     display: grid;
     gap: 14px;
+    padding-left: 20px;
     padding-bottom: var(--app-safe-bottom);
   `,
   GradeSheetFooter: styled.div`

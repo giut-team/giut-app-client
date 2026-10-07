@@ -138,7 +138,7 @@ export function ProfileEditPage() {
   const [showAllSkills, setShowAllSkills] = useState(false);
   const [introduction, setIntroduction] = useState(
     "AI로 더 편리한 캠퍼스 서비스를 만들고 싶어요. " +
-      "주말에는 데이터 시각화 프로젝트를 진행합니다.",
+    "주말에는 데이터 시각화 프로젝트를 진행합니다.",
   );
   const [isPublic, setIsPublic] = useState(true);
 
@@ -398,8 +398,7 @@ export function ProfileEditPage() {
         onClose={() => setIsRoleSheetOpen(false)}
         onSelectDetail={(role) =>
           navigate(
-            `/my-profile/edit/roles/${
-              role === "프론트엔드" ? "frontend" : "backend"
+            `/my-profile/edit/roles/${role === "프론트엔드" ? "frontend" : "backend"
             }`,
             { state: profileDraft },
           )
@@ -715,7 +714,7 @@ function DirectSkillSheet({
   );
 }
 
-function RoleSelectSheet({
+export function RoleSelectSheet({
   open,
   onClose,
   roles,
@@ -744,10 +743,13 @@ function RoleSelectSheet({
     if (selectedRole) onSelectDetail(selectedRole);
     else onClose();
   };
+  const getSelectedCount = (cat: string) =>
+    cat === "개발" ? roleOptions.filter((role) => roles.includes(role)).length : 0;
 
   return (
     <BottomSheet
       contentFill
+      contentPadding="12px 18px 20px 2px"
       footer={
         <S.SheetFooter>
           <S.SelectedRoles>
@@ -773,7 +775,7 @@ function RoleSelectSheet({
         </S.SheetFooter>
       }
       footerVariant="action"
-      minHeight="min(84svh, 700px)"
+      minHeight="calc(100dvh - 8px)"
       onClose={onClose}
       open={open}
       showHeaderDivider={false}
@@ -791,16 +793,17 @@ function RoleSelectSheet({
         </S.SheetHeader>
         <S.RoleSheetLayout>
           <S.CategoryList>
-            {roleCategories.map((item) => (
-              <button
+            {roleCategories.map((item) => {
+              const count = getSelectedCount(item);
+              return (<button
                 data-active={category === item}
                 key={item}
                 onClick={() => setCategory(item)}
                 type="button"
               >
-                {item}
-              </button>
-            ))}
+                {item} {count>0 && <S.CategoryCount>{count}</S.CategoryCount>}
+              </button>)
+            })}
           </S.CategoryList>
           <S.RoleOptionList>
             {category === "개발" ? (
@@ -814,7 +817,7 @@ function RoleSelectSheet({
                     type="button"
                   >
                     <span>
-                      {selected && <Icon name="check" size={13} weight="bold" />}
+                      {selected && <Icon name="check" size={20} weight="bold" />}
                     </span>
                     {role}
                   </S.RoleOption>

@@ -138,6 +138,10 @@ export function MyProfilePage() {
             <S.Status>{preview?.profileStatus ?? profile.status}</S.Status>
           </S.ProfileInfo>
         </S.ProfileSection>
+        <S.IntroductionSection>
+            <S.FieldLabel>자기소개</S.FieldLabel>
+            <S.Introduction>{profile.introduction}</S.Introduction>
+        </S.IntroductionSection>
         <S.ProfileActions>
           <S.EditButton
             onClick={() => navigate("/my-profile/edit", { state: preview })}
@@ -208,6 +212,15 @@ export function MyProfilePage() {
         </S.TabList>
         {activeTab === "portfolio" && (
           <S.TabContent>
+            <S.PortfolioHeader>
+              <S.PortfolioExposure>프로필 노출<em>{detail.portfolios.length}</em><span>/ 6</span></S.PortfolioExposure>
+              <S.PortfolioHeaderButtons>
+                <S.portfolioManageButton onClick={() => navigate("/my-profile/potfoliomanage", { state: preview })}
+                type="button">관리</S.portfolioManageButton>
+                <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolioadd", { state: preview })}
+                type="button">+ 추가</S.portfolioAddButton>
+              </S.PortfolioHeaderButtons>
+            </S.PortfolioHeader>
             <S.FeaturedPortfolio
               onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
               type="button"

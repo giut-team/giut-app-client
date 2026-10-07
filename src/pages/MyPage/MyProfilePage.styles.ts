@@ -569,4 +569,83 @@ export const S = {
       color: #a8b1c0;
     }
   `,
+  IntroductionSection: styled.section`
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 12px;
+    padding: 5px 30px 15px;
+    background: ${tokens.color.neutral[50]};
+  `,
+  FieldLabel: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 14px;
+    font-weight: 500;
+  `,
+  Introduction: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 14px;
+    letter-spacing: -0.5px;
+    line-height: 1.65;
+    white-space: pre-line;
+  `,
+  PortfolioHeader: styled.section`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 10px;
+  `,
+  PortfolioExposure: styled.h2`
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 800;
+
+    >em{
+      color: ${tokens.color.primary[600]};
+      font-weight: 900;
+      font-style: normal;
+    }
+
+    >span{
+      color: ${tokens.color.neutral[500]};
+      font-weight: 700;
+      font-style: normal;
+    }
+  `,
+  PortfolioHeaderButtons: styled.section`
+      display: flex;
+      align-items: center;
+      gap: 8px;
+  `,
+  portfolioManageButton: styled.button`
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 13px;
+    border: 1;
+    border-style:solid;
+    border-color: ${tokens.color.neutral[200]};
+    border-radius: 18px;
+    background: ${tokens.color.neutral[50]};
+    color: black;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  `,
+  portfolioAddButton: styled.button`
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: 18px;
+    background: ${primary};
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  `,
 };
