@@ -9,6 +9,7 @@ import {
 } from "../../../api/profiles";
 import {
   closeTeamRecruitment,
+  deleteTeam,
   fetchTeamDetail,
   fetchTeamMembers,
   fetchTeamRecruitments,
@@ -189,6 +190,21 @@ export function OwnerTeamDetailPage() {
       showToast("팀 모집을 마감했어요.");
     },
     onError: () => showToast("팀 모집 마감을 처리하지 못했어요. 잠시 후 다시 시도해 주세요."),
+  });
+  const { isPending: isDeletingTeam, mutate: removeTeam } = useMutation({
+    mutationFn: () => deleteTeam(numericTeamId),
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["team", numericTeamId] });
+      void queryClient.invalidateQueries({ queryKey: ["recruitingTeams"] });
+      void queryClient.invalidateQueries({ queryKey: ["contest", contestId] });
+      void queryClient.invalidateQueries({ queryKey: ["teamApplications", numericTeamId] });
+      setIsDeleteModalOpen(false);
+      navigate(`/contests/${contestId}`, { replace: true });
+    },
+    onError: () => {
+      setIsDeleteModalOpen(false);
+      showToast("팀을 삭제하지 못했어요. 잠시 후 다시 시도해 주세요.");
+    },
   });
   const isActionMenuOpen = actionMenuState === "opening";
   const toggleActionMenu = () => {
@@ -766,8 +782,10 @@ export function OwnerTeamDetailPage() {
         onClose={() => setIsDeleteModalOpen(false)}
         open={isDeleteModalOpen}
         primaryAction={{
-          label: "삭제하기",
-          onClick: () => navigate(`/contests/${contestId}`, { replace: true }),
+          label: isDeletingTeam ? "삭제 중..." : "삭제하기",
+          onClick: () => {
+            if (!isDeletingTeam) removeTeam();
+          },
         }}
         secondaryAction={{
           label: "취소",

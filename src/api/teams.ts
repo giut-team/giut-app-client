@@ -29,6 +29,15 @@ export type CreateTeamResponse = {
   teamId: number;
 };
 
+export type UpdateTeamRequest = {
+  name: string;
+  description?: string;
+  activityMode: TeamActivityMode;
+  maxMemberCount: number;
+  weeklyMeetingCount: number;
+  meetingPlace: TeamMeetingPlace;
+};
+
 export type RecruitingTeam = {
   teamId: number;
   competitionId: number;
@@ -248,6 +257,19 @@ export const approveTeamApplication = async (
   );
 
   return data;
+};
+
+export const updateTeam = async (
+  teamId: number,
+  request: UpdateTeamRequest,
+): Promise<TeamDetail> => {
+  const { data } = await api.put<TeamDetail>(`/api/teams/${teamId}`, request);
+
+  return data;
+};
+
+export const deleteTeam = async (teamId: number): Promise<void> => {
+  await api.delete(`/api/teams/${teamId}`);
 };
 
 export const rejectTeamApplication = async (
