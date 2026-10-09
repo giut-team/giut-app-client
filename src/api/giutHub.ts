@@ -73,44 +73,85 @@ export type PublicProfileDetail = {
 };
 
 export type PrimaryRoleCode = "PLANNING" | "DESIGN" | "DEVELOPMENT" | "MARKETING";
+export type PublicProfileGrade = 1 | 2 | 3 | 4 | 5;
 
 export type PublicProfileFilters = {
   primaryRole?: PrimaryRoleCode;
+  role?: string;
   activityStatus?: PublicProfile["activityStatus"];
   department?: string;
+  grade?: PublicProfileGrade;
+  skillTagId?: number;
+};
+
+export type PublicProfileSelectionFilters = Omit<PublicProfileFilters, "primaryRole" | "department" | "grade"> & {
+  primaryRoles: readonly PrimaryRoleCode[];
+  departments: readonly string[];
+  grades: readonly PublicProfileGrade[];
 };
 
 export async function getPublicProfiles(
   filters: PublicProfileFilters = {},
+  signal?: AbortSignal,
 ): Promise<PublicProfile[]> {
   const firstPage = await giutHubApi.get<PublicProfileList>("/api/profile", {
     params: { page: 0, ...filters },
+    signal,
   });
   const result = [...firstPage.data.profiles];
 
-  if (firstPage.data.totalPages > 1) {
-    const remainingPages = await Promise.all(
-      Array.from({ length: firstPage.data.totalPages - 1 }, (_, index) =>
-        giutHubApi.get<PublicProfileList>("/api/profile", {
-          params: { page: index + 1, ...filters },
-        }),
-      ),
-    );
-    remainingPages.forEach(({ data }) => result.push(...data.profiles));
+  for (let page = 1; page < firstPage.data.totalPages; page += 1) {
+    signal?.throwIfAborted();
+    const { data } = await giutHubApi.get<PublicProfileList>("/api/profile", {
+      params: { page, ...filters },
+      signal,
+    });
+    result.push(...data.profiles);
   }
 
   return result;
 }
 
-export async function getPublicProfilesForRoles(
-  primaryRoles: readonly PrimaryRoleCode[],
+export async function getPublicProfilesForFilters(
+  { primaryRoles, departments, grades, ...sharedFilters }: PublicProfileSelectionFilters,
+  signal?: AbortSignal,
 ): Promise<PublicProfile[]> {
-  if (primaryRoles.length === 0) return getPublicProfiles();
+  const uniqueRoles = [...new Set(primaryRoles)];
+  const uniqueDepartments = [...new Set(departments)];
+  const uniqueGrades = [...new Set(grades)];
+  const requests: PublicProfileFilters[] = [];
+  for (const primaryRole of uniqueRoles.length ? uniqueRoles : [undefined]) {
+    for (const department of uniqueDepartments.length ? uniqueDepartments : [undefined]) {
+      for (const grade of uniqueGrades.length ? uniqueGrades : [undefined]) {
+        requests.push({
+          ...sharedFilters,
+          ...(primaryRole ? { primaryRole } : {}),
+          ...(department ? { department } : {}),
+          ...(grade ? { grade } : {}),
+        });
+      }
+    }
+  }
 
-  const results = await Promise.all(
-    [...new Set(primaryRoles)].map((primaryRole) => getPublicProfiles({ primaryRole })),
-  );
-  return [...new Map(results.flat().map((profile) => [profile.userId, profile])).values()];
+  const results: PublicProfile[][] = new Array(requests.length);
+  let nextIndex = 0;
+  let failed = false;
+  const worker = async () => {
+    while (!failed && nextIndex < requests.length) {
+      signal?.throwIfAborted();
+      const index = nextIndex++;
+      try {
+        results[index] = await getPublicProfiles(requests[index], signal);
+      } catch (error) {
+        failed = true;
+        throw error;
+      }
+    }
+  };
+  // 단일 값만 받는 API에 선택값 조합을 보내되 동시 HTTP 요청은 최대 4개로 제한한다.
+  await Promise.all(Array.from({ length: Math.min(4, requests.length) }, worker));
+  return [...new Map(results.flat().map((profile) => [profile.userId, profile])).values()]
+    .sort((a, b) => b.userId - a.userId);
 }
 
 export async function getPublicProfile(userId: number): Promise<PublicProfileDetail> {
