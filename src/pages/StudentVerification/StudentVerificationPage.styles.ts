@@ -67,33 +67,11 @@ export const S = {
     border-radius: 11px;
     font-size: 12px;
   `,
-  PasswordField: styled.div`
-    position: relative;
-  `,
-  PasswordInput: styled(Input)`
-    height: 40px;
-    padding: 0 40px 0 12px;
-    border-radius: 11px;
-    font-size: 12px;
-  `,
-  PasswordToggle: styled(Button)`
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    display: grid;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    place-items: center;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
+  FieldHint: styled.span`
     color: ${tokens.color.neutral[500]};
-    transform: translateY(-50%);
-    &:hover:not(:disabled) {
-      opacity: 1;
-      background: transparent;
-    }
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.4;
   `,
   Consent: styled.div`
     display: flex;

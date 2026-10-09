@@ -5,20 +5,17 @@ import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
 import { S } from "./StudentVerificationPage.styles";
 
-const MIN_PORTAL_PASSWORD_LENGTH = 9;
+const UNIVERSITY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@uos\.ac\.kr$/;
 
 export function StudentVerificationPage() {
   const navigate = useNavigate();
-  const [portalId, setPortalId] = useState("");
-  const [portalPassword, setPortalPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [universityEmail, setUniversityEmail] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
 
-  const canSubmit =
-    portalId.trim().length > 0 &&
-    portalPassword.length >= MIN_PORTAL_PASSWORD_LENGTH &&
-    isAgreed;
+  const normalizedEmail = universityEmail.trim();
+  const isUniversityEmail = UNIVERSITY_EMAIL_PATTERN.test(normalizedEmail);
+  const canSubmit = isUniversityEmail && isAgreed;
 
   return (
     <S.Page>
@@ -27,51 +24,28 @@ export function StudentVerificationPage() {
       <S.Content>
         <S.Title>{"서울시립대학교\n구성원 인증하기"}</S.Title>
         <S.Description>
-          학교 포털 계정으로 재학생임을 인증하면 학교 인증 배지가 붙고, 우리
-          학교 팀
+          학교 이메일로 재학생임을 인증하면 학교 인증 배지가 붙고, 우리 학교 팀
           <br />
           매칭을 이용할 수 있어요.
         </S.Description>
 
         <S.Notice>
           <Icon name="lock" size={13} weight="fill" />
-          계정 정보는 인증에만 쓰이고 저장되지 않아요
+          학교 이메일은 재학생 인증에만 사용돼요
         </S.Notice>
 
         <S.Form onSubmit={(event) => event.preventDefault()}>
           <S.Field>
-            포털 아이디
+            학교 이메일
             <S.FieldInput
-              onChange={(event) => setPortalId(event.target.value)}
-              placeholder="아이디를 입력해주세요"
-              value={portalId}
+              autoComplete="email"
+              inputMode="email"
+              onChange={(event) => setUniversityEmail(event.target.value)}
+              placeholder="example@uos.ac.kr"
+              type="email"
+              value={universityEmail}
             />
-          </S.Field>
-
-          <S.Field>
-            포털 비밀번호
-            <S.PasswordField>
-              <S.PasswordInput
-                onChange={(event) => setPortalPassword(event.target.value)}
-                placeholder="비밀번호를 입력해주세요"
-                type={isPasswordVisible ? "text" : "password"}
-                value={portalPassword}
-              />
-              <S.PasswordToggle
-                aria-label={
-                  isPasswordVisible ? "비밀번호 숨기기" : "비밀번호 보기"
-                }
-                onClick={() => setIsPasswordVisible((visible) => !visible)}
-                tone="secondary"
-                type="button"
-              >
-                <Icon
-                  name={isPasswordVisible ? "eye-slash" : "eye"}
-                  size={15}
-                  weight="regular"
-                />
-              </S.PasswordToggle>
-            </S.PasswordField>
+            <S.FieldHint>서울시립대학교 이메일(@uos.ac.kr)을 입력해주세요.</S.FieldHint>
           </S.Field>
 
           <S.Consent>
@@ -107,7 +81,7 @@ export function StudentVerificationPage() {
           학생 인증 나중에 하기
         </S.LaterButton>
         <S.SubmitButton disabled={!canSubmit} type="button" width="100%">
-          인증하기
+          인증코드 받기
         </S.SubmitButton>
       </S.BottomArea>
 
@@ -137,8 +111,8 @@ export function StudentVerificationPage() {
           <S.TermsSection>
             <S.TermsHeading>1. 수집하는 항목</S.TermsHeading>
             <S.TermsText>
-              학교명, 포털 아이디, 재학 여부, 학과, 학년, 이름. 포털 비밀번호는
-              인증 요청 시에만 사용되며 서버에 저장하지 않습니다.
+              학교명, 학교 이메일, 재학 여부, 학교 이메일 인증 일시를
+              수집합니다.
             </S.TermsText>
           </S.TermsSection>
           <S.TermsSection>
