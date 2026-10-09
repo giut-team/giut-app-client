@@ -8,23 +8,7 @@ import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
 import { S } from "./MyApplicationPage.styles";
 
-const applicationQuestions = [
-  {
-    title: "Q1. 이 팀에 지원한 이유를 알려주세요",
-    answer:
-      "캠페인 성과를 숫자로 보여주는 일에 관심이 많았습니다. ESG 주제는 데이터가 준비된 큰 과제라고 생각해서, 기획 단계부터 지표를 함께 잡아보고 싶어 지원했습니다. 지난 학기에는 교내 환경 캠페인 참여율을 분석해 개선안을 제안한 적이 있습니다.",
-  },
-  {
-    title: "Q2. 지원한 포지션에서 맡을 수 있는 역할은 무엇인가요?",
-    answer:
-      "데이터 수집·정제와 시각화를 맡을 수 있습니다. Python·SQL로 공공데이터를 다뤄봤고, 발표용 대시보드까지 정리해 본 경험이 있습니다. 필요한 지표 정의서와 결과 리포트 작성도 함께 하겠습니다.",
-  },
-  {
-    title: "Q3. 참여 가능 시간",
-    answer:
-      "주 10시간 이상 · 평일 저녁, 주말 오후 참여 가능 · 시험 기간(4월 중순) 2주는 참여 시간이 줄어들 수 있습니다.",
-  },
-];
+type ApplicationQuestion = { title: string; answer: string };
 
 const submittedApplicationContent = [
   {
@@ -46,7 +30,7 @@ const submittedApplicationContent = [
     title: "한 주당 참여 가능한 시간",
     answer: "15시간",
   },
-] satisfies Array<(typeof applicationQuestions)[number]>;
+] satisfies ApplicationQuestion[];
 
 export function MyApplicationPage() {
   const navigate = useNavigate();
