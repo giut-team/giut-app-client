@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Button } from "../../components/Button";
 import { tokens } from "../../design-system/tokens.generated";
 
-type CategoryTone = "blue" | "orange" | "purple";
+type CategoryTone = "blue" | "orange" | "purple" | "green" | "pink" | "yellow";
 type BannerCirclePosition = "top" | "bottom";
 type BannerTone = "primary" | "deep";
 
@@ -19,12 +19,24 @@ const categoryColors: Record<CategoryTone, { background: string; color: string }
     background: tokens.color.purple[100],
     color: tokens.color.purple[500],
   },
+  green: {
+    background: `color-mix(in srgb, ${tokens.color.success[500]} 10%, ${tokens.color.neutral[50]})`,
+    color: tokens.color.success[500],
+  },
+  pink: {
+    background: `color-mix(in srgb, ${tokens.color.danger[500]} 9%, ${tokens.color.neutral[50]})`,
+    color: tokens.color.danger[500],
+  },
+  yellow: {
+    background: tokens.color.warning[100],
+    color: tokens.color.warning[500],
+  },
 };
 
 export const S = {
   Page: styled.main`
     min-height: 100svh;
-    background: ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
   `,
   Content: styled.div`
     width: min(100%, 480px);
@@ -62,7 +74,10 @@ export const S = {
     display: flex;
     gap: 6px;
   `,
-  HeaderButton: styled.button<{ $isTeamButtonAnimating?: boolean }>`
+  HeaderButton: styled.button<{
+    $isTeamButtonAnimating?: boolean;
+    $soft?: boolean;
+  }>`
     position: relative;
     display: grid;
     width: 30px;
@@ -71,13 +86,19 @@ export const S = {
     place-items: center;
     border: 0;
     border-radius: 10px;
-    background: ${({ $isTeamButtonAnimating }) =>
+    background: ${({ $isTeamButtonAnimating, $soft }) =>
       $isTeamButtonAnimating
         ? tokens.color.primary[100]
-        : tokens.color.neutral[50]};
+        : $soft
+          ? tokens.color.neutral[50]
+          : tokens.color.neutral[50]};
     color: ${tokens.color.neutral[700]};
     cursor: pointer;
     transition: background-color 180ms ease;
+
+    &:disabled {
+      cursor: default;
+    }
 
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
@@ -99,6 +120,19 @@ export const S = {
     font-size: 9px;
     font-weight: 800;
     line-height: 1;
+  `,
+  HeaderLock: styled.span`
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    display: grid;
+    width: 14px;
+    height: 14px;
+    place-items: center;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 50%;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
   `,
   NotificationDot: styled.span`
     position: absolute;
@@ -123,6 +157,52 @@ export const S = {
     font-weight: 800;
     letter-spacing: -0.8px;
     line-height: 1.35;
+  `,
+  VerificationCard: styled.section`
+    margin-top: 8px;
+    padding: 13px;
+    border: 1px dashed color-mix(in srgb, ${tokens.color.primary[500]} 40%, white);
+    border-radius: 15px;
+    background: ${tokens.color.primary[100]};
+  `,
+  VerificationMeta: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 600;
+  `,
+  VerificationBadge: styled.span`
+    display: inline-flex;
+    align-items: center;
+    min-height: 21px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: ${tokens.color.primary[500]};
+    color: ${tokens.color.neutral[50]};
+    font-weight: 800;
+  `,
+  VerificationTitle: styled.h2`
+    margin: 10px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  `,
+  VerificationDescription: styled.p`
+    margin: 8px 0 0;
+    color: ${tokens.color.primary[500]};
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: -0.15px;
+    line-height: 1.6;
+  `,
+  VerificationButton: styled(Button)`
+    height: 30px;
+    margin-top: 11px;
+    border-radius: 7px;
+    font-size: 10px;
   `,
   HeroViewport: styled.div`
     position: relative;
@@ -249,7 +329,7 @@ export const S = {
     gap: 6px;
     margin-top: 16px;
   `,
-  Shortcut: styled.button`
+  Shortcut: styled.button<{ $locked?: boolean }>`
     display: flex;
     align-items: center;
     width: 100%;
@@ -257,9 +337,10 @@ export const S = {
     padding: 7px 10px;
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 12px;
-    background: ${tokens.color.neutral[50]};
+    background: ${({ $locked }) =>
+      $locked ? tokens.color.neutral[100] : tokens.color.neutral[50]};
     text-align: left;
-    cursor: pointer;
+    cursor: ${({ $locked }) => ($locked ? "default" : "pointer")};
 
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
@@ -303,6 +384,17 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     font-size: 16px;
   `,
+  ShortcutLock: styled.span`
+    display: grid;
+    width: 27px;
+    height: 27px;
+    margin-left: auto;
+    place-items: center;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 8px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
+  `,
   SectionHeader: styled.div`
     display: flex;
     align-items: center;
@@ -330,6 +422,33 @@ export const S = {
   ContestList: styled.div`
     display: grid;
     gap: 8px;
+  `,
+  ContestSkeleton: styled.div`
+    min-height: 86px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 13px;
+    background: linear-gradient(
+      90deg,
+      ${tokens.color.neutral[100]} 25%,
+      ${tokens.color.neutral[50]} 50%,
+      ${tokens.color.neutral[100]} 75%
+    );
+    background-size: 200% 100%;
+    animation: home-contest-loading 1.3s ease-in-out infinite;
+
+    @keyframes home-contest-loading {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+  `,
+  ContestState: styled.p`
+    margin: 0;
+    padding: 24px 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 13px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 10px;
+    text-align: center;
   `,
   ContestCard: styled.button`
     min-height: 86px;

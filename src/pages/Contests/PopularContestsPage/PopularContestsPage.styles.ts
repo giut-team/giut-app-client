@@ -65,6 +65,11 @@ export const S = {
     font-size: 8px;
     font-weight: 700;
     cursor: pointer;
+
+    &:disabled {
+      color: ${tokens.color.neutral[500]};
+      cursor: default;
+    }
   `,
   SortButton: styled.button`
     display: inline-flex;

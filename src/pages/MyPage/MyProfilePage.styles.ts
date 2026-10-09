@@ -67,6 +67,18 @@ export const S = {
       font-size: 13px;
     }
   `,
+  LockedPhotoContent: styled.div`
+    display: grid;
+    place-items: center;
+    gap: 9px;
+    color: ${tokens.color.neutral[500]};
+
+    span {
+      color: ${tokens.color.neutral[500]};
+      font-size: 13px;
+      font-weight: 700;
+    }
+  `,
   ProfileInfo: styled.div`
     min-width: 0;
   `,
@@ -94,15 +106,14 @@ export const S = {
       white-space: nowrap;
     }
   `,
-  Status: styled.span`
+  LockedProfileValue: styled.span`
     display: inline-flex;
-    margin-top: 10px;
-    padding: 8px 13px;
-    border-radius: 10px;
-    background: #e5f8f1;
-    color: #10a877;
+    align-items: center;
+    gap: 5px;
+    color: ${tokens.color.neutral[500]};
     font-size: 13px;
     font-weight: 700;
+    white-space: nowrap;
   `,
   ProfileActions: styled.div`
     display: grid;
@@ -111,7 +122,67 @@ export const S = {
     padding: 12px 30px 28px;
     background: ${tokens.color.neutral[50]};
   `,
-  EditButton: styled.button`
+  ProfileVerificationSection: styled.section`
+    padding: 18px 20px;
+    border-top: 8px solid ${tokens.color.neutral[100]};
+    background: ${tokens.color.neutral[50]};
+  `,
+  ProfileVerificationCard: styled.div`
+    padding: 20px;
+    border: 1px solid color-mix(in srgb, ${tokens.color.primary[500]} 25%, white);
+    border-radius: 20px;
+    background: ${tokens.color.primary[100]};
+  `,
+  ProfileVerificationMeta: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: ${tokens.color.primary[500]};
+    font-size: 11px;
+    font-weight: 600;
+  `,
+  ProfileVerificationBadge: styled.span`
+    display: inline-flex;
+    min-height: 26px;
+    padding: 0 9px;
+    align-items: center;
+    border-radius: 7px;
+    background: ${tokens.color.primary[500]};
+    color: ${tokens.color.neutral[50]};
+    font-weight: 800;
+  `,
+  ProfileVerificationTitle: styled.h2`
+    margin: 15px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.45px;
+  `,
+  ProfileVerificationDescription: styled.p`
+    margin: 10px 0 17px;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    letter-spacing: -0.2px;
+    line-height: 1.7;
+  `,
+  ProfileVerificationButton: styled.button`
+    width: 100%;
+    min-height: 46px;
+    border: 0;
+    border-radius: 13px;
+    background: ${tokens.color.primary[500]};
+    color: ${tokens.color.neutral[50]};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 3px;
+    }
+  `,
+  EditButton: styled.button<{ $locked?: boolean }>`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -119,22 +190,25 @@ export const S = {
     padding: 18px 14px;
     border: 0;
     border-radius: 18px;
-    background: ${primary};
-    color: ${tokens.color.neutral[50]};
+    background: ${({ $locked }) =>
+      $locked ? tokens.color.neutral[100] : primary};
+    color: ${({ $locked }) =>
+      $locked ? tokens.color.neutral[500] : tokens.color.neutral[50]};
     font: inherit;
     font-size: 18px;
     font-weight: 800;
-    cursor: pointer;
+    cursor: ${({ $locked }) => ($locked ? "default" : "pointer")};
   `,
-  ShareButton: styled.button`
+  ShareButton: styled.button<{ $locked?: boolean }>`
     display: grid;
     padding: 15px;
     place-items: center;
     border: 0;
     border-radius: 18px;
     background: ${tokens.color.neutral[100]};
-    color: #647087;
-    cursor: pointer;
+    color: ${({ $locked }) =>
+      $locked ? tokens.color.neutral[500] : "#647087"};
+    cursor: ${({ $locked }) => ($locked ? "default" : "pointer")};
   `,
   Metrics: styled.section`
     display: grid;
@@ -180,6 +254,10 @@ export const S = {
   `,
   Tab: styled.button<{ $active: boolean }>`
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     padding: 21px 4px 19px;
     border: 0;
     background: transparent;
@@ -189,6 +267,10 @@ export const S = {
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+    }
 
     &::after {
       position: absolute;
@@ -202,6 +284,41 @@ export const S = {
   `,
   TabContent: styled.section`
     padding: 22px 20px;
+  `,
+  LockedPortfolioCard: styled.section`
+    display: grid;
+    min-height: 250px;
+    padding: 28px 22px;
+    place-items: center;
+    align-content: center;
+    border-radius: 24px;
+    background: ${tokens.color.neutral[50]};
+    text-align: center;
+  `,
+  LockedPortfolioIcon: styled.span`
+    display: grid;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+    place-items: center;
+    border-radius: 16px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+  `,
+  LockedPortfolioTitle: styled.h2`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.45px;
+  `,
+  LockedPortfolioDescription: styled.p`
+    max-width: 340px;
+    margin: 12px 0 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 12px;
+    letter-spacing: -0.25px;
+    line-height: 1.7;
   `,
   FeaturedPortfolio: styled.button`
     display: grid;

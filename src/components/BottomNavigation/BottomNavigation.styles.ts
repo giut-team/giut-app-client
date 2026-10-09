@@ -36,6 +36,7 @@ export const S = {
     font-size: 10px;
     font-weight: ${({ $active }) => $active ? 800 : 500};
     cursor: pointer;
+    &:disabled { cursor: default; }
     &:focus-visible { outline: 2px solid ${tokens.color.primary[500]}; outline-offset: -2px; border-radius: 10px; }
   `,
   Badge: styled.span`
@@ -53,5 +54,18 @@ export const S = {
     font-size: 9px;
     font-weight: 800;
     line-height: 1;
+  `,
+  Lock: styled.span`
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 17px);
+    display: grid;
+    width: 15px;
+    height: 15px;
+    place-items: center;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 50%;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
   `,
 };
