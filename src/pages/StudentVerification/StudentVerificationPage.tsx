@@ -14,6 +14,14 @@ import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./StudentVerificationPage.styles";
 
 const UNIVERSITY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@uos\.ac\.kr$/;
+const VERIFICATION_CODE_VALIDITY_MS = 5 * 60 * 1000;
+
+const formatRemainingTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+};
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!axios.isAxiosError<{ message?: string }>(error)) return fallback;
@@ -31,6 +39,8 @@ export function StudentVerificationPage() {
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [codeExpiresAt, setCodeExpiresAt] = useState<number | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
 
   const normalizedEmail = universityEmail.trim();
   const isUniversityEmail = UNIVERSITY_EMAIL_PATTERN.test(normalizedEmail);
@@ -38,8 +48,18 @@ export function StudentVerificationPage() {
   const sendCodeMutation = useMutation({
     mutationFn: sendUniversityEmailCode,
     onSuccess: (response) => {
+      const now = Date.now();
+      const serverExpiration = new Date(response.expiresAt).getTime();
+      const fallbackExpiration = now + VERIFICATION_CODE_VALIDITY_MS;
+      const expiration =
+        Number.isNaN(serverExpiration) || serverExpiration <= now
+          ? fallbackExpiration
+          : Math.min(serverExpiration, fallbackExpiration);
+
       setSentEmail(response.universityEmail);
       setVerificationCode("");
+      setCodeExpiresAt(expiration);
+      setRemainingSeconds(Math.ceil((expiration - now) / 1000));
       setErrorMessage("");
       setToastMessage("인증번호를 이메일로 보냈어요.");
     },
@@ -70,8 +90,9 @@ export function StudentVerificationPage() {
   });
   const isSubmitting =
     sendCodeMutation.isPending || verifyCodeMutation.isPending;
+  const isCodeExpired = isCodeStep && remainingSeconds <= 0;
   const canSubmit = isCodeStep
-    ? verificationCode.trim().length > 0
+    ? verificationCode.trim().length > 0 && !isCodeExpired
     : isUniversityEmail && isAgreed;
 
   useEffect(() => {
@@ -81,6 +102,28 @@ export function StudentVerificationPage() {
 
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
+
+  useEffect(() => {
+    if (!codeExpiresAt) return;
+
+    const updateRemainingTime = () => {
+      const nextRemainingSeconds = Math.max(
+        0,
+        Math.ceil((codeExpiresAt - Date.now()) / 1000),
+      );
+
+      setRemainingSeconds(nextRemainingSeconds);
+      if (nextRemainingSeconds === 0) {
+        setErrorMessage((currentMessage) =>
+          currentMessage || "인증번호 유효시간이 만료됐어요. 인증번호를 다시 받아주세요.",
+        );
+      }
+    };
+
+    const intervalId = window.setInterval(updateRemainingTime, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [codeExpiresAt]);
 
   const handleSendCode = () => {
     if (!isUniversityEmail || !isAgreed || sendCodeMutation.isPending) return;
@@ -92,6 +135,12 @@ export function StudentVerificationPage() {
   const handleVerifyCode = () => {
     const code = verificationCode.trim();
     if (!sentEmail || !code || verifyCodeMutation.isPending) return;
+    if (!codeExpiresAt || Date.now() >= codeExpiresAt) {
+      setErrorMessage(
+        "인증번호 유효시간이 만료됐어요. 인증번호를 다시 받아주세요.",
+      );
+      return;
+    }
 
     setErrorMessage("");
     verifyCodeMutation.mutate({ universityEmail: sentEmail, code });
@@ -110,6 +159,8 @@ export function StudentVerificationPage() {
     if (isCodeStep) {
       setSentEmail("");
       setVerificationCode("");
+      setCodeExpiresAt(null);
+      setRemainingSeconds(0);
       setErrorMessage("");
       return;
     }
@@ -154,32 +205,39 @@ export function StudentVerificationPage() {
         >
           {isCodeStep ? (
             <>
-              <S.Field>
+              <S.CodeField>
                 인증번호
-                <S.FieldInput
-                  autoComplete="one-time-code"
-                  inputMode="numeric"
-                  onChange={(event) => {
-                    setVerificationCode(event.target.value);
-                    setErrorMessage("");
-                  }}
-                  placeholder="인증번호를 입력해주세요"
-                  value={verificationCode}
-                />
-              </S.Field>
-              <S.ResendButton
-                disabled={sendCodeMutation.isPending}
-                onClick={() => {
-                  setErrorMessage("");
-                  sendCodeMutation.mutate({ universityEmail: sentEmail });
-                }}
-                tone="secondary"
-                type="button"
-              >
-                {sendCodeMutation.isPending
-                  ? "다시 보내는 중..."
-                  : "인증번호 다시 받기"}
-              </S.ResendButton>
+                <S.CodeInputRow>
+                  <S.CodeInputWrap>
+                    <S.CodeFieldInput
+                      autoComplete="one-time-code"
+                      inputMode="numeric"
+                      onChange={(event) => {
+                        setVerificationCode(event.target.value);
+                        setErrorMessage("");
+                      }}
+                      placeholder="인증번호를 입력해주세요"
+                      value={verificationCode}
+                    />
+                    <S.CodeTimer aria-label={`남은 시간 ${formatRemainingTime(remainingSeconds)}`}>
+                      {formatRemainingTime(remainingSeconds)}
+                    </S.CodeTimer>
+                  </S.CodeInputWrap>
+                  <S.ResendButton
+                    disabled={sendCodeMutation.isPending}
+                    onClick={() => {
+                      setErrorMessage("");
+                      sendCodeMutation.mutate({ universityEmail: sentEmail });
+                    }}
+                    tone="secondary"
+                    type="button"
+                  >
+                    {sendCodeMutation.isPending
+                      ? "전송 중..."
+                      : "인증번호 다시 받기"}
+                  </S.ResendButton>
+                </S.CodeInputRow>
+              </S.CodeField>
             </>
           ) : (
             <>
@@ -231,6 +289,8 @@ export function StudentVerificationPage() {
             if (isCodeStep) {
               setSentEmail("");
               setVerificationCode("");
+              setCodeExpiresAt(null);
+              setRemainingSeconds(0);
               setErrorMessage("");
               return;
             }

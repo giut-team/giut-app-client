@@ -6,6 +6,7 @@ import giutLogo from "../../assets/giut-logo.svg";
 import trophyIcon from "../../assets/trophy.svg";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
+import { Modal } from "../../components/Modal/Modal";
 import { SearchOverlay } from "../../components/SearchOverlay/SearchOverlay";
 import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./HomePage.styles";
@@ -44,6 +45,7 @@ export function HomePage() {
   const [activeBanner, setActiveBanner] = useState(0);
   const [isTeamButtonAnimating, setIsTeamButtonAnimating] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const {
     data: popularContests = [],
     isError: isPopularContestsError,
@@ -176,7 +178,7 @@ export function HomePage() {
               학교 인증 후 이용할 수 있어요.
             </S.VerificationDescription>
             <S.VerificationButton
-              onClick={() => navigate("/student-verification")}
+              onClick={() => setIsVerificationModalOpen(true)}
               type="button"
               width="100%"
             >
@@ -335,6 +337,23 @@ export function HomePage() {
       <SearchOverlay
         onClose={() => setIsSearchOpen(false)}
         open={isSearchOpen}
+      />
+
+      <Modal
+        description="같은 학교 학생끼리 안전하게 팀을 만들기 위해, 기웃허브와 팀 지원은 학교 인증을 마친 뒤 이용할 수 있어요. 1분이면 끝나요."
+        emphasizeDescription
+        icon={<Icon name="lock" size={22} weight="regular" />}
+        onClose={() => setIsVerificationModalOpen(false)}
+        open={isVerificationModalOpen}
+        primaryAction={{
+          label: "학교 인증하기",
+          onClick: () => navigate("/student-verification"),
+        }}
+        secondaryAction={{
+          label: "다음에 하기",
+          onClick: () => setIsVerificationModalOpen(false),
+        }}
+        title="학교 인증 후 볼 수 있어요"
       />
 
       <BottomNavigation

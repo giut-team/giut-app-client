@@ -61,14 +61,50 @@ export const S = {
     font-weight: 700;
     letter-spacing: -0.2px;
   `,
+  CodeField: styled.div`
+    display: grid;
+    gap: 7px;
+    color: ${tokens.color.neutral[700]};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  `,
   FieldInput: styled(Input)`
     height: 40px;
     padding: 0 12px;
     border-radius: 11px;
     font-size: 12px;
   `,
+  CodeInputRow: styled.span`
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+  `,
+  CodeInputWrap: styled.span`
+    position: relative;
+    display: block;
+    min-width: 0;
+  `,
+  CodeFieldInput: styled(Input)`
+    width: 100%;
+    height: 40px;
+    padding: 0 55px 0 12px;
+    border-radius: 11px;
+    font-size: 12px;
+  `,
+  CodeTimer: styled.span`
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    color: ${tokens.color.danger[500]};
+    font-size: 10px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    transform: translateY(-50%);
+  `,
   FieldHint: styled.span`
-    color: ${tokens.color.neutral[500]};
+    color: #000;
     font-size: 10px;
     font-weight: 400;
     line-height: 1.4;
@@ -80,23 +116,24 @@ export const S = {
     line-height: 1.5;
   `,
   ResendButton: styled(Button)`
-    width: fit-content;
-    height: auto;
-    justify-self: end;
-    padding: 0;
-    background: transparent;
+    width: auto;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid ${tokens.color.primary[500]};
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
     color: ${tokens.color.primary[500]};
     font-size: 10px;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    white-space: nowrap;
 
     &:hover:not(:disabled) {
       opacity: 1;
-      background: transparent;
+      background: ${tokens.color.primary[100]};
     }
 
     &:disabled {
-      background: transparent;
+      border-color: ${tokens.color.neutral[200]};
+      background: ${tokens.color.neutral[100]};
       color: ${tokens.color.neutral[500]};
     }
   `,
