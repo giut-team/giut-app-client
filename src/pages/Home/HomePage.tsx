@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchPopularContests } from "../../api/contests";
 import giutLogo from "../../assets/giut-logo.svg";
 import trophyIcon from "../../assets/trophy.svg";
@@ -8,6 +8,7 @@ import { BottomNavigation } from "../../components/BottomNavigation/BottomNaviga
 import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
 import { SearchOverlay } from "../../components/SearchOverlay/SearchOverlay";
+import { Toast } from "../../components/Toast/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./HomePage.styles";
 
@@ -39,6 +40,7 @@ const BANNER_AUTOPLAY_INTERVAL = 10000;
 
 export function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, profile, universityVerified } = useAuth();
   const isUniversityUnverified = isAuthenticated && !universityVerified;
   const [activeNavigation, setActiveNavigation] = useState("home");
@@ -46,6 +48,9 @@ export function HomePage() {
   const [isTeamButtonAnimating, setIsTeamButtonAnimating] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState(
+    (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
+  );
   const {
     data: popularContests = [],
     isError: isPopularContestsError,
@@ -81,6 +86,18 @@ export function HomePage() {
 
     return () => window.clearInterval(intervalId);
   }, [banners.length, isUniversityUnverified]);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    if ((location.state as { toastMessage?: string } | null)?.toastMessage) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+
+    const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [location.pathname, location.state, navigate, toastMessage]);
 
   const handleTeamNavigation = () => {
     if (isTeamButtonAnimating) return;
@@ -355,6 +372,7 @@ export function HomePage() {
         }}
         title="학교 인증 후 볼 수 있어요"
       />
+      <Toast message={toastMessage} open={Boolean(toastMessage)} />
 
       <BottomNavigation
         activeKey={activeNavigation}

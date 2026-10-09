@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
+import { Modal } from "../../components/Modal/Modal";
 import { useAuth } from "../../contexts/AuthContext";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
@@ -98,6 +99,7 @@ export function MyProfilePage() {
   const preview = location.state as ProfilePreview | null;
   const [activeTab, setActiveTab] = useState<MyProfileTab>("portfolio");
   const [scrapFilter, setScrapFilter] = useState<ScrapFilter>("all");
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const profile = giutHubProfiles.find((item) => item.id === "minjae");
   if (!profile) return null;
 
@@ -230,7 +232,7 @@ export function MyProfilePage() {
                 학교 팀 추천을 받을 수 있어요.
               </S.ProfileVerificationDescription>
               <S.ProfileVerificationButton
-                onClick={() => navigate("/student-verification")}
+                onClick={() => setIsVerificationModalOpen(true)}
                 type="button"
               >
                 학교 인증하기
@@ -324,6 +326,7 @@ export function MyProfilePage() {
                 </S.LockedPortfolioTitle>
                 <S.LockedPortfolioDescription>
                   활동 사진 6장과 한 줄 캡션으로 나를 소개하는 공간이에요.
+                  <br />
                   학교 인증을 마치면 바로 열려요.
                 </S.LockedPortfolioDescription>
               </S.LockedPortfolioCard>
@@ -491,6 +494,22 @@ export function MyProfilePage() {
           </S.ScrapContent>
         )}
       </S.Content>
+      <Modal
+        description="같은 학교 학생끼리 안전하게 팀을 만들기 위해, 기웃허브와 팀 지원은 학교 인증을 마친 뒤 이용할 수 있어요. 1분이면 끝나요."
+        emphasizeDescription
+        icon={<Icon name="lock" size={22} weight="regular" />}
+        onClose={() => setIsVerificationModalOpen(false)}
+        open={isVerificationModalOpen}
+        primaryAction={{
+          label: "학교 인증하기",
+          onClick: () => navigate("/student-verification"),
+        }}
+        secondaryAction={{
+          label: "다음에 하기",
+          onClick: () => setIsVerificationModalOpen(false),
+        }}
+        title="학교 인증 후 볼 수 있어요"
+      />
       <BottomNavigation
         activeKey="mypage"
         items={navigationItems}

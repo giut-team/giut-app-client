@@ -79,7 +79,10 @@ export function StudentVerificationPage() {
     onSuccess: async () => {
       sessionStorage.removeItem("kakao-login-pending");
       await refreshAuth();
-      navigate("/home", { replace: true });
+      navigate("/home", {
+        replace: true,
+        state: { toastMessage: "학교 인증을 완료했어요." },
+      });
     },
     onError: (error) => {
       setErrorMessage(

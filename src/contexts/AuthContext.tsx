@@ -4,6 +4,7 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { api } from "../api/client";
 
 type AuthProfile = {
@@ -34,12 +35,18 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const fetchMyProfile = () => api.get<MyProfileResponse>("/api/userprofile/me/profile");
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ["auth", "my-profile"],
     queryFn: async () => (await fetchMyProfile()).data,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     retry: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
+  const responseStatus = axios.isAxiosError(error)
+    ? error.response?.status
+    : undefined;
+  const isUnverifiedProfileForbidden = responseStatus === 403;
 
   const refreshAuth = async () => {
     await refetch();
@@ -48,14 +55,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !isError && data !== undefined,
+        isAuthenticated: data !== undefined || isUnverifiedProfileForbidden,
         isLoading: isPending,
         profile: data?.profile ?? null,
         profileCompleted: data?.profileCompleted ?? false,
         universityVerified:
-          data?.universityVerified ??
-          data?.profile?.universityVerified ??
-          false,
+          !isUnverifiedProfileForbidden &&
+          (data?.universityVerified ??
+            data?.profile?.universityVerified ??
+            false),
         refreshAuth,
       }}
     >
