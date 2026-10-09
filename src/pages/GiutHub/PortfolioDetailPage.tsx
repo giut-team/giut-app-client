@@ -1,15 +1,14 @@
 import { useLayoutEffect, useRef, useState, type PointerEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MarkdownContent } from "../../components/MarkdownContent";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
-import { giutHubProfiles } from "./GiutHubPage";
+import { getPublicProfile } from "../../api/giutHub";
+import dataDashboard from "../../assets/portfolio/data-dashboard.png";
+import { toHubProfile } from "./GiutHubPage";
 import { GiutHubDialog } from "./GiutHubDialog";
-import {
-  detailsByProfileId,
-  getSkillIcon,
-  TeamProposalBottomSheet,
-} from "./GiutHubProfilePage";
+import { getSkillIcon, TeamProposalBottomSheet } from "./GiutHubProfilePage";
 import { S } from "./PortfolioDetailPage.styles";
 
 function PortfolioShareModal({
@@ -103,16 +102,38 @@ function PortfolioShareModal({
 
 export function PortfolioDetailPage() {
   const navigate = useNavigate();
+  const { profileNumber, portfolioNumber } = useParams();
+  const userId = Number(profileNumber);
+  const portfolioIndex = Number(portfolioNumber) - 1;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const { data: apiProfile, isPending: isLoadingProfile } = useQuery({
+    queryKey: ["giut-hub", "profile", userId],
+    queryFn: () => getPublicProfile(userId),
+    enabled: Number.isSafeInteger(userId) && userId > 0,
+    retry: false,
+  });
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
-  const { profileNumber, portfolioNumber } = useParams();
-  const profile = giutHubProfiles.find(
-    (item) => item.profileNumber === Number(profileNumber),
-  );
-  const portfolio =
-    profile && detailsByProfileId[profile.id]?.portfolios[Number(portfolioNumber) - 1];
+
+  const profileData = apiProfile?.profile;
+  const profile = profileData ? toHubProfile(profileData) : null;
+  const apiPortfolio = profileData?.portfolioItems?.[portfolioIndex];
+  const portfolio = apiPortfolio
+    ? {
+        title: apiPortfolio.title,
+        description: apiPortfolio.caption,
+        image: apiPortfolio.imageUrl || dataDashboard,
+        markdown: apiPortfolio.markdownContent || apiPortfolio.caption,
+        startDate: apiPortfolio.projectStartDate,
+        endDate: apiPortfolio.projectEndDate,
+        teamSize: apiPortfolio.teamSize,
+        skills: apiPortfolio.skillTags ?? [],
+      }
+    : null;
+  const skills = portfolio?.skills.length
+    ? portfolio.skills.map((skill) => skill.name)
+    : (profileData?.tags ?? []).filter((tag) => tag.type === "SKILL").map((tag) => tag.name);
 
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -139,7 +160,9 @@ export function PortfolioDetailPage() {
     if (horizontalDistance > 88 && horizontalDistance > verticalDistance) goBack();
   };
 
-  if (!profile || !portfolio) return <Navigate replace to="/giut-hub" />;
+  if (!Number.isSafeInteger(userId) || userId <= 0) return <Navigate replace to="/giut-hub" />;
+  if (isLoadingProfile) return <div role="status">포트폴리오를 불러오고 있어요.</div>;
+  if (!profile || !portfolio) return <Navigate replace to={`/giut-hub/${userId}`} />;
 
   return (
     <S.Page $isLeaving={isLeaving}>
@@ -178,13 +201,16 @@ export function PortfolioDetailPage() {
             </span>
           </S.Author>
           <S.Title>{portfolio.title}</S.Title>
-          <S.Meta>2026.03 - 2026.06&nbsp;&nbsp;·&nbsp;&nbsp;4인 팀</S.Meta>
+          <S.Meta>
+            {[portfolio.startDate, portfolio.endDate].filter(Boolean).join(" - ")}
+            {portfolio.teamSize ? ` · ${portfolio.teamSize}인 팀` : ""}
+          </S.Meta>
           <S.Markdown>
             <MarkdownContent content={portfolio.markdown} />
           </S.Markdown>
           <S.StackTitle>기술 스택</S.StackTitle>
           <S.StackList>
-            {detailsByProfileId[profile.id].skills.slice(0, 3).map((skill, index) => (
+            {skills.slice(0, 3).map((skill, index) => (
               <S.Stack $index={index} key={skill}>
                 {getSkillIcon(skill) && <img alt="" src={getSkillIcon(skill)} />}
                 {skill}

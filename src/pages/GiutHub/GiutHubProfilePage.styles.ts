@@ -411,6 +411,16 @@ export const S = {
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
   `,
+  EmptyState: styled.p`
+    margin: 22px;
+    padding: 28px 18px;
+    border-radius: 16px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+  `,
   ActivityItem: styled.article<{ $last: boolean }>`
     position: relative;
     display: grid;

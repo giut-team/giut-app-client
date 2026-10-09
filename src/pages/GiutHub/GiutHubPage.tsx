@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import designerFemale from "../../assets/default_image/designer-female.png";
 import designerMale from "../../assets/default_image/designer-male.png";
@@ -12,16 +13,13 @@ import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { PillButton } from "../../components/PillButton";
+import { getPublicProfilesForRoles, type PrimaryRoleCode, type PublicProfile } from "../../api/giutHub";
 import { S } from "./GiutHubPage.styles";
 
 type Category = "전체" | "기획" | "디자인" | "개발" | "마케팅";
 type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
 type Position = "기획" | "디자인" | "개발" | "마케팅";
-type TeamStatus =
-  | "전체"
-  | "바로 합류 가능"
-  | "제안 검토 중"
-  | "일정 조율 필요";
+type TeamStatus = "전체" | "팀 찾는 중" | "제안 검토 중";
 type Grade = 1 | 2 | 3 | 4;
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
 
@@ -40,7 +38,7 @@ export type GiutHubProfile = {
   category: Exclude<Category, "전체">;
   role: Position;
   detailRole: string;
-  status: ProfileStatus;
+  status: string;
   name: string;
   available: boolean;
   summary: string;
@@ -66,10 +64,9 @@ const positionOptions: {
   { value: "마케팅", icon: "megaphone" },
 ];
 const teamStatusOptions: { value: TeamStatus; description: string }[] = [
-  { value: "전체", description: "모든 상태의 팀원" },
-  { value: "바로 합류 가능", description: "지금 바로 시작할 수 있어요" },
-  { value: "제안 검토 중", description: "좋은 제안이라면 확인해요" },
-  { value: "일정 조율 필요", description: "시작 일정을 맞춰야 해요" },
+  { value: "전체", description: "모든 공개 상태의 팀원" },
+  { value: "팀 찾는 중", description: "함께할 팀을 찾고 있어요" },
+  { value: "제안 검토 중", description: "팀 제안을 검토하고 있어요" },
 ];
 const gradeOptions: { value: Grade; label: string }[] = [
   { value: 1, label: "1학년" },
@@ -394,43 +391,56 @@ export const giutHubProfiles: GiutHubProfile[] = [
   },
 ];
 
-const profileFilterData: Record<
-  string,
-  { grade: Grade; department: string; teamStatus: TeamStatus }
-> = {
-  "kim-hyeonjin": {
-    grade: 3,
-    department: "컴퓨터과학부",
-    teamStatus: "바로 합류 가능",
-  },
-  "park-seojun": {
-    grade: 4,
-    department: "통계학과",
-    teamStatus: "바로 합류 가능",
-  },
-  "choi-yuna": {
-    grade: 3,
-    department: "디자인학과",
-    teamStatus: "바로 합류 가능",
-  },
-  minjae: {
-    grade: 3,
-    department: "컴퓨터과학부",
-    teamStatus: "바로 합류 가능",
-  },
-  seoyeon: { grade: 3, department: "경영학부", teamStatus: "바로 합류 가능" },
-  jiwoo: { grade: 2, department: "디자인학과", teamStatus: "제안 검토 중" },
-  junseo: {
-    grade: 2,
-    department: "전자전기컴퓨터공학부",
-    teamStatus: "일정 조율 필요",
-  },
-  dohyun: { grade: 4, department: "행정학과", teamStatus: "제안 검토 중" },
-  hayoon: { grade: 3, department: "디자인학과", teamStatus: "바로 합류 가능" },
-  soomin: { grade: 2, department: "경영학부", teamStatus: "바로 합류 가능" },
-  minho: { grade: 3, department: "경제학부", teamStatus: "일정 조율 필요" },
-  yujin: { grade: 4, department: "경영학부", teamStatus: "제안 검토 중" },
+const categoryByCode: Record<string, Exclude<Category, "전체">> = {
+  PLANNING: "기획",
+  DESIGN: "디자인",
+  DEVELOPMENT: "개발",
+  MARKETING: "마케팅",
 };
+
+const codeByCategory: Record<Position, PrimaryRoleCode> = {
+  기획: "PLANNING",
+  디자인: "DESIGN",
+  개발: "DEVELOPMENT",
+  마케팅: "MARKETING",
+};
+
+const avatarByCategory: Record<Exclude<Category, "전체">, string[]> = {
+  기획: [plannerFemale, plannerMale],
+  디자인: [designerFemale, designerMale],
+  개발: [developerFemale, developerMale],
+  마케팅: [marketingFemale, marketingMale],
+};
+
+export function toHubProfile(
+  profile: PublicProfile & { roles?: { code: string; name: string }[] },
+): GiutHubProfile {
+  const primaryRole = profile.primaryRoles[0];
+  const category = categoryByCode[primaryRole?.code] ?? "개발";
+  const avatarTone: GiutHubProfile["avatarTone"] =
+    category === "기획" ? "purple" : category === "디자인" ? "green" : category === "마케팅" ? "orange" : "blue";
+
+  return {
+    profileNumber: profile.userId,
+    id: `user-${profile.userId}`,
+    category,
+    role: category,
+    detailRole: profile.roles?.map((role) => role.name).join(", ") || primaryRole?.name || category,
+    status: profile.activityStatusName,
+    name: profile.nickname,
+    available: profile.activityStatus === "OPEN_TO_OFFERS",
+    summary: `${category} · ${profile.departmentName} · ${profile.grade}학년`,
+    introduction: profile.bio,
+    tags: (profile.skills ?? []).filter((tag) => tag.type === "SKILL").map((tag) => tag.name),
+    projectCount: 0,
+    lastActiveAt: "",
+    lastResponseAt: "",
+    recommendationCount: 0,
+    avatarFallback: profile.nickname.slice(0, 1),
+    avatarTone,
+    avatarSrc: profile.profileImageUrl || avatarByCategory[category][0],
+  };
+}
 
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
@@ -453,21 +463,39 @@ export function GiutHubPage() {
     useState<DepartmentCategory>("전체");
   const [departmentQuery, setDepartmentQuery] = useState("");
 
+  const requestedRoles = activeCategory !== "전체"
+    ? [codeByCategory[activeCategory]]
+    : positionOptions
+        .filter(({ value }) => selectedPositions.includes(value))
+        .map(({ value }) => codeByCategory[value]);
+  const {
+    data: publicProfiles,
+    isPending: isLoadingProfiles,
+    isError: profileLoadError,
+    refetch: loadProfiles,
+  } = useQuery({
+    queryKey: ["giut-hub", "profiles", { primaryRoles: requestedRoles }],
+    queryFn: () => getPublicProfilesForRoles(requestedRoles),
+    retry: false,
+  });
+
   const visibleProfiles = useMemo(
     () =>
-      giutHubProfiles.filter((profile) => {
-        const filterData = profileFilterData[profile.id];
+      (publicProfiles ?? []).filter((profile) => {
+        const profileCategories = profile.primaryRoles.map(({ code }) => categoryByCode[code]);
         const matchesCategory =
-          activeCategory === "전체" || profile.category === activeCategory;
+          activeCategory === "전체" || profileCategories.includes(activeCategory);
         const matchesPosition =
-          selectedPositions.length === 0 || selectedPositions.includes(profile.category);
+          selectedPositions.length === 0 ||
+          selectedPositions.some((position) => profileCategories.includes(position));
         const matchesStatus =
-          selectedTeamStatus === "전체" || filterData.teamStatus === selectedTeamStatus;
+          selectedTeamStatus === "전체" || profile.activityStatusName === selectedTeamStatus;
         const matchesGrade =
-          selectedGrades.length === 0 || selectedGrades.includes(filterData.grade);
+          selectedGrades.length === 0 ||
+          selectedGrades.includes(Math.min(4, profile.grade) as Grade);
         const matchesDepartment =
           selectedDepartments.length === 0 ||
-          selectedDepartments.includes(filterData.department);
+          selectedDepartments.includes(profile.departmentName);
 
         return (
           matchesCategory &&
@@ -476,9 +504,10 @@ export function GiutHubPage() {
           matchesGrade &&
           matchesDepartment
         );
-      }),
+      }).map(toHubProfile),
     [
       activeCategory,
+      publicProfiles,
       selectedDepartments,
       selectedGrades,
       selectedPositions,
@@ -641,14 +670,23 @@ export function GiutHubPage() {
           </S.CategoryList>
 
           <S.ProfileList>
-            {visibleProfiles.map((profile) => (
+            {isLoadingProfiles && (
+              <S.EmptyState>기웃허브 팀원을 불러오고 있어요.</S.EmptyState>
+            )}
+            {!isLoadingProfiles && profileLoadError && (
+              <S.EmptyState>
+                기웃허브 정보를 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 시도해 주세요.
+                <button onClick={() => void loadProfiles()} type="button">다시 불러오기</button>
+              </S.EmptyState>
+            )}
+            {!isLoadingProfiles && !profileLoadError && visibleProfiles.map((profile) => (
               <ProfileCard
                 key={profile.id}
                 onView={() => navigate(`/giut-hub/${profile.profileNumber}`)}
                 profile={profile}
               />
             ))}
-            {visibleProfiles.length === 0 && (
+            {!isLoadingProfiles && !profileLoadError && visibleProfiles.length === 0 && (
               <S.EmptyState>
                 선택한 분야의 팀원을 준비하고 있어요.
               </S.EmptyState>
@@ -906,8 +944,6 @@ function ProfileCard({
   profile: GiutHubProfile;
   onView: () => void;
 }) {
-  const responseStatus = getResponseStatus(profile.lastResponseAt);
-
   return (
     <S.ProfileCard>
       <S.ProfileTop>
@@ -919,14 +955,12 @@ function ProfileCard({
           )}
         </S.Avatar>
         <S.ProfileIdentity>
-          <S.ProfileHeader>
-            <S.Name>{profile.name}</S.Name>
-            <S.Availability $available={profile.available}>
-              <S.AvailabilityDot $available={profile.available} />
-              {profile.available
-                ? "합류 가능"
-                : "현재 팀을 찾고 있지 않아요"}
-            </S.Availability>
+        <S.ProfileHeader>
+          <S.Name>{profile.name}</S.Name>
+          <S.Availability $available={profile.available}>
+            <S.AvailabilityDot $available={profile.available} />
+            {profile.status}
+          </S.Availability>
           </S.ProfileHeader>
           <S.ProfileSummary>{profile.summary}</S.ProfileSummary>
         </S.ProfileIdentity>
@@ -938,22 +972,6 @@ function ProfileCard({
           <Icon name="caret-right" size={20} weight="bold" />
         </S.DetailButton>
       </S.ProfileTop>
-      <S.ProfileMeta aria-label={`${profile.name} 활동 정보`}>
-        <span>
-          <Icon name="users" size={16} weight="regular" />
-          협업 경험 {profile.projectCount}회
-        </span>
-        <S.ResponseMeta
-          $fast={responseStatus.isFast}
-          aria-label={
-            `최근 답장 ${responseStatus.elapsedHours}시간 전, ` +
-            responseStatus.label
-          }
-        >
-          <Icon name="lightning" size={14} weight="fill" />
-          {responseStatus.label}
-        </S.ResponseMeta>
-      </S.ProfileMeta>
       <S.Introduction>{profile.introduction}</S.Introduction>
       <S.CardFooter>
         <S.TagList aria-label={`${profile.name} 관심 분야`}>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
@@ -8,7 +9,8 @@ import dataDashboard from "../../assets/portfolio/data-dashboard.png";
 import esgGlobe from "../../assets/portfolio/esg-globe.png";
 import hackathonCode from "../../assets/portfolio/hackathon-code.png";
 import projectRoadmap from "../../assets/portfolio/project-roadmap.png";
-import { getResponseStatus, giutHubProfiles, type GiutHubProfile } from "./GiutHubPage";
+import { getPublicProfile } from "../../api/giutHub";
+import { toHubProfile, type GiutHubProfile } from "./GiutHubPage";
 import { GiutHubDialog } from "./GiutHubDialog";
 import { S } from "./GiutHubProfilePage.styles";
 
@@ -19,7 +21,6 @@ export type Portfolio = {
   markdown: string;
 };
 export type ProfileDetail = { skills: string[]; portfolios: Portfolio[] };
-type Activity = { title: string; description: string };
 type ProposalTeam = { id: string; name: string; summary: string; disabled?: boolean };
 
 const proposalTeams: ProposalTeam[] = [
@@ -298,93 +299,6 @@ export const detailsByProfileId: Record<string, ProfileDetail> = {
       ],
     ),
   },
-};
-
-const activitiesByProfileId: Record<string, Activity[]> = {
-  "kim-hyeonjin": [
-    {
-      title: "공공데이터 활용 해커톤 우수상",
-      description: "백엔드 · 4인 팀",
-    },
-    { title: "개발 동아리 서버 파트", description: "Spring · PostgreSQL" },
-  ],
-  "park-seojun": [
-    {
-      title: "데이터 분석 공모전 본선 진출",
-      description: "데이터 분석 · 3인 팀",
-    },
-    { title: "통계학과 데이터 스터디", description: "Python · SQL" },
-  ],
-  "choi-yuna": [
-    {
-      title: "교내 UX/UI 디자인 공모전 수상",
-      description: "UI 디자인 · 3인 팀",
-    },
-    {
-      title: "모바일 앱 디자인 스터디",
-      description: "Figma · 프로토타이핑",
-    },
-  ],
-  minjae: [
-    {
-      title: "2025 교내 SW 해커톤 우수상",
-      description: "백엔드 · 4인 팀",
-    },
-    {
-      title: "스타트업 프론트엔드 인턴 6개월",
-      description: "React · TypeScript",
-    },
-  ],
-  seoyeon: [
-    {
-      title: "교내 서비스 기획 공모전 대상",
-      description: "기획 · 4인 팀",
-    },
-    { title: "학생회 서비스 운영", description: "운영 · 콘텐츠 기획" },
-  ],
-  jiwoo: [
-    { title: "UX/UI 디자인 공모전 수상", description: "디자인 · 3인 팀" },
-    { title: "디자인 스터디 운영", description: "Figma · 프로토타이핑" },
-  ],
-  junseo: [
-    {
-      title: "교내 SW 해커톤 본선 진출",
-      description: "백엔드 · 5인 팀",
-    },
-    { title: "개발 동아리 서버 파트", description: "Spring · MySQL" },
-  ],
-  dohyun: [
-    {
-      title: "지역 문제 해결 공모전 장려상",
-      description: "기획 · 4인 팀",
-    },
-    { title: "공공 프로젝트 리서치", description: "리서치 · 문서화" },
-  ],
-  hayoon: [
-    { title: "브랜딩 디자인 프로젝트", description: "디자인 · 3인 팀" },
-    { title: "교내 전시 홍보물 제작", description: "그래픽 · UI 디자인" },
-  ],
-  soomin: [
-    { title: "SNS 캠페인 기획 및 운영", description: "마케팅 · 4인 팀" },
-    { title: "콘텐츠 마케팅 스터디", description: "카피라이팅 · 분석" },
-  ],
-  minho: [
-    {
-      title: "데이터 마케팅 공모전 수상",
-      description: "마케팅 · 4인 팀",
-    },
-    { title: "광고 성과 분석 프로젝트", description: "GA · 데이터 분석" },
-  ],
-  yujin: [
-    {
-      title: "예비창업패키지 청년 트랙",
-      description: "사업 기획 · 4인 팀",
-    },
-    {
-      title: "청년 창업 아이디어톤 본선",
-      description: "기획 · 서비스 설계",
-    },
-  ],
 };
 
 export function TeamProposalBottomSheet({
@@ -675,6 +589,7 @@ function ProfileBlockModal({
 export function GiutHubProfilePage() {
   const navigate = useNavigate();
   const { profileNumber } = useParams();
+  const userId = Number(profileNumber);
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
   const [isScrapped, setIsScrapped] = useState(false);
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
@@ -682,19 +597,71 @@ export function GiutHubProfilePage() {
   const [profileAction, setProfileAction] = useState<"share" | "report" | "block" | null>(
     null,
   );
-  const profile = giutHubProfiles.find(
-    (item) => item.profileNumber === Number(profileNumber),
-  );
-  if (!profile) return <Navigate replace to="/giut-hub" />;
+  const {
+    data: apiProfile,
+    isPending: isLoadingProfile,
+    isError: profileLoadError,
+  } = useQuery({
+    queryKey: ["giut-hub", "profile", userId],
+    queryFn: () => getPublicProfile(userId),
+    enabled: Number.isSafeInteger(userId) && userId > 0,
+    retry: false,
+  });
 
-  const detail = detailsByProfileId[profile.id];
-  const activities = activitiesByProfileId[profile.id];
-  const responseStatus = getResponseStatus(profile.lastResponseAt);
-  const [, departmentAndGrade] = profile.summary.split(" · ", 2);
+  const profileData = apiProfile?.profile;
+  const profile = profileData ? toHubProfile(profileData) : null;
+  const detail = profileData
+    ? {
+        skills: (profileData.tags ?? [])
+          .filter((tag) => tag.type === "SKILL")
+          .map((tag) => tag.name),
+        portfolios: (profileData.portfolioItems ?? []).map((item) => ({
+          title: item.title,
+          description: item.caption,
+          image: item.imageUrl || portfolioImages[0],
+          markdown: item.markdownContent || item.caption,
+        })),
+      }
+    : null;
+  const activities = (profileData?.activityHistories ?? []).map((activity) => ({
+    title: activity.title,
+    description: [activity.organization, activity.startMonth, activity.endMonth]
+      .filter(Boolean)
+      .join(" · "),
+  }));
+  const departmentAndGrade = profileData
+    ? `${profileData.departmentName} / ${profileData.grade}학년`
+    : "";
   const openProfileAction = (action: "share" | "report" | "block") => {
     setIsMoreSheetOpen(false);
     window.setTimeout(() => setProfileAction(action), 180);
   };
+
+  if (!Number.isSafeInteger(userId) || userId <= 0) {
+    return <Navigate replace to="/giut-hub" />;
+  }
+  if (isLoadingProfile) {
+    return (
+      <S.Page>
+        <S.Content>
+          <PageHeader onBack={() => navigate("/giut-hub")} title="" />
+          <S.EmptyState>프로필을 불러오고 있어요.</S.EmptyState>
+        </S.Content>
+      </S.Page>
+    );
+  }
+  if (profileLoadError || !profile || !profileData || !detail) {
+    return (
+      <S.Page>
+        <S.Content>
+          <PageHeader onBack={() => navigate("/giut-hub")} title="" />
+          <S.EmptyState>
+            프로필을 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 시도해 주세요.
+          </S.EmptyState>
+        </S.Content>
+      </S.Page>
+    );
+  }
 
   return (
     <S.Page>
@@ -739,27 +706,6 @@ export function GiutHubProfilePage() {
           <S.FieldLabel>자기소개</S.FieldLabel>
           <S.Introduction>{profile.introduction}</S.Introduction>
         </S.IntroductionSection>
-        <S.Metrics aria-label="프로필 활동 정보">
-          <S.Metric>
-            <Icon name="users" size={29} weight="regular" />
-            <span>
-              협업 경험<strong>{profile.projectCount}회</strong>
-            </span>
-          </S.Metric>
-          <S.Metric>
-            <Icon name="lightning" size={29} weight="regular" />
-            <span>
-              {responseStatus.label}
-              <small>최근 답장 {responseStatus.elapsedHours}시간 전</small>
-            </span>
-          </S.Metric>
-          <S.Metric>
-            <Icon name="star" size={29} weight="regular" />
-            <span>
-              추천<strong>{profile.recommendationCount}</strong>
-            </span>
-          </S.Metric>
-        </S.Metrics>
         <S.SkillList aria-label="보유 기술">
           {detail.skills.map((skill, index) => (
             <S.Skill $index={index} key={skill}>
@@ -806,7 +752,8 @@ export function GiutHubProfilePage() {
           </S.Tab>
         </S.TabList>
         {activeTab === "portfolio" ? (
-          <S.PortfolioContent>
+          detail.portfolios.length > 0 ? (
+            <S.PortfolioContent>
             <S.FeaturedPortfolioCard
               onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
             >
@@ -845,8 +792,11 @@ export function GiutHubProfilePage() {
                 </S.PortfolioCard>
               ))}
             </S.PortfolioList>
-          </S.PortfolioContent>
-        ) : (
+            </S.PortfolioContent>
+          ) : (
+            <S.EmptyState>아직 공개된 포트폴리오가 없어요.</S.EmptyState>
+          )
+        ) : activities.length > 0 ? (
           <S.ActivityList>
             {activities.map((activity, index) => (
               <S.ActivityItem
@@ -861,6 +811,8 @@ export function GiutHubProfilePage() {
               </S.ActivityItem>
             ))}
           </S.ActivityList>
+        ) : (
+          <S.EmptyState>등록된 활동 이력이 없어요.</S.EmptyState>
         )}
       </S.Content>
       <TeamProposalBottomSheet

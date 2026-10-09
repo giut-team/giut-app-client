@@ -714,7 +714,7 @@ export const S = {
       outline-offset: 2px;
     }
   `,
-  EmptyState: styled.p`
+  EmptyState: styled.div`
     margin: 0;
     padding: 40px 16px;
     border-radius: 18px;
