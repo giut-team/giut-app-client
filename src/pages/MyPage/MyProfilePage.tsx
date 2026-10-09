@@ -5,6 +5,9 @@ import { Icon } from "../../components/icons";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
+import { useAuth } from "../../contexts/AuthContext";
+import { ProfileShareSheet } from "../GiutHub/ProfileShareSheet";
+import { useProfileShare } from "../GiutHub/useProfileShare";
 
 type MyProfileTab = "portfolio" | "teams" | "scraps";
 type ScrapFilter = "all" | "posts" | "teams";
@@ -93,6 +96,8 @@ const scrapTeams = [
 export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, profile: currentProfile } = useAuth();
+  const share = useProfileShare(isAuthenticated);
   const preview = location.state as ProfilePreview | null;
   const [activeTab, setActiveTab] = useState<MyProfileTab>("portfolio");
   const [scrapFilter, setScrapFilter] = useState<ScrapFilter>("all");
@@ -150,7 +155,7 @@ export function MyProfilePage() {
             <Icon name="edit" size={23} weight="bold" />
             프로필 편집
           </S.EditButton>
-          <S.ShareButton aria-label="프로필 공유" type="button">
+          <S.ShareButton aria-label="프로필 공유" onClick={share.openShare} type="button">
             <Icon name="share" size={25} weight="regular" />
           </S.ShareButton>
         </S.ProfileActions>
@@ -381,6 +386,7 @@ export function MyProfilePage() {
           if (key === "chat") navigate("/chat");
         }}
       />
+      {share.isOpen && <ProfileShareSheet profileName={currentProfile?.nickname ?? "내"} share={share} />}
     </S.Page>
   );
 }

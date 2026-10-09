@@ -10,8 +10,12 @@ import esgGlobe from "../../assets/portfolio/esg-globe.png";
 import hackathonCode from "../../assets/portfolio/hackathon-code.png";
 import projectRoadmap from "../../assets/portfolio/project-roadmap.png";
 import { getPublicProfile } from "../../api/giutHub";
-import { toHubProfile, type GiutHubProfile } from "./GiutHubPage";
+import { toHubProfile } from "./GiutHubPage";
 import { GiutHubDialog } from "./GiutHubDialog";
+import { useAuth } from "../../contexts/AuthContext";
+import { ProfileShareSheet } from "./ProfileShareSheet";
+import { useProfileShare } from "./useProfileShare";
+import { canIssueProfileShare } from "./profileShare";
 import { S } from "./GiutHubProfilePage.styles";
 
 export type Portfolio = {
@@ -422,87 +426,6 @@ function ProfileMoreBottomSheet({
   );
 }
 
-function ProfileShareSheet({
-  open,
-  profile,
-  onClose,
-}: {
-  open: boolean;
-  profile: GiutHubProfile;
-  onClose: () => void;
-}) {
-  const [isCopied, setIsCopied] = useState(false);
-  const profileLink = `giut.kr/u/${profile.id}`;
-
-  const copyProfileLink = async () => {
-    try {
-      await navigator.clipboard?.writeText(window.location.href);
-    } finally {
-      setIsCopied(true);
-    }
-  };
-
-  const openNativeShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: `${profile.name}님의 프로필`,
-          text: `${profile.name}님의 기웃허브 프로필을 확인해 보세요.`,
-          url: window.location.href,
-        });
-      } else {
-        await copyProfileLink();
-      }
-    } catch {
-      // 공유 창을 닫은 경우에도 현재 화면은 그대로 유지합니다.
-    }
-  };
-
-  return (
-    <BottomSheet
-      minHeight="auto"
-      onClose={onClose}
-      open={open}
-      showHeaderDivider={false}
-      variant="compact"
-    >
-      <S.ShareHeading>프로필 공유</S.ShareHeading>
-      <S.ShareDescription>
-        {profile.name} 님의 프로필을 팀원에게 공유할 수 있어요.
-      </S.ShareDescription>
-      <S.ShareLinkBox>
-        <code>{profileLink}</code>
-        <S.CopyButton onClick={copyProfileLink} type="button">
-          {isCopied ? "복사됨" : "복사"}
-        </S.CopyButton>
-      </S.ShareLinkBox>
-      <S.ShareChannelList aria-label="공유 방식 선택">
-        <S.ShareChannel onClick={openNativeShare} type="button">
-          <S.KakaoMark>
-            <Icon name="chat" size={23} weight="fill" />
-          </S.KakaoMark>
-          <span>카카오톡</span>
-        </S.ShareChannel>
-        <S.ShareChannel onClick={copyProfileLink} type="button">
-          <S.ShareChannelIcon>
-            <Icon name="link" size={24} weight="bold" />
-          </S.ShareChannelIcon>
-          <span>링크 공유</span>
-        </S.ShareChannel>
-        <S.ShareChannel onClick={openNativeShare} type="button">
-          <S.ShareChannelIcon>
-            <Icon name="share" size={24} weight="bold" />
-          </S.ShareChannelIcon>
-          <span>기타</span>
-        </S.ShareChannel>
-      </S.ShareChannelList>
-      <S.ShareCloseButton onClick={onClose} type="button">
-        닫기
-      </S.ShareCloseButton>
-    </BottomSheet>
-  );
-}
-
 const reportReasons = [
   "스팸 · 광고성 프로필",
   "허위 경력 · 정보 도용",
@@ -590,6 +513,8 @@ export function GiutHubProfilePage() {
   const navigate = useNavigate();
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
+  const { profile: currentProfile } = useAuth();
+  const share = useProfileShare(canIssueProfileShare(userId, currentProfile?.userId));
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
   const [isScrapped, setIsScrapped] = useState(false);
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
@@ -634,6 +559,10 @@ export function GiutHubProfilePage() {
     : "";
   const openProfileAction = (action: "share" | "report" | "block") => {
     setIsMoreSheetOpen(false);
+    if (action === "share") {
+      share.openShare();
+      return;
+    }
     window.setTimeout(() => setProfileAction(action), 180);
   };
 
@@ -827,11 +756,7 @@ export function GiutHubProfilePage() {
         onShare={() => openProfileAction("share")}
         open={isMoreSheetOpen}
       />
-      <ProfileShareSheet
-        onClose={() => setProfileAction(null)}
-        open={profileAction === "share"}
-        profile={profile}
-      />
+      {share.isOpen && <ProfileShareSheet profileName={profile.name} share={share} />}
       <ProfileReportModal
         onClose={() => setProfileAction(null)}
         open={profileAction === "report"}

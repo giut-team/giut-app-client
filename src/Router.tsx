@@ -4,6 +4,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
+import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
@@ -62,6 +63,7 @@ export function AppRouter() {
         <Route element={<ChatPage />} path="/chat" />
         <Route element={<ChatRoomPage />} path="/chat/:chatId" />
         <Route element={<GiutHubPage />} path="/giut-hub" />
+        <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />
         <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
         <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />

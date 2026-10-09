@@ -528,12 +528,11 @@ export const S = {
     code {
       min-width: 0;
       color: ${tokens.color.neutral[700]};
-      overflow: hidden;
       font-family: inherit;
       font-size: 14px;
       letter-spacing: -0.3px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
+      user-select: all;
     }
   `,
   CopyButton: styled.button`
@@ -547,6 +546,7 @@ export const S = {
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.45; cursor: default; }
   `,
   ShareChannelList: styled.div`
     display: grid;
@@ -567,6 +567,7 @@ export const S = {
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
+    &:disabled { opacity: 0.45; cursor: default; }
 
     &:active {
       background: ${tokens.color.neutral[100]};
