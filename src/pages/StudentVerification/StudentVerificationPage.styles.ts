@@ -1,7 +1,13 @@
+import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { tokens } from "../../design-system/tokens.generated";
+
+const loadingDot = keyframes`
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+`;
 
 export const S = {
   Page: styled.main`
@@ -206,6 +212,39 @@ export const S = {
     height: 42px;
     border-radius: 11px;
     font-size: 13px;
+  `,
+  ProcessingLabel: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  `,
+  LoadingDots: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+
+    i {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: ${loadingDot} 1.1s ease-in-out infinite;
+    }
+
+    i:nth-of-type(2) {
+      animation-delay: 0.15s;
+    }
+
+    i:nth-of-type(3) {
+      animation-delay: 0.3s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      i {
+        animation: none;
+        opacity: 1;
+      }
+    }
   `,
   TermsContent: styled.div`
     display: flex;

@@ -7,8 +7,9 @@ import {
   verifyUniversityEmailCode,
 } from "../../api/members";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
-import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
+import { Modal } from "../../components/Modal/Modal";
+import { PageHeader } from "../../components/PageHeader";
 import { Toast } from "../../components/Toast/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./StudentVerificationPage.styles";
@@ -37,6 +38,7 @@ export function StudentVerificationPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isLaterModalOpen, setIsLaterModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [codeExpiresAt, setCodeExpiresAt] = useState<number | null>(null);
@@ -295,8 +297,7 @@ export function StudentVerificationPage() {
               return;
             }
 
-            sessionStorage.removeItem("kakao-login-pending");
-            navigate("/home", { replace: true });
+            setIsLaterModalOpen(true);
           }}
           tone="secondary"
           type="button"
@@ -304,16 +305,32 @@ export function StudentVerificationPage() {
           {isCodeStep ? "학교 이메일 다시 입력하기" : "학생 인증 나중에 하기"}
         </S.LaterButton>
         <S.SubmitButton
+          aria-label={
+            isSubmitting
+              ? isCodeStep
+                ? "인증 처리 중"
+                : "인증번호 전송 중"
+              : undefined
+          }
           disabled={!canSubmit || isSubmitting}
           onClick={handleSubmit}
           type="button"
           width="100%"
         >
-          {isSubmitting
-            ? "처리 중..."
-            : isCodeStep
-              ? "인증하기"
-              : "인증코드 받기"}
+          {isSubmitting ? (
+            <S.ProcessingLabel aria-live="polite">
+              {isCodeStep ? "인증 중" : "인증번호 전송 중"}
+              <S.LoadingDots aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </S.LoadingDots>
+            </S.ProcessingLabel>
+          ) : isCodeStep ? (
+            "인증하기"
+          ) : (
+            "인증코드 받기"
+          )}
         </S.SubmitButton>
       </S.BottomArea>
 
@@ -372,6 +389,25 @@ export function StudentVerificationPage() {
           <S.TermsNote>문의: privacy@giut.app · 시행일 2026.03.01</S.TermsNote>
         </S.TermsContent>
       </BottomSheet>
+      <Modal
+        description="학교 인증 전에는 일부 기능들을 이용할 수 없어요. 홈에서 언제든 다시 인증할 수 있어요."
+        emphasizeDescription
+        icon={<Icon name="lock" size={22} weight="regular" />}
+        onClose={() => setIsLaterModalOpen(false)}
+        open={isLaterModalOpen}
+        primaryAction={{
+          label: "계속 인증하기",
+          onClick: () => setIsLaterModalOpen(false),
+        }}
+        secondaryAction={{
+          label: "다음에 하기",
+          onClick: () => {
+            sessionStorage.removeItem("kakao-login-pending");
+            navigate("/home", { replace: true });
+          },
+        }}
+        title="학생 인증을 나중에 할까요?"
+      />
       <Toast message={toastMessage} open={Boolean(toastMessage)} />
     </S.Page>
   );
