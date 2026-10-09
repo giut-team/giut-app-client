@@ -10,6 +10,7 @@ import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
 import { Toast } from "../../components/Toast/Toast";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./StudentVerificationPage.styles";
 
 const UNIVERSITY_EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@uos\.ac\.kr$/;
@@ -22,6 +23,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export function StudentVerificationPage() {
   const navigate = useNavigate();
+  const { refreshAuth } = useAuth();
   const [universityEmail, setUniversityEmail] = useState("");
   const [sentEmail, setSentEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -52,8 +54,9 @@ export function StudentVerificationPage() {
   });
   const verifyCodeMutation = useMutation({
     mutationFn: verifyUniversityEmailCode,
-    onSuccess: () => {
+    onSuccess: async () => {
       sessionStorage.removeItem("kakao-login-pending");
+      await refreshAuth();
       navigate("/home", { replace: true });
     },
     onError: (error) => {

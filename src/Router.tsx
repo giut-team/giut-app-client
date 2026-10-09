@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { HomePage } from "./pages/Home/HomePage";
@@ -51,6 +51,18 @@ function HomeEntryPage() {
   return loginPending && isLoading ? null : <HomePage />;
 }
 
+function UniversityVerifiedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading, universityVerified } = useAuth();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate replace to="/login" />;
+  if (!universityVerified) {
+    return <Navigate replace to="/student-verification" />;
+  }
+
+  return children;
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
@@ -59,21 +71,71 @@ export function AppRouter() {
         <Route element={<LoginPage />} path="/login" />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
-        <Route element={<ChatPage />} path="/chat" />
-        <Route element={<ChatRoomPage />} path="/chat/:chatId" />
-        <Route element={<GiutHubPage />} path="/giut-hub" />
-        <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
-        <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ChatPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/chat"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ChatRoomPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/chat/:chatId"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <GiutHubPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <GiutHubProfilePage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub/:profileNumber"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <PortfolioDetailPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub/:profileNumber/portfolio/:portfolioNumber"
+        />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />
         <Route element={<ContestsPage />} path="/contests" />
-        <Route element={<ContestRegistrationPage />} path="/contests/register" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ContestRegistrationPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/register"
+        />
         <Route element={<ContestDetailPage />} path="/contests/:contestId" />
         <Route
-          element={<RecruitingTeamsPage />}
+          element={
+            <UniversityVerifiedRoute>
+              <RecruitingTeamsPage />
+            </UniversityVerifiedRoute>
+          }
           path="/contests/:contestId/teams"
         />
         <Route
-          element={<TeamDetailPage />}
+          element={
+            <UniversityVerifiedRoute>
+              <TeamDetailPage />
+            </UniversityVerifiedRoute>
+          }
           path="/contests/:contestId/teams/:teamId"
         />
         <Route
@@ -85,7 +147,11 @@ export function AppRouter() {
           path="/contests/:contestId/teams/joined-data-seoul"
         />
         <Route
-          element={<TeamApplicationPage />}
+          element={
+            <UniversityVerifiedRoute>
+              <TeamApplicationPage />
+            </UniversityVerifiedRoute>
+          }
           path="/contests/:contestId/teams/:teamId/apply"
         />
         <Route
@@ -94,9 +160,11 @@ export function AppRouter() {
         />
         <Route
           element={
-            <TeamCreationProvider>
-              <Outlet />
-            </TeamCreationProvider>
+            <UniversityVerifiedRoute>
+              <TeamCreationProvider>
+                <Outlet />
+              </TeamCreationProvider>
+            </UniversityVerifiedRoute>
           }
           path="/contests/:contestId/teams/create"
         >

@@ -1,38 +1,14 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { fetchPopularContests } from "../../api/contests";
 import giutLogo from "../../assets/giut-logo.svg";
 import trophyIcon from "../../assets/trophy.svg";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { SearchOverlay } from "../../components/SearchOverlay/SearchOverlay";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./HomePage.styles";
-
-const popularContests = [
-  {
-    id: "seoul-data",
-    category: "IT/과학",
-    categoryTone: "blue" as const,
-    dDay: "D-15",
-    title: "2026 서울시 데이터 활용 공모전",
-    organization: "서울특별시",
-  },
-  {
-    id: "environment-idea",
-    category: "기획",
-    categoryTone: "orange" as const,
-    dDay: "D-3",
-    title: "대학생 환경 아이디어 챌린지",
-    organization: "환경부",
-  },
-  {
-    id: "esg-campaign",
-    category: "디자인",
-    categoryTone: "purple" as const,
-    dDay: "D-10",
-    title: "디자인으로 만드는 ESG 캠페인",
-    organization: "한국디자인진흥원",
-  },
-];
 
 const shortcuts = [
   {
@@ -62,10 +38,22 @@ const BANNER_AUTOPLAY_INTERVAL = 10000;
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { isAuthenticated, profile, universityVerified } = useAuth();
+  const isUniversityUnverified = isAuthenticated && !universityVerified;
   const [activeNavigation, setActiveNavigation] = useState("home");
   const [activeBanner, setActiveBanner] = useState(0);
   const [isTeamButtonAnimating, setIsTeamButtonAnimating] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const {
+    data: popularContests = [],
+    isError: isPopularContestsError,
+    isPending: isPopularContestsLoading,
+  } = useQuery({
+    queryKey: ["popularContests"],
+    queryFn: fetchPopularContests,
+    staleTime: 60 * 1000,
+  });
+  const homePopularContests = popularContests.slice(0, 3);
   const banners = [
     {
       eyebrow: "마감 임박",
@@ -83,12 +71,14 @@ export function HomePage() {
   };
 
   useEffect(() => {
+    if (isUniversityUnverified) return;
+
     const intervalId = window.setInterval(() => {
       setActiveBanner((banner) => (banner + 1) % banners.length);
     }, BANNER_AUTOPLAY_INTERVAL);
 
     return () => window.clearInterval(intervalId);
-  }, [banners.length]);
+  }, [banners.length, isUniversityUnverified]);
 
   const handleTeamNavigation = () => {
     if (isTeamButtonAnimating) return;
@@ -108,16 +98,29 @@ export function HomePage() {
             </S.Brand>
             <S.HeaderActions>
               <S.HeaderButton
-                aria-label="팀 페이지로 이동"
+                aria-label={
+                  isUniversityUnverified
+                    ? "팀 페이지, 학교 인증 필요"
+                    : "팀 페이지로 이동"
+                }
                 $isTeamButtonAnimating={isTeamButtonAnimating}
+                $soft={isUniversityUnverified}
+                disabled={isUniversityUnverified}
                 onClick={handleTeamNavigation}
                 type="button"
               >
                 <Icon name="users" size={16} weight="regular" />
-                <S.HeaderBadge>3</S.HeaderBadge>
+                {isUniversityUnverified ? (
+                  <S.HeaderLock aria-hidden="true">
+                    <Icon name="lock" size={8} weight="fill" />
+                  </S.HeaderLock>
+                ) : (
+                  <S.HeaderBadge>3</S.HeaderBadge>
+                )}
               </S.HeaderButton>
               <S.HeaderButton
                 aria-label="검색"
+                $soft={isUniversityUnverified}
                 onClick={() => setIsSearchOpen(true)}
                 type="button"
               >
@@ -125,132 +128,207 @@ export function HomePage() {
               </S.HeaderButton>
               <S.HeaderButton
                 aria-label="알림"
+                $soft={isUniversityUnverified}
                 onClick={() => navigate("/notifications")}
                 type="button"
               >
                 <Icon name="bell" size={16} weight="regular" />
-                <S.NotificationDot />
+                {!isUniversityUnverified && <S.NotificationDot />}
               </S.HeaderButton>
             </S.HeaderActions>
           </S.Header>
 
-          <S.Greeting>이루매님, 안녕하세요</S.Greeting>
+          {!isUniversityUnverified && (
+            <S.Greeting>
+              {profile?.nickname
+                ? `${profile.nickname}님, 안녕하세요`
+                : "안녕하세요"}
+            </S.Greeting>
+          )}
           <S.Title>
-            지금, 함께할 팀을
-            <br />
-            찾아볼까요?
+            {isUniversityUnverified ? (
+              <>
+                학교 인증만 하면
+                <br />
+                팀에 지원할 수 있어요
+              </>
+            ) : (
+              <>
+                지금, 함께할 팀을
+                <br />
+                찾아볼까요?
+              </>
+            )}
           </S.Title>
         </S.TopArea>
 
-        <S.HeroViewport>
-          <S.HeroTrack $active={activeBanner} $count={banners.length}>
-            {banners.map((banner, index) => (
-              <S.HeroBanner
-                $slideCount={banners.length}
-                $tone={banner.tone}
-                key={banner.eyebrow}
-              >
-                <S.BannerCircle $position="top" />
-                <S.BannerCircle $position="bottom" />
-                <S.BannerContent>
-                  <S.BannerEyebrow>{banner.eyebrow}</S.BannerEyebrow>
-                  <S.BannerTitle>{banner.title}</S.BannerTitle>
-                  <S.BannerButton
-                    onClick={
-                      index === 0
-                        ? () => navigate("/closing-contests")
-                        : () => navigate("/position-teams")
-                    }
-                    tone="secondary"
-                    type="button"
-                    width="fit-content"
+        {isUniversityUnverified ? (
+          <S.VerificationCard>
+            <S.VerificationMeta>
+              <S.VerificationBadge>인증 필요</S.VerificationBadge>
+              <span>1분이면 끝나요</span>
+            </S.VerificationMeta>
+            <S.VerificationTitle>
+              아직 학교 인증을 하지 않았어요
+            </S.VerificationTitle>
+            <S.VerificationDescription>
+              같은 학교 학생끼리 안전하게 팀을 만들기 위해, 팀 지원·팀 만들기는
+              학교 인증 후 이용할 수 있어요.
+            </S.VerificationDescription>
+            <S.VerificationButton
+              onClick={() => navigate("/student-verification")}
+              type="button"
+              width="100%"
+            >
+              학교 인증하기
+            </S.VerificationButton>
+          </S.VerificationCard>
+        ) : (
+          <S.HeroViewport>
+              <S.HeroTrack $active={activeBanner} $count={banners.length}>
+                {banners.map((banner, index) => (
+                  <S.HeroBanner
+                    $slideCount={banners.length}
+                    $tone={banner.tone}
+                    key={banner.eyebrow}
                   >
-                    지금 보기 <span aria-hidden="true">→</span>
-                  </S.BannerButton>
-                </S.BannerContent>
-                <S.BannerNextButton
-                  aria-label="다음 배너 보기"
-                  onClick={showNextBanner}
-                  type="button"
-                >
-                  <Icon name="caret-right" size={14} weight="bold" />
-                </S.BannerNextButton>
-              </S.HeroBanner>
-            ))}
-          </S.HeroTrack>
-          <S.BannerPagination aria-label="배너 페이지">
-            {banners.map((banner, index) => (
-              <S.PaginationDot
-                $active={index === activeBanner}
-                aria-label={`${index + 1}번째 배너`}
-                key={banner.eyebrow}
-              />
-            ))}
-          </S.BannerPagination>
-        </S.HeroViewport>
+                    <S.BannerCircle $position="top" />
+                    <S.BannerCircle $position="bottom" />
+                    <S.BannerContent>
+                      <S.BannerEyebrow>{banner.eyebrow}</S.BannerEyebrow>
+                      <S.BannerTitle>{banner.title}</S.BannerTitle>
+                      <S.BannerButton
+                        onClick={
+                          index === 0
+                            ? () => navigate("/closing-contests")
+                            : () => navigate("/position-teams")
+                        }
+                        tone="secondary"
+                        type="button"
+                        width="fit-content"
+                      >
+                        지금 보기 <span aria-hidden="true">→</span>
+                      </S.BannerButton>
+                    </S.BannerContent>
+                    <S.BannerNextButton
+                      aria-label="다음 배너 보기"
+                      onClick={showNextBanner}
+                      type="button"
+                    >
+                      <Icon name="caret-right" size={14} weight="bold" />
+                    </S.BannerNextButton>
+                  </S.HeroBanner>
+                ))}
+              </S.HeroTrack>
+              <S.BannerPagination aria-label="배너 페이지">
+                {banners.map((banner, index) => (
+                  <S.PaginationDot
+                    $active={index === activeBanner}
+                    aria-label={`${index + 1}번째 배너`}
+                    key={banner.eyebrow}
+                  />
+                ))}
+              </S.BannerPagination>
+          </S.HeroViewport>
+        )}
 
         <S.Shortcuts>
-          {shortcuts.map((shortcut) => (
-            <S.Shortcut
-              key={shortcut.title}
-              onClick={() => {
-                if (shortcut.destination) navigate(shortcut.destination);
-              }}
-              type="button"
-            >
-              <S.ShortcutIcon>
-                {shortcut.iconType === "image" ? (
-                  <S.ShortcutIconImage alt="" src={shortcut.icon} />
-                ) : (
-                  shortcut.icon
-                )}
-              </S.ShortcutIcon>
-              <S.ShortcutText>
-                <S.ShortcutTitle>{shortcut.title}</S.ShortcutTitle>
-                <S.ShortcutDescription>
-                  {shortcut.description}
-                </S.ShortcutDescription>
-              </S.ShortcutText>
-              <S.Caret aria-hidden="true">›</S.Caret>
-            </S.Shortcut>
-          ))}
+          {shortcuts.map((shortcut) => {
+            const isLocked =
+              isUniversityUnverified &&
+              shortcut.destination === "/matched-teams";
+
+            return (
+                <S.Shortcut
+                  $locked={isLocked}
+                  aria-label={
+                    isLocked
+                      ? `${shortcut.title}, 학교 인증 필요`
+                      : shortcut.title
+                  }
+                  disabled={isLocked}
+                  key={shortcut.title}
+                  onClick={() => navigate(shortcut.destination)}
+                  type="button"
+                >
+                  <S.ShortcutIcon>
+                    {shortcut.iconType === "image" ? (
+                      <S.ShortcutIconImage alt="" src={shortcut.icon} />
+                    ) : (
+                      shortcut.icon
+                    )}
+                  </S.ShortcutIcon>
+                  <S.ShortcutText>
+                    <S.ShortcutTitle>{shortcut.title}</S.ShortcutTitle>
+                    <S.ShortcutDescription>
+                      {isLocked
+                        ? "학교 인증 후 이용할 수 있어요"
+                        : shortcut.description}
+                    </S.ShortcutDescription>
+                  </S.ShortcutText>
+                  {isLocked ? (
+                    <S.ShortcutLock>
+                      <Icon name="lock" size={13} weight="regular" />
+                    </S.ShortcutLock>
+                  ) : (
+                    <S.Caret aria-hidden="true">›</S.Caret>
+                  )}
+                </S.Shortcut>
+            );
+          })}
         </S.Shortcuts>
 
         <S.SectionHeader>
-          <S.SectionTitle>인기 공모전</S.SectionTitle>
-          <S.ViewAll
-            onClick={() => navigate("/contests/popular")}
-            type="button"
-          >
-            전체 보기 ›
-          </S.ViewAll>
+              <S.SectionTitle>인기 공모전</S.SectionTitle>
+              <S.ViewAll
+                onClick={() => navigate("/contests/popular")}
+                type="button"
+              >
+                전체 보기 ›
+              </S.ViewAll>
         </S.SectionHeader>
 
         <S.ContestList>
-          {popularContests.map((contest) => (
-            <S.ContestCard
-              key={contest.id}
-              onClick={() => navigate(`/contests/${contest.id}`)}
-              type="button"
-            >
-              <S.ContestTopline>
-                <S.ContestCategoryGroup>
-                  <S.Category $tone={contest.categoryTone}>
-                    {contest.category}
-                  </S.Category>
-                  <S.VerifiedBadge aria-label="인증된 공모전">
-                    <Icon name="check" size={8} weight="bold" />
-                    인증
-                  </S.VerifiedBadge>
-                </S.ContestCategoryGroup>
-                <S.DDay>{contest.dDay}</S.DDay>
-              </S.ContestTopline>
-              <S.ContestTitle>{contest.title}</S.ContestTitle>
-              <S.ContestOrganization>
-                {contest.organization}
-              </S.ContestOrganization>
-            </S.ContestCard>
-          ))}
+          {isPopularContestsLoading &&
+            Array.from({ length: 3 }, (_, index) => (
+              <S.ContestSkeleton aria-hidden="true" key={index} />
+            ))}
+          {isPopularContestsError && (
+            <S.ContestState>
+              인기 공모전을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+            </S.ContestState>
+          )}
+          {!isPopularContestsLoading &&
+            !isPopularContestsError &&
+            homePopularContests.map((contest) => (
+              <S.ContestCard
+                key={contest.id}
+                onClick={() => navigate(`/contests/${contest.id}`)}
+                type="button"
+              >
+                <S.ContestTopline>
+                  <S.ContestCategoryGroup>
+                    <S.Category $tone={contest.categoryTone}>
+                      {contest.categoryName}
+                    </S.Category>
+                    <S.VerifiedBadge aria-label="인증된 공모전">
+                      <Icon name="check" size={8} weight="bold" />
+                      인증
+                    </S.VerifiedBadge>
+                  </S.ContestCategoryGroup>
+                  <S.DDay>{contest.dDay}</S.DDay>
+                </S.ContestTopline>
+                <S.ContestTitle>{contest.title}</S.ContestTitle>
+                <S.ContestOrganization>
+                  {contest.hostOrganization}
+                </S.ContestOrganization>
+              </S.ContestCard>
+            ))}
+          {!isPopularContestsLoading &&
+            !isPopularContestsError &&
+            homePopularContests.length === 0 && (
+              <S.ContestState>현재 인기 공모전이 없어요.</S.ContestState>
+            )}
         </S.ContestList>
       </S.Content>
 

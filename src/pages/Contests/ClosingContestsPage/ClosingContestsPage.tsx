@@ -5,6 +5,7 @@ import { categories, fetchClosingSoonContests, type Contest, type ContestCategor
 import { Icon } from "../../../components/icons";
 import { PageHeader } from "../../../components/PageHeader";
 import { PillButton } from "../../../components/PillButton";
+import { useAuth } from "../../../contexts/AuthContext";
 import { S } from "./ClosingContestsPage.styles";
 
 function ContestCard({
@@ -48,6 +49,8 @@ function ContestCard({
 
 export function ClosingContestsPage() {
   const navigate = useNavigate();
+  const { isAuthenticated, universityVerified } = useAuth();
+  const isUniversityUnverified = isAuthenticated && !universityVerified;
   const [activeCategory, setActiveCategory] = useState<ContestCategory>("전체");
   const {
     data: closingSoonContests = [],
@@ -84,10 +87,16 @@ export function ClosingContestsPage() {
 
         <S.ListControls>
           <S.RegisterButton
+            aria-label={isUniversityUnverified ? "공모전 등록, 학교 인증 필요" : "공모전 등록"}
+            disabled={isUniversityUnverified}
             onClick={() => navigate("/contests/register")}
             type="button"
           >
-            <Icon name="plus" size={10} weight="bold" />
+            <Icon
+              name={isUniversityUnverified ? "lock" : "plus"}
+              size={10}
+              weight="bold"
+            />
             공모전 등록
           </S.RegisterButton>
         </S.ListControls>

@@ -11,12 +11,14 @@ type AuthProfile = {
   grade: number;
   nickname: string;
   profileImageUrl: string | null;
+  universityVerified?: boolean;
   userId: number;
 };
 
 type MyProfileResponse = {
   profile: AuthProfile | null;
   profileCompleted: boolean;
+  universityVerified?: boolean;
 };
 
 type AuthContextValue = {
@@ -24,6 +26,7 @@ type AuthContextValue = {
   isLoading: boolean;
   profile: AuthProfile | null;
   profileCompleted: boolean;
+  universityVerified: boolean;
   refreshAuth: () => Promise<void>;
 };
 
@@ -49,6 +52,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: isPending,
         profile: data?.profile ?? null,
         profileCompleted: data?.profileCompleted ?? false,
+        universityVerified:
+          data?.universityVerified ??
+          data?.profile?.universityVerified ??
+          false,
         refreshAuth,
       }}
     >

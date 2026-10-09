@@ -34,6 +34,7 @@ export const S = {
     gap: 2px;
   `,
   HeaderButton: styled.button`
+    position: relative;
     display: grid;
     width: 31px;
     height: 31px;
@@ -45,6 +46,10 @@ export const S = {
     color: ${tokens.color.neutral[700]};
     cursor: pointer;
 
+    &:disabled {
+      cursor: default;
+    }
+
     &:focus-visible {
       outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 2px;
@@ -54,6 +59,19 @@ export const S = {
       background: transparent;
       color: ${tokens.color.neutral[700]};
     }
+  `,
+  HeaderLock: styled.span`
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    display: grid;
+    width: 12px;
+    height: 12px;
+    place-items: center;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 50%;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
   `,
   SkeletonContent: styled.div`
     display: grid;
@@ -270,6 +288,45 @@ export const S = {
     display: grid;
     gap: 18px;
     margin-top: 0;
+  `,
+  LockedTeamsCard: styled.button`
+    position: relative;
+    width: 100%;
+    min-height: 118px;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 16px;
+    background: ${tokens.color.neutral[50]};
+    color: inherit;
+    font: inherit;
+    cursor: default;
+
+    &:focus-visible {
+      outline: 2px solid ${tokens.color.primary[500]};
+      outline-offset: 2px;
+    }
+  `,
+  LockedTeamsPreview: styled.span`
+    display: grid;
+    gap: 10px;
+    padding: 20px;
+    color: ${tokens.color.neutral[500]};
+    filter: blur(5px);
+    font-size: 11px;
+    text-align: left;
+    opacity: 0.35;
+  `,
+  LockedTeamsMessage: styled.span`
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 7px;
+    color: ${tokens.color.neutral[500]};
+    font-size: 10px;
+    font-weight: 700;
   `,
   TeamCard: styled.article`
     position: relative;
@@ -490,22 +547,30 @@ export const S = {
       color: ${tokens.color.primary[500]};
     }
   `,
-  ApplyButton: styled.button`
+  ApplyButton: styled.button<{ $locked?: boolean }>`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     flex: 1;
     height: 52px;
     padding: 0;
     border: 0;
     border-radius: 15px;
-    background: ${tokens.color.primary[500]};
-    color: ${tokens.color.neutral[50]};
-    box-shadow: 0 8px 18px rgb(43 87 255 / 28%);
+    background: ${({ $locked }) =>
+      $locked ? tokens.color.neutral[100] : tokens.color.primary[500]};
+    color: ${({ $locked }) =>
+      $locked ? tokens.color.neutral[500] : tokens.color.neutral[50]};
+    box-shadow: ${({ $locked }) =>
+      $locked ? "none" : "0 8px 18px rgb(43 87 255 / 28%)"};
     font: inherit;
     font-size: 11px;
     font-weight: 800;
-    cursor: pointer;
+    cursor: ${({ $locked }) => ($locked ? "default" : "pointer")};
 
     &:hover {
-      background: ${tokens.color.primary[600]};
+      background: ${({ $locked }) =>
+        $locked ? tokens.color.neutral[100] : tokens.color.primary[600]};
     }
   `,
 };
