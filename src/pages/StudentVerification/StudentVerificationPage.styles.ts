@@ -73,6 +73,33 @@ export const S = {
     font-weight: 400;
     line-height: 1.4;
   `,
+  ErrorMessage: styled.p`
+    margin: 0;
+    color: ${tokens.color.danger[500]};
+    font-size: 10px;
+    line-height: 1.5;
+  `,
+  ResendButton: styled(Button)`
+    width: fit-content;
+    height: auto;
+    justify-self: end;
+    padding: 0;
+    background: transparent;
+    color: ${tokens.color.primary[500]};
+    font-size: 10px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover:not(:disabled) {
+      opacity: 1;
+      background: transparent;
+    }
+
+    &:disabled {
+      background: transparent;
+      color: ${tokens.color.neutral[500]};
+    }
+  `,
   Consent: styled.div`
     display: flex;
     align-items: center;
