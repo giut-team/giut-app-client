@@ -27,3 +27,11 @@ md
 
 # Local harness files
 /harness-starter/
+/.harness/
+/docs/
+/examples/
+/example/
+/tools/harness/
+/AGENTS.md
+/CLAUDE.md
+/README_HARNESS.md
