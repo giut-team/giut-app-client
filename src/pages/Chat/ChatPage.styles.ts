@@ -232,10 +232,15 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
-  EmptyMessage: styled.p`
-    margin: 36px 0;
+  EmptyMessage: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 36px 0;
     color: ${tokens.color.neutral[500]};
     font-size: 13px;
     text-align: center;
+    p { margin: 0; line-height: 1.6; }
   `,
 };

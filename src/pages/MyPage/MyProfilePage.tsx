@@ -6,7 +6,7 @@ import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage"
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
 import { useAuth } from "../../contexts/AuthContext";
-import { ProfileShareSheet } from "../GiutHub/ProfileShareSheet";
+import { ProfileShareScreen } from "../GiutHub/ProfileShareScreen";
 import { useProfileShare } from "../GiutHub/useProfileShare";
 
 type MyProfileTab = "portfolio" | "teams" | "scraps";
@@ -386,7 +386,7 @@ export function MyProfilePage() {
           if (key === "chat") navigate("/chat");
         }}
       />
-      {share.isOpen && <ProfileShareSheet profileName={currentProfile?.nickname ?? "내"} share={share} />}
+      {share.isOpen && <ProfileShareScreen profileName={currentProfile?.nickname ?? "내"} share={share} />}
     </S.Page>
   );
 }

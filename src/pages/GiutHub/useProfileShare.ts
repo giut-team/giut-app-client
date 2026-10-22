@@ -2,16 +2,21 @@ import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { createProfileShareLink } from "../../api/profileShares";
 
-export function useProfileShare(canIssue: boolean) {
+export function useProfileShare(canIssue: boolean, profileUserId?: number) {
   const [isOpen, setIsOpen] = useState(false);
   const inFlight = useRef(false);
-  const issuance = useMutation({ mutationFn: createProfileShareLink, retry: false });
+  const issuance = useMutation({
+    mutationKey: ["profile-share-issue", profileUserId ?? "me"],
+    mutationFn: () => createProfileShareLink(profileUserId),
+    retry: false,
+    onSettled: () => { inFlight.current = false; },
+  });
 
   const issueLink = () => {
     if (!canIssue || inFlight.current) return;
     inFlight.current = true;
     issuance.reset();
-    issuance.mutate(undefined, { onSettled: () => { inFlight.current = false; } });
+    issuance.mutate();
   };
 
   return {

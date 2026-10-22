@@ -5,13 +5,19 @@ const { renderToStaticMarkup } = require("react-dom/server");
 const { loadModule } = require("./helpers/loadTypeScript.cjs");
 
 const S = {
-  TabEmptyState: "section", EmptyIcon: "div", EmptyTitle: "h2",
+  TabEmptyState: "section", EmptyIcon: "div", EmptyBody: "div", EmptyCopy: "div", EmptyTitle: "h2",
   EmptyDescription: "p", EmptyAction: "button",
 };
 const { ProfileTabEmptyState } = loadModule("src/pages/GiutHub/ProfileTabEmptyState.tsx", {
   "./GiutHubProfilePage.styles": { S },
   "../../components/icons": { Icon: () => null },
 });
+
+function findButton(element) {
+  if (!React.isValidElement(element)) return undefined;
+  if (element.type === "button") return element;
+  return React.Children.toArray(element.props.children).map(findButton).find(Boolean);
+}
 
 test("빈 포트폴리오는 본인에게만 작성 동작을 제공하고 방문자에게는 공개 안내를 표시한다", () => {
   let navigations = 0;
@@ -20,7 +26,7 @@ test("빈 포트폴리오는 본인에게만 작성 동작을 제공하고 방�
   const ownMarkup = renderToStaticMarkup(own);
   assert.match(ownMarkup, /<h2>아직 공개된 포트폴리오가 없어요<\/h2>/);
   assert.match(ownMarkup, /포트폴리오 작성하기/);
-  const action = React.Children.toArray(own.props.children).find((child) => child.type === "button");
+  const action = findButton(own);
   action.props.onClick();
   assert.equal(navigations, 1);
 

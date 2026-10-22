@@ -7,6 +7,7 @@ import { Icon } from "../../components/icons";
 import { getPublicProfile } from "../../api/giutHub";
 import dataDashboard from "../../assets/portfolio/data-dashboard.png";
 import { toHubProfile } from "./GiutHubPage";
+import { toDetailProfileSummary } from "./profileDetail";
 import { GiutHubDialog } from "./GiutHubDialog";
 import { getSkillIcon, TeamProposalBottomSheet } from "./GiutHubProfilePage";
 import { S } from "./PortfolioDetailPage.styles";
@@ -117,7 +118,7 @@ export function PortfolioDetailPage() {
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   const profileData = apiProfile?.profile;
-  const profile = profileData ? toHubProfile(profileData) : null;
+  const profile = apiProfile ? toHubProfile(toDetailProfileSummary(apiProfile)) : null;
   const apiPortfolio = profileData?.portfolioItems?.[portfolioIndex];
   const portfolio = apiPortfolio
     ? {

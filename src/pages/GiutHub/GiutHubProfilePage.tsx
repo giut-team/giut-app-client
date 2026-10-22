@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
@@ -9,15 +9,18 @@ import dataDashboard from "../../assets/portfolio/data-dashboard.png";
 import esgGlobe from "../../assets/portfolio/esg-globe.png";
 import hackathonCode from "../../assets/portfolio/hackathon-code.png";
 import projectRoadmap from "../../assets/portfolio/project-roadmap.png";
-import { getPublicProfile } from "../../api/giutHub";
+import { getPublicProfile, type PublicProfileDetail } from "../../api/giutHub";
+import { getProfileRecommendation, setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
+import { createPersonalChatRoom } from "../../api/chat";
 import { toHubProfile } from "./GiutHubPage";
 import { GiutHubDialog } from "./GiutHubDialog";
 import { useAuth } from "../../contexts/AuthContext";
-import { ProfileShareSheet } from "./ProfileShareSheet";
+import { ProfileShareScreen } from "./ProfileShareScreen";
 import { ProfileTabEmptyState } from "./ProfileTabEmptyState";
 import { useProfileShare } from "./useProfileShare";
-import { canIssueProfileShare } from "./profileShare";
 import { S } from "./GiutHubProfilePage.styles";
+import { getProfileHeadingStatusColor } from "./profileStatus";
+import { toDetailProfileSummary, updateDetailRecommendation } from "./profileDetail";
 
 export type Portfolio = {
   title: string;
@@ -514,29 +517,51 @@ export function GiutHubProfilePage() {
   const navigate = useNavigate();
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
-  const { profile: currentProfile } = useAuth();
+  const { profile: currentProfile, isAuthenticated } = useAuth();
   const isOwnProfile = currentProfile?.userId === userId;
-  const share = useProfileShare(canIssueProfileShare(userId, currentProfile?.userId));
-  const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
-  const [isScrapped, setIsScrapped] = useState(false);
-  const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
-  const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
-  const [profileAction, setProfileAction] = useState<"share" | "report" | "block" | null>(
-    null,
-  );
+  const queryClient = useQueryClient();
+  const detailKey = ["giut-hub", "profile", userId, currentProfile?.userId];
   const {
     data: apiProfile,
     isPending: isLoadingProfile,
     isError: profileLoadError,
   } = useQuery({
-    queryKey: ["giut-hub", "profile", userId],
+    queryKey: detailKey,
     queryFn: () => getPublicProfile(userId),
     enabled: Number.isSafeInteger(userId) && userId > 0,
     retry: false,
   });
+  const recommendationKey = ["profile-recommendation", currentProfile?.userId, userId];
+  const recommendation = useQuery({
+    queryKey: recommendationKey,
+    queryFn: ({ signal }) => getProfileRecommendation(userId, signal),
+    enabled: isAuthenticated && !isOwnProfile && !!apiProfile && !profileLoadError,
+    placeholderData: apiProfile ? { userId, recommended: apiProfile.recommended, recommendationCount: apiProfile.recommendationCount } : undefined,
+    retry: false,
+  });
+  const recommendationMutation = useMutation({
+    mutationKey: ["profile-recommendation-update", currentProfile?.userId, userId],
+    mutationFn: () => setProfileRecommendation(userId, !recommendation.data?.recommended),
+    onMutate: () => queryClient.cancelQueries({ queryKey: recommendationKey }),
+    onSuccess: data => {
+      queryClient.setQueryData(recommendationKey, data);
+      queryClient.setQueryData<PublicProfileDetail>(detailKey, previous => updateDetailRecommendation(previous, data));
+    },
+    retry: false,
+  });
+  const contact = useMutation({ mutationKey: ["profile-contact", userId], mutationFn: () => createPersonalChatRoom(userId), retry: false });
+  const share = useProfileShare(isAuthenticated, isOwnProfile ? undefined : userId);
+  const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
+  const isRecommended = recommendation.data?.recommended ?? apiProfile?.recommended ?? false;
+  const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
+  const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
+  const [profileAction, setProfileAction] = useState<"share" | "report" | "block" | null>(
+    null,
+  );
 
   const profileData = apiProfile?.profile;
-  const profile = profileData ? toHubProfile(profileData) : null;
+  const profileSummary = apiProfile ? toDetailProfileSummary(apiProfile) : null;
+  const profile = profileSummary ? toHubProfile(profileSummary) : null;
   const detail = profileData
     ? {
         skills: (profileData.tags ?? [])
@@ -619,18 +644,24 @@ export function GiutHubProfilePage() {
             )}
           </S.Avatar>
           <S.ProfileInfo>
-            <S.Name>{profile.name}</S.Name>
-            <S.DetailRow>
-              <span>학과/학년</span>
-              <strong>{departmentAndGrade}</strong>
-            </S.DetailRow>
-            <S.DetailRow>
-              <span>분야/역할</span>
-              <strong>
-                {profile.detailRole} / {profile.role}
-              </strong>
-            </S.DetailRow>
-            <S.Status>{profile.status}</S.Status>
+            <S.ProfileHeading>
+              <S.NameRow>
+                <S.Name>{profile.name}</S.Name>
+                <S.Status $color={getProfileHeadingStatusColor(profile.activityStatus)}>{profile.status}</S.Status>
+              </S.NameRow>
+              <S.ProfileDetails>
+                <S.DetailRow>
+                  <span>학과/학년</span>
+                  <strong>{departmentAndGrade}</strong>
+                </S.DetailRow>
+                <S.DetailRow>
+                  <span>분야/역할</span>
+                  <strong>
+                    {profile.detailRole} / {profile.role}
+                  </strong>
+                </S.DetailRow>
+              </S.ProfileDetails>
+            </S.ProfileHeading>
           </S.ProfileInfo>
         </S.ProfileSection>
         <S.IntroductionSection>
@@ -646,22 +677,34 @@ export function GiutHubProfilePage() {
           ))}
         </S.SkillList>
         <S.ActionRow>
-          <Button onClick={() => setIsProposalSheetOpen(true)} type="button" width="100%">
+          <Button onClick={() => setIsProposalSheetOpen(true)} type="button">
             <Icon name="paper-plane" size={19} weight="fill" />팀 제안 보내기
           </Button>
-          <S.MessageButton onClick={() => undefined} type="button">
+          <S.MessageButton disabled={!isAuthenticated || isOwnProfile || contact.isPending} onClick={() => {
+            if (contact.isPending || isOwnProfile) return;
+            contact.mutate(undefined, { onSuccess: room => navigate(`/chat/${room.chatRoomId}`) });
+          }} type="button">
             <Icon name="chat" size={20} weight="regular" />
-            메시지 보내기
+            {contact.isPending ? "연결 중…" : "메시지 보내기"}
           </S.MessageButton>
           <S.FavoriteButton
-            $active={isScrapped}
-            aria-label="관심 프로필에 추가"
-            onClick={() => setIsScrapped((current) => !current)}
+            $active={isRecommended}
+            aria-label={isRecommended ? "프로필 추천 취소" : "프로필 추천하기"}
+            aria-pressed={isRecommended}
+            disabled={!isAuthenticated || isOwnProfile || recommendation.isPending || recommendation.isError || recommendationMutation.isPending}
+            onClick={() => { if (!recommendationMutation.isPending && !recommendation.isError) recommendationMutation.mutate(); }}
             type="button"
           >
-            <Icon name="star" size={21} weight={isScrapped ? "fill" : "regular"} />
+            <Icon name="star" size={21} weight={isRecommended ? "fill" : "regular"} />
           </S.FavoriteButton>
         </S.ActionRow>
+        {(recommendation.isError || recommendationMutation.isError || contact.isError) && (
+          <S.ActionFeedback>
+            <p role="alert">{getProfileActionError(recommendation.error ?? recommendationMutation.error ?? contact.error,
+              recommendation.isError ? "추천 상태를 확인하지 못했어요." : recommendationMutation.isError ? "추천을 변경하지 못했어요. 다시 시도해 주세요." : "대화를 시작하지 못했어요. 다시 시도해 주세요.")}</p>
+            {recommendation.isError && <Button onClick={() => void recommendation.refetch()} disabled={recommendation.isFetching} type="button">추천 상태 다시 확인</Button>}
+          </S.ActionFeedback>
+        )}
         <S.TabList role="tablist">
           <S.Tab
             $active={activeTab === "portfolio"}
@@ -766,7 +809,7 @@ export function GiutHubProfilePage() {
         onShare={() => openProfileAction("share")}
         open={isMoreSheetOpen}
       />
-      {share.isOpen && <ProfileShareSheet profileName={profile.name} share={share} />}
+      {share.isOpen && <ProfileShareScreen profile={profileSummary ?? undefined} profileName={profile.name} share={share} />}
       <ProfileReportModal
         onClose={() => setProfileAction(null)}
         open={profileAction === "report"}

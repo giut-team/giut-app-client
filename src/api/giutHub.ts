@@ -55,10 +55,13 @@ export type PublicProfilePortfolio = {
 export type PublicProfileDetail = {
   nickname: string;
   universityVerified: boolean;
-  profile: PublicProfile & {
+  receivedProposalCount: number;
+  recommended: boolean;
+  recommendationCount: number;
+  profile: Omit<PublicProfile, "universityVerified" | "activityStatus" | "skills"> & {
     searchable: boolean;
     roles: { code: string; name: string }[];
-    tags: PublicProfile["skills"];
+    tags: { id: number; type: "SKILL" | "INTEREST" | "EXPERIENCE"; name: string; relatedRoles?: { code: string; name: string }[] }[];
     portfolioItems: PublicProfilePortfolio[];
     activityHistories: {
       id: number;

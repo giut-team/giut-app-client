@@ -4,10 +4,6 @@ export function buildProfileShareUrl(token: string, origin: string): string {
   return new URL(`/api/profile/shares/${encodeURIComponent(token)}`, origin).href;
 }
 
-export function canIssueProfileShare(profileUserId: number, currentUserId?: number): boolean {
-  return currentUserId !== undefined && profileUserId === currentUserId;
-}
-
 export function isProfileShareExpired(link: ProfileShareLink, now = Date.now()): boolean {
   return !Number.isFinite(Date.parse(link.expiresAt)) || now >= Date.parse(link.expiresAt);
 }

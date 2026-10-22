@@ -39,14 +39,15 @@ export const S = {
     }
   `,
   ProfileSection: styled.section`
-    display: grid;
-    grid-template-columns: 130px minmax(0, 1fr);
+    display: flex;
+    align-items: flex-start;
     gap: 20px;
     padding: 27px 30px 22px;
     background: ${tokens.color.neutral[50]};
   `,
   Avatar: styled.div<{ $tone: AvatarTone }>`
     display: grid;
+    flex: 0 0 130px;
     width: 130px;
     height: 130px;
     overflow: hidden;
@@ -70,18 +71,44 @@ export const S = {
     }
   `,
   ProfileInfo: styled.div`
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
     min-width: 0;
     padding-top: 1px;
+  `,
+  ProfileHeading: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    min-width: 0;
+  `,
+  ProfileDetails: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  `,
+  NameRow: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    min-width: 0;
   `,
   Name: styled.h1`
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 15px;
+    min-width: 0;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 25px;
     font-weight: 800;
     letter-spacing: -1.2px;
+    overflow-wrap: anywhere;
 
     svg {
       padding: 3px;
@@ -91,46 +118,61 @@ export const S = {
     }
   `,
   DetailRow: styled.p`
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr);
+    display: flex;
     gap: 6px;
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 14px;
     letter-spacing: -0.5px;
 
     span {
+      flex: 0 0 76px;
       color: ${tokens.color.neutral[500]};
     }
     strong {
+      flex: 1;
+      min-width: 0;
       color: ${tokens.color.neutral[900]};
       font-weight: 700;
-      white-space: nowrap;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
     }
   `,
-  Status: styled.span`
+  Status: styled.span<{ $color: string }>`
     display: inline-flex;
-    margin-top: 11px;
-    padding: 8px 13px;
-    border-radius: 10px;
-    background: #e5f8f1;
-    color: #10a877;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+    color: ${({ $color }) => $color};
     font-size: 13px;
     font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+
+    &::before {
+      flex: 0 0 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
   `,
   IntroductionSection: styled.section`
-    display: grid;
-    grid-template-columns: 88px minmax(0, 1fr);
+    display: flex;
     gap: 12px;
     padding: 22px 30px 18px;
     background: ${tokens.color.neutral[50]};
   `,
   FieldLabel: styled.h2`
+    flex: 0 0 88px;
     margin: 0;
     color: ${tokens.color.neutral[500]};
     font-size: 14px;
     font-weight: 500;
   `,
   Introduction: styled.p`
+    flex: 1;
+    min-width: 0;
     margin: 0;
     color: ${tokens.color.neutral[700]};
     font-size: 14px;
@@ -211,14 +253,14 @@ export const S = {
     }
   `,
   ActionRow: styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) 44px;
+    display: flex;
     gap: 8px;
     padding: 0 16px 30px;
     background: ${tokens.color.neutral[50]};
 
     > button {
-      width: 100%;
+      flex: 1 1 0;
+      width: auto;
       min-width: 0;
       height: 48px;
       gap: 6px;
@@ -226,6 +268,10 @@ export const S = {
       border-radius: 14px;
       font-size: 14px;
       line-height: 1;
+    }
+
+    > button:last-of-type {
+      flex: 0 0 44px;
     }
 
     > button:first-of-type {
@@ -261,6 +307,18 @@ export const S = {
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
+    &:disabled { opacity: 0.45; cursor: default; }
+  `,
+  ActionFeedback: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 16px 20px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font-size: 14px;
+    p { margin: 0; line-height: 1.6; }
+    > button { align-self: flex-start; font-size: 14px; }
   `,
   FavoriteButton: styled.button<{ $active: boolean }>`
     display: grid;
@@ -273,6 +331,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${({ $active }) => ($active ? "#f1b900" : "#63718a")};
     cursor: pointer;
+    &:disabled { opacity: 0.45; cursor: default; }
     transition:
       transform 0.12s ease,
       background-color 0.12s ease,
@@ -285,14 +344,15 @@ export const S = {
     }
   `,
   TabList: styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     border-top: 8px solid ${tokens.color.neutral[100]};
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     background: ${tokens.color.neutral[50]};
   `,
   Tab: styled.button<{ $active: boolean }>`
     position: relative;
+    flex: 1 1 0;
+    min-width: 0;
     height: 69px;
     border: 0;
     background: transparent;
@@ -314,6 +374,9 @@ export const S = {
     }
   `,
   PortfolioContent: styled.section`
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     padding: 25px 22px 30px;
   `,
   FeaturedPortfolioCard: styled.article`
@@ -351,7 +414,6 @@ export const S = {
   PortfolioList: styled.section`
     display: grid;
     gap: 0;
-    margin-top: 14px;
     padding: 0 18px;
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
@@ -444,10 +506,25 @@ export const S = {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 20px;
     padding: 64px 24px 80px;
     text-align: center;
     word-break: keep-all;
     overflow-wrap: anywhere;
+  `,
+  EmptyBody: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 100%;
+  `,
+  EmptyCopy: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
   `,
   EmptyIcon: styled.div`
     display: grid;
@@ -460,7 +537,7 @@ export const S = {
   `,
   EmptyTitle: styled.h2`
     max-width: 100%;
-    margin: 20px 0 0;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 18px;
     font-weight: 800;
@@ -469,7 +546,7 @@ export const S = {
   `,
   EmptyDescription: styled.p`
     max-width: 280px;
-    margin: 8px 0 0;
+    margin: 0;
     color: ${tokens.color.neutral[700]};
     font-size: 14px;
     line-height: 1.6;
@@ -477,7 +554,6 @@ export const S = {
   EmptyAction: styled(Button)`
     max-width: 100%;
     gap: 6px;
-    margin-top: 24px;
     font-size: 14px;
   `,
   ActivityItem: styled.article<{ $last: boolean }>`
@@ -560,107 +636,6 @@ export const S = {
     margin: 4px 0;
     border: 0;
     background: ${tokens.color.neutral[200]};
-  `,
-  ShareHeading: styled.h2`
-    margin: 4px 0 0;
-    color: ${tokens.color.neutral[900]};
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.8px;
-  `,
-  ShareDescription: styled.p`
-    margin: 12px 0 20px;
-    color: ${tokens.color.neutral[500]};
-    font-size: 14px;
-    letter-spacing: -0.45px;
-  `,
-  ShareLinkBox: styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 13px 12px 19px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 18px;
-    background: ${tokens.color.neutral[100]};
-
-    code {
-      min-width: 0;
-      color: ${tokens.color.neutral[700]};
-      font-family: inherit;
-      font-size: 14px;
-      letter-spacing: -0.3px;
-      overflow-wrap: anywhere;
-      user-select: all;
-    }
-  `,
-  CopyButton: styled.button`
-    flex: 0 0 auto;
-    padding: 11px 17px;
-    border: 0;
-    border-radius: 12px;
-    background: ${giutHubPrimary};
-    color: ${tokens.color.neutral[50]};
-    font: inherit;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    &:disabled { opacity: 0.45; cursor: default; }
-  `,
-  ShareChannelList: styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin: 22px 0 28px;
-  `,
-  ShareChannel: styled.button`
-    display: grid;
-    place-items: center;
-    gap: 10px;
-    padding: 17px 6px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 18px;
-    background: ${tokens.color.neutral[50]};
-    color: ${tokens.color.neutral[700]};
-    font: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    &:disabled { opacity: 0.45; cursor: default; }
-
-    &:active {
-      background: ${tokens.color.neutral[100]};
-    }
-  `,
-  ShareChannelIcon: styled.span`
-    display: grid;
-    width: 48px;
-    aspect-ratio: 1;
-    place-items: center;
-    border-radius: 15px;
-    background: #edf2fb;
-    color: ${giutHubPrimary};
-  `,
-  KakaoMark: styled.span`
-    display: grid;
-    width: 48px;
-    aspect-ratio: 1;
-    place-items: center;
-    border-radius: 15px;
-    background: #ffe500;
-    color: #371d1e;
-  `,
-  ShareCloseButton: styled.button`
-    width: 100%;
-    padding: 17px 12px calc(17px + var(--app-safe-bottom));
-    border: 0;
-    border-radius: 18px;
-    background: ${tokens.color.neutral[100]};
-    color: ${tokens.color.neutral[500]};
-    font: inherit;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
   `,
   ReportReasonList: styled.div`
     display: grid;

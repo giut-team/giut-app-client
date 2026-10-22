@@ -18,8 +18,12 @@ const sharedProfileApi = axios.create({
   withCredentials: false,
 });
 
-export async function createProfileShareLink(): Promise<ProfileShareLink> {
-  const { data } = await api.post<ProfileShareLink>("/api/users/me/profile-share-links");
+export async function createProfileShareLink(profileUserId?: number): Promise<ProfileShareLink> {
+  if (profileUserId !== undefined && (!Number.isSafeInteger(profileUserId) || profileUserId <= 0)) {
+    throw new Error("공유할 프로필을 확인할 수 없어요.");
+  }
+  const target = profileUserId === undefined ? "me" : profileUserId;
+  const { data } = await api.post<ProfileShareLink>(`/api/users/${target}/profile-share-links`);
   if (!data.token?.trim() || !Number.isFinite(Date.parse(data.expiresAt))) {
     throw new Error("공유 링크 발급 응답을 확인할 수 없어요.");
   }
@@ -34,9 +38,17 @@ export async function getSharedProfile(token: string, signal?: AbortSignal): Pro
   return data;
 }
 
+export async function getSharedProfileTarget(token: string, signal?: AbortSignal): Promise<{ userId: number }> {
+  const { data } = await api.get<{ userId: number }>(`/api/profile/shares/${encodeURIComponent(token)}/target`, { signal });
+  if (!Number.isSafeInteger(data.userId) || data.userId <= 0) {
+    throw new Error("공유된 프로필을 확인할 수 없어요.");
+  }
+  return data;
+}
+
 export function getSharedProfileErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error) && [404, 410].includes(error.response?.status ?? 0)) {
     return "공유 링크가 만료되었거나 사용할 수 없어요. 프로필 소유자에게 새 링크를 요청해 주세요.";
   }
-  return "공유 프로필을 불러오지 못했어요. 네트워크를 확인하고 다시 시도해 주세요.";
+  return "네트워크 연결을 확인한 뒤 다시 시도해 주세요.";
 }

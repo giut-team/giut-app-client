@@ -15,6 +15,8 @@ import { Icon } from "../../components/icons";
 import { getPublicProfilesForFilters, type PublicProfile } from "../../api/giutHub";
 import { buildPublicProfileFilters, type Category, type Position, type TeamStatus, type Grade } from "./giutHubFilters";
 import { S } from "./GiutHubPage.styles";
+import { getProfileStatusColor } from "./profileStatus";
+import { GiutHubLoadError } from "./GiutHubLoadError";
 
 type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
@@ -35,6 +37,7 @@ export type GiutHubProfile = {
   role: Position;
   detailRole: string;
   status: string;
+  activityStatus?: PublicProfile["activityStatus"];
   name: string;
   available: boolean;
   summary: string;
@@ -415,6 +418,7 @@ export function toHubProfile(
     role: category,
     detailRole: profile.roles?.map((role) => role.name).join(", ") || primaryRole?.name || category,
     status: profile.activityStatusName,
+    activityStatus: profile.activityStatus,
     name: profile.nickname,
     available: profile.activityStatus === "OPEN_TO_OFFERS",
     summary: `${category} · ${profile.departmentName} · ${profile.grade}학년`,
@@ -449,6 +453,7 @@ export function GiutHubPage() {
   const [departmentCategory, setDepartmentCategory] =
     useState<DepartmentCategory>("전체");
   const [departmentQuery, setDepartmentQuery] = useState("");
+  const [retryingProfilesError, setRetryingProfilesError] = useState<unknown>(null);
 
   const requestFilters = buildPublicProfileFilters({
     activeCategory: "전체",
@@ -461,11 +466,23 @@ export function GiutHubPage() {
     data: publicProfiles,
     isFetching: isLoadingProfiles,
     isError: profileLoadError,
+    error: profilesError,
+    refetch: refetchProfiles,
   } = useQuery({
     queryKey: ["giut-hub", "profiles", requestFilters],
     queryFn: ({ signal }) => getPublicProfilesForFilters(requestFilters, signal),
     retry: false,
   });
+  const showProfilesError = profileLoadError || retryingProfilesError !== null;
+  const retryProfiles = async () => {
+    if (isLoadingProfiles || retryingProfilesError !== null) return;
+    setRetryingProfilesError(profilesError ?? new Error("목록 재요청"));
+    try {
+      await refetchProfiles({ cancelRefetch: false });
+    } finally {
+      setRetryingProfilesError(null);
+    }
+  };
 
   const visibleProfiles = useMemo(
     () =>
@@ -633,22 +650,26 @@ export function GiutHubPage() {
           <S.SectionTitle>{recommendationTitle}</S.SectionTitle>
 
           <S.ProfileList>
-            {isLoadingProfiles && (
+            {isLoadingProfiles && !showProfilesError && (
               <S.EmptyState>기웃허브 팀원을 불러오고 있어요.</S.EmptyState>
             )}
-            {!isLoadingProfiles && profileLoadError && (
-              <S.EmptyState>
-                기웃허브 정보를 불러오지 못했어요. 로그인 상태와 네트워크를 확인해 주세요.
-              </S.EmptyState>
+            {showProfilesError && (
+              <GiutHubLoadError
+                error={retryingProfilesError ?? profilesError}
+                isRetrying={isLoadingProfiles || retryingProfilesError !== null}
+                onRetry={() => { void retryProfiles(); }}
+                onLogin={() => navigate("/login")}
+                onCheckProfile={() => navigate("/my-profile")}
+              />
             )}
-            {!isLoadingProfiles && !profileLoadError && visibleProfiles.map((profile) => (
+            {!isLoadingProfiles && !showProfilesError && visibleProfiles.map((profile) => (
               <ProfileCard
                 key={profile.id}
                 onView={() => navigate(`/giut-hub/${profile.profileNumber}`)}
                 profile={profile}
               />
             ))}
-            {!isLoadingProfiles && !profileLoadError && visibleProfiles.length === 0 && (
+            {!isLoadingProfiles && !showProfilesError && visibleProfiles.length === 0 && (
               <S.EmptyState>
                 선택한 조건에 맞는 팀원이 없어요.
               </S.EmptyState>
@@ -925,8 +946,8 @@ function ProfileCard({
         <S.ProfileIdentity>
         <S.ProfileHeader>
           <S.Name>{profile.name}</S.Name>
-          <S.Availability $available={profile.available}>
-            <S.AvailabilityDot $available={profile.available} />
+          <S.Availability $color={getProfileStatusColor(profile.activityStatus)}>
+            <S.AvailabilityDot aria-hidden="true" />
             {profile.status}
           </S.Availability>
           </S.ProfileHeader>
@@ -942,10 +963,15 @@ function ProfileCard({
       </S.ProfileTop>
       <S.Introduction>{profile.introduction}</S.Introduction>
       <S.CardFooter>
-        <S.TagList aria-label={`${profile.name} 관심 분야`}>
-          {profile.tags.map((tag) => (
+        <S.TagList aria-label={`${profile.name} 스킬`}>
+          {profile.tags.length > 0 ? profile.tags.map((tag) => (
             <S.Tag key={tag}>#{tag}</S.Tag>
-          ))}
+          )) : (
+            <S.EmptySkills>
+              <Icon name="tag" size={14} weight="regular" />
+              <span>스킬 소개 전</span>
+            </S.EmptySkills>
+          )}
         </S.TagList>
         <S.ProfileLink onClick={onView} type="button">
           프로필 보기 <Icon name="arrow-right" size={16} weight="bold" />
