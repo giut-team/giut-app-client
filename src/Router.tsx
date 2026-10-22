@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
+import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
@@ -41,14 +43,11 @@ function HomeEntryPage() {
   useEffect(() => {
     if (!loginPending || isLoading) return;
 
-    sessionStorage.removeItem("kakao-login-pending");
-
-    if (isAuthenticated) {
-      navigate("/student-verification", { replace: true });
-    }
+    const destination = completePendingLogin(isAuthenticated);
+    if (destination) navigate(destination, { replace: true });
   }, [isAuthenticated, isLoading, loginPending, navigate]);
 
-  return loginPending && isLoading ? null : <HomePage />;
+  return loginPending && (isLoading || isAuthenticated) ? null : <HomePage />;
 }
 
 export function AppRouter() {
@@ -62,6 +61,7 @@ export function AppRouter() {
         <Route element={<ChatPage />} path="/chat" />
         <Route element={<ChatRoomPage />} path="/chat/:chatId" />
         <Route element={<GiutHubPage />} path="/giut-hub" />
+        <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />
         <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
         <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />

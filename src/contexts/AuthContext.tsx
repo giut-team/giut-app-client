@@ -4,20 +4,7 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api/client";
-
-type AuthProfile = {
-  departmentName: string;
-  grade: number;
-  nickname: string;
-  profileImageUrl: string | null;
-  userId: number;
-};
-
-type MyProfileResponse = {
-  profile: AuthProfile | null;
-  profileCompleted: boolean;
-};
+import { getAuthSession, type AuthProfile } from "../api/authSession";
 
 type AuthContextValue = {
   isAuthenticated: boolean;
@@ -28,12 +15,11 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const fetchMyProfile = () => api.get<MyProfileResponse>("/api/userprofile/me/profile");
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["auth", "my-profile"],
-    queryFn: async () => (await fetchMyProfile()).data,
+    queryFn: getAuthSession,
     retry: false,
     staleTime: 5 * 60 * 1000,
   });

@@ -219,3 +219,50 @@ final result: blocked
 - Code checks: `npm.cmd run build` passed. `npm.cmd run lint` remains blocked by five pre-existing `react-refresh/only-export-components` errors in `GiutHubPage.tsx` and `GiutHubProfilePage.tsx`; no chat-page lint errors were reported.
 
 final result: blocked
+
+---
+
+# TASK-028 — 전체 화면 프로필 공유 검수 기록
+
+## 범위와 현재 결과
+
+- 코드 적용과 자동 검증 완료. 실제 화면 비교는 미완료다.
+- 사용자 최신 선택: 별도 Playwright 실행 제안에 **지금은 코드 적용만**이라고 답변. 그 뒤 별도 브라우저 도구를 실행하지 않았다.
+- source visual truth: 이번 대화에 사용자가 첨부한 전체 화면 프로필 공유 이미지. 원본 파일 경로/정확한 픽셀 크기는 제공되지 않았다. 이전 Desktop 스크린샷은 다른 내용이라 비교 근거로 사용하지 않았다.
+- implementation screenshot path: 미생성. CUA inventory 및 reset/Safari 재연결은 Sky Computer Use native pipe startup failed, iab는 unavailable.
+- viewport: 375×737/320×640/440×860 CSS px 검수 페이지를 준비했으나 실제 렌더링 미실행.
+- source/implementation pixels 및 density normalization: 미확인/미실행. 1:1 비교를 했다고 주장하지 않는다.
+- state: 준비된 화면은 실제 컴포넌트와 모의 HTTP 응답의 ready/긴 문구/빈 스킬. 추가 pending/error/expired/other 분기도 검수용으로 준비. 실서버 응답/인증을 검증한 결과가 아니다.
+
+## Findings
+
+- [검수 차단] 전체/집중 영역의 원본과 구현 스크린샷 비교를 수행하지 못했다. 실제 간격/줄바꿈/넘침/초점/스크롤/네이티브 공유 및 PNG 다운로드는 미검증.
+- 의도된 데이터 차이: API에 username/handle이 없어 원본의 @아이디를 기웃에서 만나요로 변경했다. 닉네임으로 가짜 계정을 만들지 않는다. 사진은 실제 사용자 사진/기존 기본 아바타를 사용한다. 추가 스킬은3개와 나머지 개수로 표시한다.
+
+## 필수 시각 항목 — 코드 대조와 미검증 구분
+
+| 항목 | 코드에서 확인한 적용 | 실제 시각 비교 |
+| --- | --- | --- |
+| 글꼴/타이포그래피 | 기존 SUIT 상속, 반응형 제목24~28px/상태12~14px, 긴 한글 keep-all/anywhere | 미실행 |
+| 배치/간격 | native dialog 전체 화면, max453px 본문, 부모 flex/gap 및 padding, 동일 너비3버튼과 원형 X | 미실행 |
+| 색상/토큰 | #F9F8FF/흰 카드, 기존 #1C4EA3 및 지정된 상태 팔레트, 중립색 | 미실행 |
+| 이미지/아이콘 | 실제 사진 및 기존 직무 아바타, 공통 Phosphor 아이콘, PNG는 실제 DOM 캡처 | 실제 렌더링/PNG 미실행 |
+| 문구/데이터 | 실제 공개 카드 DTO, 스킬 없음/발급중/오류/만료/재발급 안내 | SSR/유닛 확인, 브라우저 미실행 |
+
+## 상호작용 및 검사
+
+- docs/typecheck/lint/build/test 모두 통과. 테스트19개(필터6/빈 화면2/공유 및 카드11), 린트 오류0/경고10(기존 앱6+로컬 보관본4). e2e는 미설정 skipped.
+- 발급된 동일 URL의 복사/공유, 중복 동작 차단, 만료 차단, close/cancel 콜백, 본인 권한, 공유 DTO 조회 조건 및 AbortSignal, 카드 데이터/SKILL 필터/기본 이미지, PNG 생성·사진 실패·다운로드 요청을 모의 경계와 SSR로 검증했다.
+- 브라우저 console 확인: 미실행. 실제 사진 CORS/모바일 파일 저장/OS 공유 창 및 native dialog 포커스·배경 inert·스크롤 복원은 실브라우저에서 재확인 필요.
+- full-view/focused comparison evidence: 없음. 상태/이미지/문구 확인은 자동 검사이며 시각 QA를 대체하지 않는다.
+- comparison history: 시각 비교를 수행하지 않아 시각 수정 iteration 없음. 테스트의 이미지 mock 보정과 카드 조회 경로 개선은 별도 구현 기록이며 시각 QA 반복으로 세지 않는다.
+
+## Implementation Checklist
+
+- [x] 두 공유 진입점의 전체 화면 코드 적용
+- [x] 공유/복사/PNG 저장 및 실패/만료 상태 연결
+- [x] 자동 검사와 회귀 테스트 통과
+- [ ] 실제 모바일 렌더링과 주요 조작 확인
+- [ ] 원본과 같은 조건의 스크린샷을 함께 비교하고 P0/P1/P2 판정
+
+final result: blocked

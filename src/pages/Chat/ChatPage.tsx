@@ -1,9 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { Toast } from "../../components/Toast/Toast";
 import { S } from "./ChatPage.styles";
+import { getChatRooms, getChatUnreadCount } from "../../api/chat";
+import { getPublicProfile } from "../../api/giutHub";
+import { getProfileActionError } from "../../api/profileActions";
+import { useAuth } from "../../contexts/AuthContext";
+import { Button } from "../../components/Button";
 
 type ChatTab = "all" | "unread";
 type AvatarTone = "mint" | "peach" | "purple";
@@ -19,37 +25,6 @@ type ChatRow = {
   unread?: number;
 };
 
-const chatRows: ChatRow[] = [
-  {
-    id: "seoul-data",
-    initial: "서",
-    avatarTone: "mint",
-    title: "이서연 · 서울 데이터 공모전 팀장",
-    preview: "주 1회 온라인이고, 마감 전 한번 오프라인으로 모일 ...",
-    time: "오후 2:40",
-    latestMessageAt: "2026-09-19T14:40:00+09:00",
-  },
-  {
-    id: "esg-campaign",
-    initial: "하",
-    avatarTone: "peach",
-    title: "장하늘 · ESG 캠페인 팀장",
-    preview: "디자인 포지션 아직 열려 있어요...!",
-    time: "어제",
-    latestMessageAt: "2026-09-18T18:20:00+09:00",
-  },
-  {
-    id: "startup-package",
-    initial: "우",
-    avatarTone: "purple",
-    title: "최유진 · 예비창업패키지 팀장",
-    preview: "기웃허브에서 포트폴리오 잘 봤어요! 저희 팀 백엔드로 ...",
-    time: "오후 6:30",
-    latestMessageAt: "2026-09-19T18:30:00+09:00",
-    unread: 1,
-  },
-];
-
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
   { key: "hub", label: "기웃허브", icon: "users" as const },
@@ -60,10 +35,29 @@ const navigationItems = [
 export function ChatPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, isLoading: authLoading, profile: me } = useAuth();
+  const rooms = useQuery({ queryKey: ["chat-rooms", me?.userId],
+    queryFn: ({ signal }) => getChatRooms(signal), enabled: isAuthenticated, retry: false, refetchInterval: 10_000 });
+  const activeRooms = isAuthenticated && !rooms.isError ? rooms.data ?? [] : [];
+  const profiles = useQueries({ queries: activeRooms.map(room => ({
+    queryKey: ["chat-target", room.targetUserId], queryFn: () => getPublicProfile(room.targetUserId), retry: false,
+  })) });
+  const unread = useQueries({ queries: activeRooms.map(room => ({
+    queryKey: ["chat-unread", me?.userId, room.chatRoomId],
+    queryFn: ({ signal }: { signal: AbortSignal }) => getChatUnreadCount(room.chatRoomId, signal),
+    retry: false, refetchInterval: 10_000,
+  })) });
+  const chatRows: ChatRow[] = activeRooms.map((room, index) => {
+    const profile = profiles[index]?.data;
+    const title = profile?.nickname ?? "대화 상대";
+    return { id: String(room.chatRoomId), initial: title.slice(0, 1), avatarTone: "mint", title,
+      preview: profile ? `${profile.profile.departmentName} · ${profile.profile.grade}학년` : "대화를 이어가 보세요.",
+      time: new Date(room.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+      latestMessageAt: room.createdAt, unread: unread[index]?.data };
+  });
   const [activeTab, setActiveTab] = useState<ChatTab>("all");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [readChatIds, setReadChatIds] = useState<string[]>([]);
   const [toastMessage, setToastMessage] = useState(
     () => (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
   );
@@ -75,22 +69,16 @@ export function ChatPage() {
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
 
-  const unreadCount = chatRows.filter(
-    (chat) => chat.unread && !readChatIds.includes(chat.id),
-  ).length;
-  const sortedChats = useMemo(
-    () =>
-      [...chatRows].sort(
+  const unreadCount = chatRows.filter(chat => chat.unread).length;
+  const sortedChats = [...chatRows].sort(
         (left, right) =>
           new Date(right.latestMessageAt).getTime() -
           new Date(left.latestMessageAt).getTime(),
-      ),
-    [],
-  );
+      );
   const normalizedQuery = searchQuery.trim().replaceAll(" ", "").toLowerCase();
   const visibleChats = sortedChats.filter((chat) => {
     const matchesTab =
-      activeTab === "all" || (chat.unread && !readChatIds.includes(chat.id));
+      activeTab === "all" || chat.unread;
     const matchesSearch =
       normalizedQuery.length === 0 ||
       chat.title.replaceAll(" ", "").toLowerCase().includes(normalizedQuery);
@@ -99,9 +87,6 @@ export function ChatPage() {
   });
 
   const handleChatClick = (chat: ChatRow) => {
-    if (chat.unread && !readChatIds.includes(chat.id)) {
-      setReadChatIds((ids) => [...ids, chat.id]);
-    }
     navigate(`/chat/${chat.id}`);
   };
 
@@ -165,8 +150,12 @@ export function ChatPage() {
         </S.Tabs>
 
         <S.ChatList aria-label="채팅 목록">
+          {(authLoading || (isAuthenticated && rooms.isPending)) && <S.EmptyMessage role="status">대화를 불러오고 있어요.</S.EmptyMessage>}
+          {!authLoading && !isAuthenticated && <S.EmptyMessage><p>로그인 후 대화를 확인할 수 있어요.</p><Button onClick={() => navigate("/login")}>로그인하기</Button></S.EmptyMessage>}
+          {rooms.isError && isAuthenticated && <S.EmptyMessage role="alert"><p>{getProfileActionError(rooms.error, "대화 목록을 불러오지 못했어요.")}</p><Button onClick={() => void rooms.refetch()}>다시 불러오기</Button></S.EmptyMessage>}
+          {unread.some(result => result.isError) && <S.EmptyMessage role="alert">일부 대화의 읽지 않은 메시지 수를 확인하지 못했어요.</S.EmptyMessage>}
           {visibleChats.map((chat) => {
-            const isUnread = Boolean(chat.unread && !readChatIds.includes(chat.id));
+            const isUnread = Boolean(chat.unread);
 
             return (
               <S.ChatItem
@@ -187,9 +176,9 @@ export function ChatPage() {
               </S.ChatItem>
             );
           })}
-          {visibleChats.length === 0 && (
+          {!authLoading && isAuthenticated && !rooms.isPending && !rooms.isError && visibleChats.length === 0 && (
             <S.EmptyMessage>
-              {searchQuery ? "검색 결과가 없어요." : "읽지 않은 채팅이 없어요."}
+              {searchQuery ? "검색 결과가 없어요." : activeTab === "unread" ? "읽지 않은 채팅이 없어요." : "아직 시작한 대화가 없어요."}
             </S.EmptyMessage>
           )}
         </S.ChatList>

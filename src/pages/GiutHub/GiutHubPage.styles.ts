@@ -3,18 +3,19 @@ import { Button } from "../../components/Button";
 import { tokens } from "../../design-system/tokens.generated";
 
 const giutHubPrimary = "#1C4EA3";
+const giutHubBackground = "#F9F8FF";
 
 export const S = {
   Page: styled.main`
     min-height: 100svh;
-    background: ${tokens.color.neutral[100]};
+    background: ${giutHubBackground};
   `,
   Content: styled.div`
     width: min(100%, 453px);
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(88px + var(--app-safe-bottom));
-    background: ${tokens.color.neutral[50]};
+    background: ${giutHubBackground};
   `,
   Hero: styled.section`
     position: relative;
@@ -128,8 +129,11 @@ export const S = {
     }
   `,
   Results: styled.section`
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     padding: 23px 20px 20px;
-    background: #f7f8fb;
+    background: ${giutHubBackground};
   `,
   SectionTitle: styled.h2`
     margin: 0;
@@ -139,48 +143,16 @@ export const S = {
     letter-spacing: -0.65px;
     line-height: 1.35;
   `,
-  CategoryList: styled.div`
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    margin: 15px -20px 20px;
-    padding: 0 20px;
-    border-bottom: 1px solid ${tokens.color.neutral[200]};
-
-    button {
-      position: relative;
-      height: 38px;
-      padding: 0 6px 11px;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: ${tokens.color.neutral[500]};
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-
-      &[aria-pressed="true"] {
-        background: transparent;
-        color: ${giutHubPrimary};
-      }
-
-      &[aria-pressed="true"]::after {
-        position: absolute;
-        right: 0;
-        bottom: -1px;
-        left: 0;
-        height: 2px;
-        border-radius: 999px;
-        background: ${giutHubPrimary};
-        content: "";
-      }
-    }
-  `,
   ProfileList: styled.div`
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
   `,
   ProfileCard: styled.article`
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     padding: 19px 14px 16px;
     border: 0;
     border-radius: 20px;
@@ -191,6 +163,7 @@ export const S = {
     display: flex;
     align-items: center;
     gap: 14px;
+    padding-right: 34px;
   `,
   Avatar: styled.div<{ $tone: "blue" | "purple" | "orange" | "green" }>`
     display: grid;
@@ -223,6 +196,9 @@ export const S = {
     gap: 7px;
   `,
   ProfileIdentity: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
     min-width: 0;
     flex: 1;
   `,
@@ -234,27 +210,27 @@ export const S = {
     letter-spacing: -0.7px;
     line-height: 1.2;
   `,
-  Availability: styled.span<{ $available: boolean }>`
+  Availability: styled.span<{ $color: string }>`
     display: flex;
     align-items: center;
     gap: 7px;
-    color: ${({ $available }) =>
-      $available ? tokens.color.success[500] : tokens.color.neutral[500]};
+    color: ${({ $color }) => $color};
     font-size: 12px;
     font-weight: 700;
     letter-spacing: -0.3px;
     white-space: nowrap;
   `,
-  AvailabilityDot: styled.span<{ $available: boolean }>`
+  AvailabilityDot: styled.span`
+    flex-shrink: 0;
     width: 8px;
     height: 8px;
     margin: 0;
     border: 0;
     border-radius: 50%;
-    background: ${({ $available }) => ($available ? "currentColor" : "transparent")};
+    background: currentColor;
   `,
   ProfileSummary: styled.p`
-    margin: 7px 0 0;
+    margin: 0;
     color: ${tokens.color.neutral[500]};
     overflow: hidden;
     font-size: 12px;
@@ -265,15 +241,18 @@ export const S = {
     white-space: nowrap;
   `,
   Introduction: styled.p`
-    margin: 16px 0 0;
+    margin: 0;
+    padding-right: 34px;
     color: ${tokens.color.neutral[700]};
     font-size: 13px;
     letter-spacing: -0.35px;
     line-height: 1.5;
   `,
   DetailButton: styled.button`
+    position: absolute;
+    top: 50%;
+    right: 14px;
     display: grid;
-    flex: 0 0 20px;
     width: 28px;
     height: 36px;
     padding: 0;
@@ -282,6 +261,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[200]};
     cursor: pointer;
+    transform: translateY(-50%);
   `,
   ProfileMeta: styled.div`
     display: flex;
@@ -313,13 +293,30 @@ export const S = {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 16px;
   `,
   TagList: styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
+    min-width: 0;
     margin: 0;
+  `,
+  EmptySkills: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 28px;
+    padding: 4px 8px;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+
+    svg {
+      flex-shrink: 0;
+    }
   `,
   Tag: styled.span`
     padding: 0;
@@ -714,7 +711,61 @@ export const S = {
       outline-offset: 2px;
     }
   `,
-  EmptyState: styled.p`
+  LoadError: styled.section`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 32px 20px;
+    border-radius: 20px;
+    background: ${tokens.color.neutral[50]};
+    text-align: center;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  `,
+  LoadErrorIcon: styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: ${tokens.color.primary[100]};
+    color: ${giutHubPrimary};
+  `,
+  LoadErrorCopy: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 280px;
+  `,
+  LoadErrorTitle: styled.h3`
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    line-height: 1.5;
+  `,
+  LoadErrorDescription: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-line;
+  `,
+  LoadErrorButton: styled(Button)`
+    max-width: 100%;
+    height: 44px;
+    padding: 0 18px;
+    background-color: ${giutHubPrimary};
+    font-size: 14px;
+
+    &:hover:not(:disabled) {
+      background-color: ${giutHubPrimary};
+    }
+  `,
+  EmptyState: styled.div`
     margin: 0;
     padding: 40px 16px;
     border-radius: 18px;
