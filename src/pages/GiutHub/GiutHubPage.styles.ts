@@ -3,18 +3,19 @@ import { Button } from "../../components/Button";
 import { tokens } from "../../design-system/tokens.generated";
 
 const giutHubPrimary = "#1C4EA3";
+const giutHubBackground = "#F9F8FF";
 
 export const S = {
   Page: styled.main`
     min-height: 100svh;
-    background: ${tokens.color.neutral[100]};
+    background: ${giutHubBackground};
   `,
   Content: styled.div`
     width: min(100%, 453px);
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(88px + var(--app-safe-bottom));
-    background: ${tokens.color.neutral[50]};
+    background: ${giutHubBackground};
   `,
   Hero: styled.section`
     position: relative;
@@ -129,7 +130,7 @@ export const S = {
   `,
   Results: styled.section`
     padding: 23px 20px 20px;
-    background: #f7f8fb;
+    background: ${giutHubBackground};
   `,
   SectionTitle: styled.h2`
     margin: 0;
@@ -139,45 +140,10 @@ export const S = {
     letter-spacing: -0.65px;
     line-height: 1.35;
   `,
-  CategoryList: styled.div`
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    margin: 15px -20px 20px;
-    padding: 0 20px;
-    border-bottom: 1px solid ${tokens.color.neutral[200]};
-
-    button {
-      position: relative;
-      height: 38px;
-      padding: 0 6px 11px;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: ${tokens.color.neutral[500]};
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-
-      &[aria-pressed="true"] {
-        background: transparent;
-        color: ${giutHubPrimary};
-      }
-
-      &[aria-pressed="true"]::after {
-        position: absolute;
-        right: 0;
-        bottom: -1px;
-        left: 0;
-        height: 2px;
-        border-radius: 999px;
-        background: ${giutHubPrimary};
-        content: "";
-      }
-    }
-  `,
   ProfileList: styled.div`
     display: grid;
     gap: 14px;
+    margin-top: 20px;
   `,
   ProfileCard: styled.article`
     position: relative;
@@ -191,6 +157,7 @@ export const S = {
     display: flex;
     align-items: center;
     gap: 14px;
+    padding-right: 34px;
   `,
   Avatar: styled.div<{ $tone: "blue" | "purple" | "orange" | "green" }>`
     display: grid;
@@ -266,14 +233,17 @@ export const S = {
   `,
   Introduction: styled.p`
     margin: 16px 0 0;
+    padding-right: 34px;
     color: ${tokens.color.neutral[700]};
     font-size: 13px;
     letter-spacing: -0.35px;
     line-height: 1.5;
   `,
   DetailButton: styled.button`
+    position: absolute;
+    top: 50%;
+    right: 14px;
     display: grid;
-    flex: 0 0 20px;
     width: 28px;
     height: 36px;
     padding: 0;
@@ -282,6 +252,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[200]};
     cursor: pointer;
+    transform: translateY(-50%);
   `,
   ProfileMeta: styled.div`
     display: flex;

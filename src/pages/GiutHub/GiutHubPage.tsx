@@ -12,7 +12,6 @@ import plannerMale from "../../assets/default_image/planner-male.png";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
-import { PillButton } from "../../components/PillButton";
 import { getPublicProfilesForFilters, type PublicProfile } from "../../api/giutHub";
 import { buildPublicProfileFilters, type Category, type Position, type TeamStatus, type Grade } from "./giutHubFilters";
 import { S } from "./GiutHubPage.styles";
@@ -50,7 +49,6 @@ export type GiutHubProfile = {
   avatarSrc?: string;
 };
 
-const categories: Category[] = ["전체", "기획", "디자인", "개발", "마케팅"];
 const positionOptions: {
   value: Position;
   icon: "edit" | "palette" | "code" | "megaphone";
@@ -441,7 +439,6 @@ const navigationItems = [
 
 export function GiutHubPage() {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState<Category>("전체");
   const [isPositionSheetOpen, setIsPositionSheetOpen] = useState(false);
   const [isStatusSheetOpen, setIsStatusSheetOpen] = useState(false);
   const [isDepartmentSheetOpen, setIsDepartmentSheetOpen] = useState(false);
@@ -454,7 +451,7 @@ export function GiutHubPage() {
   const [departmentQuery, setDepartmentQuery] = useState("");
 
   const requestFilters = buildPublicProfileFilters({
-    activeCategory,
+    activeCategory: "전체",
     selectedPositions,
     selectedTeamStatus,
     selectedDepartments,
@@ -464,7 +461,6 @@ export function GiutHubPage() {
     data: publicProfiles,
     isFetching: isLoadingProfiles,
     isError: profileLoadError,
-    refetch: loadProfiles,
   } = useQuery({
     queryKey: ["giut-hub", "profiles", requestFilters],
     queryFn: ({ signal }) => getPublicProfilesForFilters(requestFilters, signal),
@@ -475,15 +471,12 @@ export function GiutHubPage() {
     () =>
       (publicProfiles ?? []).filter((profile) => {
         const profileCategories = profile.primaryRoles.map(({ code }) => categoryByCode[code]);
-        const matchesCategory =
-          activeCategory === "전체" || profileCategories.includes(activeCategory);
         const matchesPosition =
           selectedPositions.length === 0 ||
           selectedPositions.some((position) => profileCategories.includes(position));
-        return matchesCategory && matchesPosition;
+        return matchesPosition;
       }).map(toHubProfile),
     [
-      activeCategory,
       publicProfiles,
       selectedPositions,
     ],
@@ -491,10 +484,9 @@ export function GiutHubPage() {
 
   const resultButtonLabel = isLoadingProfiles
     ? "불러오는 중…"
-    : profileLoadError ? "다시 불러오기" : `${visibleProfiles.length}명 보기`;
+    : profileLoadError ? "닫기" : `${visibleProfiles.length}명 보기`;
 
   const resetFilters = () => {
-    setActiveCategory("전체");
     setSelectedPositions([]);
     setSelectedTeamStatus("전체");
     setSelectedGrades([]);
@@ -531,10 +523,15 @@ export function GiutHubPage() {
       name.includes(departmentQuery.trim()),
   );
 
-  const recommendationTitle =
-    activeCategory === "전체"
-      ? "이루매님에게 잘 맞는 팀원이에요"
-      : `${activeCategory} 분야에서 주목받는 팀원이에요`;
+  const selectedFilterLabels = [
+    ...selectedPositions,
+    ...selectedDepartments,
+    ...selectedGrades.map((grade) => grade === 4 ? "4학년 이상" : `${grade}학년`),
+    ...(selectedTeamStatus === "전체" ? [] : [selectedTeamStatus]),
+  ];
+  const recommendationTitle = selectedFilterLabels.length > 0
+    ? `${selectedFilterLabels.join(" · ")}에 잘 맞는 팀원이에요`
+    : "이루매님에게 잘 맞는 팀원이에요";
 
   const isFilterApplied = (filter: FilterName) =>
     (filter === "포지션" && selectedPositions.length > 0) ||
@@ -634,18 +631,6 @@ export function GiutHubPage() {
 
         <S.Results>
           <S.SectionTitle>{recommendationTitle}</S.SectionTitle>
-          <S.CategoryList aria-label="팀원 직무 필터">
-            {categories.map((category) => (
-              <PillButton
-                active={activeCategory === category}
-                aria-pressed={activeCategory === category}
-                key={category}
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </PillButton>
-            ))}
-          </S.CategoryList>
 
           <S.ProfileList>
             {isLoadingProfiles && (
@@ -653,8 +638,7 @@ export function GiutHubPage() {
             )}
             {!isLoadingProfiles && profileLoadError && (
               <S.EmptyState>
-                기웃허브 정보를 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 시도해 주세요.
-                <button onClick={() => void loadProfiles()} type="button">다시 불러오기</button>
+                기웃허브 정보를 불러오지 못했어요. 로그인 상태와 네트워크를 확인해 주세요.
               </S.EmptyState>
             )}
             {!isLoadingProfiles && !profileLoadError && visibleProfiles.map((profile) => (
@@ -687,7 +671,7 @@ export function GiutHubPage() {
           <S.PositionSheetFooter>
             <S.ViewPositionsButton
               disabled={isLoadingProfiles}
-              onClick={() => profileLoadError ? void loadProfiles() : setIsPositionSheetOpen(false)}
+              onClick={() => setIsPositionSheetOpen(false)}
               type="button"
             >
               {resultButtonLabel}
@@ -752,7 +736,7 @@ export function GiutHubPage() {
             </S.ResetStatusButton>
             <S.ViewStatusButton
               disabled={isLoadingProfiles}
-              onClick={() => profileLoadError ? void loadProfiles() : setIsStatusSheetOpen(false)}
+              onClick={() => setIsStatusSheetOpen(false)}
               type="button"
             >
               {resultButtonLabel}
@@ -807,7 +791,7 @@ export function GiutHubPage() {
           <S.DepartmentFooter>
             <S.ViewStatusButton
               disabled={isLoadingProfiles}
-              onClick={() => profileLoadError ? void loadProfiles() : setIsDepartmentSheetOpen(false)}
+              onClick={() => setIsDepartmentSheetOpen(false)}
               type="button"
             >
               {resultButtonLabel}
