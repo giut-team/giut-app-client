@@ -34,6 +34,7 @@ import { MyProfilePage } from "./pages/MyPage/MyProfilePage";
 import { ProfileEditPage, ProfileRoleDetailPage } from "./pages/MyPage/ProfileEditPage";
 import { PortfolioManagePage } from "./pages/MyPage/PortfolioManagePage";
 import { PortfolioAddPage } from "./pages/MyPage/PortfolioAddPage";
+import { ProfileCreatePage } from "./pages/MyPage/ProfileCreatePage";
 
 function HomeEntryPage() {
   const navigate = useNavigate();
@@ -121,8 +122,9 @@ export function AppRouter() {
         <Route element={<MyTeamPage />} path="/my-team" />
         <Route element={<MyProfilePage />} path="/my-profile" />
         <Route element={<ProfileEditPage />} path="/my-profile/edit" />
-        <Route element={<PortfolioManagePage />} path="/my-profile/potfoliomanage" />
-        <Route element={<PortfolioAddPage/>} path="/my-profile/portfolioadd" />
+        <Route element={<PortfolioManagePage />} path="/my-profile/portfolio-manage" />
+        <Route element={<PortfolioAddPage/>} path="/my-profile/portfolio-add" />
+        <Route element={<ProfileCreatePage/>} path="/my-profile/create" /> 
         <Route element={<ProfileRoleDetailPage />} path="/my-profile/edit/roles/:roleId" />
         <Route
           element={<MyApplicationPage />}

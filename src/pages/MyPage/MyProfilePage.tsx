@@ -220,9 +220,9 @@ export function MyProfilePage() {
             <S.PortfolioHeader>
               <S.PortfolioExposure>프로필 노출<em>{detail.portfolios.length}</em><span>/ 6</span></S.PortfolioExposure>
               <S.PortfolioHeaderButtons>
-                <S.portfolioManageButton onClick={() => navigate("/my-profile/potfoliomanage", { state: preview })}
+                <S.portfolioManageButton onClick={() => navigate("/my-profile/portfolio-manage", { state: preview })}
                 type="button">관리</S.portfolioManageButton>
-                <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolioadd", { state: preview })}
+                <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolio-add", { state: preview })}
                 type="button">+ 추가</S.portfolioAddButton>
               </S.PortfolioHeaderButtons>
             </S.PortfolioHeader>
