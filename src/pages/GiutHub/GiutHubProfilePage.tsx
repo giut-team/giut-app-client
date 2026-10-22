@@ -14,6 +14,7 @@ import { toHubProfile } from "./GiutHubPage";
 import { GiutHubDialog } from "./GiutHubDialog";
 import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareSheet } from "./ProfileShareSheet";
+import { ProfileTabEmptyState } from "./ProfileTabEmptyState";
 import { useProfileShare } from "./useProfileShare";
 import { canIssueProfileShare } from "./profileShare";
 import { S } from "./GiutHubProfilePage.styles";
@@ -514,6 +515,7 @@ export function GiutHubProfilePage() {
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
   const { profile: currentProfile } = useAuth();
+  const isOwnProfile = currentProfile?.userId === userId;
   const share = useProfileShare(canIssueProfileShare(userId, currentProfile?.userId));
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
   const [isScrapped, setIsScrapped] = useState(false);
@@ -668,7 +670,7 @@ export function GiutHubProfilePage() {
             role="tab"
             type="button"
           >
-            포트폴리오 {detail.portfolios.length}
+            포트폴리오{detail.portfolios.length > 0 ? ` ${detail.portfolios.length}` : ""}
           </S.Tab>
           <S.Tab
             $active={activeTab === "activity"}
@@ -723,7 +725,11 @@ export function GiutHubProfilePage() {
             </S.PortfolioList>
             </S.PortfolioContent>
           ) : (
-            <S.EmptyState>아직 공개된 포트폴리오가 없어요.</S.EmptyState>
+            <ProfileTabEmptyState
+              isOwnProfile={isOwnProfile}
+              kind="portfolio"
+              onAddPortfolio={() => navigate("/my-profile/portfolioadd")}
+            />
           )
         ) : activities.length > 0 ? (
           <S.ActivityList>
@@ -741,7 +747,11 @@ export function GiutHubProfilePage() {
             ))}
           </S.ActivityList>
         ) : (
-          <S.EmptyState>등록된 활동 이력이 없어요.</S.EmptyState>
+          <ProfileTabEmptyState
+            isOwnProfile={isOwnProfile}
+            kind="activity"
+            onAddPortfolio={() => navigate("/my-profile/portfolioadd")}
+          />
         )}
       </S.Content>
       <TeamProposalBottomSheet

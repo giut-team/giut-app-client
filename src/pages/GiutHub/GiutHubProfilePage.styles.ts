@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { Button } from "../../components/Button";
 import { tokens } from "../../design-system/tokens.generated";
 
 const giutHubPrimary = "#1C4EA3";
@@ -211,43 +212,61 @@ export const S = {
   `,
   ActionRow: styled.div`
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 44px;
+    gap: 8px;
     padding: 0 16px 30px;
     background: ${tokens.color.neutral[50]};
 
-    > button:first-of-type {
-      height: auto;
-      gap: 9px;
-      padding: 14px 12px;
+    > button {
+      width: 100%;
+      min-width: 0;
+      height: 48px;
+      gap: 6px;
+      padding: 0 8px;
       border-radius: 14px;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    > button:first-of-type {
       background: ${giutHubPrimary};
-      font-size: 16px;
+    }
+
+    > button:not(:last-of-type) > svg {
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 359px) {
+      > button:not(:last-of-type) > svg {
+        display: none;
+      }
     }
   `,
   MessageButton: styled.button`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 6px;
     min-width: 0;
-    height: auto;
+    height: 48px;
     padding: 0 8px;
-    padding-block: 14px;
     border: 0;
     border-radius: 14px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
   `,
   FavoriteButton: styled.button<{ $active: boolean }>`
     display: grid;
-    height: auto;
-    padding: 12px;
+    width: 44px;
+    height: 48px;
+    padding: 0;
     place-items: center;
     border: 0;
     border-radius: 14px;
@@ -420,6 +439,46 @@ export const S = {
     font-size: 13px;
     line-height: 1.6;
     text-align: center;
+  `,
+  TabEmptyState: styled.section`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 64px 24px 80px;
+    text-align: center;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  `,
+  EmptyIcon: styled.div`
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    border-radius: 20px;
+    background: ${tokens.color.primary[100]};
+    color: ${giutHubPrimary};
+  `,
+  EmptyTitle: styled.h2`
+    max-width: 100%;
+    margin: 20px 0 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    line-height: 1.5;
+  `,
+  EmptyDescription: styled.p`
+    max-width: 280px;
+    margin: 8px 0 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 14px;
+    line-height: 1.6;
+  `,
+  EmptyAction: styled(Button)`
+    max-width: 100%;
+    gap: 6px;
+    margin-top: 24px;
+    font-size: 14px;
   `,
   ActivityItem: styled.article<{ $last: boolean }>`
     position: relative;
