@@ -7,7 +7,7 @@ import { ProfileShareCard, type ShareCardProfile } from "./ProfileShareCard";
 import { buildProfileShareUrl, copyProfileShareUrl, isProfileShareExpired, shareProfileUrl } from "./profileShare";
 import { saveProfileShareImage } from "./profileShareImage";
 import type { useProfileShare } from "./useProfileShare";
-import { S } from "./ProfileShareScreen.styles";
+import { exitToBottom, PROFILE_SHARE_MOTION_MS, S } from "./ProfileShareScreen.styles";
 
 export function ProfileShareScreen({ share, profileName, profile }: {
   share: ReturnType<typeof useProfileShare>;
@@ -17,6 +17,9 @@ export function ProfileShareScreen({ share, profileName, profile }: {
   const navigate = useNavigate();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const cardRef = useRef<HTMLElement>(null);
+  const closePhase = useRef<"open" | "closing" | "closed">("open");
+  const closeTimer = useRef<number | undefined>(undefined);
+  const [isClosing, setIsClosing] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState("");
   const [message, setMessage] = useState("");
   const [actionError, setActionError] = useState("");
@@ -26,7 +29,7 @@ export function ProfileShareScreen({ share, profileName, profile }: {
   const { data: link, isPending, isError, error } = share.issuance;
   const expired = !!link && (expiredToken === link.token || isProfileShareExpired(link));
   const profileUrl = link ? buildProfileShareUrl(link.token, window.location.origin) : "";
-  const canShare = share.canIssue && !!link && !isPending && !isError && !expired;
+  const canShare = share.canIssue && !!link && !isPending && !isError && !expired && !isClosing;
   const profileQuery = useQuery({
     queryKey: ["profile-share-card", link?.token],
     queryFn: ({ signal }) => getSharedProfile(link!.token, signal),
@@ -37,6 +40,27 @@ export function ProfileShareScreen({ share, profileName, profile }: {
   });
   const cardProfile = profile ?? profileQuery.data;
   const isCopied = canShare && copiedUrl === profileUrl;
+
+  const finishClose = () => {
+    if (closePhase.current !== "closing") return;
+    closePhase.current = "closed";
+    window.clearTimeout(closeTimer.current);
+    share.closeShare();
+  };
+
+  const requestClose = () => {
+    if (closePhase.current !== "open") return;
+    closePhase.current = "closing";
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      finishClose();
+      return;
+    }
+    setIsClosing(true);
+    // animationend가 전달되지 않아도 닫힌 상태에 갇히지 않도록 보완한다.
+    closeTimer.current = window.setTimeout(finishClose, PROFILE_SHARE_MOTION_MS + 80);
+  };
+
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -57,7 +81,7 @@ export function ProfileShareScreen({ share, profileName, profile }: {
   }, [link]);
 
   const performAction = async (action: "share" | "copy" | "save") => {
-    if (!canShare || !link || actionPending.current) return;
+    if (!canShare || !link || actionPending.current || closePhase.current !== "open") return;
     if (isProfileShareExpired(link)) {
       setExpiredToken(link.token);
       return;
@@ -95,12 +119,16 @@ export function ProfileShareScreen({ share, profileName, profile }: {
     <S.Screen
       aria-label="프로필 공유"
       aria-modal="true"
-      onCancel={(event) => { event.preventDefault(); share.closeShare(); }}
+      data-closing={isClosing}
+      onCancel={(event) => { event.preventDefault(); requestClose(); }}
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget && event.animationName === exitToBottom.name) finishClose();
+      }}
       ref={dialogRef}
     >
       <S.Inner>
         <S.Header>
-          <S.CloseButton aria-label="프로필 공유 닫기" onClick={share.closeShare} type="button" autoFocus>
+          <S.CloseButton aria-label="프로필 공유 닫기" disabled={isClosing} onClick={requestClose} type="button" autoFocus>
             <Icon name="x" size={25} weight="regular" />
           </S.CloseButton>
         </S.Header>
@@ -108,7 +136,7 @@ export function ProfileShareScreen({ share, profileName, profile }: {
           {!share.canIssue ? (
             <S.Notice>
               <p>프로필을 공유하려면 로그인해 주세요.</p>
-              <S.RetryButton onClick={() => navigate("/login")} type="button">
+              <S.RetryButton disabled={isClosing} onClick={() => navigate("/login")} type="button">
                 로그인하기
               </S.RetryButton>
             </S.Notice>
@@ -143,7 +171,7 @@ export function ProfileShareScreen({ share, profileName, profile }: {
                   {isPending && <p role="status">공유 링크를 발급하고 있어요…</p>}
                   {isError && <p role="alert">{error instanceof Error && error.message === "공유 링크 발급 응답을 확인할 수 없어요." ? error.message : "링크를 발급하지 못했어요. 로그인 상태와 네트워크를 확인하고 다시 시도해 주세요."}</p>}
                   {expired && <p role="alert">공유 링크가 만료되었어요. 새 링크를 발급해 주세요.</p>}
-                  {(isError || expired || needsIssue) && <S.RetryButton disabled={isPending} onClick={share.issueLink} type="button">{expired ? "새 링크 발급" : isError ? "다시 발급" : "링크 발급"}</S.RetryButton>}
+                  {(isError || expired || needsIssue) && <S.RetryButton disabled={isPending || isClosing} onClick={share.issueLink} type="button">{expired ? "새 링크 발급" : isError ? "다시 발급" : "링크 발급"}</S.RetryButton>}
                   {actionError && <p role="alert">{actionError}</p>}
                   {isCopied && <p role="status">공유 링크를 복사했어요. 링크는 발급 후 3시간 동안 유효해요.</p>}
                   {message && <p role="status">{message}</p>}

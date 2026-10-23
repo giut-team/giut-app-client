@@ -4,10 +4,16 @@ import { tokens } from "../../design-system/tokens.generated";
 
 const background = "#F9F8FF";
 const primary = "#1C4EA3";
+export const PROFILE_SHARE_MOTION_MS = 480;
 
 const enterFromBottom = keyframes`
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+`;
+
+export const exitToBottom = keyframes`
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
 `;
 
 export const S = {
@@ -30,12 +36,16 @@ export const S = {
     &[open] {
       display: flex;
       justify-content: center;
-      animation: ${enterFromBottom} 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation: ${enterFromBottom} ${PROFILE_SHARE_MOTION_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    &[open][data-closing="true"] {
+      animation: ${exitToBottom} ${PROFILE_SHARE_MOTION_MS}ms cubic-bezier(0.8, 0, 0.8, 0.2) both;
+      pointer-events: none;
     }
     &::backdrop { background: transparent; }
 
     @media (prefers-reduced-motion: reduce) {
-      &[open] { animation: none; }
+      &[open], &[open][data-closing="true"] { animation: none; }
     }
     button:focus-visible, a:focus-visible {
       outline: 3px solid ${primary};
