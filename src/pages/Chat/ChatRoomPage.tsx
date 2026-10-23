@@ -1,207 +1,241 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  type InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
+import {
+  fetchChatMessages,
+  fetchChatParticipantProfile,
+  fetchChatRoom,
+  leaveChatRoom,
+  markChatRoomAsRead,
+  sendChatMessage,
+  type ChatMessageResponse,
+  type ChatMessageListResponse,
+} from "../../api/chats";
+import { subscribeToChatRoom } from "../../api/chatSocket";
 import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
 import { Toast } from "../../components/Toast/Toast";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./ChatRoomPage.styles";
 
 type AvatarTone = "mint" | "peach" | "purple";
-type Message = {
-  id: string;
-  content: string;
-  time: string;
-  sender: "me" | "other";
-};
-
-type ChatRoom = {
-  name: string;
-  initial: string;
-  avatarTone: AvatarTone;
-  subtitle: string;
-  contextLabel: string;
-  contextTitle: string;
-  primaryAction: string;
-  secondaryAction: string;
-  primaryPath: string;
-  secondaryPath: string;
-  messages: Message[];
-};
-
 type ConfirmationAction = "report" | "leave" | null;
 
-const chatRooms: Record<string, ChatRoom> = {
-  "seoul-data": {
-    name: "이서연",
-    initial: "서",
-    avatarTone: "mint",
-    subtitle: "경영학부 3학년 · 기획",
-    contextLabel: "공모전 팀 상세에서 시작된 대화",
-    contextTitle: "2026 서울시 데이터 활용 공모전 · 데이터로 서울을 팀",
-    primaryAction: "팀 보기",
-    secondaryAction: "공모전 보기",
-    primaryPath: "/contests/seoul-data/teams/my-data-seoul",
-    secondaryPath: "/contests/seoul-data",
-    messages: [
-      {
-        id: "seoul-1",
-        sender: "me",
-        time: "14:32",
-        content:
-          "안녕하세요! 공모전 공고 보고 연락드려요. 백엔드 지원 전에 회의 방식이 궁금해요.",
-      },
-      {
-        id: "seoul-2",
-        sender: "other",
-        time: "14:38",
-        content: "주 1회 온라인이고, 마감 전 한번 오프라인으로 모여요 😊",
-      },
-      {
-        id: "seoul-3",
-        sender: "me",
-        time: "14:40",
-        content: "좋아요, 지원서 준비해서 넣을게요!",
-      },
-    ],
-  },
-  "startup-package": {
-    name: "최유진",
-    initial: "우",
-    avatarTone: "purple",
-    subtitle: "경영학부 4학년 · 디자인",
-    contextLabel: "기웃허브에서 받은 제안",
-    contextTitle: "예비창업패키지 청년 트랙 · 백엔드 개발자 제안",
-    primaryAction: "팀 보기",
-    secondaryAction: "프로필 보기",
-    primaryPath: "/contests/seoul-data/teams/syrup-data-lab",
-    secondaryPath: "/giut-hub/9",
-    messages: [
-      {
-        id: "startup-1",
-        sender: "other",
-        time: "11:20",
-        content:
-          "기웃허브에서 포트폴리오 잘 봤어요! 저희 팀 백엔드로 함께해 주실 수 있을까요?",
-      },
-      {
-        id: "startup-2",
-        sender: "me",
-        time: "11:32",
-        content: "관심 있어요! 팀 구성이나 일정 좀 더 알 수 있을까요?",
-      },
-      {
-        id: "startup-3",
-        sender: "other",
-        time: "11:35",
-        content:
-          "기획 2명 · 디자인 1명이고 주 1회 온라인이에요. 팀 상세에 정리해 뒀어요 😊",
-      },
-    ],
-  },
-  "esg-campaign": {
-    name: "장하늘",
-    initial: "하",
-    avatarTone: "peach",
-    subtitle: "시각디자인과 3학년 · 디자인",
-    contextLabel: "공모전 팀 상세에서 시작된 대화",
-    contextTitle: "ESG 임팩트 캠페인 · 디자인 포지션 제안",
-    primaryAction: "팀 보기",
-    secondaryAction: "공모전 보기",
-    primaryPath: "/contests/seoul-data/teams/syrup-data-lab",
-    secondaryPath: "/contests/seoul-data",
-    messages: [
-      {
-        id: "esg-1",
-        sender: "other",
-        time: "어제",
-        content: "디자인 포지션 아직 열려 있어요. 포트폴리오도 잘 봤습니다!",
-      },
-    ],
-  },
+const avatarTones: AvatarTone[] = ["mint", "peach", "purple"];
+
+const formatMessageTime = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+};
+
+const uniqueChronologicalMessages = (messages: ChatMessageResponse[]) => {
+  const unique = new Map(messages.map((message) => [message.messageId, message]));
+  return [...unique.values()].sort(
+    (left, right) =>
+      new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
+  );
 };
 
 export function ChatRoomPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { chatId } = useParams();
-  const room = chatRooms[chatId ?? ""];
+  const { profile: myProfile } = useAuth();
+  const chatRoomId = Number(chatId);
+  const isValidChatRoomId = Number.isSafeInteger(chatRoomId) && chatRoomId > 0;
   const [draft, setDraft] = useState("");
-  const [sentMessages, setSentMessages] = useState<Message[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [confirmationAction, setConfirmationAction] =
     useState<ConfirmationAction>(null);
   const [toastMessage, setToastMessage] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+  const lastReadMessageIdRef = useRef<number | null>(null);
+
+  const roomQuery = useQuery({
+    queryKey: ["chat-room", chatRoomId],
+    queryFn: () => fetchChatRoom(chatRoomId),
+    enabled: isValidChatRoomId,
+    retry: false,
+  });
+
+  const participantQuery = useQuery({
+    queryKey: ["chat-participant-profile", roomQuery.data?.targetUserId],
+    queryFn: () => fetchChatParticipantProfile(roomQuery.data!.targetUserId!),
+    enabled:
+      roomQuery.data?.type === "PERSONAL" &&
+      Boolean(roomQuery.data.targetUserId),
+  });
+
+  const messagesQuery = useInfiniteQuery({
+    queryKey: ["chat-messages", chatRoomId],
+    queryFn: ({ pageParam }) => fetchChatMessages(chatRoomId, pageParam, 30),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.page + 1 : undefined,
+    enabled:
+      isValidChatRoomId && roomQuery.data?.status === "ACTIVE",
+    refetchInterval: 10_000,
+    retry: false,
+  });
 
   const messages = useMemo(
-    () => [...(room?.messages ?? []), ...sentMessages],
-    [room?.messages, sentMessages],
+    () =>
+      uniqueChronologicalMessages(
+        messagesQuery.data?.pages.flatMap((page) => page.messages) ?? [],
+      ),
+    [messagesQuery.data],
   );
 
   useEffect(() => {
-    if (!toastMessage) return;
+    if (!isValidChatRoomId || roomQuery.data?.status !== "ACTIVE") return;
 
+    return subscribeToChatRoom({
+      chatRoomId,
+      onMessage: (receivedMessage) => {
+        queryClient.setQueryData<InfiniteData<ChatMessageListResponse>>(
+          ["chat-messages", chatRoomId],
+          (current) => {
+            if (!current) return current;
+            const alreadyExists = current.pages.some((page) =>
+              page.messages.some(
+                (message) => message.messageId === receivedMessage.messageId,
+              ),
+            );
+            if (alreadyExists) return current;
+
+            return {
+              ...current,
+              pages: current.pages.map((page, index) =>
+                index === 0
+                  ? { ...page, messages: [...page.messages, receivedMessage] }
+                  : page,
+              ),
+            };
+          },
+        );
+        void queryClient.invalidateQueries({
+          queryKey: ["chat-room-summary", chatRoomId],
+        });
+        void queryClient.invalidateQueries({ queryKey: ["chat-rooms"] });
+      },
+    });
+  }, [chatRoomId, isValidChatRoomId, queryClient, roomQuery.data?.status]);
+
+  const participantProfile = participantQuery.data?.profile;
+  const roomName =
+    participantProfile?.nickname ||
+    participantQuery.data?.nickname ||
+    (roomQuery.data?.type === "TEAM"
+      ? `팀 채팅 #${chatRoomId}`
+      : `개인 채팅 #${roomQuery.data?.targetUserId ?? chatRoomId}`);
+  const roomSubtitle = participantProfile
+    ? [
+        participantProfile.departmentName,
+        participantProfile.grade ? `${participantProfile.grade}학년` : "",
+        participantProfile.primaryRoles[0]?.name,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : roomQuery.data?.type === "TEAM"
+      ? "팀 채팅"
+      : "1:1 채팅";
+  const avatarTone = avatarTones[chatRoomId % avatarTones.length];
+
+  const readMutation = useMutation({
+    mutationFn: (messageId: number) =>
+      markChatRoomAsRead(chatRoomId, messageId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["chat-room-summary", chatRoomId] });
+      void queryClient.invalidateQueries({ queryKey: ["chat-rooms"] });
+      void queryClient.invalidateQueries({ queryKey: ["chat-unread-total"] });
+    },
+  });
+
+  const sendMutation = useMutation({
+    mutationFn: (content: string) => sendChatMessage(chatRoomId, content),
+    onSuccess: () => {
+      setDraft("");
+      void queryClient.invalidateQueries({ queryKey: ["chat-messages", chatRoomId] });
+      void queryClient.invalidateQueries({ queryKey: ["chat-room-summary", chatRoomId] });
+      void queryClient.invalidateQueries({ queryKey: ["chat-rooms"] });
+    },
+    onError: () => setToastMessage("메시지를 보내지 못했어요."),
+  });
+
+  const leaveMutation = useMutation({
+    mutationFn: () => leaveChatRoom(chatRoomId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["chat-rooms"] });
+      void queryClient.invalidateQueries({ queryKey: ["chat-unread-total"] });
+      navigate("/chat", {
+        replace: true,
+        state: { toastMessage: "채팅방을 나갔어요." },
+      });
+    },
+    onError: () => {
+      setConfirmationAction(null);
+      setToastMessage("채팅방을 나가지 못했어요.");
+    },
+  });
+
+  useEffect(() => {
+    if (!toastMessage) return;
     const timeoutId = window.setTimeout(() => setToastMessage(""), 3200);
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
 
   useEffect(() => {
     if (!isMenuOpen) return;
-
     const closeWhenClickedOutside = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !menuRef.current?.contains(event.target)
-      ) {
+      if (event.target instanceof Node && !menuRef.current?.contains(event.target)) {
         setIsMenuOpen(false);
       }
     };
-
     window.addEventListener("pointerdown", closeWhenClickedOutside);
     return () => window.removeEventListener("pointerdown", closeWhenClickedOutside);
   }, [isMenuOpen]);
 
-  if (!room) {
-    return <Navigate replace to="/chat" />;
-  }
+  useEffect(() => {
+    if (!myProfile?.userId || messages.length === 0) return;
+    const latestReceivedMessage = [...messages]
+      .reverse()
+      .find((message) => message.senderId !== myProfile.userId);
+    if (
+      !latestReceivedMessage ||
+      lastReadMessageIdRef.current === latestReceivedMessage.messageId
+    ) {
+      return;
+    }
+    lastReadMessageIdRef.current = latestReceivedMessage.messageId;
+    readMutation.mutate(latestReceivedMessage.messageId);
+  }, [messages, myProfile?.userId, readMutation]);
 
-  const sendMessage = () => {
-    const content = draft.trim();
-    if (!content) return;
-
-    setSentMessages((current) => [
-      ...current,
-      {
-        id: `sent-${Date.now()}`,
-        content,
-        sender: "me",
-        time: new Intl.DateTimeFormat("ko-KR", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }).format(new Date()),
-      },
-    ]);
-    setDraft("");
-  };
+  if (!isValidChatRoomId) return <Navigate replace to="/chat" />;
 
   const toggleMute = () => {
     const nextMuted = !isMuted;
     setIsMuted(nextMuted);
     setIsMenuOpen(false);
-    setToastMessage(
-      nextMuted ? "채팅방 알림을 껐어요." : "채팅방 알림을 켰어요.",
-    );
+    setToastMessage(nextMuted ? "채팅방 알림을 껐어요." : "채팅방 알림을 켰어요.");
   };
 
   const completeConfirmation = () => {
     if (confirmationAction === "leave") {
-      navigate("/chat", {
-        replace: true,
-        state: { toastMessage: "채팅방을 나갔어요." },
-      });
+      leaveMutation.mutate();
       return;
     }
-
     setConfirmationAction(null);
     setToastMessage("신고가 접수되었어요.");
   };
@@ -209,17 +243,15 @@ export function ChatRoomPage() {
   return (
     <S.Page>
       <S.Header>
-        <S.BackButton
-          aria-label="채팅 목록으로"
-          onClick={() => navigate("/chat")}
-          type="button"
-        >
+        <S.BackButton aria-label="채팅 목록으로" onClick={() => navigate("/chat")} type="button">
           <Icon name="arrow-left" size={23} weight="bold" />
         </S.BackButton>
-        <S.Avatar $tone={room.avatarTone}>{room.initial}</S.Avatar>
+        <S.Avatar $tone={avatarTone}>
+          {roomQuery.data?.type === "TEAM" ? "팀" : roomName.slice(0, 1)}
+        </S.Avatar>
         <S.Profile>
-          <S.Name>{room.name}</S.Name>
-          <S.Subtitle>{room.subtitle}</S.Subtitle>
+          <S.Name>{roomQuery.isPending ? "채팅방을 불러오는 중" : roomName}</S.Name>
+          <S.Subtitle>{roomSubtitle}</S.Subtitle>
         </S.Profile>
         <S.MenuAnchor ref={menuRef}>
           <S.MoreButton
@@ -260,33 +292,45 @@ export function ChatRoomPage() {
       </S.Header>
 
       <S.Thread>
-        <S.ContextCard>
-          <S.ContextLabel>{room.contextLabel}</S.ContextLabel>
-          <S.ContextTitle>{room.contextTitle}</S.ContextTitle>
-          <S.ContextActions>
-            <S.ContextButton onClick={() => navigate(room.primaryPath)} type="button">
-              {room.primaryAction}
-            </S.ContextButton>
-            <S.ContextButton onClick={() => navigate(room.secondaryPath)} type="button">
-              {room.secondaryAction}
-            </S.ContextButton>
-          </S.ContextActions>
-        </S.ContextCard>
-
-        <S.DateDivider>오늘</S.DateDivider>
-
-        <S.Messages aria-label={`${room.name}님과의 대화`}>
-          {messages.map((message) => (
-            <S.MessageRow $sender={message.sender} key={message.id}>
-              {message.sender === "me" && (
-                <S.MessageTime>{message.time}</S.MessageTime>
-              )}
-              <S.Bubble $sender={message.sender}>{message.content}</S.Bubble>
-              {message.sender === "other" && (
-                <S.MessageTime>{message.time}</S.MessageTime>
-              )}
-            </S.MessageRow>
-          ))}
+        {messagesQuery.hasNextPage && (
+          <S.LoadMoreButton
+            disabled={messagesQuery.isFetchingNextPage}
+            onClick={() => void messagesQuery.fetchNextPage()}
+            type="button"
+          >
+            {messagesQuery.isFetchingNextPage ? "불러오는 중..." : "이전 메시지 보기"}
+          </S.LoadMoreButton>
+        )}
+        <S.DateDivider>대화</S.DateDivider>
+        <S.Messages aria-label={`${roomName}님과의 대화`}>
+          {messages.map((message) => {
+            const sender = message.senderId === myProfile?.userId ? "me" : "other";
+            return (
+              <S.MessageRow $sender={sender} key={message.messageId}>
+                {sender === "me" && <S.MessageTime>{formatMessageTime(message.createdAt)}</S.MessageTime>}
+                <S.Bubble $sender={sender}>
+                  {message.status === "DELETED" ? "삭제된 메시지입니다." : message.content}
+                </S.Bubble>
+                {sender === "other" && <S.MessageTime>{formatMessageTime(message.createdAt)}</S.MessageTime>}
+              </S.MessageRow>
+            );
+          })}
+          {(roomQuery.isPending || messagesQuery.isPending) && (
+            <S.ThreadStatus>메시지를 불러오는 중이에요.</S.ThreadStatus>
+          )}
+          {roomQuery.isError && (
+            <S.ThreadStatus>채팅방에 접근할 수 없어요.</S.ThreadStatus>
+          )}
+          {!roomQuery.isError && messagesQuery.isError && (
+            <S.ThreadStatus>메시지를 불러오지 못했어요.</S.ThreadStatus>
+          )}
+          {!roomQuery.isPending &&
+            !roomQuery.isError &&
+            !messagesQuery.isPending &&
+            !messagesQuery.isError &&
+            messages.length === 0 && (
+            <S.ThreadStatus>첫 메시지를 보내보세요.</S.ThreadStatus>
+          )}
         </S.Messages>
       </S.Thread>
 
@@ -297,48 +341,51 @@ export function ChatRoomPage() {
             : "신고 내용은 운영팀이 검토해요. 허위 신고는 서비스 이용에 제한이 있을 수 있어요."
         }
         emphasizeDescription
-        icon={
-          <Icon
-            name={confirmationAction === "leave" ? "x" : "warning"}
-            size={22}
-            weight="bold"
-          />
-        }
+        icon={<Icon name={confirmationAction === "leave" ? "x" : "warning"} size={22} weight="bold" />}
         onClose={() => setConfirmationAction(null)}
         open={confirmationAction !== null}
         primaryAction={{
-          label: confirmationAction === "leave" ? "나가기" : "신고하기",
+          label:
+            confirmationAction === "leave" && leaveMutation.isPending
+              ? "나가는 중..."
+              : confirmationAction === "leave"
+                ? "나가기"
+                : "신고하기",
           onClick: completeConfirmation,
         }}
-        secondaryAction={{
-          label: "취소",
-          onClick: () => setConfirmationAction(null),
-        }}
-        title={
-          confirmationAction === "leave"
-            ? "채팅방을 나갈까요?"
-            : `${room.name}님을 신고할까요?`
-        }
+        secondaryAction={{ label: "취소", onClick: () => setConfirmationAction(null) }}
+        title={confirmationAction === "leave" ? "채팅방을 나갈까요?" : `${roomName}님을 신고할까요?`}
       />
 
       <S.Composer
         onSubmit={(event) => {
           event.preventDefault();
-          sendMessage();
+          const content = draft.trim();
+          if (content) sendMutation.mutate(content);
         }}
       >
-        <S.PlusButton aria-label="첨부하기" type="button">
+        <S.PlusButton aria-label="첨부하기" disabled type="button">
           <Icon name="plus" size={18} weight="bold" />
         </S.PlusButton>
         <S.MessageInput
           aria-label="메시지"
+          disabled={sendMutation.isPending || roomQuery.data?.status !== "ACTIVE"}
+          maxLength={2000}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="메시지를 입력하세요"
+          placeholder={
+            roomQuery.isPending
+              ? "채팅방을 불러오는 중입니다"
+              : roomQuery.isError
+                ? "채팅방에 접근할 수 없습니다"
+                : roomQuery.data?.status === "ACTIVE"
+                  ? "메시지를 입력하세요"
+                  : "종료된 채팅방입니다"
+          }
           value={draft}
         />
         <S.SendButton
           aria-label="메시지 전송"
-          disabled={!draft.trim()}
+          disabled={!draft.trim() || sendMutation.isPending || roomQuery.data?.status !== "ACTIVE"}
           type="submit"
         >
           <Icon name="paper-plane" size={19} weight="fill" />

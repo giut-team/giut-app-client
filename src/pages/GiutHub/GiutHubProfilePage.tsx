@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { createPersonalChatRoom } from "../../api/chats";
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
@@ -685,6 +687,10 @@ export function GiutHubProfilePage() {
   const profile = giutHubProfiles.find(
     (item) => item.profileNumber === Number(profileNumber),
   );
+  const startChatMutation = useMutation({
+    mutationFn: () => createPersonalChatRoom(Number(profileNumber)),
+    onSuccess: (chatRoom) => navigate(`/chat/${chatRoom.chatRoomId}`),
+  });
   if (!profile) return <Navigate replace to="/giut-hub" />;
 
   const detail = detailsByProfileId[profile.id];
@@ -772,9 +778,17 @@ export function GiutHubProfilePage() {
           <Button onClick={() => setIsProposalSheetOpen(true)} type="button" width="100%">
             <Icon name="paper-plane" size={19} weight="fill" />팀 제안 보내기
           </Button>
-          <S.MessageButton onClick={() => undefined} type="button">
+          <S.MessageButton
+            disabled={startChatMutation.isPending}
+            onClick={() => startChatMutation.mutate()}
+            type="button"
+          >
             <Icon name="chat" size={20} weight="regular" />
-            메시지 보내기
+            {startChatMutation.isPending
+              ? "채팅방 여는 중..."
+              : startChatMutation.isError
+                ? "다시 시도"
+                : "메시지 보내기"}
           </S.MessageButton>
           <S.FavoriteButton
             $active={isScrapped}

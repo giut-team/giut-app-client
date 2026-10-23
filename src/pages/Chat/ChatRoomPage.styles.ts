@@ -121,6 +121,24 @@ export const S = {
     padding: 14px 14px 24px;
     box-sizing: border-box;
   `,
+  LoadMoreButton: styled.button`
+    display: block;
+    margin: 0 auto 10px;
+    padding: 7px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.65;
+    }
+  `,
   ContextCard: styled.article`
     padding: 13px 12px;
     border: 1px solid ${tokens.color.neutral[200]};
@@ -172,6 +190,12 @@ export const S = {
   Messages: styled.div`
     display: grid;
     gap: 11px;
+  `,
+  ThreadStatus: styled.p`
+    margin: 28px 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 12px;
+    text-align: center;
   `,
   MessageRow: styled.div<{ $sender: Sender }>`
     display: flex;
@@ -231,6 +255,11 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[700]};
     cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
   `,
   MessageInput: styled.input`
     width: 100%;
