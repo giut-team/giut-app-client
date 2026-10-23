@@ -626,9 +626,8 @@ export const S = {
     text-align: left;
     cursor: pointer;
 
-    &:active {
-      opacity: 0.6;
-    }
+    &:active:not(:disabled) { opacity: 0.6; }
+    &:disabled { opacity: 0.45; cursor: default; }
   `,
   ProfileMenuDivider: styled.hr`
     width: 100%;
@@ -637,10 +636,56 @@ export const S = {
     border: 0;
     background: ${tokens.color.neutral[200]};
   `,
+  ReportBody: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 28px;
+  `,
   ReportReasonList: styled.div`
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-    margin-top: 28px;
+  `,
+  ReportDescriptionField: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  `,
+  ReportDescriptionLabel: styled.label`
+    color: ${tokens.color.neutral[700]};
+    font-size: 13px;
+    font-weight: 700;
+    span { color: ${tokens.color.neutral[500]}; font-weight: 500; }
+  `,
+  ReportDescriptionInput: styled.textarea`
+    width: 100%;
+    min-height: 92px;
+    padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: vertical;
+    &::placeholder { color: ${tokens.color.neutral[500]}; }
+    &:focus-visible { outline: 2px solid ${tokens.color.danger[500]}; outline-offset: 2px; }
+    &:disabled { opacity: 0.5; }
+  `,
+  ReportDescriptionCount: styled.span`
+    align-self: flex-end;
+    color: ${tokens.color.neutral[500]};
+    font-size: 12px;
+  `,
+  ReportError: styled.p`
+    margin: 0;
+    color: ${tokens.color.danger[500]};
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   `,
   ReportReason: styled.button<{ $selected: boolean }>`
     display: flex;
@@ -660,6 +705,7 @@ export const S = {
     letter-spacing: -0.45px;
     text-align: left;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ReportRadio: styled.span<{ $selected: boolean }>`
     display: grid;
@@ -681,23 +727,11 @@ export const S = {
       content: ${({ $selected }) => ($selected ? '""' : "none")};
     }
   `,
-  BlockNotice: styled.div`
-    display: grid;
-    gap: 10px;
-    margin-top: 24px;
-    padding: 18px 20px;
-    border-radius: 16px;
-    background: ${tokens.color.neutral[100]};
-    color: ${tokens.color.neutral[500]};
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: -0.4px;
-  `,
-  DangerDialogActions: styled.div`
-    display: grid;
-    grid-template-columns: 0.95fr 1.35fr;
+  ReportActions: styled.div`
+    display: flex;
     gap: 12px;
-    margin-top: 26px;
+    > button:first-of-type { flex: 0.95; }
+    > button:last-of-type { flex: 1.35; }
   `,
   DialogCancelButton: styled.button`
     padding: 16px 10px;
@@ -709,6 +743,7 @@ export const S = {
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   DialogDangerButton: styled.button`
     padding: 16px 10px;
@@ -720,6 +755,7 @@ export const S = {
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ProposalHeading: styled.h2`
     margin: 4px 0 0;

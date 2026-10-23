@@ -13,7 +13,7 @@ import { getPublicProfile, type PublicProfileDetail } from "../../api/giutHub";
 import { setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
 import { createPersonalChatRoom } from "../../api/chat";
 import { toHubProfile } from "./GiutHubPage";
-import { GiutHubDialog } from "./GiutHubDialog";
+import { ProfileReportModal } from "./ProfileReportModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareScreen } from "./ProfileShareScreen";
 import { ProfileTabEmptyState } from "./ProfileTabEmptyState";
@@ -395,13 +395,13 @@ function ProfileMoreBottomSheet({
   onClose,
   onShare,
   onReport,
-  onBlock,
+  canReport,
 }: {
   open: boolean;
   onClose: () => void;
   onShare: () => void;
   onReport: () => void;
-  onBlock: () => void;
+  canReport: boolean;
 }) {
   return (
     <BottomSheet
@@ -417,99 +417,12 @@ function ProfileMoreBottomSheet({
           프로필 공유
         </S.ProfileMenuButton>
         <S.ProfileMenuDivider />
-        <S.ProfileMenuButton $destructive onClick={onReport} type="button">
+        <S.ProfileMenuButton $destructive disabled={!canReport} onClick={onReport} type="button">
           <Icon name="shield-check" size={21} weight="regular" />
           신고하기
         </S.ProfileMenuButton>
-        <S.ProfileMenuButton $destructive onClick={onBlock} type="button">
-          <Icon name="lock" size={21} weight="regular" />
-          차단하기
-        </S.ProfileMenuButton>
       </S.ProfileMenu>
     </BottomSheet>
-  );
-}
-
-const reportReasons = [
-  "스팸 · 광고성 프로필",
-  "허위 경력 · 정보 도용",
-  "부적절한 언행 · 괴롭힘",
-  "기타",
-];
-
-function ProfileReportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [selectedReason, setSelectedReason] = useState(reportReasons[1]);
-
-  return (
-    <GiutHubDialog
-      description={
-        "신고 사유를 선택해 주세요. " +
-        "운영팀이 24시간 내 검토합니다."
-      }
-      onClose={onClose}
-      open={open}
-      title="신고하기"
-    >
-      <S.ReportReasonList aria-label="신고 사유 선택">
-        {reportReasons.map((reason) => (
-          <S.ReportReason
-            $selected={selectedReason === reason}
-            aria-pressed={selectedReason === reason}
-            key={reason}
-            onClick={() => setSelectedReason(reason)}
-            type="button"
-          >
-            <S.ReportRadio $selected={selectedReason === reason} />
-            {reason}
-          </S.ReportReason>
-        ))}
-      </S.ReportReasonList>
-      <S.DangerDialogActions>
-        <S.DialogCancelButton onClick={onClose} type="button">
-          취소
-        </S.DialogCancelButton>
-        <S.DialogDangerButton onClick={onClose} type="button">
-          신고 접수
-        </S.DialogDangerButton>
-      </S.DangerDialogActions>
-    </GiutHubDialog>
-  );
-}
-
-function ProfileBlockModal({
-  open,
-  profileName,
-  onClose,
-}: {
-  open: boolean;
-  profileName: string;
-  onClose: () => void;
-}) {
-  return (
-    <GiutHubDialog
-      description={
-        "차단하면 서로의 프로필과 팀 제안이 노출되지 않아요.\n" +
-        "설정에서 언제든 해제할 수 있어요."
-      }
-      icon={<Icon name="lock" size={24} weight="bold" />}
-      onClose={onClose}
-      open={open}
-      title={`${profileName} 님을 차단할까요?`}
-      tone="danger"
-    >
-      <S.BlockNotice>
-        <span>· 진행 중인 팀 제안 1건이 자동 취소됩니다</span>
-        <span>· 주고받은 채팅방이 숨겨집니다</span>
-      </S.BlockNotice>
-      <S.DangerDialogActions>
-        <S.DialogCancelButton onClick={onClose} type="button">
-          취소
-        </S.DialogCancelButton>
-        <S.DialogDangerButton onClick={onClose} type="button">
-          차단하기
-        </S.DialogDangerButton>
-      </S.DangerDialogActions>
-    </GiutHubDialog>
   );
 }
 
@@ -546,7 +459,7 @@ export function GiutHubProfilePage() {
   const isRecommended = apiProfile?.recommended ?? false;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
-  const [profileAction, setProfileAction] = useState<"share" | "report" | "block" | null>(
+  const [profileAction, setProfileAction] = useState<"share" | "report" | null>(
     null,
   );
 
@@ -575,13 +488,13 @@ export function GiutHubProfilePage() {
   const departmentAndGrade = profileData
     ? `${profileData.departmentName} / ${profileData.grade}학년`
     : "";
-  const openProfileAction = (action: "share" | "report" | "block") => {
+  const openProfileAction = (action: "share" | "report") => {
     setIsMoreSheetOpen(false);
     if (action === "share") {
       share.openShare();
       return;
     }
-    window.setTimeout(() => setProfileAction(action), 180);
+    if (isAuthenticated && !isOwnProfile) window.setTimeout(() => setProfileAction(action), 180);
   };
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
@@ -796,22 +709,16 @@ export function GiutHubProfilePage() {
         profileName={profile.name}
       />
       <ProfileMoreBottomSheet
-        onBlock={() => openProfileAction("block")}
+        canReport={isAuthenticated && !isOwnProfile}
         onClose={() => setIsMoreSheetOpen(false)}
         onReport={() => openProfileAction("report")}
         onShare={() => openProfileAction("share")}
         open={isMoreSheetOpen}
       />
       {share.isOpen && <ProfileShareScreen profile={profileSummary ?? undefined} profileName={profile.name} share={share} />}
-      <ProfileReportModal
-        onClose={() => setProfileAction(null)}
-        open={profileAction === "report"}
-      />
-      <ProfileBlockModal
-        onClose={() => setProfileAction(null)}
-        open={profileAction === "block"}
-        profileName={profile.name}
-      />
+      {profileAction === "report" && isAuthenticated && !isOwnProfile && (
+        <ProfileReportModal key={`${userId}-${currentProfile?.userId}`} onClose={() => setProfileAction(null)} userId={userId} />
+      )}
     </S.Page>
   );
 }
