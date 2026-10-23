@@ -7,6 +7,7 @@ import { Icon } from "../../components/icons";
 import { PageHeader } from "../../components/PageHeader";
 import { PillButton } from "../../components/PillButton";
 import { Toast } from "../../components/Toast/Toast";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./ContestsPage.styles";
 
 type SortOption = "views" | "scraps" | "deadline";
@@ -80,6 +81,8 @@ function ContestCardSkeleton() {
 
 export function ContestsPage() {
   const navigate = useNavigate();
+  const { isAuthenticated, universityVerified } = useAuth();
+  const isUniversityUnverified = isAuthenticated && !universityVerified;
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<ContestCategory>("전체");
@@ -148,10 +151,16 @@ export function ContestsPage() {
       <S.Content>
         <S.ListControls>
           <S.RegisterButton
+            aria-label={isUniversityUnverified ? "공모전 등록, 학교 인증 필요" : "공모전 등록"}
+            disabled={isUniversityUnverified}
             onClick={() => navigate("/contests/register")}
             type="button"
           >
-            <Icon name="plus" size={10} weight="bold" />
+            <Icon
+              name={isUniversityUnverified ? "lock" : "plus"}
+              size={10}
+              weight="bold"
+            />
             공모전 등록
           </S.RegisterButton>
           <S.SortButton

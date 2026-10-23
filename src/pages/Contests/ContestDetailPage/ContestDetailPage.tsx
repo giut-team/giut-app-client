@@ -12,6 +12,7 @@ import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { Toast } from "../../../components/Toast/Toast";
+import { useAuth } from "../../../contexts/AuthContext";
 import { S } from "./ContestDetailPage.styles";
 
 type DetailTab = "overview" | "guide";
@@ -57,6 +58,8 @@ const recruitTeams = [
 
 export function ContestDetailPage() {
   const navigate = useNavigate();
+  const { isAuthenticated, universityVerified } = useAuth();
+  const isUniversityUnverified = isAuthenticated && !universityVerified;
   const queryClient = useQueryClient();
   const location = useLocation();
   const { contestId } = useParams();
@@ -182,6 +185,8 @@ export function ContestDetailPage() {
       - (savedOverride === false && contest.scrapped ? 1 : 0);
 
   const handleScrap = () => {
+    if (isUniversityUnverified) return;
+
     toggleScrap(isSaved);
   };
 
@@ -242,9 +247,15 @@ export function ContestDetailPage() {
           </S.HeaderButton>
           <S.HeaderActions>
             <S.HeaderButton
-              aria-label={isSaved ? "공모전 스크랩 취소하기" : "공모전 스크랩하기"}
-              aria-pressed={isSaved}
-              disabled={isScrapPending}
+              aria-label={
+                isUniversityUnverified
+                  ? "공모전 스크랩, 학교 인증 필요"
+                  : isSaved
+                    ? "공모전 스크랩 취소하기"
+                    : "공모전 스크랩하기"
+              }
+              aria-pressed={!isUniversityUnverified && isSaved}
+              disabled={isUniversityUnverified || isScrapPending}
               onClick={handleScrap}
               type="button"
             >
@@ -253,6 +264,11 @@ export function ContestDetailPage() {
                 size={18}
                 weight={isSaved ? "fill" : "regular"}
               />
+              {isUniversityUnverified && (
+                <S.HeaderLock aria-hidden="true">
+                  <Icon name="lock" size={7} weight="fill" />
+                </S.HeaderLock>
+              )}
             </S.HeaderButton>
             <S.HeaderButton
               aria-label="공유하기"
@@ -351,15 +367,32 @@ export function ContestDetailPage() {
         <S.TeamsHeader>
           <S.SectionHeader>
             <S.SectionTitle>
-              모집 중인 팀 <S.TeamTotal>{contest.recruitingTeamCount}</S.TeamTotal>
+              모집 중인 팀
+              {!isUniversityUnverified && (
+                <> <S.TeamTotal>{contest.recruitingTeamCount}</S.TeamTotal></>
+              )}
             </S.SectionTitle>
-            <S.ViewAll onClick={() => navigate("teams")} type="button">
-              전체 보기 ›
-            </S.ViewAll>
+            {!isUniversityUnverified && (
+              <S.ViewAll onClick={() => navigate("teams")} type="button">
+                전체 보기 ›
+              </S.ViewAll>
+            )}
           </S.SectionHeader>
         </S.TeamsHeader>
         <S.TeamsSection>
-          <S.TeamList>
+          {isUniversityUnverified ? (
+            <S.LockedTeamsCard disabled type="button">
+              <S.LockedTeamsPreview aria-hidden="true">
+                <strong>데이터로 서울을</strong>
+                <span>함께할 팀원을 모집하고 있어요</span>
+              </S.LockedTeamsPreview>
+              <S.LockedTeamsMessage>
+                <Icon name="lock" size={15} weight="regular" />
+                <span>학교 인증 후 볼 수 있어요</span>
+              </S.LockedTeamsMessage>
+            </S.LockedTeamsCard>
+          ) : (
+            <S.TeamList>
             {recruitTeams.slice(0, 3).map((team) => {
               const favorite = favoriteTeamIds.includes(team.id);
 
@@ -430,7 +463,8 @@ export function ContestDetailPage() {
                 </S.TeamCard>
               );
             })}
-          </S.TeamList>
+            </S.TeamList>
+          )}
         </S.TeamsSection>
       </S.Content>
 
@@ -477,9 +511,14 @@ export function ContestDetailPage() {
 
       <S.ActionBar>
         <S.ApplyButton
+          $locked={isUniversityUnverified}
+          disabled={isUniversityUnverified}
           onClick={() => setIsTeamCreationModalOpen(true)}
           type="button"
         >
+          {isUniversityUnverified && (
+            <Icon name="lock" size={14} weight="fill" />
+          )}
           팀 구성하기
         </S.ApplyButton>
       </S.ActionBar>
