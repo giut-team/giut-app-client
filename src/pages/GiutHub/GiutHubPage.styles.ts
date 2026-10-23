@@ -11,7 +11,7 @@ export const S = {
     background: ${giutHubBackground};
   `,
   Content: styled.div`
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(88px + var(--app-safe-bottom));

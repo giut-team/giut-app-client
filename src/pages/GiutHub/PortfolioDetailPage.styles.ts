@@ -28,7 +28,7 @@ export const S = {
     }
   `,
   Content: styled.div`
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: 92px;
@@ -308,6 +308,8 @@ export const S = {
     z-index: 4;
     display: flex;
     justify-content: center;
+    width: min(100%, var(--app-content-width));
+    margin: 0 auto;
     padding: 10px 20px calc(12px + var(--app-safe-bottom));
     box-sizing: border-box;
     border-top: 1px solid ${tokens.color.neutral[100]};
@@ -318,7 +320,7 @@ export const S = {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    width: min(100%, 413px);
+    width: 100%;
     padding: 14px 20px;
     border: 0;
     border-radius: 14px;

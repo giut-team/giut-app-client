@@ -14,11 +14,11 @@ export const S = {
   Screen: styled.dialog`
     position: fixed;
     inset: 0;
-    width: 100%;
-    max-width: none;
+    width: min(100%, var(--app-content-width));
+    max-width: var(--app-content-width);
     height: 100dvh;
     max-height: none;
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -46,7 +46,7 @@ export const S = {
     display: flex;
     flex-direction: column;
     align-self: flex-start;
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100%;
   `,
   Header: styled.header`
