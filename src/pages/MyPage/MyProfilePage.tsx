@@ -7,6 +7,9 @@ import { useAuth } from "../../contexts/AuthContext";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
+import { useAuth } from "../../contexts/AuthContext";
+import { ProfileShareScreen } from "../GiutHub/ProfileShareScreen";
+import { useProfileShare } from "../GiutHub/useProfileShare";
 
 type MyProfileTab = "portfolio" | "teams" | "scraps";
 type ScrapFilter = "all" | "posts" | "teams";
@@ -94,8 +97,8 @@ const scrapTeams = [
 export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, universityVerified } = useAuth();
-  const isUniversityUnverified = isAuthenticated && !universityVerified;
+  const { isAuthenticated, profile: currentProfile } = useAuth();
+  const share = useProfileShare(isAuthenticated);
   const preview = location.state as ProfilePreview | null;
   const [activeTab, setActiveTab] = useState<MyProfileTab>("portfolio");
   const [scrapFilter, setScrapFilter] = useState<ScrapFilter>("all");
@@ -200,21 +203,8 @@ export function MyProfilePage() {
             />
             프로필 편집
           </S.EditButton>
-          <S.ShareButton
-            $locked={isUniversityUnverified}
-            aria-label={
-              isUniversityUnverified
-                ? "프로필 공유, 학교 인증 필요"
-                : "프로필 공유"
-            }
-            disabled={isUniversityUnverified}
-            type="button"
-          >
-            <Icon
-              name={isUniversityUnverified ? "lock" : "share"}
-              size={25}
-              weight="regular"
-            />
+          <S.ShareButton aria-label="프로필 공유" onClick={share.openShare} type="button">
+            <Icon name="share" size={25} weight="regular" />
           </S.ShareButton>
         </S.ProfileActions>
         {isUniversityUnverified ? (
@@ -316,33 +306,40 @@ export function MyProfilePage() {
         </S.TabList>
         {activeTab === "portfolio" && (
           <S.TabContent>
-            {isUniversityUnverified ? (
-              <S.LockedPortfolioCard>
-                <S.LockedPortfolioIcon>
-                  <Icon name="lock" size={23} weight="regular" />
-                </S.LockedPortfolioIcon>
-                <S.LockedPortfolioTitle>
-                  인증하면 포트폴리오를 만들 수 있어요
-                </S.LockedPortfolioTitle>
-                <S.LockedPortfolioDescription>
-                  활동 사진 6장과 한 줄 캡션으로 나를 소개하는 공간이에요.
-                  <br />
-                  학교 인증을 마치면 바로 열려요.
-                </S.LockedPortfolioDescription>
-              </S.LockedPortfolioCard>
-            ) : (
-              <>
-                <S.PortfolioHeader>
-                  <S.PortfolioExposure>프로필 노출<em>{detail.portfolios.length}</em><span>/ 6</span></S.PortfolioExposure>
-                  <S.PortfolioHeaderButtons>
-                    <S.portfolioManageButton onClick={() => navigate("/my-profile/potfoliomanage", { state: preview })}
-                    type="button">관리</S.portfolioManageButton>
-                    <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolioadd", { state: preview })}
-                    type="button">+ 추가</S.portfolioAddButton>
-                  </S.PortfolioHeaderButtons>
-                </S.PortfolioHeader>
-                <S.FeaturedPortfolio
-                  onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
+            <S.PortfolioHeader>
+              <S.PortfolioExposure>프로필 노출<em>{detail.portfolios.length}</em><span>/ 6</span></S.PortfolioExposure>
+              <S.PortfolioHeaderButtons>
+                <S.portfolioManageButton onClick={() => navigate("/my-profile/portfolio-manage", { state: preview })}
+                type="button">관리</S.portfolioManageButton>
+                <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolio-add", { state: preview })}
+                type="button">+ 추가</S.portfolioAddButton>
+              </S.PortfolioHeaderButtons>
+            </S.PortfolioHeader>
+            <S.FeaturedPortfolio
+              onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
+              type="button"
+            >
+              <S.FeaturedImage>
+                <Icon name="image" size={18} weight="regular" />
+                <span>사진</span>
+                <small>
+                  or <u>browse files</u>
+                </small>
+              </S.FeaturedImage>
+              <S.PortfolioCopy>
+                <S.RepresentativeLabel>대표 프로젝트</S.RepresentativeLabel>
+                <strong>{detail.portfolios[0].title}</strong>
+                <small>{portfolioPeriods[0]}</small>
+              </S.PortfolioCopy>
+              <Icon name="caret-right" size={23} weight="bold" />
+            </S.FeaturedPortfolio>
+            <S.PortfolioList>
+              {detail.portfolios.slice(1).map((item, index) => (
+                <S.PortfolioItem
+                  key={item.title}
+                  onClick={() =>
+                    navigate(`/giut-hub/${profile.profileNumber}/portfolio/${index + 2}`)
+                  }
                   type="button"
                 >
                   <S.FeaturedImage>
@@ -519,6 +516,7 @@ export function MyProfilePage() {
           if (key === "chat") navigate("/chat");
         }}
       />
+      {share.isOpen && <ProfileShareScreen profileName={currentProfile?.nickname ?? "내"} share={share} />}
     </S.Page>
   );
 }

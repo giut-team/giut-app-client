@@ -12,9 +12,12 @@ interface ImageItem {
 
 interface ImageUploaderProps {
   onChange?: (files: File[]) => void;
+  maxImages?: number;
+  maxMsg?: string; 
 }
 
-export default function ImageUploader({ onChange }: ImageUploaderProps) {
+export default function ImageUploader({ onChange, maxImages=MAX_IMAGES, maxMsg, }: ImageUploaderProps) {
+  const limitMsg = maxMsg ?? `사진은 최대 ${maxImages}장까지 추가할 수 있어요`;
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
@@ -42,8 +45,8 @@ export default function ImageUploader({ onChange }: ImageUploaderProps) {
   };
 
   const handleAddClick = () => {
-    if (images.length >= MAX_IMAGES) {
-      showToast(MAX_MSG);
+    if (images.length >= maxImages) {
+      showToast(limitMsg);
       return;
     }
     inputRef.current?.click();
@@ -53,8 +56,8 @@ export default function ImageUploader({ onChange }: ImageUploaderProps) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
 
-    const remain = MAX_IMAGES - images.length;
-    if (files.length > remain) showToast(MAX_MSG);
+    const remain = maxImages - images.length;
+    if (files.length > remain) showToast(limitMsg);
 
     const added: ImageItem[] = files.slice(0, remain).map((file) => ({
       id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2)}`,
@@ -75,7 +78,7 @@ export default function ImageUploader({ onChange }: ImageUploaderProps) {
       <S.AddButton type="button" onClick={handleAddClick}>
         <S.Plus>+</S.Plus>
         <S.Count>
-          {images.length} / {MAX_IMAGES}
+          {images.length} / {maxImages}
         </S.Count>
       </S.AddButton>
 

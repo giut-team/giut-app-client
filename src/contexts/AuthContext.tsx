@@ -32,7 +32,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const fetchMyProfile = () => api.get<MyProfileResponse>("/api/userprofile/me/profile");
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data, error, isPending, refetch } = useQuery({

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import designerFemale from "../../assets/default_image/designer-female.png";
 import designerMale from "../../assets/default_image/designer-male.png";
@@ -11,18 +12,13 @@ import plannerMale from "../../assets/default_image/planner-male.png";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
-import { PillButton } from "../../components/PillButton";
+import { getPublicProfilesForFilters, type PublicProfile } from "../../api/giutHub";
+import { buildPublicProfileFilters, type Category, type Position, type TeamStatus, type Grade } from "./giutHubFilters";
 import { S } from "./GiutHubPage.styles";
+import { getProfileStatusColor } from "./profileStatus";
+import { GiutHubLoadError } from "./GiutHubLoadError";
 
-type Category = "전체" | "기획" | "디자인" | "개발" | "마케팅";
 type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
-type Position = "기획" | "디자인" | "개발" | "마케팅";
-type TeamStatus =
-  | "전체"
-  | "바로 합류 가능"
-  | "제안 검토 중"
-  | "일정 조율 필요";
-type Grade = 1 | 2 | 3 | 4;
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
 
 export const ProfileStatus = {
@@ -40,7 +36,8 @@ export type GiutHubProfile = {
   category: Exclude<Category, "전체">;
   role: Position;
   detailRole: string;
-  status: ProfileStatus;
+  status: string;
+  activityStatus?: PublicProfile["activityStatus"];
   name: string;
   available: boolean;
   summary: string;
@@ -55,7 +52,6 @@ export type GiutHubProfile = {
   avatarSrc?: string;
 };
 
-const categories: Category[] = ["전체", "기획", "디자인", "개발", "마케팅"];
 const positionOptions: {
   value: Position;
   icon: "edit" | "palette" | "code" | "megaphone";
@@ -66,10 +62,9 @@ const positionOptions: {
   { value: "마케팅", icon: "megaphone" },
 ];
 const teamStatusOptions: { value: TeamStatus; description: string }[] = [
-  { value: "전체", description: "모든 상태의 팀원" },
-  { value: "바로 합류 가능", description: "지금 바로 시작할 수 있어요" },
-  { value: "제안 검토 중", description: "좋은 제안이라면 확인해요" },
-  { value: "일정 조율 필요", description: "시작 일정을 맞춰야 해요" },
+  { value: "전체", description: "모든 공개 상태의 팀원" },
+  { value: "팀 찾는 중", description: "함께할 팀을 찾고 있어요" },
+  { value: "제안 검토 중", description: "팀 제안을 검토하고 있어요" },
 ];
 const gradeOptions: { value: Grade; label: string }[] = [
   { value: 1, label: "1학년" },
@@ -394,43 +389,50 @@ export const giutHubProfiles: GiutHubProfile[] = [
   },
 ];
 
-const profileFilterData: Record<
-  string,
-  { grade: Grade; department: string; teamStatus: TeamStatus }
-> = {
-  "kim-hyeonjin": {
-    grade: 3,
-    department: "컴퓨터과학부",
-    teamStatus: "바로 합류 가능",
-  },
-  "park-seojun": {
-    grade: 4,
-    department: "통계학과",
-    teamStatus: "바로 합류 가능",
-  },
-  "choi-yuna": {
-    grade: 3,
-    department: "디자인학과",
-    teamStatus: "바로 합류 가능",
-  },
-  minjae: {
-    grade: 3,
-    department: "컴퓨터과학부",
-    teamStatus: "바로 합류 가능",
-  },
-  seoyeon: { grade: 3, department: "경영학부", teamStatus: "바로 합류 가능" },
-  jiwoo: { grade: 2, department: "디자인학과", teamStatus: "제안 검토 중" },
-  junseo: {
-    grade: 2,
-    department: "전자전기컴퓨터공학부",
-    teamStatus: "일정 조율 필요",
-  },
-  dohyun: { grade: 4, department: "행정학과", teamStatus: "제안 검토 중" },
-  hayoon: { grade: 3, department: "디자인학과", teamStatus: "바로 합류 가능" },
-  soomin: { grade: 2, department: "경영학부", teamStatus: "바로 합류 가능" },
-  minho: { grade: 3, department: "경제학부", teamStatus: "일정 조율 필요" },
-  yujin: { grade: 4, department: "경영학부", teamStatus: "제안 검토 중" },
+const categoryByCode: Record<string, Exclude<Category, "전체">> = {
+  PLANNING: "기획",
+  DESIGN: "디자인",
+  DEVELOPMENT: "개발",
+  MARKETING: "마케팅",
 };
+
+const avatarByCategory: Record<Exclude<Category, "전체">, string[]> = {
+  기획: [plannerFemale, plannerMale],
+  디자인: [designerFemale, designerMale],
+  개발: [developerFemale, developerMale],
+  마케팅: [marketingFemale, marketingMale],
+};
+
+export function toHubProfile(
+  profile: PublicProfile & { roles?: { code: string; name: string }[] },
+): GiutHubProfile {
+  const primaryRole = profile.primaryRoles[0];
+  const category = categoryByCode[primaryRole?.code] ?? "개발";
+  const avatarTone: GiutHubProfile["avatarTone"] =
+    category === "기획" ? "purple" : category === "디자인" ? "green" : category === "마케팅" ? "orange" : "blue";
+
+  return {
+    profileNumber: profile.userId,
+    id: `user-${profile.userId}`,
+    category,
+    role: category,
+    detailRole: profile.roles?.map((role) => role.name).join(", ") || primaryRole?.name || category,
+    status: profile.activityStatusName,
+    activityStatus: profile.activityStatus,
+    name: profile.nickname,
+    available: profile.activityStatus === "OPEN_TO_OFFERS",
+    summary: `${category} · ${profile.departmentName} · ${profile.grade}학년`,
+    introduction: profile.bio,
+    tags: (profile.skills ?? []).filter((tag) => tag.type === "SKILL").map((tag) => tag.name),
+    projectCount: 0,
+    lastActiveAt: "",
+    lastResponseAt: "",
+    recommendationCount: 0,
+    avatarFallback: profile.nickname.slice(0, 1),
+    avatarTone,
+    avatarSrc: profile.profileImageUrl || avatarByCategory[category][0],
+  };
+}
 
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
@@ -441,7 +443,6 @@ const navigationItems = [
 
 export function GiutHubPage() {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState<Category>("전체");
   const [isPositionSheetOpen, setIsPositionSheetOpen] = useState(false);
   const [isStatusSheetOpen, setIsStatusSheetOpen] = useState(false);
   const [isDepartmentSheetOpen, setIsDepartmentSheetOpen] = useState(false);
@@ -452,42 +453,57 @@ export function GiutHubPage() {
   const [departmentCategory, setDepartmentCategory] =
     useState<DepartmentCategory>("전체");
   const [departmentQuery, setDepartmentQuery] = useState("");
+  const [retryingProfilesError, setRetryingProfilesError] = useState<unknown>(null);
+
+  const requestFilters = buildPublicProfileFilters({
+    activeCategory: "전체",
+    selectedPositions,
+    selectedTeamStatus,
+    selectedDepartments,
+    selectedGrades,
+  });
+  const {
+    data: publicProfiles,
+    isFetching: isLoadingProfiles,
+    isError: profileLoadError,
+    error: profilesError,
+    refetch: refetchProfiles,
+  } = useQuery({
+    queryKey: ["giut-hub", "profiles", requestFilters],
+    queryFn: ({ signal }) => getPublicProfilesForFilters(requestFilters, signal),
+    retry: false,
+  });
+  const showProfilesError = profileLoadError || retryingProfilesError !== null;
+  const retryProfiles = async () => {
+    if (isLoadingProfiles || retryingProfilesError !== null) return;
+    setRetryingProfilesError(profilesError ?? new Error("목록 재요청"));
+    try {
+      await refetchProfiles({ cancelRefetch: false });
+    } finally {
+      setRetryingProfilesError(null);
+    }
+  };
 
   const visibleProfiles = useMemo(
     () =>
-      giutHubProfiles.filter((profile) => {
-        const filterData = profileFilterData[profile.id];
-        const matchesCategory =
-          activeCategory === "전체" || profile.category === activeCategory;
+      (publicProfiles ?? []).filter((profile) => {
+        const profileCategories = profile.primaryRoles.map(({ code }) => categoryByCode[code]);
         const matchesPosition =
-          selectedPositions.length === 0 || selectedPositions.includes(profile.category);
-        const matchesStatus =
-          selectedTeamStatus === "전체" || filterData.teamStatus === selectedTeamStatus;
-        const matchesGrade =
-          selectedGrades.length === 0 || selectedGrades.includes(filterData.grade);
-        const matchesDepartment =
-          selectedDepartments.length === 0 ||
-          selectedDepartments.includes(filterData.department);
-
-        return (
-          matchesCategory &&
-          matchesPosition &&
-          matchesStatus &&
-          matchesGrade &&
-          matchesDepartment
-        );
-      }),
+          selectedPositions.length === 0 ||
+          selectedPositions.some((position) => profileCategories.includes(position));
+        return matchesPosition;
+      }).map(toHubProfile),
     [
-      activeCategory,
-      selectedDepartments,
-      selectedGrades,
+      publicProfiles,
       selectedPositions,
-      selectedTeamStatus,
     ],
   );
 
+  const resultButtonLabel = isLoadingProfiles
+    ? "불러오는 중…"
+    : profileLoadError ? "닫기" : `${visibleProfiles.length}명 보기`;
+
   const resetFilters = () => {
-    setActiveCategory("전체");
     setSelectedPositions([]);
     setSelectedTeamStatus("전체");
     setSelectedGrades([]);
@@ -524,10 +540,15 @@ export function GiutHubPage() {
       name.includes(departmentQuery.trim()),
   );
 
-  const recommendationTitle =
-    activeCategory === "전체"
-      ? "이루매님에게 잘 맞는 팀원이에요"
-      : `${activeCategory} 분야에서 주목받는 팀원이에요`;
+  const selectedFilterLabels = [
+    ...selectedPositions,
+    ...selectedDepartments,
+    ...selectedGrades.map((grade) => grade === 4 ? "4학년 이상" : `${grade}학년`),
+    ...(selectedTeamStatus === "전체" ? [] : [selectedTeamStatus]),
+  ];
+  const recommendationTitle = selectedFilterLabels.length > 0
+    ? `${selectedFilterLabels.join(" · ")}에 잘 맞는 팀원이에요`
+    : "이루매님에게 잘 맞는 팀원이에요";
 
   const isFilterApplied = (filter: FilterName) =>
     (filter === "포지션" && selectedPositions.length > 0) ||
@@ -601,7 +622,7 @@ export function GiutHubPage() {
                   onClick={() => toggleGrade(grade)}
                   type="button"
                 >
-                  {typeof grade === "string" ? grade : `${grade}학년`} <span>×</span>
+                  {grade === 4 ? "4학년 이상" : `${grade}학년`} <span>×</span>
                 </S.AppliedFilter>
               ))}
               {selectedDepartments.map((department) => (
@@ -627,30 +648,30 @@ export function GiutHubPage() {
 
         <S.Results>
           <S.SectionTitle>{recommendationTitle}</S.SectionTitle>
-          <S.CategoryList aria-label="팀원 직무 필터">
-            {categories.map((category) => (
-              <PillButton
-                active={activeCategory === category}
-                aria-pressed={activeCategory === category}
-                key={category}
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </PillButton>
-            ))}
-          </S.CategoryList>
 
           <S.ProfileList>
-            {visibleProfiles.map((profile) => (
+            {isLoadingProfiles && !showProfilesError && (
+              <S.EmptyState>기웃허브 팀원을 불러오고 있어요.</S.EmptyState>
+            )}
+            {showProfilesError && (
+              <GiutHubLoadError
+                error={retryingProfilesError ?? profilesError}
+                isRetrying={isLoadingProfiles || retryingProfilesError !== null}
+                onRetry={() => { void retryProfiles(); }}
+                onLogin={() => navigate("/login")}
+                onCheckProfile={() => navigate("/my-profile")}
+              />
+            )}
+            {!isLoadingProfiles && !showProfilesError && visibleProfiles.map((profile) => (
               <ProfileCard
                 key={profile.id}
                 onView={() => navigate(`/giut-hub/${profile.profileNumber}`)}
                 profile={profile}
               />
             ))}
-            {visibleProfiles.length === 0 && (
+            {!isLoadingProfiles && !showProfilesError && visibleProfiles.length === 0 && (
               <S.EmptyState>
-                선택한 분야의 팀원을 준비하고 있어요.
+                선택한 조건에 맞는 팀원이 없어요.
               </S.EmptyState>
             )}
           </S.ProfileList>
@@ -670,10 +691,11 @@ export function GiutHubPage() {
         footer={
           <S.PositionSheetFooter>
             <S.ViewPositionsButton
+              disabled={isLoadingProfiles}
               onClick={() => setIsPositionSheetOpen(false)}
               type="button"
             >
-              {visibleProfiles.length}명 보기
+              {resultButtonLabel}
             </S.ViewPositionsButton>
           </S.PositionSheetFooter>
         }
@@ -733,8 +755,12 @@ export function GiutHubPage() {
             >
               초기화
             </S.ResetStatusButton>
-            <S.ViewStatusButton onClick={() => setIsStatusSheetOpen(false)} type="button">
-              결과 {visibleProfiles.length}명 보기
+            <S.ViewStatusButton
+              disabled={isLoadingProfiles}
+              onClick={() => setIsStatusSheetOpen(false)}
+              type="button"
+            >
+              {resultButtonLabel}
             </S.ViewStatusButton>
           </S.StatusSheetFooter>
         }
@@ -785,10 +811,11 @@ export function GiutHubPage() {
         footer={
           <S.DepartmentFooter>
             <S.ViewStatusButton
+              disabled={isLoadingProfiles}
               onClick={() => setIsDepartmentSheetOpen(false)}
               type="button"
             >
-              결과 {visibleProfiles.length}명 보기
+              {resultButtonLabel}
             </S.ViewStatusButton>
           </S.DepartmentFooter>
         }
@@ -815,9 +842,9 @@ export function GiutHubPage() {
           <S.SelectedGradeList>
             {selectedGrades.map((grade) => (
               <S.SelectedGrade key={grade}>
-                {`${grade}학년`}{" "}
+                {grade === 4 ? "4학년 이상" : `${grade}학년`}{" "}
                 <button
-                  aria-label={`${grade} 선택 해제`}
+                  aria-label={`${grade === 4 ? "4학년 이상" : `${grade}학년`} 선택 해제`}
                   onClick={() => toggleGrade(grade)}
                   type="button"
                 >
@@ -906,8 +933,6 @@ function ProfileCard({
   profile: GiutHubProfile;
   onView: () => void;
 }) {
-  const responseStatus = getResponseStatus(profile.lastResponseAt);
-
   return (
     <S.ProfileCard>
       <S.ProfileTop>
@@ -919,14 +944,12 @@ function ProfileCard({
           )}
         </S.Avatar>
         <S.ProfileIdentity>
-          <S.ProfileHeader>
-            <S.Name>{profile.name}</S.Name>
-            <S.Availability $available={profile.available}>
-              <S.AvailabilityDot $available={profile.available} />
-              {profile.available
-                ? "합류 가능"
-                : "현재 팀을 찾고 있지 않아요"}
-            </S.Availability>
+        <S.ProfileHeader>
+          <S.Name>{profile.name}</S.Name>
+          <S.Availability $color={getProfileStatusColor(profile.activityStatus)}>
+            <S.AvailabilityDot aria-hidden="true" />
+            {profile.status}
+          </S.Availability>
           </S.ProfileHeader>
           <S.ProfileSummary>{profile.summary}</S.ProfileSummary>
         </S.ProfileIdentity>
@@ -938,28 +961,17 @@ function ProfileCard({
           <Icon name="caret-right" size={20} weight="bold" />
         </S.DetailButton>
       </S.ProfileTop>
-      <S.ProfileMeta aria-label={`${profile.name} 활동 정보`}>
-        <span>
-          <Icon name="users" size={16} weight="regular" />
-          협업 경험 {profile.projectCount}회
-        </span>
-        <S.ResponseMeta
-          $fast={responseStatus.isFast}
-          aria-label={
-            `최근 답장 ${responseStatus.elapsedHours}시간 전, ` +
-            responseStatus.label
-          }
-        >
-          <Icon name="lightning" size={14} weight="fill" />
-          {responseStatus.label}
-        </S.ResponseMeta>
-      </S.ProfileMeta>
       <S.Introduction>{profile.introduction}</S.Introduction>
       <S.CardFooter>
-        <S.TagList aria-label={`${profile.name} 관심 분야`}>
-          {profile.tags.map((tag) => (
+        <S.TagList aria-label={`${profile.name} 스킬`}>
+          {profile.tags.length > 0 ? profile.tags.map((tag) => (
             <S.Tag key={tag}>#{tag}</S.Tag>
-          ))}
+          )) : (
+            <S.EmptySkills>
+              <Icon name="tag" size={14} weight="regular" />
+              <span>스킬 소개 전</span>
+            </S.EmptySkills>
+          )}
         </S.TagList>
         <S.ProfileLink onClick={onView} type="button">
           프로필 보기 <Icon name="arrow-right" size={16} weight="bold" />

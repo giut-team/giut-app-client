@@ -466,7 +466,7 @@ const statusOptions: { description: string; value: ProfileStatus }[] = [
   { value: "지금은 쉬는 중", description: "검색 결과에서 잠시 숨겨요" },
 ];
 
-function DepartmentSelectSheet({
+export function DepartmentSelectSheet({
   open,
   onClose,
   onSelect,
@@ -553,7 +553,7 @@ function DepartmentSelectSheet({
   );
 }
 
-function GradeSelectSheet({
+export function GradeSelectSheet({
   open,
   onClose,
   onSelect,
@@ -835,7 +835,7 @@ export function RoleSelectSheet({
   );
 }
 
-function InterestSelectSheet({
+export function InterestSelectSheet({
   open,
   onClose,
   interests,
