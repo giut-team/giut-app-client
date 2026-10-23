@@ -203,8 +203,12 @@ export const S = {
     justify-content: ${({ $sender }) => ($sender === "me" ? "flex-end" : "flex-start")};
     gap: 7px;
   `,
-  Bubble: styled.p<{ $sender: Sender }>`
+  MessageBubbleArea: styled.div`
+    position: relative;
     max-width: min(76%, 286px);
+  `,
+  Bubble: styled.p<{ $sender: Sender }>`
+    max-width: 100%;
     margin: 0;
     padding: 11px 12px;
     border-radius: ${({ $sender }) =>
@@ -218,6 +222,31 @@ export const S = {
     letter-spacing: -0.32px;
     line-height: 1.5;
     white-space: pre-wrap;
+    word-break: break-word;
+    user-select: none;
+  `,
+  MessageActionMenu: styled.div`
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    z-index: 4;
+    overflow: hidden;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 9px;
+    background: ${tokens.color.neutral[50]};
+    box-shadow: 0 6px 18px rgba(16, 21, 34, 0.14);
+  `,
+  MessageDeleteButton: styled.button`
+    min-width: 76px;
+    height: 38px;
+    padding: 0 14px;
+    border: 0;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.danger[500]};
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
   `,
   MessageTime: styled.time`
     margin-bottom: 3px;

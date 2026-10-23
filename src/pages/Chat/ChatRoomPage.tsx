@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
+  deleteChatMessage,
   fetchChatMessages,
   fetchChatParticipantProfile,
   fetchChatRoom,
@@ -59,8 +60,12 @@ export function ChatRoomPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [confirmationAction, setConfirmationAction] =
     useState<ConfirmationAction>(null);
+  const [messageMenuId, setMessageMenuId] = useState<number | null>(null);
+  const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
   const [toastMessage, setToastMessage] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+  const messageMenuRef = useRef<HTMLDivElement>(null);
+  const longPressTimerRef = useRef<number | null>(null);
   const lastReadMessageIdRef = useRef<number | null>(null);
 
   const roomQuery = useQuery({
@@ -174,6 +179,44 @@ export function ChatRoomPage() {
     onError: () => setToastMessage("메시지를 보내지 못했어요."),
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (messageId: number) =>
+      deleteChatMessage(chatRoomId, messageId),
+    onSuccess: (_, messageId) => {
+      queryClient.setQueryData<InfiniteData<ChatMessageListResponse>>(
+        ["chat-messages", chatRoomId],
+        (current) =>
+          current
+            ? {
+                ...current,
+                pages: current.pages.map((page) => ({
+                  ...page,
+                  messages: page.messages.map((message) =>
+                    message.messageId === messageId
+                      ? { ...message, status: "DELETED" as const }
+                      : message,
+                  ),
+                })),
+              }
+            : current,
+      );
+      setMessageToDelete(null);
+      setMessageMenuId(null);
+      setToastMessage("메시지를 삭제했어요.");
+      void queryClient.invalidateQueries({
+        queryKey: ["chat-messages", chatRoomId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["chat-room-summary", chatRoomId],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["chat-rooms"] });
+    },
+    onError: () => {
+      setMessageToDelete(null);
+      setToastMessage("메시지를 삭제하지 못했어요.");
+    },
+  });
+
   const leaveMutation = useMutation({
     mutationFn: () => leaveChatRoom(chatRoomId),
     onSuccess: () => {
@@ -208,6 +251,29 @@ export function ChatRoomPage() {
   }, [isMenuOpen]);
 
   useEffect(() => {
+    if (messageMenuId === null) return;
+    const closeWhenClickedOutside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !messageMenuRef.current?.contains(event.target)
+      ) {
+        setMessageMenuId(null);
+      }
+    };
+    window.addEventListener("pointerdown", closeWhenClickedOutside);
+    return () => window.removeEventListener("pointerdown", closeWhenClickedOutside);
+  }, [messageMenuId]);
+
+  useEffect(
+    () => () => {
+      if (longPressTimerRef.current !== null) {
+        window.clearTimeout(longPressTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
     if (!myProfile?.userId || messages.length === 0) return;
     const latestReceivedMessage = [...messages]
       .reverse()
@@ -232,12 +298,22 @@ export function ChatRoomPage() {
   };
 
   const completeConfirmation = () => {
+    if (messageToDelete !== null) {
+      deleteMutation.mutate(messageToDelete);
+      return;
+    }
     if (confirmationAction === "leave") {
       leaveMutation.mutate();
       return;
     }
     setConfirmationAction(null);
     setToastMessage("신고가 접수되었어요.");
+  };
+
+  const clearLongPressTimer = () => {
+    if (longPressTimerRef.current === null) return;
+    window.clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
   };
 
   return (
@@ -305,12 +381,50 @@ export function ChatRoomPage() {
         <S.Messages aria-label={`${roomName}님과의 대화`}>
           {messages.map((message) => {
             const sender = message.senderId === myProfile?.userId ? "me" : "other";
+            const canDelete = sender === "me" && message.status === "ACTIVE";
             return (
               <S.MessageRow $sender={sender} key={message.messageId}>
                 {sender === "me" && <S.MessageTime>{formatMessageTime(message.createdAt)}</S.MessageTime>}
-                <S.Bubble $sender={sender}>
-                  {message.status === "DELETED" ? "삭제된 메시지입니다." : message.content}
-                </S.Bubble>
+                <S.MessageBubbleArea>
+                  <S.Bubble
+                    $sender={sender}
+                    aria-haspopup={canDelete ? "menu" : undefined}
+                    onContextMenu={(event) => {
+                      if (!canDelete) return;
+                      event.preventDefault();
+                      setMessageMenuId(message.messageId);
+                    }}
+                    onPointerCancel={clearLongPressTimer}
+                    onPointerDown={(event) => {
+                      if (!canDelete || event.pointerType === "mouse") return;
+                      clearLongPressTimer();
+                      longPressTimerRef.current = window.setTimeout(() => {
+                        setMessageMenuId(message.messageId);
+                        longPressTimerRef.current = null;
+                      }, 550);
+                    }}
+                    onPointerLeave={clearLongPressTimer}
+                    onPointerUp={clearLongPressTimer}
+                  >
+                    {message.status === "DELETED"
+                      ? "삭제된 메시지입니다."
+                      : message.content}
+                  </S.Bubble>
+                  {messageMenuId === message.messageId && (
+                    <S.MessageActionMenu ref={messageMenuRef} role="menu">
+                      <S.MessageDeleteButton
+                        onClick={() => {
+                          setMessageMenuId(null);
+                          setMessageToDelete(message.messageId);
+                        }}
+                        role="menuitem"
+                        type="button"
+                      >
+                        삭제
+                      </S.MessageDeleteButton>
+                    </S.MessageActionMenu>
+                  )}
+                </S.MessageBubbleArea>
                 {sender === "other" && <S.MessageTime>{formatMessageTime(message.createdAt)}</S.MessageTime>}
               </S.MessageRow>
             );
@@ -336,25 +450,46 @@ export function ChatRoomPage() {
 
       <Modal
         description={
-          confirmationAction === "leave"
+          messageToDelete !== null
+            ? "삭제한 메시지는 다시 복구할 수 없어요."
+            : confirmationAction === "leave"
             ? "나가면 이 채팅방의 메시지를 더 이상 확인할 수 없어요."
             : "신고 내용은 운영팀이 검토해요. 허위 신고는 서비스 이용에 제한이 있을 수 있어요."
         }
         emphasizeDescription
-        icon={<Icon name={confirmationAction === "leave" ? "x" : "warning"} size={22} weight="bold" />}
-        onClose={() => setConfirmationAction(null)}
-        open={confirmationAction !== null}
+        icon={<Icon name={messageToDelete !== null || confirmationAction === "leave" ? "x" : "warning"} size={22} weight="bold" />}
+        onClose={() => {
+          setConfirmationAction(null);
+          setMessageToDelete(null);
+        }}
+        open={confirmationAction !== null || messageToDelete !== null}
         primaryAction={{
           label:
-            confirmationAction === "leave" && leaveMutation.isPending
+            messageToDelete !== null && deleteMutation.isPending
+              ? "삭제 중..."
+              : messageToDelete !== null
+                ? "삭제하기"
+                : confirmationAction === "leave" && leaveMutation.isPending
               ? "나가는 중..."
               : confirmationAction === "leave"
                 ? "나가기"
                 : "신고하기",
           onClick: completeConfirmation,
         }}
-        secondaryAction={{ label: "취소", onClick: () => setConfirmationAction(null) }}
-        title={confirmationAction === "leave" ? "채팅방을 나갈까요?" : `${roomName}님을 신고할까요?`}
+        secondaryAction={{
+          label: "취소",
+          onClick: () => {
+            setConfirmationAction(null);
+            setMessageToDelete(null);
+          },
+        }}
+        title={
+          messageToDelete !== null
+            ? "메시지를 삭제할까요?"
+            : confirmationAction === "leave"
+              ? "채팅방을 나갈까요?"
+              : `${roomName}님을 신고할까요?`
+        }
       />
 
       <S.Composer
