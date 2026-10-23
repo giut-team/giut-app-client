@@ -147,41 +147,35 @@ test("공유 페이지는 인증 확인 후 중앙 로그인 안내 또는 정�
   assert.doesNotMatch(render(), /role="dialog"/);
 });
 
-test("프로필 추천은 Swagger 경로·응답으로 조회·추천·취소하고 실패와 취소 신호를 전달한다", async () => {
+test("프로필 추천 변경은 조회 없이 POST·DELETE 응답의 여부와 수를 사용하고 실패를 전달한다", async () => {
   let recommended = false, fail = false;
   const calls = [];
   const response = () => ({ data: { userId: 13, recommended, recommendationCount: recommended ? 5 : 4 } });
-  const { getProfileRecommendation, setProfileRecommendation } = loadModule("src/api/profileActions.ts", {
+  const { setProfileRecommendation } = loadModule("src/api/profileActions.ts", {
     "./client": { api: {
-      get: async (path, config) => { calls.push(["GET", path, config]); if (fail) throw new Error("denied"); return response(); },
+      get: async () => { assert.fail("추천 변경에 별도 GET은 필요 없음"); },
       post: async (...args) => { calls.push(["POST", ...args]); if (fail) throw new Error("denied"); recommended = true; return response(); },
       delete: async (...args) => { calls.push(["DELETE", ...args]); if (fail) throw new Error("denied"); recommended = false; return response(); },
     } },
   });
-  const controller = new AbortController();
-  assert.equal((await getProfileRecommendation(13, controller.signal)).recommended, false);
-  assert.equal(calls[0][2].signal, controller.signal);
   const added = await setProfileRecommendation(13, true);
   assert.equal(added.recommended, true);
   assert.equal(added.recommendationCount, 5);
-  assert.equal((await getProfileRecommendation(13)).recommended, true);
   const removed = await setProfileRecommendation(13, false);
   assert.equal(removed.recommended, false);
   assert.equal(removed.recommendationCount, 4);
-  assert.equal((await getProfileRecommendation(13)).recommended, false);
-  assert.deepEqual(calls.map(([method]) => method), ["GET", "POST", "GET", "DELETE", "GET"]);
+  assert.deepEqual(calls.map(([method]) => method), ["POST", "DELETE"]);
   assert.ok(calls.every(([, path]) => path === "/api/profile/13/recommendations"));
-  assert.ok(calls.filter(([method]) => method !== "GET").every(call => call.length === 2), "추천·취소는 요청 본문 없음");
+  assert.ok(calls.every(call => call.length === 2), "추천·취소는 요청 본문 없음");
   fail = true;
-  await assert.rejects(() => getProfileRecommendation(13), /denied/);
   await assert.rejects(() => setProfileRecommendation(13, true), /denied/);
   await assert.rejects(() => setProfileRecommendation(13, false), /denied/);
   assert.equal(recommended, false, "저장 실패를 성공 상태로 바꾸지 않음");
 });
 
-test("추천 조회404와 연결 실패는 해당 동작의 안내를 유지하고 인증 오류는 구분한다", () => {
+test("추천 변경404와 연결 실패는 해당 동작의 안내를 유지하고 인증 오류는 구분한다", () => {
   const { getProfileActionError } = loadModule("src/api/profileActions.ts", { "./client": {} });
-  const fallback = "추천 상태를 확인하지 못했어요.";
+  const fallback = "추천을 변경하지 못했어요.";
   const error = status => new AxiosError("failed", undefined, undefined, undefined, { status });
   assert.equal(getProfileActionError(error(404), fallback), fallback);
   assert.equal(getProfileActionError(error(500), fallback), fallback);

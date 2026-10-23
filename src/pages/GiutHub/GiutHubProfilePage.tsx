@@ -10,7 +10,7 @@ import esgGlobe from "../../assets/portfolio/esg-globe.png";
 import hackathonCode from "../../assets/portfolio/hackathon-code.png";
 import projectRoadmap from "../../assets/portfolio/project-roadmap.png";
 import { getPublicProfile, type PublicProfileDetail } from "../../api/giutHub";
-import { getProfileRecommendation, setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
+import { setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
 import { createPersonalChatRoom } from "../../api/chat";
 import { toHubProfile } from "./GiutHubPage";
 import { GiutHubDialog } from "./GiutHubDialog";
@@ -531,20 +531,11 @@ export function GiutHubProfilePage() {
     enabled: Number.isSafeInteger(userId) && userId > 0,
     retry: false,
   });
-  const recommendationKey = ["profile-recommendation", currentProfile?.userId, userId];
-  const recommendation = useQuery({
-    queryKey: recommendationKey,
-    queryFn: ({ signal }) => getProfileRecommendation(userId, signal),
-    enabled: isAuthenticated && !isOwnProfile && !!apiProfile && !profileLoadError,
-    placeholderData: apiProfile ? { userId, recommended: apiProfile.recommended, recommendationCount: apiProfile.recommendationCount } : undefined,
-    retry: false,
-  });
   const recommendationMutation = useMutation({
     mutationKey: ["profile-recommendation-update", currentProfile?.userId, userId],
-    mutationFn: () => setProfileRecommendation(userId, !recommendation.data?.recommended),
-    onMutate: () => queryClient.cancelQueries({ queryKey: recommendationKey }),
+    mutationFn: (recommended: boolean) => setProfileRecommendation(userId, recommended),
+    onMutate: () => queryClient.cancelQueries({ queryKey: detailKey }),
     onSuccess: data => {
-      queryClient.setQueryData(recommendationKey, data);
       queryClient.setQueryData<PublicProfileDetail>(detailKey, previous => updateDetailRecommendation(previous, data));
     },
     retry: false,
@@ -552,7 +543,7 @@ export function GiutHubProfilePage() {
   const contact = useMutation({ mutationKey: ["profile-contact", userId], mutationFn: () => createPersonalChatRoom(userId), retry: false });
   const share = useProfileShare(isAuthenticated, isOwnProfile ? undefined : userId);
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
-  const isRecommended = recommendation.data?.recommended ?? apiProfile?.recommended ?? false;
+  const isRecommended = apiProfile?.recommended ?? false;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
   const [profileAction, setProfileAction] = useState<"share" | "report" | "block" | null>(
@@ -691,18 +682,20 @@ export function GiutHubProfilePage() {
             $active={isRecommended}
             aria-label={isRecommended ? "프로필 추천 취소" : "프로필 추천하기"}
             aria-pressed={isRecommended}
-            disabled={!isAuthenticated || isOwnProfile || recommendation.isPending || recommendation.isError || recommendationMutation.isPending}
-            onClick={() => { if (!recommendationMutation.isPending && !recommendation.isError) recommendationMutation.mutate(); }}
+            disabled={!isAuthenticated || isOwnProfile || !apiProfile || profileLoadError || recommendationMutation.isPending}
+            onClick={() => {
+              if (!isAuthenticated || isOwnProfile || !apiProfile || profileLoadError || recommendationMutation.isPending) return;
+              recommendationMutation.mutate(!isRecommended);
+            }}
             type="button"
           >
             <Icon name="star" size={21} weight={isRecommended ? "fill" : "regular"} />
           </S.FavoriteButton>
         </S.ActionRow>
-        {(recommendation.isError || recommendationMutation.isError || contact.isError) && (
+        {(recommendationMutation.isError || contact.isError) && (
           <S.ActionFeedback>
-            <p role="alert">{getProfileActionError(recommendation.error ?? recommendationMutation.error ?? contact.error,
-              recommendation.isError ? "추천 상태를 확인하지 못했어요." : recommendationMutation.isError ? "추천을 변경하지 못했어요. 다시 시도해 주세요." : "대화를 시작하지 못했어요. 다시 시도해 주세요.")}</p>
-            {recommendation.isError && <Button onClick={() => void recommendation.refetch()} disabled={recommendation.isFetching} type="button">추천 상태 다시 확인</Button>}
+            <p role="alert">{getProfileActionError(recommendationMutation.error ?? contact.error,
+              recommendationMutation.isError ? "추천을 변경하지 못했어요. 다시 시도해 주세요." : "대화를 시작하지 못했어요. 다시 시도해 주세요.")}</p>
           </S.ActionFeedback>
         )}
         <S.TabList role="tablist">
