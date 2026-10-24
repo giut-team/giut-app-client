@@ -1,8 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./client";
-
-export const ADMIN_ACCESS_TOKEN_KEY = "adminAccessToken";
-export const ADMIN_REFRESH_TOKEN_KEY = "adminRefreshToken";
+import { saveAdminSession } from "./adminClient";
 
 export type AdminLoginRequest = {
   email: string;
@@ -36,8 +34,7 @@ export async function loginAdmin(
     throw new Error("관리자 권한이 없는 계정입니다.");
   }
 
-  localStorage.setItem(ADMIN_ACCESS_TOKEN_KEY, data.accessToken);
-  localStorage.setItem(ADMIN_REFRESH_TOKEN_KEY, data.refreshToken);
+  saveAdminSession(data);
 
   return data;
 }

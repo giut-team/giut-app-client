@@ -55,9 +55,8 @@ export function AdminLoginPage() {
             비밀번호
             <S.Input
               autoComplete="current-password"
-              minLength={8}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="8자 이상"
+              placeholder="비밀번호를 입력해 주세요"
               required
               type="password"
               value={password}
