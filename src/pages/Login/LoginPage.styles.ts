@@ -59,16 +59,22 @@ export const S = {
     border-radius: 0 0 16px 16px;
     background: ${tokens.color.neutral[50]};
   `,
-  Logo: styled.div`
+  Logo: styled.button`
     display: inline-flex;
     align-items: center;
     align-self: flex-start;
     gap: 4px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: ${tokens.color.primary[500]};
+    font-family: inherit;
     font-size: 28px;
     font-weight: 800;
     letter-spacing: -1.6px;
     line-height: 1;
+    cursor: default;
+    user-select: none;
   `,
   LogoMark: styled.img`
     display: block;

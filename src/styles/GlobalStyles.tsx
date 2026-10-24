@@ -47,6 +47,10 @@ export function GlobalStyles() {
           transform: translateX(-50%);
         }
 
+        #root:has([data-admin-page])::after {
+          display: none;
+        }
+
         body {
           min-width: 320px;
           margin: 0;

@@ -4,23 +4,7 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { api } from "../api/client";
-
-type AuthProfile = {
-  departmentName: string;
-  grade: number;
-  nickname: string;
-  profileImageUrl: string | null;
-  universityVerified?: boolean;
-  userId: number;
-};
-
-type MyProfileResponse = {
-  profile: AuthProfile | null;
-  profileCompleted: boolean;
-  universityVerified?: boolean;
-};
+import { getAuthSession, type AuthProfile } from "../api/authSession";
 
 type AuthContextValue = {
   isAuthenticated: boolean;
@@ -36,17 +20,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data, error, isPending, refetch } = useQuery({
     queryKey: ["auth", "my-profile"],
-    queryFn: async () => (await fetchMyProfile()).data,
+    queryFn: getAuthSession,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     retry: false,
     staleTime: 0,
   });
-  const responseStatus = axios.isAxiosError(error)
-    ? error.response?.status
-    : undefined;
-  const isUnverifiedProfileForbidden = responseStatus === 403;
-
   const refreshAuth = async () => {
     await refetch();
   };
@@ -54,15 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: data !== undefined || isUnverifiedProfileForbidden,
+        isAuthenticated: data !== undefined && error === null,
         isLoading: isPending,
         profile: data?.profile ?? null,
         profileCompleted: data?.profileCompleted ?? false,
-        universityVerified:
-          !isUnverifiedProfileForbidden &&
-          (data?.universityVerified ??
-            data?.profile?.universityVerified ??
-            false),
+        universityVerified: data?.universityVerified ?? false,
         refreshAuth,
       }}
     >

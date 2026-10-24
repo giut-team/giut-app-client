@@ -7,7 +7,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
-import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareScreen } from "../GiutHub/ProfileShareScreen";
 import { useProfileShare } from "../GiutHub/useProfileShare";
 
@@ -97,7 +96,12 @@ const scrapTeams = [
 export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, profile: currentProfile } = useAuth();
+  const {
+    isAuthenticated,
+    profile: currentProfile,
+    universityVerified,
+  } = useAuth();
+  const isUniversityUnverified = !universityVerified;
   const share = useProfileShare(isAuthenticated);
   const preview = location.state as ProfilePreview | null;
   const [activeTab, setActiveTab] = useState<MyProfileTab>("portfolio");
@@ -342,40 +346,15 @@ export function MyProfilePage() {
                   }
                   type="button"
                 >
-                  <S.FeaturedImage>
-                    <Icon name="image" size={18} weight="regular" />
-                    <span>사진</span>
-                    <small>
-                      or <u>browse files</u>
-                    </small>
-                  </S.FeaturedImage>
+                  <S.ListDot />
                   <S.PortfolioCopy>
-                    <S.RepresentativeLabel>대표 프로젝트</S.RepresentativeLabel>
-                    <strong>{detail.portfolios[0].title}</strong>
-                    <small>{portfolioPeriods[0]}</small>
+                    <strong>{item.title}</strong>
+                    <small>{portfolioPeriods[index + 1]}</small>
                   </S.PortfolioCopy>
-                  <Icon name="caret-right" size={23} weight="bold" />
-                </S.FeaturedPortfolio>
-                <S.PortfolioList>
-                  {detail.portfolios.slice(1).map((item, index) => (
-                    <S.PortfolioItem
-                      key={item.title}
-                      onClick={() =>
-                        navigate(`/giut-hub/${profile.profileNumber}/portfolio/${index + 2}`)
-                      }
-                      type="button"
-                    >
-                      <S.ListDot />
-                      <S.PortfolioCopy>
-                        <strong>{item.title}</strong>
-                        <small>{portfolioPeriods[index + 1]}</small>
-                      </S.PortfolioCopy>
-                      <Icon name="caret-right" size={22} weight="bold" />
-                    </S.PortfolioItem>
-                  ))}
-                </S.PortfolioList>
-              </>
-            )}
+                  <Icon name="caret-right" size={22} weight="bold" />
+                </S.PortfolioItem>
+              ))}
+            </S.PortfolioList>
           </S.TabContent>
         )}
         {activeTab === "teams" && (

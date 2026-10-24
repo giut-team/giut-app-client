@@ -5,7 +5,6 @@ import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
-import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
@@ -20,6 +19,7 @@ import { TeamCreationPage } from "./pages/Contests/TeamCreationPage/TeamCreation
 import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCreationContext";
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
+import { AdminLoginPage } from "./pages/Admin/AdminLoginPage";
 import { MatchedTeamsPage } from "./pages/MatchedTeams/MatchedTeamsPage";
 import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/ApplicationDetailPage";
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
@@ -69,6 +69,7 @@ export function AppRouter() {
       <Routes>
         <Route element={<HomeEntryPage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
+        <Route element={<AdminLoginPage />} path="/admin/login" />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
         <Route
