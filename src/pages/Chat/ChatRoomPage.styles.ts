@@ -12,10 +12,12 @@ const avatarColors: Record<AvatarTone, { background: string; color: string }> = 
 
 export const S = {
   Page: styled.main`
+    display: flex;
     width: min(100%, 480px);
-    min-height: 100svh;
+    height: 100svh;
     margin: 0 auto;
-    padding: 0 0 76px;
+    flex-direction: column;
+    overflow: hidden;
     background: #f5f6fa;
     box-sizing: border-box;
   `,
@@ -30,6 +32,7 @@ export const S = {
     gap: 9px;
     background: ${tokens.color.neutral[50]};
     box-sizing: border-box;
+    flex-shrink: 0;
   `,
   BackButton: styled.button`
     display: grid;
@@ -117,8 +120,11 @@ export const S = {
 
   `,
   Thread: styled.section`
-    min-height: calc(100svh - 136px);
-    padding: 14px 14px 24px;
+    min-height: 0;
+    padding: 14px 14px 11px;
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     box-sizing: border-box;
   `,
   LoadMoreButton: styled.button`
@@ -257,38 +263,18 @@ export const S = {
     white-space: nowrap;
   `,
   Composer: styled.form`
-    position: fixed;
-    right: auto;
-    bottom: 0;
-    left: 50%;
+    position: relative;
     z-index: 3;
     display: grid;
-    grid-template-columns: 32px minmax(0, 1fr) 35px;
-    width: min(100%, 480px);
+    grid-template-columns: minmax(0, 1fr) 35px;
+    width: 100%;
     min-height: 64px;
     padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
     align-items: center;
     gap: 8px;
     background: ${tokens.color.neutral[50]};
     box-sizing: border-box;
-    transform: translateX(-50%);
-  `,
-  PlusButton: styled.button`
-    display: grid;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    place-items: center;
-    border: 0;
-    border-radius: 50%;
-    background: ${tokens.color.neutral[100]};
-    color: ${tokens.color.neutral[700]};
-    cursor: pointer;
-
-    &:disabled {
-      cursor: default;
-      opacity: 0.5;
-    }
+    flex-shrink: 0;
   `,
   MessageInput: styled.input`
     width: 100%;

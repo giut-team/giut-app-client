@@ -65,8 +65,10 @@ export function ChatRoomPage() {
   const [toastMessage, setToastMessage] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
   const messageMenuRef = useRef<HTMLDivElement>(null);
+  const threadRef = useRef<HTMLElement>(null);
   const longPressTimerRef = useRef<number | null>(null);
   const lastReadMessageIdRef = useRef<number | null>(null);
+  const lastScrolledMessageKeyRef = useRef<string | null>(null);
 
   const roomQuery = useQuery({
     queryKey: ["chat-room", chatRoomId],
@@ -102,6 +104,22 @@ export function ChatRoomPage() {
       ),
     [messagesQuery.data],
   );
+  const latestMessageId = messages.at(-1)?.messageId;
+
+  useEffect(() => {
+    if (messagesQuery.isPending || latestMessageId === undefined) return;
+
+    const latestMessageKey = `${chatRoomId}:${latestMessageId}`;
+    if (lastScrolledMessageKeyRef.current === latestMessageKey) return;
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      const thread = threadRef.current;
+      if (thread) thread.scrollTop = thread.scrollHeight;
+      lastScrolledMessageKeyRef.current = latestMessageKey;
+    });
+
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [chatRoomId, latestMessageId, messagesQuery.isPending]);
 
   useEffect(() => {
     if (!isValidChatRoomId || roomQuery.data?.status !== "ACTIVE") return;
@@ -367,7 +385,7 @@ export function ChatRoomPage() {
         </S.MenuAnchor>
       </S.Header>
 
-      <S.Thread>
+      <S.Thread ref={threadRef}>
         {messagesQuery.hasNextPage && (
           <S.LoadMoreButton
             disabled={messagesQuery.isFetchingNextPage}
@@ -499,9 +517,6 @@ export function ChatRoomPage() {
           if (content) sendMutation.mutate(content);
         }}
       >
-        <S.PlusButton aria-label="첨부하기" disabled type="button">
-          <Icon name="plus" size={18} weight="bold" />
-        </S.PlusButton>
         <S.MessageInput
           aria-label="메시지"
           disabled={sendMutation.isPending || roomQuery.data?.status !== "ACTIVE"}
