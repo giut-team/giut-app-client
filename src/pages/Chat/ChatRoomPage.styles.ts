@@ -75,6 +75,24 @@ export const S = {
     letter-spacing: -0.2px;
     line-height: 1.2;
   `,
+  HeaderActions: styled.div`
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    gap: 2px;
+  `,
+  NotificationButton: styled.button<{ $muted: boolean }>`
+    display: grid;
+    width: 30px;
+    height: 32px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: ${({ $muted }) =>
+      $muted ? tokens.color.neutral[500] : tokens.color.neutral[900]};
+    cursor: pointer;
+  `,
   MoreButton: styled.button`
     display: grid;
     width: 30px;
@@ -89,7 +107,6 @@ export const S = {
   MenuAnchor: styled.div`
     position: relative;
     display: grid;
-    margin-left: auto;
   `,
   ChatMenu: styled.div`
     position: absolute;

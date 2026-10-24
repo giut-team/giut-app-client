@@ -347,42 +347,54 @@ export function ChatRoomPage() {
           <S.Name>{roomQuery.isPending ? "채팅방을 불러오는 중" : roomName}</S.Name>
           <S.Subtitle>{roomSubtitle}</S.Subtitle>
         </S.Profile>
-        <S.MenuAnchor ref={menuRef}>
-          <S.MoreButton
-            aria-expanded={isMenuOpen}
-            aria-label="대화 메뉴"
-            onClick={() => setIsMenuOpen((open) => !open)}
+        <S.HeaderActions>
+          <S.NotificationButton
+            $muted={isMuted}
+            aria-label={isMuted ? "채팅방 알림 켜기" : "채팅방 알림 끄기"}
+            aria-pressed={isMuted}
+            onClick={toggleMute}
             type="button"
           >
-            <Icon name="more" size={21} weight="bold" />
-          </S.MoreButton>
-          {isMenuOpen && (
-            <S.ChatMenu aria-label="채팅방 메뉴">
-              <S.ChatMenuButton onClick={toggleMute} type="button">
-                {isMuted ? "알림 켜기" : "알림 끄기"}
-              </S.ChatMenuButton>
-              <S.ChatMenuButton
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  setConfirmationAction("report");
-                }}
-                type="button"
-              >
-                신고하기
-              </S.ChatMenuButton>
-              <S.ChatMenuButton
-                $danger
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  setConfirmationAction("leave");
-                }}
-                type="button"
-              >
-                채팅방 나가기
-              </S.ChatMenuButton>
-            </S.ChatMenu>
-          )}
-        </S.MenuAnchor>
+            <Icon
+              name={isMuted ? "bell-slash" : "bell"}
+              size={20}
+              weight={isMuted ? "regular" : "fill"}
+            />
+          </S.NotificationButton>
+          <S.MenuAnchor ref={menuRef}>
+            <S.MoreButton
+              aria-expanded={isMenuOpen}
+              aria-label="대화 메뉴"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              type="button"
+            >
+              <Icon name="more" size={21} weight="bold" />
+            </S.MoreButton>
+            {isMenuOpen && (
+              <S.ChatMenu aria-label="채팅방 메뉴">
+                <S.ChatMenuButton
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setConfirmationAction("report");
+                  }}
+                  type="button"
+                >
+                  신고하기
+                </S.ChatMenuButton>
+                <S.ChatMenuButton
+                  $danger
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setConfirmationAction("leave");
+                  }}
+                  type="button"
+                >
+                  채팅방 나가기
+                </S.ChatMenuButton>
+              </S.ChatMenu>
+            )}
+          </S.MenuAnchor>
+        </S.HeaderActions>
       </S.Header>
 
       <S.Thread ref={threadRef}>
