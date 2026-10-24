@@ -114,7 +114,7 @@ export const S = {
   `,
   Description: styled.p`
     margin: 7px 0 0;
-    color: #748095;
+    color: ${navy};
     font-size: 16px;
   `,
   Workspace: styled.div`
@@ -249,13 +249,28 @@ export const S = {
     }
   `,
   ReportMeta: styled.span`
-    color: #465166;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 14px;
+    color: ${navy};
     font-size: 14px;
-    word-spacing: 5px;
+
+    strong {
+      color: ${navy};
+      font-weight: 700;
+    }
   `,
   ReportSubMeta: styled.span`
-    color: ${muted};
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 14px;
+    color: ${navy};
     font-size: 14px;
+
+    strong {
+      color: ${navy};
+      font-weight: 600;
+    }
   `,
   StatusBadge: styled.span<{ $status: "PENDING" | "ACTIONED" | "DISMISSED" }>`
     flex: 0 0 auto;
@@ -265,13 +280,13 @@ export const S = {
       $status === "PENDING"
         ? "#fff1d8"
         : $status === "ACTIONED"
-          ? "#ffe7e7"
+          ? "#e3f5ec"
           : "#eef0f4"};
     color: ${({ $status }) =>
       $status === "PENDING"
         ? "#b87700"
         : $status === "ACTIONED"
-          ? "#dd4d4d"
+          ? "#16845b"
           : "#687386"};
     font-size: 12px;
     font-weight: 750;
@@ -334,14 +349,22 @@ export const S = {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: ${muted};
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: ${navy};
     font-size: 13px;
+    font-weight: 700;
   `,
   DetailTitle: styled.h2`
     margin: 10px 0 4px;
     font-size: 23px;
     font-weight: 850;
+  `,
+  ReasonCode: styled.p`
+    margin: 0;
+    color: #596579;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
   `,
   DetailBody: styled.div`
     display: grid;
@@ -364,8 +387,9 @@ export const S = {
     }
 
     span {
-      color: ${muted};
+      color: ${navy};
       font-size: 13px;
+      font-weight: 700;
     }
   `,
   ProfileCard: styled.div`
@@ -438,7 +462,8 @@ export const S = {
     font-size: 14px;
 
     dt {
-      color: ${muted};
+      color: ${navy};
+      font-weight: 700;
     }
 
     dd {
@@ -449,12 +474,6 @@ export const S = {
   ReviewResult: styled.section`
     display: grid;
     gap: 13px;
-
-    h3 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 800;
-    }
   `,
   ReviewActions: styled.div`
     display: grid;
@@ -484,5 +503,96 @@ export const S = {
     background: #f4f6f9;
     color: #5d687b;
     font-size: 14px;
+  `,
+  ApprovalModal: styled.div`
+    padding: 28px 30px 30px;
+    color: ${navy};
+  `,
+  ApprovalTitle: styled.h2`
+    margin: 0;
+    font-size: 22px;
+    font-weight: 850;
+    letter-spacing: -0.5px;
+  `,
+  ApprovalDescription: styled.p`
+    margin: 7px 0 23px;
+    color: ${navy};
+    font-size: 14px;
+    line-height: 1.55;
+  `,
+  ApprovalSummary: styled.dl`
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 10px 12px;
+    margin: 0 0 19px;
+    padding: 17px 20px;
+    border-radius: 13px;
+    background: #f4f6f9;
+    font-size: 14px;
+
+    dt {
+      color: ${navy};
+    }
+
+    dd {
+      margin: 0;
+      color: ${navy};
+    }
+
+    span {
+      color: ${navy};
+    }
+  `,
+  MemoLabel: styled.label`
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 800;
+  `,
+  MemoTextarea: styled.textarea`
+    width: 100%;
+    min-height: 120px;
+    padding: 15px;
+    resize: vertical;
+    border: 1px solid #d5dbe5;
+    border-radius: 12px;
+    outline: none;
+    color: ${navy};
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.55;
+
+    &::placeholder {
+      color: #8792a5;
+    }
+
+    &:focus {
+      border-color: ${blue};
+      box-shadow: 0 0 0 3px rgba(35, 69, 155, 0.1);
+    }
+  `,
+  ApprovalActions: styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  `,
+  ModalButton: styled.button<{ $primary?: boolean }>`
+    min-width: 76px;
+    height: 54px;
+    padding: 0 20px;
+    border: ${({ $primary }) => ($primary ? "0" : "1px solid #d5dbe5")};
+    border-radius: 11px;
+    background: ${({ $primary }) => ($primary ? blue : "#fff")};
+    color: ${({ $primary }) => ($primary ? "#fff" : navy)};
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.6;
+    }
   `,
 };
