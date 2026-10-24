@@ -49,14 +49,10 @@ export const S = {
     font-size: 17px;
     font-weight: 800;
   `,
-  NavLabel: styled.p`
-    margin: 35px 8px 10px;
-    color: ${muted};
-    font-size: 13px;
-  `,
   Nav: styled.nav`
     display: grid;
     gap: 3px;
+    margin-top: 35px;
   `,
   NavItem: styled.button<{ $active?: boolean }>`
     width: 100%;

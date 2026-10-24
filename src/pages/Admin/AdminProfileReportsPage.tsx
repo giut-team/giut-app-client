@@ -138,10 +138,11 @@ export function AdminProfileReportsPage() {
     <S.Page data-admin-page>
       <S.Sidebar>
         <S.Brand><S.BrandMark>A</S.BrandMark>Admin Console</S.Brand>
-        <S.NavLabel>운영</S.NavLabel>
         <S.Nav aria-label="관리자 메뉴">
           <S.NavItem $active type="button">프로필 신고</S.NavItem>
-          <S.NavItem type="button">공모전</S.NavItem>
+          <S.NavItem onClick={() => navigate("/admin/contests")} type="button">
+            공모전
+          </S.NavItem>
         </S.Nav>
         <S.Account>
           <S.AccountName>{admin?.nickname || "관리자"}</S.AccountName>
