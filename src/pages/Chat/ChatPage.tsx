@@ -136,28 +136,33 @@ export function ChatPage() {
 
   const chatRows = useMemo<ChatRow[]>(
     () =>
-      rooms.map((room, index) => {
+      rooms.flatMap((room, index) => {
         const summary = summaryQueries[index]?.data;
+        if (!summary?.latestMessage) return [];
+
         const nickname = summary?.profile?.profile?.nickname || summary?.profile?.nickname;
         const title = nickname || getFallbackTitle(room);
-        const latestMessageAt = summary?.latestMessage?.createdAt ?? room.createdAt;
+        const latestMessageAt = summary.latestMessage.createdAt;
 
-        return {
+        return [{
           id: room.chatRoomId,
           initial: room.type === "TEAM" ? "팀" : title.slice(0, 1),
           avatarTone: avatarTones[room.chatRoomId % avatarTones.length],
           title,
           preview:
-            summary?.latestMessage?.status === "DELETED"
+            summary.latestMessage.status === "DELETED"
               ? "삭제된 메시지입니다."
-              : summary?.latestMessage?.content || "대화를 시작해 보세요.",
+              : summary.latestMessage.content,
           time: formatChatTime(latestMessageAt),
           latestMessageAt,
           unread: summary?.unread ?? 0,
-        };
+        }];
       }),
     [rooms, summaryQueries],
   );
+
+  const areSummariesPending =
+    rooms.length > 0 && summaryQueries.some((query) => query.isPending);
 
   const unreadCount = chatRows.filter((chat) => chat.unread > 0).length;
   const sortedChats = [...chatRows].sort(
@@ -252,9 +257,14 @@ export function ChatPage() {
               </S.ChatMeta>
             </S.ChatItem>
           ))}
-          {roomsQuery.isPending && <S.EmptyMessage>채팅을 불러오는 중이에요.</S.EmptyMessage>}
+          {(roomsQuery.isPending || areSummariesPending) && (
+            <S.EmptyMessage>채팅을 불러오는 중이에요.</S.EmptyMessage>
+          )}
           {roomsQuery.isError && <S.EmptyMessage>채팅을 불러오지 못했어요.</S.EmptyMessage>}
-          {!roomsQuery.isPending && !roomsQuery.isError && visibleChats.length === 0 && (
+          {!roomsQuery.isPending &&
+            !areSummariesPending &&
+            !roomsQuery.isError &&
+            visibleChats.length === 0 && (
             <S.EmptyMessage>
               {searchQuery
                 ? "검색 결과가 없어요."
@@ -262,7 +272,7 @@ export function ChatPage() {
                   ? "읽지 않은 채팅이 없어요."
                   : "아직 참여 중인 채팅이 없어요."}
             </S.EmptyMessage>
-          )}
+            )}
         </S.ChatList>
       </S.Content>
 
