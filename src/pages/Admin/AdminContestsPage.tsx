@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { clearAdminSession, getAdminSessionUser } from "../../api/adminClient";
 import {
@@ -78,6 +79,20 @@ const toDateTimeInput = (value?: string) => {
   return local.toISOString().slice(0, 16);
 };
 
+const isValidHttpUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (!axios.isAxiosError<{ message?: string }>(error)) return fallback;
+  return error.response?.data?.message || fallback;
+};
+
 const toListItem = (
   competition: AdminCompetitionResponse,
 ): AdminCompetitionListItem => ({
@@ -105,6 +120,10 @@ export function AdminContestsPage() {
   const contestsQuery = useQuery({
     queryKey: ["admin-competitions"],
     queryFn: fetchAdminCompetitions,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 
   const normalizedSearchKeyword = searchKeyword.trim().toLowerCase();
@@ -141,7 +160,8 @@ export function AdminContestsPage() {
       );
       showToast("공모전 공개를 승인했습니다.");
     },
-    onError: () => showToast("공모전 공개 승인에 실패했습니다."),
+    onError: (error) =>
+      showToast(getApiErrorMessage(error, "공모전 공개 승인에 실패했습니다.")),
   });
 
   const saveMutation = useMutation({
@@ -178,7 +198,8 @@ export function AdminContestsPage() {
           : "공모전을 수정했습니다.",
       );
     },
-    onError: () => showToast("공모전 정보를 저장하지 못했습니다."),
+    onError: (error) =>
+      showToast(getApiErrorMessage(error, "공모전 정보를 저장하지 못했습니다.")),
   });
 
   useEffect(() => {
@@ -235,6 +256,19 @@ export function AdminContestsPage() {
     if (!editorMode) return;
     if (!editorForm.title.trim() || !editorForm.summary.trim() || !editorForm.primaryUrl.trim()) {
       showToast("제목, 소개, 대표 URL을 입력해 주세요.");
+      return;
+    }
+    if (!isValidHttpUrl(editorForm.primaryUrl.trim())) {
+      showToast("대표 모집 URL을 https:// 또는 http://로 시작해 입력해 주세요.");
+      return;
+    }
+    if (
+      editorForm.applicationStartAt &&
+      editorForm.applicationEndAt &&
+      new Date(editorForm.applicationStartAt).getTime() >=
+        new Date(editorForm.applicationEndAt).getTime()
+    ) {
+      showToast("접수 마감은 접수 시작보다 늦어야 합니다.");
       return;
     }
     saveMutation.mutate({
@@ -384,12 +418,13 @@ export function AdminContestsPage() {
                       ? "인증"
                       : "미인증"}
                   </S.StatusBadge>
-                  {formatVerifiedAt(contest.verifiedAt) && (
+                  {contest.publicationStatus === "PUBLISHED" &&
+                    formatVerifiedAt(contest.verifiedAt) && (
                     <S.Verified>
                       <Icon name="check" size={12} weight="bold" /> 검증{" "}
                       {formatVerifiedAt(contest.verifiedAt)}
                     </S.Verified>
-                  )}
+                    )}
                 </S.Status>
                 <S.Actions>
                   {contest.publicationStatus === "DRAFT" && (

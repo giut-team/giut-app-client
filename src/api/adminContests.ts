@@ -92,6 +92,10 @@ type PublicCompetitionListResponse = {
     applicationStartAt: string;
     applicationEndAt: string;
     primaryUrl: string;
+    publicationStatus?: AdminCompetitionPublicationStatus;
+    verificationStatus?: AdminCompetitionVerificationStatus;
+    verifiedAt?: string | null;
+    targetParticipants?: string;
   }>;
   page: number;
   size: number;
@@ -108,7 +112,7 @@ export async function fetchAdminCompetitions(): Promise<AdminCompetitionListItem
 
   return data.competitions.map((competition) => ({
     ...competition,
-    publicationStatus: "PUBLISHED",
+    publicationStatus: competition.publicationStatus ?? "PUBLISHED",
   }));
 }
 
