@@ -51,6 +51,10 @@ export function GlobalStyles() {
           display: none;
         }
 
+        #root:has([data-admin-page]) {
+          padding-bottom: 0;
+        }
+
         body {
           min-width: 320px;
           margin: 0;

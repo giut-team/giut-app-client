@@ -20,6 +20,8 @@ import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCrea
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
 import { AdminLoginPage } from "./pages/Admin/AdminLoginPage";
+import { AdminProfileReportsPage } from "./pages/Admin/AdminProfileReportsPage";
+import { ADMIN_ACCESS_TOKEN_KEY } from "./api/adminClient";
 import { MatchedTeamsPage } from "./pages/MatchedTeams/MatchedTeamsPage";
 import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/ApplicationDetailPage";
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
@@ -63,6 +65,14 @@ function UniversityVerifiedRoute({ children }: { children: ReactNode }) {
   return children;
 }
 
+function AdminRoute({ children }: { children: ReactNode }) {
+  return localStorage.getItem(ADMIN_ACCESS_TOKEN_KEY) ? (
+    children
+  ) : (
+    <Navigate replace to="/admin/login" />
+  );
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
@@ -70,6 +80,14 @@ export function AppRouter() {
         <Route element={<HomeEntryPage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<AdminLoginPage />} path="/admin/login" />
+        <Route
+          element={
+            <AdminRoute>
+              <AdminProfileReportsPage />
+            </AdminRoute>
+          }
+          path="/admin/profile-reports"
+        />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
         <Route

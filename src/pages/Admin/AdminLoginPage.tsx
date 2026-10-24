@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../api/adminAuth";
 import { S } from "./AdminLoginPage.styles";
 
@@ -22,11 +23,13 @@ function getLoginErrorMessage(error: unknown) {
 }
 
 export function AdminLoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const loginMutation = useMutation({
     mutationFn: loginAdmin,
+    onSuccess: () => navigate("/admin/profile-reports", { replace: true }),
   });
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
