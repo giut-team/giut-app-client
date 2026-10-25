@@ -318,6 +318,7 @@ export const S = {
     background: rgb(255 255 255 / 96%);
   `,
   ProposalButton: styled.button`
+    &:disabled { opacity: 0.5; cursor: default; }
     display: inline-flex;
     align-items: center;
     justify-content: center;

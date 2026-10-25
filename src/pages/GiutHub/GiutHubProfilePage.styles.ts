@@ -761,26 +761,82 @@ export const S = {
     cursor: pointer;
     &:disabled { opacity: 0.5; cursor: default; }
   `,
+  ProposalBody: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  `,
+  ProposalIntro: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  `,
+  ProposalField: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  `,
+  ProposalState: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+    border-radius: 14px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[700]};
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+    overflow-wrap: anywhere;
+    p { margin: 0; }
+  `,
+  ProposalError: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    line-height: 1.6;
+  `,
+  ProposalMessageLabel: styled.label`
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    font-weight: 700;
+    span { color: ${tokens.color.neutral[500]}; font-weight: 500; }
+  `,
+  ProposalMessageInput: styled.textarea`
+    width: 100%;
+    padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: vertical;
+    &:focus-visible { outline: 2px solid ${giutHubPrimary}; outline-offset: 2px; }
+  `,
   ProposalHeading: styled.h2`
-    margin: 4px 0 0;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.7px;
   `,
   ProposalDescription: styled.p`
-    margin: 8px 0 14px;
-    color: ${tokens.color.neutral[500]};
-    font-size: 11px;
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    line-height: 1.5;
     letter-spacing: -0.4px;
   `,
   ProposalTeamList: styled.div`
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 9px;
   `,
   ProposalTeamCard: styled.button<{ $selected: boolean; $disabled: boolean }>`
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
@@ -795,11 +851,7 @@ export const S = {
     text-align: left;
     cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
 
-    > span {
-      display: grid;
-      gap: 5px;
-      min-width: 0;
-    }
+    &:disabled { cursor: default; }
     strong {
       font-size: 13px;
       font-weight: 800;
@@ -821,11 +873,21 @@ export const S = {
       font-style: normal;
     }
   `,
+  ProposalTeamCopy: styled.span`
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  `,
   ProposalRadio: styled.span<{ $selected: boolean }>`
-    display: grid;
+    display: flex;
+    flex: 0 0 20px;
     width: 20px;
     height: 20px;
-    place-items: center;
+    align-items: center;
+    justify-content: center;
     border: 1.5px solid ${({ $selected }) => ($selected ? giutHubPrimary : "#b7c0d0")};
     border-radius: 50%;
     background: ${({ $selected }) =>
@@ -833,7 +895,7 @@ export const S = {
     color: ${tokens.color.neutral[50]};
   `,
   ProposalPositionTitle: styled.h3`
-    margin: 16px 0 9px;
+    margin: 0;
     color: ${tokens.color.neutral[700]};
     font-size: 12px;
     font-weight: 800;
@@ -844,6 +906,7 @@ export const S = {
     gap: 8px;
   `,
   ProposalPosition: styled.button<{ $selected: boolean }>`
+    min-height: 44px;
     padding: 10px 14px;
     border: 1px solid
       ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
@@ -856,13 +919,15 @@ export const S = {
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ProposalFooter: styled.div`
-    display: grid;
-    grid-template-columns: 0.65fr 1.85fr;
+    display: flex;
     gap: 10px;
   `,
   ProposalCancelButton: styled.button`
+    flex: 0.65;
+    min-height: 44px;
     padding: 13px 10px;
     border: 0;
     border-radius: 11px;
@@ -872,8 +937,13 @@ export const S = {
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ProposalConfirmButton: styled.button`
+    flex: 1.85;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
     padding: 13px 10px;
     border: 0;
     border-radius: 11px;
@@ -883,5 +953,6 @@ export const S = {
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
 };

@@ -18,6 +18,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareScreen } from "./ProfileShareScreen";
 import { ProfileTabEmptyState } from "./ProfileTabEmptyState";
 import { ImageWithFallback } from "./ImageWithFallback";
+import { TeamProposalBottomSheet } from "./TeamProposalBottomSheet";
 import { useProfileShare } from "./useProfileShare";
 import { S } from "./GiutHubProfilePage.styles";
 import { getProfileHeadingStatusColor } from "./profileStatus";
@@ -30,29 +31,6 @@ export type Portfolio = {
   markdown: string;
 };
 export type ProfileDetail = { skills: string[]; portfolios: Portfolio[] };
-type ProposalTeam = { id: string; name: string; summary: string; disabled?: boolean };
-
-const proposalTeams: ProposalTeam[] = [
-  {
-    id: "data-seoul",
-    name: "데이터로 서울을",
-    summary: "서울시 데이터 공모전 · 3/5명 · 백엔드 개발자 1자리",
-  },
-  {
-    id: "calendar-hackathon",
-    name: "캘린더 해커톤 4팀",
-    summary: "제 12회 캘린더 해커톤 · 2/5명 · 백엔드 개발자 2자리",
-  },
-  {
-    id: "greentech",
-    name: "그린테크 스터디팀",
-    summary: "모집 마감 · 남은 자리 없음",
-    disabled: true,
-  },
-];
-
-const proposalPositions = ["백엔드 개발자", "데이터 엔지니어"];
-
 const skillIconFileNames: Record<string, string> = {
   Python: "python",
   SQL: "sql",
@@ -310,87 +288,6 @@ export const detailsByProfileId: Record<string, ProfileDetail> = {
   },
 };
 
-export function TeamProposalBottomSheet({
-  open,
-  profileName,
-  onClose,
-}: {
-  open: boolean;
-  profileName: string;
-  onClose: () => void;
-}) {
-  const [selectedProposalTeam, setSelectedProposalTeam] = useState("data-seoul");
-  const [selectedProposalPosition, setSelectedProposalPosition] = useState(
-    proposalPositions[0],
-  );
-
-  return (
-    <BottomSheet
-      footer={
-        <S.ProposalFooter>
-          <S.ProposalCancelButton onClick={onClose} type="button">
-            취소
-          </S.ProposalCancelButton>
-          <S.ProposalConfirmButton onClick={onClose} type="button">
-            이 팀으로 제안 보내기
-          </S.ProposalConfirmButton>
-        </S.ProposalFooter>
-      }
-      footerVariant="action"
-      minHeight="min(76svh, 570px)"
-      onClose={onClose}
-      open={open}
-      showHeaderDivider={false}
-      variant="compact"
-    >
-      <S.ProposalHeading>어느 팀으로 제안할까요?</S.ProposalHeading>
-      <S.ProposalDescription>
-        {profileName}님에게 보낼 팀을 골라주세요. 내가 팀장인 팀만
-        보여요.
-      </S.ProposalDescription>
-      <S.ProposalTeamList aria-label="제안할 팀 선택">
-        {proposalTeams.map((team) => {
-          const selected = selectedProposalTeam === team.id;
-          return (
-            <S.ProposalTeamCard
-              $disabled={team.disabled === true}
-              $selected={selected}
-              aria-pressed={selected}
-              disabled={team.disabled}
-              key={team.id}
-              onClick={() => setSelectedProposalTeam(team.id)}
-              type="button"
-            >
-              <S.ProposalRadio $selected={selected}>
-                {selected && <Icon name="check" size={13} weight="bold" />}
-              </S.ProposalRadio>
-              <span>
-                <strong>{team.name}</strong>
-                <small>{team.summary}</small>
-              </span>
-              {team.disabled && <em>선택 불가</em>}
-            </S.ProposalTeamCard>
-          );
-        })}
-      </S.ProposalTeamList>
-      <S.ProposalPositionTitle>제안할 포지션</S.ProposalPositionTitle>
-      <S.ProposalPositionList>
-        {proposalPositions.map((position) => (
-          <S.ProposalPosition
-            $selected={selectedProposalPosition === position}
-            aria-pressed={selectedProposalPosition === position}
-            key={position}
-            onClick={() => setSelectedProposalPosition(position)}
-            type="button"
-          >
-            {position}
-          </S.ProposalPosition>
-        ))}
-      </S.ProposalPositionList>
-    </BottomSheet>
-  );
-}
-
 function ProfileMoreBottomSheet({
   open,
   onClose,
@@ -582,7 +479,7 @@ export function GiutHubProfilePage() {
           ))}
         </S.SkillList>
         <S.ActionRow>
-          <Button onClick={() => setIsProposalSheetOpen(true)} type="button">
+          <Button disabled={!isAuthenticated || isOwnProfile} onClick={() => setIsProposalSheetOpen(true)} type="button">
             <Icon name="paper-plane" size={19} weight="fill" />팀 제안 보내기
           </Button>
           <S.MessageButton disabled={!isAuthenticated || isOwnProfile || contact.isPending} onClick={() => {
@@ -704,11 +601,12 @@ export function GiutHubProfilePage() {
           />
         )}
       </S.Content>
-      <TeamProposalBottomSheet
+      {isProposalSheetOpen && <TeamProposalBottomSheet
+        key={`${currentProfile?.userId}:${userId}`}
         onClose={() => setIsProposalSheetOpen(false)}
-        open={isProposalSheetOpen}
+        targetUserId={userId}
         profileName={profile.name}
-      />
+      />}
       <ProfileMoreBottomSheet
         canReport={isAuthenticated && !isOwnProfile}
         onClose={() => setIsMoreSheetOpen(false)}

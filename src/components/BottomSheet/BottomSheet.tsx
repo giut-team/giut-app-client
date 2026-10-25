@@ -24,6 +24,7 @@ export type BottomSheetOption<T extends string> = {
 
 type BottomSheetProps = {
   open: boolean;
+  dragDisabled?: boolean;
   title?: string;
   eyebrow?: string;
   showCloseButton?: boolean; // 닫기 버튼 표시 여부
@@ -202,6 +203,7 @@ function ApplicationCancelContent({
 
 export function BottomSheet({
   open,
+  dragDisabled = false,
   title,
   eyebrow,
   showCloseButton = false,
@@ -261,6 +263,7 @@ export function BottomSheet({
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (dragDisabled) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
 
     dragStartY.current = event.clientY;

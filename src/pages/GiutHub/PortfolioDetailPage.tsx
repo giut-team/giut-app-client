@@ -9,7 +9,9 @@ import { ImageWithFallback } from "./ImageWithFallback";
 import { toHubProfile } from "./GiutHubPage";
 import { toDetailProfileSummary } from "./profileDetail";
 import { GiutHubDialog } from "./GiutHubDialog";
-import { getSkillIcon, TeamProposalBottomSheet } from "./GiutHubProfilePage";
+import { getSkillIcon } from "./GiutHubProfilePage";
+import { TeamProposalBottomSheet } from "./TeamProposalBottomSheet";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./PortfolioDetailPage.styles";
 
 function PortfolioShareModal({
@@ -105,6 +107,7 @@ export function PortfolioDetailPage() {
   const navigate = useNavigate();
   const { profileNumber, portfolioNumber } = useParams();
   const userId = Number(profileNumber);
+  const { profile: viewer, isAuthenticated } = useAuth();
   const portfolioIndex = Number(portfolioNumber) - 1;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -221,16 +224,17 @@ export function PortfolioDetailPage() {
         </S.Body>
       </S.Content>
       <S.ProposalBar>
-        <S.ProposalButton onClick={() => setIsProposalSheetOpen(true)} type="button">
+        <S.ProposalButton disabled={!isAuthenticated || viewer?.userId === userId} onClick={() => setIsProposalSheetOpen(true)} type="button">
           <Icon name="users" size={23} weight="regular" />
           {profile.name}에게 팀 제안하기
         </S.ProposalButton>
       </S.ProposalBar>
-      <TeamProposalBottomSheet
+      {isProposalSheetOpen && <TeamProposalBottomSheet
+        key={`${viewer?.userId}:${userId}`}
         onClose={() => setIsProposalSheetOpen(false)}
-        open={isProposalSheetOpen}
+        targetUserId={userId}
         profileName={profile.name}
-      />
+      />}
       <PortfolioShareModal
         detailRole={profile.detailRole}
         onClose={() => setIsShareModalOpen(false)}
