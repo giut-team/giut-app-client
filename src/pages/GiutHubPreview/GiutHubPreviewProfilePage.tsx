@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { Circle, Trophy } from "@phosphor-icons/react";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import { Icon } from "../../components/icons";
+import { useProfileSlideNavigate } from "../../components/ProfileRouteMotion/useProfileSlideNavigate";
 import { ImageWithFallback } from "../GiutHub/ImageWithFallback";
 import { getProfileStatusColor } from "../GiutHub/profileStatus";
 import { PreviewProfileActions } from "./PreviewProfileActions";
@@ -14,20 +15,20 @@ export function GiutHubPreviewProfilePage() {
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
   const query = usePreviewProfile(userId);
-  const navigate = useNavigate();
+  const slideNavigate = useProfileSlideNavigate();
   const location = useLocation();
   const previous = location.state?.returnTo;
   const returnTo = typeof previous === "string" && (previous === PREVIEW_PATH || previous.startsWith(`${PREVIEW_PATH}?`)) ? previous : PREVIEW_PATH;
   useEffect(() => { window.scrollTo(0, 0); }, [userId]);
   if (!Number.isSafeInteger(userId) || userId <= 0) return <Navigate replace to={PREVIEW_PATH} />;
-  if (query.authLoading || !query.data || query.isError || !query.isAuthenticated) return <PreviewProfileLoadState query={query} onBack={() => navigate(returnTo)} />;
+  if (query.authLoading || !query.data || query.isError || !query.isAuthenticated) return <PreviewProfileLoadState query={query} onBack={() => { void slideNavigate(returnTo); }} />;
   const detail = query.data;
   const profile = detail.profile;
   const portfolios = orderedPortfolios(profile.portfolioItems ?? []);
   const skills = skillNames(profile.tags);
 
   return <S.Page>
-    <PreviewProfileActions key={`${query.queryScope}:${query.data.profile.userId}`} detail={detail} onBack={() => navigate(returnTo)} />
+    <PreviewProfileActions key={`${query.queryScope}:${query.data.profile.userId}`} detail={detail} onBack={() => { void slideNavigate(returnTo); }} />
     <S.DetailMain>
       <S.Biography>{profile.bio.trim() || "아직 소개를 준비하고 있어요."}</S.Biography>
       <S.Identity>

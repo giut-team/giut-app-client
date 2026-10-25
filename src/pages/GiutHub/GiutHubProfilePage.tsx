@@ -4,6 +4,7 @@ import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
+import { useProfileSlideNavigate } from "../../components/ProfileRouteMotion/useProfileSlideNavigate";
 import { Icon } from "../../components/icons";
 import dataDashboard from "../../assets/portfolio/data-dashboard.png";
 import esgGlobe from "../../assets/portfolio/esg-globe.png";
@@ -328,6 +329,7 @@ function ProfileMoreBottomSheet({
 
 export function GiutHubProfilePage() {
   const navigate = useNavigate();
+  const slideNavigate = useProfileSlideNavigate();
   const location = useLocation();
   const returnTo = hubListReturnTo(location.state?.returnTo);
   const { profileNumber } = useParams();
@@ -405,7 +407,7 @@ export function GiutHubProfilePage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate(returnTo)} title="" />
+          <PageHeader onBack={() => { void slideNavigate(returnTo); }} title="" />
           <S.EmptyState>프로필을 불러오고 있어요.</S.EmptyState>
         </S.Content>
       </S.Page>
@@ -415,7 +417,7 @@ export function GiutHubProfilePage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate(returnTo)} title="" />
+          <PageHeader onBack={() => { void slideNavigate(returnTo); }} title="" />
           <S.EmptyState>
             프로필을 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 시도해 주세요.
           </S.EmptyState>
@@ -428,7 +430,7 @@ export function GiutHubProfilePage() {
     <S.Page>
       <S.Content>
         <PageHeader
-          onBack={() => navigate(returnTo)}
+          onBack={() => { void slideNavigate(returnTo); }}
           rightContent={
             <S.MoreButton
               aria-label="더보기"

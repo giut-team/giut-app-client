@@ -1,10 +1,11 @@
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
 import { tokens } from "../../design-system/tokens.generated";
+import { PROFILE_SCREEN_MOTION_MS, PROFILE_SCREEN_ENTER_EASING, PROFILE_SCREEN_EXIT_EASING } from "../../styles/motion";
 
 const background = "#F9F8FF";
 const primary = "#1C4EA3";
-export const PROFILE_SHARE_MOTION_MS = 480;
+export const PROFILE_SHARE_MOTION_MS = PROFILE_SCREEN_MOTION_MS;
 
 const enterFromBottom = keyframes`
   from { transform: translateY(100%); }
@@ -36,10 +37,10 @@ export const S = {
     &[open] {
       display: flex;
       justify-content: center;
-      animation: ${enterFromBottom} ${PROFILE_SHARE_MOTION_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation: ${enterFromBottom} ${PROFILE_SHARE_MOTION_MS}ms ${PROFILE_SCREEN_ENTER_EASING} both;
     }
     &[open][data-closing="true"] {
-      animation: ${exitToBottom} ${PROFILE_SHARE_MOTION_MS}ms cubic-bezier(0.8, 0, 0.8, 0.2) both;
+      animation: ${exitToBottom} ${PROFILE_SHARE_MOTION_MS}ms ${PROFILE_SCREEN_EXIT_EASING} both;
       pointer-events: none;
     }
     &::backdrop { background: transparent; }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useProfileSlideNavigate } from "../../components/ProfileRouteMotion/useProfileSlideNavigate";
 import designerFemale from "../../assets/default_image/designer-female.png";
 import designerMale from "../../assets/default_image/designer-male.png";
 import developerFemale from "../../assets/default_image/developer-female.png";
@@ -447,6 +448,7 @@ const navigationItems = [
 
 export function GiutHubPage() {
   const navigate = useNavigate();
+  const slideNavigate = useProfileSlideNavigate();
   const { queryScope, isLoading: authLoading } = useAuth();
   const [isPositionSheetOpen, setIsPositionSheetOpen] = useState(false);
   const [isStatusSheetOpen, setIsStatusSheetOpen] = useState(false);
@@ -661,7 +663,7 @@ export function GiutHubPage() {
             {!isLoadingProfiles && !showProfilesError && visibleProfiles.map((profile) => (
               <ProfileCard
                 key={profile.id}
-                onView={() => navigate(`/giut-hub/${profile.profileNumber}`, { state: { returnTo } })}
+                onView={() => { void slideNavigate(`/giut-hub/${profile.profileNumber}`, { state: { returnTo } }); }}
                 profile={profile}
               />
             ))}
