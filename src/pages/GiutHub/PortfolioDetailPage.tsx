@@ -4,7 +4,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MarkdownContent } from "../../components/MarkdownContent";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
-import { getPublicProfile } from "../../api/giutHub";
+import { profileDetailOptions } from "./profileQueries";
 import { ImageWithFallback } from "./ImageWithFallback";
 import { toHubProfile } from "./GiutHubPage";
 import { toDetailProfileSummary } from "./profileDetail";
@@ -107,16 +107,15 @@ export function PortfolioDetailPage() {
   const navigate = useNavigate();
   const { profileNumber, portfolioNumber } = useParams();
   const userId = Number(profileNumber);
-  const { profile: viewer, isAuthenticated } = useAuth();
+  const { profile: viewer, isAuthenticated, isLoading: authLoading, queryScope } = useAuth();
+  const detailOptions = profileDetailOptions(userId, queryScope);
   const portfolioIndex = Number(portfolioNumber) - 1;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const { data: apiProfile, isPending: isLoadingProfile } = useQuery({
-    queryKey: ["giut-hub", "profile", userId],
-    queryFn: () => getPublicProfile(userId),
-    enabled: Number.isSafeInteger(userId) && userId > 0,
-    retry: false,
+    ...detailOptions,
+    enabled: detailOptions.enabled && !authLoading,
   });
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
 

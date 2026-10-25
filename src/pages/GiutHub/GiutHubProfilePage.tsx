@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
@@ -9,7 +9,9 @@ import dataDashboard from "../../assets/portfolio/data-dashboard.png";
 import esgGlobe from "../../assets/portfolio/esg-globe.png";
 import hackathonCode from "../../assets/portfolio/hackathon-code.png";
 import projectRoadmap from "../../assets/portfolio/project-roadmap.png";
-import { getPublicProfile, type PublicProfileDetail } from "../../api/giutHub";
+import type { PublicProfileDetail } from "../../api/giutHub";
+import { profileDetailOptions } from "./profileQueries";
+import { hubListReturnTo } from "./giutHubFilters";
 import { setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
 import { createPersonalChatRoom } from "../../api/chat";
 import { toHubProfile } from "./GiutHubPage";
@@ -326,21 +328,22 @@ function ProfileMoreBottomSheet({
 
 export function GiutHubProfilePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = hubListReturnTo(location.state?.returnTo);
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
-  const { profile: currentProfile, isAuthenticated } = useAuth();
+  const { profile: currentProfile, isAuthenticated, isLoading: authLoading, queryScope } = useAuth();
   const isOwnProfile = currentProfile?.userId === userId;
   const queryClient = useQueryClient();
-  const detailKey = ["giut-hub", "profile", userId, currentProfile?.userId];
+  const detailOptions = profileDetailOptions(userId, queryScope);
+  const detailKey = detailOptions.queryKey;
   const {
     data: apiProfile,
     isPending: isLoadingProfile,
     isError: profileLoadError,
   } = useQuery({
-    queryKey: detailKey,
-    queryFn: () => getPublicProfile(userId),
-    enabled: Number.isSafeInteger(userId) && userId > 0,
-    retry: false,
+    ...detailOptions,
+    enabled: detailOptions.enabled && !authLoading,
   });
   const recommendationMutation = useMutation({
     mutationKey: ["profile-recommendation-update", currentProfile?.userId, userId],
@@ -402,7 +405,7 @@ export function GiutHubProfilePage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate("/giut-hub")} title="" />
+          <PageHeader onBack={() => navigate(returnTo)} title="" />
           <S.EmptyState>프로필을 불러오고 있어요.</S.EmptyState>
         </S.Content>
       </S.Page>
@@ -412,7 +415,7 @@ export function GiutHubProfilePage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate("/giut-hub")} title="" />
+          <PageHeader onBack={() => navigate(returnTo)} title="" />
           <S.EmptyState>
             프로필을 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 시도해 주세요.
           </S.EmptyState>
@@ -425,7 +428,7 @@ export function GiutHubProfilePage() {
     <S.Page>
       <S.Content>
         <PageHeader
-          onBack={() => navigate("/giut-hub")}
+          onBack={() => navigate(returnTo)}
           rightContent={
             <S.MoreButton
               aria-label="더보기"
