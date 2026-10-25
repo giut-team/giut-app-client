@@ -5,7 +5,7 @@ import { MarkdownContent } from "../../components/MarkdownContent";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
 import { getPublicProfile } from "../../api/giutHub";
-import dataDashboard from "../../assets/portfolio/data-dashboard.png";
+import { ImageWithFallback } from "./ImageWithFallback";
 import { toHubProfile } from "./GiutHubPage";
 import { toDetailProfileSummary } from "./profileDetail";
 import { GiutHubDialog } from "./GiutHubDialog";
@@ -124,7 +124,7 @@ export function PortfolioDetailPage() {
     ? {
         title: apiPortfolio.title,
         description: apiPortfolio.caption,
-        image: apiPortfolio.imageUrl || dataDashboard,
+        image: apiPortfolio.imageUrl,
         markdown: apiPortfolio.markdownContent || apiPortfolio.caption,
         startDate: apiPortfolio.projectStartDate,
         endDate: apiPortfolio.projectEndDate,
@@ -183,7 +183,7 @@ export function PortfolioDetailPage() {
           title="포트폴리오"
         />
         <S.HeroImage>
-          <img alt={`${portfolio.title} 대표 이미지`} src={portfolio.image} />
+          <ImageWithFallback alt={`${portfolio.title} 대표 이미지`} src={portfolio.image} />
         </S.HeroImage>
         <S.Body>
           <S.Author>

@@ -17,6 +17,7 @@ import { ProfileReportModal } from "./ProfileReportModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareScreen } from "./ProfileShareScreen";
 import { ProfileTabEmptyState } from "./ProfileTabEmptyState";
+import { ImageWithFallback } from "./ImageWithFallback";
 import { useProfileShare } from "./useProfileShare";
 import { S } from "./GiutHubProfilePage.styles";
 import { getProfileHeadingStatusColor } from "./profileStatus";
@@ -474,7 +475,7 @@ export function GiutHubProfilePage() {
         portfolios: (profileData.portfolioItems ?? []).map((item) => ({
           title: item.title,
           description: item.caption,
-          image: item.imageUrl || portfolioImages[0],
+          image: item.imageUrl,
           markdown: item.markdownContent || item.caption,
         })),
       }
@@ -638,7 +639,7 @@ export function GiutHubProfilePage() {
               onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
             >
               <S.FeaturedPortfolioImage>
-                <img alt="" src={detail.portfolios[0].image} />
+                <ImageWithFallback alt={`${detail.portfolios[0].title} 대표 이미지`} src={detail.portfolios[0].image} />
               </S.FeaturedPortfolioImage>
               <S.PortfolioCopy>
                 <S.RepresentativeLabel>대표 프로젝트</S.RepresentativeLabel>
@@ -660,7 +661,7 @@ export function GiutHubProfilePage() {
                   }
                 >
                   <S.PortfolioImage>
-                    <img alt="" src={item.image} />
+                    <ImageWithFallback alt={`${item.title} 이미지`} src={item.image} />
                   </S.PortfolioImage>
                   <S.PortfolioCopy>
                     <S.PortfolioTitle>{item.title}</S.PortfolioTitle>

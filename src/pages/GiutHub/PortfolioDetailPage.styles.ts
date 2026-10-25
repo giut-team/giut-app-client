@@ -168,11 +168,13 @@ export const S = {
     cursor: pointer;
   `,
   HeroImage: styled.div`
+    display: flex;
     aspect-ratio: 1.58;
     overflow: hidden;
     background: ${tokens.color.neutral[100]};
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;

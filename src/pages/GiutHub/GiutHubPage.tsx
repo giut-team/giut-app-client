@@ -17,6 +17,7 @@ import { buildPublicProfileFilters, type Category, type Position, type TeamStatu
 import { S } from "./GiutHubPage.styles";
 import { getProfileStatusColor } from "./profileStatus";
 import { GiutHubLoadError } from "./GiutHubLoadError";
+import { ImageWithFallback } from "./ImageWithFallback";
 
 type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
@@ -937,11 +938,7 @@ function ProfileCard({
     <S.ProfileCard>
       <S.ProfileTop>
         <S.Avatar $tone={profile.avatarTone}>
-          {profile.avatarSrc ? (
-            <img alt={`${profile.name} 프로필`} src={profile.avatarSrc} />
-          ) : (
-            profile.avatarFallback
-          )}
+          <ImageWithFallback alt={`${profile.name} 프로필`} src={profile.avatarSrc} />
         </S.Avatar>
         <S.ProfileIdentity>
         <S.ProfileHeader>

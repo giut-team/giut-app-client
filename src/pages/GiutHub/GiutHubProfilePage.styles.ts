@@ -399,6 +399,7 @@ export const S = {
     }
   `,
   FeaturedPortfolioImage: styled.div`
+    display: flex;
     align-self: center;
     aspect-ratio: 1.58;
     overflow: hidden;
@@ -406,6 +407,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -441,6 +443,7 @@ export const S = {
     }
   `,
   PortfolioImage: styled.div`
+    display: flex;
     align-self: center;
     aspect-ratio: 1.72;
     overflow: hidden;
@@ -448,6 +451,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
