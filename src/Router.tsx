@@ -4,6 +4,9 @@ import { useAuth } from "./contexts/AuthContext";
 import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
+import { GiutHubPreviewPage } from "./pages/GiutHubPreview/GiutHubPreviewPage";
+import { GiutHubPreviewProfilePage } from "./pages/GiutHubPreview/GiutHubPreviewProfilePage";
+import { PreviewPortfolioPage } from "./pages/GiutHubPreview/PreviewPortfolioPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
 import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
@@ -61,6 +64,9 @@ export function AppRouter() {
         <Route element={<ChatPage />} path="/chat" />
         <Route element={<ChatRoomPage />} path="/chat/:chatId" />
         <Route element={<GiutHubPage />} path="/giut-hub" />
+        <Route element={<GiutHubPreviewPage />} path="/giut-hub-preview" />
+        <Route element={<GiutHubPreviewProfilePage />} path="/giut-hub-preview/:profileNumber" />
+        <Route element={<PreviewPortfolioPage />} path="/giut-hub-preview/:profileNumber/portfolio/:portfolioId" />
         <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />
         <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
         <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
