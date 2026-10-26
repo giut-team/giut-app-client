@@ -272,7 +272,24 @@ export function ContestDetailPage() {
   }
 
   if (isContestError || !contest) {
-    return <S.Page><S.Content><S.InfoSection>공모전 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</S.InfoSection></S.Content></S.Page>;
+    return (
+      <S.Page>
+        <S.Content>
+          <S.Header>
+            <S.HeaderButton
+              aria-label="뒤로 가기"
+              onClick={handleBack}
+              type="button"
+            >
+              <Icon name="arrow-left" size={20} weight="regular" />
+            </S.HeaderButton>
+          </S.Header>
+          <S.InfoSection>
+            공모전 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+          </S.InfoSection>
+        </S.Content>
+      </S.Page>
+    );
   }
 
   return (

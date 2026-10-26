@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
@@ -334,6 +334,9 @@ export function GiutHubProfilePage() {
   const returnTo = hubListReturnTo(location.state?.returnTo);
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [userId]);
   const { profile: currentProfile, isAuthenticated, isLoading: authLoading, queryScope } = useAuth();
   const isOwnProfile = currentProfile?.userId === userId;
   const queryClient = useQueryClient();
