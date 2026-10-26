@@ -13,11 +13,6 @@ import { BottomNavigation } from "../../components/BottomNavigation/BottomNaviga
 import { Icon } from "../../components/icons";
 import { Toast } from "../../components/Toast/Toast";
 import { S } from "./ChatPage.styles";
-import { getChatRooms, getChatUnreadCount } from "../../api/chat";
-import { getPublicProfile } from "../../api/giutHub";
-import { getProfileActionError } from "../../api/profileActions";
-import { useAuth } from "../../contexts/AuthContext";
-import { Button } from "../../components/Button";
 
 type ChatTab = "all" | "unread";
 type AvatarTone = "mint" | "peach" | "purple";
@@ -86,26 +81,6 @@ const getLatestMessage = (messages: ChatMessageResponse[]) =>
 export function ChatPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isLoading: authLoading, profile: me } = useAuth();
-  const rooms = useQuery({ queryKey: ["chat-rooms", me?.userId],
-    queryFn: ({ signal }) => getChatRooms(signal), enabled: isAuthenticated, retry: false, refetchInterval: 10_000 });
-  const activeRooms = isAuthenticated && !rooms.isError ? rooms.data ?? [] : [];
-  const profiles = useQueries({ queries: activeRooms.map(room => ({
-    queryKey: ["chat-target", room.targetUserId], queryFn: () => getPublicProfile(room.targetUserId), retry: false,
-  })) });
-  const unread = useQueries({ queries: activeRooms.map(room => ({
-    queryKey: ["chat-unread", me?.userId, room.chatRoomId],
-    queryFn: ({ signal }: { signal: AbortSignal }) => getChatUnreadCount(room.chatRoomId, signal),
-    retry: false, refetchInterval: 10_000,
-  })) });
-  const chatRows: ChatRow[] = activeRooms.map((room, index) => {
-    const profile = profiles[index]?.data;
-    const title = profile?.nickname ?? "대화 상대";
-    return { id: String(room.chatRoomId), initial: title.slice(0, 1), avatarTone: "mint", title,
-      preview: profile ? `${profile.profile.departmentName} · ${profile.profile.grade}학년` : "대화를 이어가 보세요.",
-      time: new Date(room.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-      latestMessageAt: room.createdAt, unread: unread[index]?.data };
-  });
   const [activeTab, setActiveTab] = useState<ChatTab>("all");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

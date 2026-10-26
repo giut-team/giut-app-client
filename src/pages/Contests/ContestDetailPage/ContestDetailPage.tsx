@@ -408,7 +408,15 @@ export function ContestDetailPage() {
         <S.TeamsHeader>
           <S.SectionHeader>
             <S.SectionTitle>
-              모집 중인 팀 <S.TeamTotal>{recruitingTeams?.totalElements ?? contest.recruitingTeamCount}</S.TeamTotal>
+              모집 중인 팀
+              {!isUniversityUnverified && (
+                <>
+                  {" "}
+                  <S.TeamTotal>
+                    {recruitingTeams?.totalElements ?? contest.recruitingTeamCount}
+                  </S.TeamTotal>
+                </>
+              )}
             </S.SectionTitle>
             {!isUniversityUnverified && (
               <S.ViewAll onClick={() => navigate("teams")} type="button">
@@ -417,8 +425,20 @@ export function ContestDetailPage() {
             )}
           </S.SectionHeader>
         </S.TeamsHeader>
-          <S.TeamsSection>
-          <S.TeamList>
+        <S.TeamsSection>
+          {isUniversityUnverified ? (
+            <S.LockedTeamsCard disabled type="button">
+              <S.LockedTeamsPreview aria-hidden="true">
+                <strong>데이터로 서울을</strong>
+                <span>함께할 팀원을 모집하고 있어요</span>
+              </S.LockedTeamsPreview>
+              <S.LockedTeamsMessage>
+                <Icon name="lock" size={15} weight="regular" />
+                <span>학교 인증 후 볼 수 있어요</span>
+              </S.LockedTeamsMessage>
+            </S.LockedTeamsCard>
+          ) : (
+            <S.TeamList>
             {isRecruitingTeamsLoading && (
               <S.TeamDescription>팀 목록을 불러오는 중입니다.</S.TeamDescription>
             )}

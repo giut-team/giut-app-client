@@ -2,7 +2,6 @@ import { useRef, useState, useEffect, type ChangeEvent } from "react";
 import { S } from "./ImageUploader.styles";
 
 const MAX_IMAGES = 10;
-const MAX_MSG = "사진을 10장 이상 추가할 수 없습니다";
 
 interface ImageItem {
   id: string;

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import { createPersonalChatRoom } from "../../../api/chats";
 import { fetchContestDetail } from "../../../api/contests";
 import {
   fetchProfileRoles,
@@ -149,6 +150,28 @@ export function TeamDetailPage() {
         ),
       );
       setIsApplicationCancelModalOpen(false);
+    },
+  });
+  const startChatMutation = useMutation({
+    mutationFn: () => {
+      if (!team) throw new Error("팀 정보를 확인할 수 없습니다.");
+      return createPersonalChatRoom(team.leaderUserId);
+    },
+    onSuccess: (chatRoom) => {
+      saveChatRoomContext(chatRoom.chatRoomId, {
+        kind: "TEAM_INQUIRY",
+        label: "공모전 팀 상세에서 시작된 대화",
+        title: `${contest?.title ?? "공모전"} · ${team?.name ?? "팀"}`,
+        primaryAction: {
+          label: "팀 보기",
+          path: `/contests/${contestId}/teams/${teamId}`,
+        },
+        secondaryAction: {
+          label: "공모전 보기",
+          path: `/contests/${contestId}`,
+        },
+      });
+      navigate(`/chat/${chatRoom.chatRoomId}`);
     },
   });
 
