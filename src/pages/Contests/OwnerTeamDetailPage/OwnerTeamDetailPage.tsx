@@ -485,7 +485,10 @@ export function OwnerTeamDetailPage() {
                       $state={actionMenuState}
                       onClick={() => {
                         setActionMenuState("closed");
-                        navigate(`/contests/${contestId}/teams/${teamId}/edit`);
+                        navigate(`/contests/${contestId}/teams/${teamId}/edit`, {
+                          replace: true,
+                          state: location.state,
+                        });
                       }}
                       role="menuitem"
                       type="button"
@@ -649,7 +652,12 @@ export function OwnerTeamDetailPage() {
         ) : (
           <>
             <S.ApplicationsButton
-              onClick={() => navigate(`/my-team/${numericTeamId}/applications`)}
+              onClick={() =>
+                navigate(`/my-team/${numericTeamId}/applications`, {
+                  replace: true,
+                  state: location.state,
+                })
+              }
               type="button"
             >
               받은 지원 보기

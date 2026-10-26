@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getProfileRoleName } from "../../../api/profiles";
 import { fetchTeamApplications, fetchTeamDetail } from "../../../api/teams";
 import { Icon } from "../../../components/icons";
@@ -23,6 +23,7 @@ const formatAppliedAt = (value: string) => {
 };
 
 export function ManageApplicationsPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { teamId = "" } = useParams();
   const numericTeamId = Number(teamId);
@@ -67,6 +68,7 @@ export function ManageApplicationsPage() {
 
     navigate(`/contests/${team.competitionId}/teams/${numericTeamId}/manage`, {
       replace: true,
+      state: location.state,
     });
   };
 
@@ -150,6 +152,7 @@ export function ManageApplicationsPage() {
                   aria-label={`${applicantName} 지원서 상세보기`}
                   onClick={() => navigate(
                     `/my-team/${numericTeamId}/applications/${application.applicationId}`,
+                    { state: location.state },
                   )}
                   type="button"
                 >

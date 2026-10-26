@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { fetchContestDetail } from "../../../api/contests";
 import {
   createTeam,
@@ -138,11 +138,13 @@ function StepHeader({
 function StepOne({
   contestTitle,
   isEditMode,
+  minimumMemberCount,
   roleSpecs,
   isLoadingRoleOptions,
 }: {
   contestTitle: string;
   isEditMode: boolean;
+  minimumMemberCount: number;
   roleSpecs: RoleSpecs;
   isLoadingRoleOptions: boolean;
 }) {
@@ -229,6 +231,7 @@ function StepOne({
         <S.Label htmlFor="team-name">팀명</S.Label>
         <S.TeamNameInput
           id="team-name"
+          maxLength={100}
           onChange={(event) => setTeamName(event.target.value)}
           value={teamName}
         />
@@ -240,7 +243,7 @@ function StepOne({
         <S.MemberControl>
           <S.CountButton
             aria-label="모집 인원 줄이기"
-            disabled={memberCount <= 2}
+            disabled={memberCount <= Math.max(2, minimumMemberCount)}
             onClick={() => setMemberCount(memberCount - 1)}
             type="button"
           >
@@ -251,7 +254,7 @@ function StepOne({
           </S.MemberCount>
           <S.CountButton
             aria-label="모집 인원 늘리기"
-            disabled={memberCount >= 10}
+            disabled={memberCount >= 20}
             onClick={() =>
               setMemberCount(memberCount < 2 ? 2 : memberCount + 1)
             }
@@ -264,7 +267,10 @@ function StepOne({
 
       <S.RoleField>
         <S.RoleHeading>
-          <S.Label>나(팀장) 역할</S.Label>
+          <S.FieldTitleGroup>
+            <S.Label>나(팀장) 역할</S.Label>
+            {isEditMode && <S.LockedBadge>수정 불가</S.LockedBadge>}
+          </S.FieldTitleGroup>
           <S.SelectedRole>
             {majorRole.length && subRole.length
               ? selectedRoleSummary
@@ -272,11 +278,15 @@ function StepOne({
           </S.SelectedRole>
         </S.RoleHeading>
         <S.RoleLabel>대분류</S.RoleLabel>
+        {isEditMode && (
+          <S.HelperText>팀장 역할은 팀 정보 수정에서 변경할 수 없어요.</S.HelperText>
+        )}
         <S.ChipList>
           {majorRoles.map((role) => (
             <S.RoleChip
               $active={majorRole.includes(role)}
               aria-pressed={majorRole.includes(role)}
+              disabled={isEditMode}
               key={role}
               onClick={() => selectMajorRole(role)}
               type="button"
@@ -294,6 +304,7 @@ function StepOne({
               <S.RoleChip
                 $active={subRole.includes(role)}
                 aria-pressed={subRole.includes(role)}
+                disabled={isEditMode}
                 key={role}
                 onClick={() => toggleSubRole(role)}
                 type="button"
@@ -312,16 +323,21 @@ function StepOne({
       </S.RoleField>
 
       <S.LeaderField>
-        <S.Label>모집 포지션</S.Label>
+        <S.FieldTitleGroup>
+          <S.Label>모집 포지션</S.Label>
+          {isEditMode && <S.LockedBadge>수정 불가</S.LockedBadge>}
+        </S.FieldTitleGroup>
         <S.HelperText>
-          어떤 직군을 모집할지 먼저 고르고, 세부 직군과 인원은 다음 단계에서
-          정해요.
+          {isEditMode
+            ? "모집 포지션은 현재 팀 정보 수정에서 변경할 수 없어요."
+            : "어떤 직군을 모집할지 먼저 고르고, 세부 직군과 인원은 다음 단계에서 정해요."}
         </S.HelperText>
         <S.PositionChipList>
           {majorRoles.map((role) => (
             <S.RoleChip
               $active={recruitingRoles.includes(role)}
               aria-pressed={recruitingRoles.includes(role)}
+              disabled={isEditMode}
               key={role}
               onClick={() => toggleRecruitingRole(role)}
               type="button"
@@ -335,7 +351,13 @@ function StepOne({
   );
 }
 
-function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
+function StepTwo({
+  isEditMode,
+  roleSpecs,
+}: {
+  isEditMode: boolean;
+  roleSpecs: RoleSpecs;
+}) {
   const {
     memberCount,
     recruitingRoles,
@@ -376,9 +398,17 @@ function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
 
   return (
     <S.Form>
+      {isEditMode && (
+        <S.EditRestrictionNotice>
+          모집 포지션과 필요 인원은 현재 수정할 수 없어 기존 설정으로 유지돼요.
+        </S.EditRestrictionNotice>
+      )}
       <S.StepIntro>
         <S.StepIntroHeading>
-          직군과 인원{" "}
+          <S.FieldTitleGroup>
+            <span>직군과 인원</span>
+            {isEditMode && <S.LockedBadge>수정 불가</S.LockedBadge>}
+          </S.FieldTitleGroup>
           <S.AllocationBadge>
             배정 {assignedSlots}/{totalSlots}명
           </S.AllocationBadge>
@@ -414,7 +444,7 @@ function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
                 <S.CompactCountControl>
                   <S.CountButton
                     aria-label={`${role} 인원 줄이기`}
-                    disabled={count <= 0}
+                    disabled={isEditMode || count <= 0}
                     onClick={() => changeCount(role, -1)}
                     type="button"
                   >
@@ -423,7 +453,7 @@ function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
                   <S.MemberCount>{count}명</S.MemberCount>
                   <S.CountButton
                     aria-label={`${role} 인원 늘리기`}
-                    disabled={assignedSlots >= totalSlots}
+                    disabled={isEditMode || assignedSlots >= totalSlots}
                     onClick={() => changeCount(role, 1)}
                     type="button"
                   >
@@ -436,6 +466,7 @@ function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
                   <S.SkillChip
                     $active={selectedSkills.includes(skill)}
                     aria-pressed={selectedSkills.includes(skill)}
+                    disabled={isEditMode}
                     key={skill}
                     onClick={() => toggleSkill(role, skill)}
                     type="button"
@@ -456,7 +487,7 @@ function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
   );
 }
 
-function StepThree() {
+function StepThree({ isEditMode }: { isEditMode: boolean }) {
   const {
     activityMode,
     locations,
@@ -487,20 +518,27 @@ function StepThree() {
     <S.StepThreeForm>
       <S.StepIntro>
         <S.StepIntroHeading>
-          팀원 바로 추가 <S.OptionalLabel>선택 사항</S.OptionalLabel>
+          팀원 바로 추가
+          {isEditMode ? (
+            <S.LockedBadge>수정 불가</S.LockedBadge>
+          ) : (
+            <S.OptionalLabel>선택 사항</S.OptionalLabel>
+          )}
         </S.StepIntroHeading>
         <S.HelperText>
-          이미 같이 하기로 한 팀원이 있으면 아이디로 추가해요. 추가한 만큼 모집
-          자리가 줄어들어요.
+          {isEditMode
+            ? "기존 팀원은 팀 정보 수정에서 추가하거나 제거할 수 없어요."
+            : "이미 같이 하기로 한 팀원이 있으면 아이디로 추가해요. 추가한 만큼 모집 자리가 줄어들어요."}
         </S.HelperText>
       </S.StepIntro>
       <S.SearchRow>
         <S.SearchInput
+          disabled={isEditMode}
           onChange={(event) => setSearchQuery(event.target.value)}
           placeholder="아이디 입력 (예: seoyeon)"
           value={searchQuery}
         />
-        <S.SearchButton onClick={addMember} type="button">
+        <S.SearchButton disabled={isEditMode} onClick={addMember} type="button">
           검색
         </S.SearchButton>
       </S.SearchRow>
@@ -518,6 +556,7 @@ function StepThree() {
             </div>
             <S.RemoveButton
               aria-label={`${member.name} 제거`}
+              disabled={isEditMode}
               onClick={() =>
                 setMembers(members.filter((item) => item.id !== member.id))
               }
@@ -588,13 +627,15 @@ function StepThree() {
         ))}
       </S.LocationList>
       <S.ActivityGuide>
-        팀원과 활동 방식은 팀을 등록한 뒤에도 언제든 수정할 수 있어요.
+        {isEditMode
+          ? "활동 방식, 주간 회의와 만남 장소를 수정할 수 있어요."
+          : "팀원과 활동 방식은 팀을 등록한 뒤에도 언제든 수정할 수 있어요."}
       </S.ActivityGuide>
     </S.StepThreeForm>
   );
 }
 
-function StepFour() {
+function StepFour({ isEditMode }: { isEditMode: boolean }) {
   const { introduction, questions, setIntroduction, setQuestions } =
     useTeamCreation();
   const [isQuestionSheetOpen, setIsQuestionSheetOpen] = useState(false);
@@ -649,27 +690,32 @@ function StepFour() {
         </S.HelperText>
       </S.StepIntro>
       <S.IntroductionInput
-        maxLength={500}
+        maxLength={1000}
         onChange={(event) => setIntroduction(event.target.value)}
         value={introduction}
       />
-      <S.CharacterCount>{introduction.length} / 500자</S.CharacterCount>
+      <S.CharacterCount>{introduction.length} / 1000자</S.CharacterCount>
       <S.Divider />
       <S.QuestionHeading>
-        지원자에게 받을 질문{" "}
-        <S.OptionalLabel>{questions.length} / 5개</S.OptionalLabel>
+        지원자에게 받을 질문
+        <S.HeadingMeta>
+          {isEditMode && <S.LockedBadge>수정 불가</S.LockedBadge>}
+          <S.OptionalLabel>{questions.length} / 5개</S.OptionalLabel>
+        </S.HeadingMeta>
       </S.QuestionHeading>
       <S.HelperText>
-        지원서에 이 질문들이 그대로 나가요. 팀원은 받은 지원에서 한 번에 비교할
-        수 있습니다.
+        {isEditMode
+          ? "지원 질문은 현재 팀 정보 수정에서 변경할 수 없어 기존 질문으로 유지돼요."
+          : "지원서에 이 질문들이 그대로 나가요. 팀원은 받은 지원에서 한 번에 비교할 수 있습니다."}
       </S.HelperText>
       <S.QuestionList>
         {questions.map((question, index) => (
-          <S.QuestionCard $hasActions={index >= 2} key={`${question}-${index}`}>
+          <S.QuestionCard $hasActions={!isEditMode && index >= 2} key={`${question}-${index}`}>
             <S.QuestionNumber>Q{index + 1}</S.QuestionNumber>
             {index < 2 ? (
               <S.QuestionInput
                 aria-label={`질문 ${index + 1}`}
+                disabled={isEditMode}
                 onChange={(event) => updateQuestion(index, event.target.value)}
                 value={question}
               />
@@ -685,7 +731,7 @@ function StepFour() {
             ) : (
               <S.QuestionText>{question}</S.QuestionText>
             )}
-            {index >= 2 && (
+            {!isEditMode && index >= 2 && (
               <S.QuestionActions>
                 {editingQuestionIndex === index ? (
                   <>
@@ -720,15 +766,16 @@ function StepFour() {
         ))}
       </S.QuestionList>
       <S.AddQuestionButton
-        disabled={questions.length >= 5}
+        disabled={isEditMode || questions.length >= 5}
         onClick={() => setIsQuestionSheetOpen(true)}
         type="button"
       >
         + 질문 추가하기
       </S.AddQuestionButton>
       <S.InfoBox>
-        등록하면 이 공모전 팀 목록에 바로 노출돼요. 팀 소개와 질문은 등록 후에도
-        팀 상세 → 편집에서 바꿀 수 있습니다.
+        {isEditMode
+          ? "팀 소개 변경사항만 저장되며 지원 질문은 그대로 유지돼요."
+          : "등록하면 이 공모전 팀 목록에 바로 노출돼요."}
       </S.InfoBox>
       <BottomSheet
         footer={
@@ -800,10 +847,12 @@ function StepFour() {
 
 function StepFive({
   contestTitle,
+  isEditMode,
   onEdit,
   roleSpecs,
 }: {
   contestTitle: string;
+  isEditMode: boolean;
   onEdit: (step: number) => void;
   roleSpecs: RoleSpecs;
 }) {
@@ -879,8 +928,12 @@ function StepFive({
           지원이 오면 팀장이 직접 배분해요.
         </S.ConfirmationNote>
         <S.ConfirmationEditRow>
-          <S.ConfirmationEditButton onClick={() => onEdit(2)} type="button">
-            수정
+          <S.ConfirmationEditButton
+            disabled={isEditMode}
+            onClick={() => onEdit(2)}
+            type="button"
+          >
+            {isEditMode ? "변경 불가" : "수정"}
           </S.ConfirmationEditButton>
         </S.ConfirmationEditRow>
       </S.ConfirmationCard>
@@ -896,14 +949,20 @@ function StepFive({
           ))}
         </S.ConfirmationQuestionList>
         <S.ConfirmationEditRow>
-          <S.ConfirmationEditButton onClick={() => onEdit(4)} type="button">
-            수정
+          <S.ConfirmationEditButton
+            disabled={isEditMode}
+            onClick={() => onEdit(4)}
+            type="button"
+          >
+            {isEditMode ? "변경 불가" : "수정"}
           </S.ConfirmationEditButton>
         </S.ConfirmationEditRow>
       </S.ConfirmationCard>
 
       <S.ConfirmationGuide>
-        등록 후에도 모집 분야와 팀 정보를 수정할 수 있어요.
+        {isEditMode
+          ? "팀명, 소개, 활동 방식, 최대 인원과 모임 정보를 수정합니다."
+          : "등록 후에도 백엔드가 지원하는 팀 정보를 수정할 수 있어요."}
       </S.ConfirmationGuide>
     </S.ConfirmationForm>
   );
@@ -984,6 +1043,7 @@ function TeamCreationComplete({ onConfirm }: { onConfirm: () => void }) {
 
 export function TeamCreationPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { contestId = "seoul-data", step, teamId } = useParams();
   const [searchParams] = useSearchParams();
@@ -1237,6 +1297,7 @@ export function TeamCreationPage() {
       setIsSubmitModalOpen(false);
       navigate(`/contests/${contestId}/teams/${numericTeamId}/manage`, {
         replace: true,
+        state: location.state,
       });
     },
     onError: (error) => {
@@ -1258,28 +1319,35 @@ export function TeamCreationPage() {
     (total, role) => total + (roleCounts[role] ?? 0),
     0,
   );
+  const minimumMemberCount = Math.max(2, editingTeam?.currentMemberCount ?? 2);
   const isCurrentStepValid =
     currentStep === 1
-      ? Boolean(
-          teamName.trim() &&
-          memberCount >= 2 &&
-          majorRole.length &&
-          subRole.length &&
-          recruitingRoles.length,
-        )
-      : currentStep === 2
-        ? Boolean(
-            assignedRecruitingSlots === requiredRecruitingSlots &&
-            recruitingRoles.every(
-              (role) =>
-                (roleCounts[role] ?? 0) > 0 &&
-                (roleSkills[role] ?? []).length > 0,
-            ),
+      ? isEditMode
+        ? Boolean(teamName.trim() && memberCount >= minimumMemberCount)
+        : Boolean(
+            teamName.trim() &&
+            memberCount >= 2 &&
+            majorRole.length &&
+            subRole.length &&
+            recruitingRoles.length,
           )
+      : currentStep === 2
+        ? isEditMode || Boolean(
+          assignedRecruitingSlots === requiredRecruitingSlots &&
+          recruitingRoles.every(
+            (role) =>
+              (roleCounts[role] ?? 0) > 0 &&
+              (roleSkills[role] ?? []).length > 0,
+          ),
+        )
         : currentStep === 3
-          ? Boolean(activityMode && weeklyMeetings > 0 && locations.length)
+          ? Boolean(
+              activityMode &&
+              (isEditMode ? weeklyMeetings >= 0 : weeklyMeetings > 0) &&
+              locations.length,
+            )
           : currentStep === 4
-            ? Boolean(
+            ? isEditMode || Boolean(
                 introduction.trim() &&
                 questions.length >= 2 &&
                 questions.slice(0, 2).every((question) => question.trim()),
@@ -1288,9 +1356,9 @@ export function TeamCreationPage() {
   const titleByStep = isEditMode
     ? [
         "팀 수정하기",
-        "모집 포지션 수정",
-        "팀원 · 활동 방식",
-        "팀 소개 · 지원 질문",
+        "모집 포지션 확인",
+        "팀원 확인 · 활동 방식",
+        "팀 소개 · 지원 질문 확인",
         "팀 수정 확인",
       ]
     : [
@@ -1303,7 +1371,7 @@ export function TeamCreationPage() {
   const stepPath = (targetStep: number) =>
     `/contests/${contestId}/teams/${isEditMode ? `${teamId}/edit` : "create"}${targetStep === 1 ? "" : `/${targetStep}`}${searchParams.get("from") ? `?from=${searchParams.get("from")}` : ""}`;
   const goToStep = (targetStep: number) =>
-    navigate(stepPath(targetStep), { replace: true });
+    navigate(stepPath(targetStep), { replace: true, state: location.state });
   const handleBack = () => {
     if (currentStep === 1) {
       setIsExitModalOpen(true);
@@ -1316,6 +1384,7 @@ export function TeamCreationPage() {
     if (isEditMode) {
       navigate(`/contests/${contestId}/teams/${teamId}/manage`, {
         replace: true,
+        state: location.state,
       });
       return;
     }
@@ -1453,19 +1522,23 @@ export function TeamCreationPage() {
       return (
         <StepFive
           contestTitle={contest?.title ?? "공모전 정보를 불러오는 중이에요"}
+          isEditMode={isEditMode}
           onEdit={goToStep}
           roleSpecs={roleSpecs}
         />
       );
     }
-    if (currentStep === 2) return <StepTwo roleSpecs={roleSpecs} />;
-    if (currentStep === 3) return <StepThree />;
-    if (currentStep === 4) return <StepFour />;
+    if (currentStep === 2) {
+      return <StepTwo isEditMode={isEditMode} roleSpecs={roleSpecs} />;
+    }
+    if (currentStep === 3) return <StepThree isEditMode={isEditMode} />;
+    if (currentStep === 4) return <StepFour isEditMode={isEditMode} />;
     return (
       <StepOne
         contestTitle={contest?.title ?? "공모전 정보를 불러오는 중이에요"}
         isEditMode={isEditMode}
         isLoadingRoleOptions={isLoadingProfileRoles}
+        minimumMemberCount={minimumMemberCount}
         roleSpecs={roleSpecs}
       />
     );
@@ -1554,7 +1627,7 @@ export function TeamCreationPage() {
           label: "확인",
           onClick: () => setIsSubmitErrorModalOpen(false),
         }}
-        title="팀을 등록하지 못했어요"
+        title={isEditMode ? "팀 정보를 수정하지 못했어요" : "팀을 등록하지 못했어요"}
       />
     </S.Page>
   );

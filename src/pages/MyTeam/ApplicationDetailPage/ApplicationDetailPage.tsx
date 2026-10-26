@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getProfileRoleName } from "../../../api/profiles";
 import {
   approveTeamApplication,
@@ -41,6 +41,7 @@ const getDecisionErrorMessage = (error: unknown) => {
 };
 
 export function ApplicationDetailPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { applicationId = "", teamId = "" } = useParams();
@@ -90,7 +91,10 @@ export function ApplicationDetailPage() {
         ? [queryClient.invalidateQueries({ queryKey: ["contest", team.competitionId] })]
         : []),
     ]);
-    navigate(`/my-team/${numericTeamId}/applications`);
+    navigate(`/my-team/${numericTeamId}/applications`, {
+      replace: true,
+      state: location.state,
+    });
   };
 
   if (isLoading) {
