@@ -4,23 +4,58 @@ import { tokens } from "../../design-system/tokens.generated";
 export const S = {
   Page: styled.main`
     display: grid;
-    width: 100%;
+    width: min(100%, 480px);
     min-height: 100svh;
-    padding: 40px 20px;
+    margin: 0 auto;
+    padding: 40px 20px max(40px, env(safe-area-inset-bottom));
+    border-right: 1px solid ${tokens.color.neutral[200]};
+    border-left: 1px solid ${tokens.color.neutral[200]};
     place-items: center;
     overflow-x: hidden;
     background: #f4f6f9;
 
-    @media (max-width: 600px) {
+    @media (max-width: 480px) {
       padding: 24px 20px;
+      border: 0;
     }
   `,
   Content: styled.div`
     width: 100%;
-    max-width: 500px;
+  `,
+  Header: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+
+    @media (max-width: 560px) {
+      margin-bottom: 24px;
+    }
+  `,
+  BackButton: styled.button`
+    display: grid;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: ${tokens.color.neutral[900]};
+    cursor: pointer;
+    place-items: center;
+
+    &:hover {
+      background: ${tokens.color.neutral[100]};
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba(43, 87, 255, 0.28);
+      outline-offset: 2px;
+    }
   `,
   Title: styled.h1`
-    margin: 0 0 32px;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 36px;
     font-weight: 800;
@@ -28,7 +63,6 @@ export const S = {
     line-height: 1.2;
 
     @media (max-width: 560px) {
-      margin-bottom: 24px;
       font-size: 30px;
     }
   `,

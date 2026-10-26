@@ -8,26 +8,19 @@ const muted = navy;
 export const S = {
   Page: styled.main`
     display: grid;
-    grid-template-columns: 282px minmax(0, 1fr);
+    width: min(100%, 480px);
+    grid-template-columns: minmax(0, 1fr);
     min-height: 100svh;
-    overflow: hidden;
+    margin: 0 auto;
+    overflow-x: hidden;
     background: #f4f6f9;
     color: ${navy};
-
-    @media (max-width: 960px) {
-      grid-template-columns: 220px minmax(900px, 1fr);
-      overflow-x: auto;
-    }
   `,
   Sidebar: styled.aside`
-    position: sticky;
-    top: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
     width: 100%;
-    height: 100svh;
-    padding: 30px 17px 18px;
-    border-right: 1px solid ${border};
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid ${border};
     background: #fff;
   `,
   Brand: styled.div`
@@ -50,13 +43,13 @@ export const S = {
     font-weight: 800;
   `,
   Nav: styled.nav`
-    display: grid;
-    gap: 3px;
-    margin-top: 56px;
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
   `,
   NavItem: styled.button<{ $active?: boolean }>`
-    width: 100%;
-    padding: 13px 12px;
+    flex: 1;
+    padding: 11px 12px;
     border: 0;
     border-radius: 9px;
     background: ${({ $active }) => ($active ? "#eaf0ff" : "transparent")};
@@ -64,27 +57,33 @@ export const S = {
     font: inherit;
     font-size: 16px;
     font-weight: ${({ $active }) => ($active ? 750 : 650)};
-    text-align: left;
+    text-align: center;
     cursor: ${({ $active }) => ($active ? "default" : "pointer")};
   `,
   Account: styled.div`
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 2px;
-    margin-top: auto;
-    padding: 15px 6px 0;
+    margin-top: 16px;
+    padding: 14px 6px 0;
     border-top: 1px solid #eaedf2;
   `,
   AccountName: styled.strong`
+    grid-column: 1;
     color: ${navy};
     font-size: 14px;
   `,
   AccountId: styled.span`
+    grid-column: 1;
     color: ${muted};
     font-size: 13px;
   `,
   LogoutButton: styled.button`
-    height: 40px;
-    margin-top: 11px;
+    width: 92px;
+    height: 38px;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0;
     border: 1px solid #d4dae5;
     border-radius: 8px;
     background: #fff;
@@ -96,56 +95,56 @@ export const S = {
   `,
   Main: styled.section`
     min-width: 0;
-    padding: 35px 26px 48px 36px;
+    padding: 24px 14px 40px;
   `,
   Header: styled.header`
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 28px;
+    gap: 12px;
+    margin-bottom: 20px;
   `,
   Title: styled.h1`
     margin: 0;
-    font-size: 29px;
+    font-size: 26px;
     font-weight: 850;
     letter-spacing: -0.8px;
   `,
   Description: styled.p`
     margin: 6px 0 0;
     color: ${muted};
-    font-size: 16px;
+    font-size: 14px;
+    line-height: 1.5;
   `,
   CreateButton: styled.button`
     display: flex;
-    height: 50px;
+    height: 42px;
     align-items: center;
     gap: 5px;
-    padding: 0 20px;
+    padding: 0 14px;
     border: 0;
     border-radius: 9px;
     background: ${blue};
     color: #fff;
     font: inherit;
-    font-size: 15px;
+    font-size: 13px;
+    white-space: nowrap;
     font-weight: 800;
     cursor: pointer;
 
     &:hover { background: #1d3b89; }
   `,
   Table: styled.section`
-    min-width: 900px;
+    min-width: 0;
     overflow: hidden;
     border: 1px solid ${border};
     border-radius: 16px;
     background: #fff;
   `,
   TableToolbar: styled.div`
-    display: flex;
-    min-height: 61px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
+    display: grid;
+    gap: 12px;
+    padding: 16px;
     border-bottom: 1px solid #e7eaf0;
 
     strong {
@@ -155,13 +154,12 @@ export const S = {
     }
   `,
   ToolbarControls: styled.div`
-    display: flex;
-    align-items: center;
-    gap: 18px;
+    display: grid;
+    gap: 12px;
   `,
   SearchBox: styled.label`
     display: flex;
-    width: 220px;
+    width: 100%;
     height: 38px;
     align-items: center;
     gap: 8px;
@@ -224,16 +222,7 @@ export const S = {
     color: #fff;
   `,
   TableHeader: styled.div`
-    display: grid;
-    grid-template-columns: minmax(390px, 1fr) 202px 136px 178px;
-    min-height: 44px;
-    align-items: center;
-    padding: 0 19px;
-    border-bottom: 1px solid #e7eaf0;
-    color: ${muted};
-    font-size: 13px;
-
-    span { text-align: center; }
+    display: none;
   `,
   TableBody: styled.div`
     display: grid;
@@ -247,48 +236,53 @@ export const S = {
   `,
   Row: styled.article`
     display: grid;
-    grid-template-columns: minmax(390px, 1fr) 202px 136px 178px;
-    min-height: 81px;
-    align-items: center;
-    padding: 0 19px;
+    grid-template-areas:
+      "info status"
+      "period period"
+      "actions actions";
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 13px 12px;
+    padding: 18px 16px;
     border-bottom: 1px solid #e7eaf0;
 
     &:last-child { border-bottom: 0; }
   `,
   ContestInfo: styled.div`
     display: grid;
+    grid-area: info;
     gap: 4px;
-    justify-items: center;
+    justify-items: start;
     min-width: 0;
-    padding: 0 20px;
-    text-align: center;
+    padding: 0;
+    text-align: left;
 
     strong {
       overflow: hidden;
       font-size: 15px;
       font-weight: 800;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow-wrap: anywhere;
     }
 
     span {
       overflow: hidden;
       color: ${muted};
       font-size: 13px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
     }
   `,
   Period: styled.div`
     display: grid;
+    grid-area: period;
     gap: 2px;
-    justify-items: center;
+    justify-items: start;
     color: ${navy};
     font-size: 14px;
-    text-align: center;
+    text-align: left;
   `,
   Status: styled.div`
     display: grid;
+    grid-area: status;
     justify-items: center;
     gap: 4px;
   `,
@@ -311,11 +305,12 @@ export const S = {
   `,
   Actions: styled.div`
     display: flex;
-    justify-content: center;
+    grid-area: actions;
+    justify-content: flex-end;
     gap: 8px;
   `,
   EditButton: styled.button<{ $wide?: boolean }>`
-    width: ${({ $wide }) => ($wide ? "112px" : "auto")};
+    width: auto;
     height: 40px;
     padding: 0 16px;
     border: 1px solid #d5dbe5;
@@ -350,7 +345,7 @@ export const S = {
     }
   `,
   Editor: styled.div`
-    padding: 28px 30px 30px;
+    padding: 24px 20px;
     color: ${navy};
   `,
   EditorTitle: styled.h2`
@@ -365,7 +360,7 @@ export const S = {
   `,
   EditorForm: styled.form`
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px 14px;
   `,
   Field: styled.label<{ $wide?: boolean }>`

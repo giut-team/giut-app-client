@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../api/adminAuth";
+import { Icon } from "../../components/icons";
 import { S } from "./AdminLoginPage.styles";
 
 function getLoginErrorMessage(error: unknown) {
@@ -40,7 +41,16 @@ export function AdminLoginPage() {
   return (
     <S.Page data-admin-page>
       <S.Content>
-        <S.Title>관리자 로그인</S.Title>
+        <S.Header>
+          <S.BackButton
+            aria-label="일반 로그인으로 돌아가기"
+            onClick={() => navigate("/login")}
+            type="button"
+          >
+            <Icon name="arrow-left" size={24} />
+          </S.BackButton>
+          <S.Title>관리자 로그인</S.Title>
+        </S.Header>
         <S.Card onSubmit={handleSubmit}>
           <S.Field>
             이메일

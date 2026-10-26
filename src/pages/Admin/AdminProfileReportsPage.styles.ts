@@ -8,26 +8,19 @@ const muted = "#8792a5";
 export const S = {
   Page: styled.main`
     display: grid;
-    grid-template-columns: 284px minmax(0, 1fr);
+    width: min(100%, 480px);
     min-height: 100svh;
-    overflow: hidden;
+    margin: 0 auto;
+    overflow-x: hidden;
     background: #f4f6f9;
     color: ${navy};
-
-    @media (max-width: 960px) {
-      grid-template-columns: 220px minmax(720px, 1fr);
-      overflow-x: auto;
-    }
+    grid-template-columns: minmax(0, 1fr);
   `,
   Sidebar: styled.aside`
-    position: sticky;
-    top: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
     width: 100%;
-    height: 100svh;
-    padding: 30px 17px 18px;
-    border-right: 1px solid ${border};
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid ${border};
     background: #fff;
   `,
   Brand: styled.div`
@@ -50,13 +43,13 @@ export const S = {
     font-weight: 800;
   `,
   Nav: styled.nav`
-    display: grid;
-    gap: 3px;
-    margin-top: 35px;
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
   `,
   NavItem: styled.button<{ $active?: boolean }>`
-    width: 100%;
-    padding: 13px 12px;
+    flex: 1;
+    padding: 11px 12px;
     border: 0;
     border-radius: 9px;
     background: ${({ $active }) => ($active ? "#eaf0ff" : "transparent")};
@@ -64,26 +57,32 @@ export const S = {
     font: inherit;
     font-size: 16px;
     font-weight: ${({ $active }) => ($active ? 750 : 650)};
-    text-align: left;
+    text-align: center;
     cursor: ${({ $active }) => ($active ? "default" : "pointer")};
   `,
   Account: styled.div`
     display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 2px;
-    margin-top: auto;
-    padding: 15px 8px 0;
+    margin-top: 16px;
+    padding: 14px 6px 0;
     border-top: 1px solid #eaedf2;
   `,
   AccountName: styled.strong`
+    grid-column: 1;
     font-size: 14px;
   `,
   AccountId: styled.span`
+    grid-column: 1;
     color: ${muted};
     font-size: 13px;
   `,
   LogoutButton: styled.button`
-    height: 40px;
-    margin-top: 11px;
+    width: 92px;
+    height: 38px;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0;
     border: 1px solid #d4dae5;
     border-radius: 8px;
     background: #fff;
@@ -97,28 +96,28 @@ export const S = {
   `,
   Main: styled.section`
     min-width: 0;
-    padding: 38px 36px 42px;
+    padding: 24px 14px 40px;
   `,
   Header: styled.header`
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   `,
   Title: styled.h1`
     margin: 0;
-    font-size: 29px;
+    font-size: 26px;
     font-weight: 850;
     letter-spacing: -0.8px;
   `,
   Description: styled.p`
     margin: 7px 0 0;
     color: ${navy};
-    font-size: 16px;
+    font-size: 14px;
+    line-height: 1.5;
   `,
   Workspace: styled.div`
     display: grid;
-    grid-template-columns: minmax(390px, 446px) minmax(520px, 1fr);
-    gap: 20px;
-    min-height: 542px;
-    height: calc(100svh - 157px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    min-height: 0;
   `,
   Panel: styled.section`
     min-width: 0;
@@ -131,7 +130,8 @@ export const S = {
     position: relative;
     display: grid;
     min-width: 0;
-    grid-template-rows: 60px minmax(0, 1fr) 62px;
+    height: 560px;
+    grid-template-rows: 56px minmax(0, 1fr) 56px;
     overflow: visible;
     border: 1px solid ${border};
     border-radius: 16px;
@@ -143,7 +143,7 @@ export const S = {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 16px;
     border-bottom: 1px solid ${border};
   `,
   SectionTitle: styled.h2`
@@ -173,7 +173,7 @@ export const S = {
     top: calc(100% + 9px);
     right: -9px;
     display: grid;
-    width: 238px;
+    width: min(238px, calc(100vw - 48px));
     padding: 10px;
     border: 1px solid ${border};
     border-radius: 18px;
@@ -210,7 +210,7 @@ export const S = {
     display: grid;
     width: 100%;
     gap: 7px;
-    padding: 19px 20px 18px;
+    padding: 17px 16px 16px;
     border: 0;
     border-bottom: 1px solid #eaedf2;
     background: ${({ $selected }) => ($selected ? "#f1f3f7" : "#fff")};
@@ -300,7 +300,7 @@ export const S = {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 12px;
     border-top: 1px solid ${border};
     color: ${muted};
     font-size: 14px;
@@ -312,8 +312,8 @@ export const S = {
   `,
   PageButton: styled.button<{ $active?: boolean }>`
     display: grid;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     place-items: center;
     border: ${({ $active }) => ($active ? "0" : "1px solid #dfe3eb")};
     border-radius: 8px;
@@ -332,13 +332,13 @@ export const S = {
     display: flex;
     min-width: 0;
     flex-direction: column;
-    overflow: auto;
+    overflow: hidden;
     border: 1px solid ${border};
     border-radius: 16px;
     background: #fff;
   `,
   DetailHeader: styled.header`
-    padding: 26px 30px 22px;
+    padding: 22px 20px 18px;
     border-bottom: 1px solid #e7eaf0;
   `,
   DetailEyebrow: styled.div`
@@ -364,8 +364,8 @@ export const S = {
   `,
   DetailBody: styled.div`
     display: grid;
-    gap: 25px;
-    padding: 25px 30px 30px;
+    gap: 22px;
+    padding: 22px 20px 24px;
   `,
   Subsection: styled.section`
     display: grid;
@@ -391,22 +391,22 @@ export const S = {
   ProfileCard: styled.div`
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 20px;
+    gap: 14px;
+    padding: 16px;
     border-radius: 14px;
     background: #f4f6f9;
   `,
   Avatar: styled.div`
     display: grid;
-    width: 90px;
-    height: 90px;
+    width: 70px;
+    height: 70px;
     flex: 0 0 auto;
     overflow: hidden;
     place-items: center;
     border-radius: 15px;
     background: #e3e9f8;
     color: ${blue};
-    font-size: 27px;
+    font-size: 23px;
     font-weight: 800;
 
     img {
@@ -449,7 +449,7 @@ export const S = {
   `,
   Facts: styled.dl`
     display: grid;
-    grid-template-columns: 105px minmax(0, 1fr);
+    grid-template-columns: 82px minmax(0, 1fr);
     gap: 10px 14px;
     margin: 2px 0 0;
     padding: 18px 0;
@@ -477,7 +477,7 @@ export const S = {
     gap: 10px;
   `,
   ReviewButton: styled.button<{ $primary?: boolean }>`
-    height: 58px;
+    height: 50px;
     border: ${({ $primary }) => ($primary ? "0" : "1px solid #d5dbe5")};
     border-radius: 11px;
     background: ${({ $primary }) => ($primary ? blue : "#fff")};
