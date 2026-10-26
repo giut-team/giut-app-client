@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useState,
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -48,8 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isUnverifiedProfileForbidden = responseStatus === 403;
 
   const refreshAuth = async () => {
+    setScope(createAuthQueryScope());
     await refetch();
   };
+  let credential: string | null = null;
+  try { credential = localStorage.getItem("accessToken"); } catch { /* 저장소 차단이 화면 렌더링을 중단시키지 않도록 한다. */ }
+  const queryScope = scope.resolve(credential, isError ? undefined : data?.profile?.userId);
 
   return (
     <AuthContext.Provider

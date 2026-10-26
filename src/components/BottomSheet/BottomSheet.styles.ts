@@ -13,7 +13,7 @@ export const S = {
     min-height: 0;
     flex: 1;
     flex-direction: column;
-    padding: ${({ $compact }) => ($compact ? "12px 18px 20px" : "17px 27px 0")};
+    padding: ${({ $compact }) => ($compact ? "12px 18px max(20px, env(safe-area-inset-bottom, 0px))" : "17px 27px 0")};
   ${({ $contentPadding }) =>
     $contentPadding !== undefined && `padding: ${$contentPadding};`}
   `,

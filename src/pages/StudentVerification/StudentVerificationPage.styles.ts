@@ -13,7 +13,7 @@ export const S = {
   Page: styled.main`
     display: flex;
     flex-direction: column;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     border: 1px solid ${tokens.color.neutral[200]};

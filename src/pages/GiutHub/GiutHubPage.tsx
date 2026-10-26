@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useProfileSlideNavigate } from "../../components/ProfileRouteMotion/useProfileSlideNavigate";
 import designerFemale from "../../assets/default_image/designer-female.png";
 import designerMale from "../../assets/default_image/designer-male.png";
 import developerFemale from "../../assets/default_image/developer-female.png";
@@ -12,11 +13,15 @@ import plannerMale from "../../assets/default_image/planner-male.png";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
-import { getPublicProfilesForFilters, type PublicProfile } from "../../api/giutHub";
+import type { PublicProfile } from "../../api/giutHub";
+import { useAuth } from "../../contexts/AuthContext";
+import { profileListOptions } from "./profileQueries";
+import { useHubFilterSelection } from "./useHubFilterSelection";
 import { buildPublicProfileFilters, type Category, type Position, type TeamStatus, type Grade } from "./giutHubFilters";
 import { S } from "./GiutHubPage.styles";
 import { getProfileStatusColor } from "./profileStatus";
 import { GiutHubLoadError } from "./GiutHubLoadError";
+import { ImageWithFallback } from "./ImageWithFallback";
 
 type FilterName = "포지션" | "학과 및 학년" | "현재 상태";
 type DepartmentCategory = "전체" | "IT·공학" | "경영·경제" | "디자인";
@@ -443,13 +448,13 @@ const navigationItems = [
 
 export function GiutHubPage() {
   const navigate = useNavigate();
+  const slideNavigate = useProfileSlideNavigate();
+  const { queryScope, isLoading: authLoading } = useAuth();
   const [isPositionSheetOpen, setIsPositionSheetOpen] = useState(false);
   const [isStatusSheetOpen, setIsStatusSheetOpen] = useState(false);
   const [isDepartmentSheetOpen, setIsDepartmentSheetOpen] = useState(false);
-  const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
-  const [selectedTeamStatus, setSelectedTeamStatus] = useState<TeamStatus>("전체");
-  const [selectedGrades, setSelectedGrades] = useState<Grade[]>([]);
-  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const { selectedPositions, setSelectedPositions, selectedTeamStatus, setSelectedTeamStatus,
+    selectedGrades, setSelectedGrades, selectedDepartments, setSelectedDepartments, resetFilters, returnTo } = useHubFilterSelection();
   const [departmentCategory, setDepartmentCategory] =
     useState<DepartmentCategory>("전체");
   const [departmentQuery, setDepartmentQuery] = useState("");
@@ -464,18 +469,18 @@ export function GiutHubPage() {
   });
   const {
     data: publicProfiles,
-    isFetching: isLoadingProfiles,
+    isPending: isLoadingProfiles,
+    isFetching: isFetchingProfiles,
     isError: profileLoadError,
     error: profilesError,
     refetch: refetchProfiles,
   } = useQuery({
-    queryKey: ["giut-hub", "profiles", requestFilters],
-    queryFn: ({ signal }) => getPublicProfilesForFilters(requestFilters, signal),
-    retry: false,
+    ...profileListOptions(requestFilters, queryScope),
+    enabled: !authLoading,
   });
   const showProfilesError = profileLoadError || retryingProfilesError !== null;
   const retryProfiles = async () => {
-    if (isLoadingProfiles || retryingProfilesError !== null) return;
+    if (isFetchingProfiles || retryingProfilesError !== null) return;
     setRetryingProfilesError(profilesError ?? new Error("목록 재요청"));
     try {
       await refetchProfiles({ cancelRefetch: false });
@@ -502,13 +507,6 @@ export function GiutHubPage() {
   const resultButtonLabel = isLoadingProfiles
     ? "불러오는 중…"
     : profileLoadError ? "닫기" : `${visibleProfiles.length}명 보기`;
-
-  const resetFilters = () => {
-    setSelectedPositions([]);
-    setSelectedTeamStatus("전체");
-    setSelectedGrades([]);
-    setSelectedDepartments([]);
-  };
 
   const togglePosition = (position: Position) => {
     setSelectedPositions((current) =>
@@ -656,7 +654,7 @@ export function GiutHubPage() {
             {showProfilesError && (
               <GiutHubLoadError
                 error={retryingProfilesError ?? profilesError}
-                isRetrying={isLoadingProfiles || retryingProfilesError !== null}
+                isRetrying={isFetchingProfiles || retryingProfilesError !== null}
                 onRetry={() => { void retryProfiles(); }}
                 onLogin={() => navigate("/login")}
                 onCheckProfile={() => navigate("/my-profile")}
@@ -665,7 +663,7 @@ export function GiutHubPage() {
             {!isLoadingProfiles && !showProfilesError && visibleProfiles.map((profile) => (
               <ProfileCard
                 key={profile.id}
-                onView={() => navigate(`/giut-hub/${profile.profileNumber}`)}
+                onView={() => { void slideNavigate(`/giut-hub/${profile.profileNumber}`, { state: { returnTo } }); }}
                 profile={profile}
               />
             ))}
@@ -937,11 +935,7 @@ function ProfileCard({
     <S.ProfileCard>
       <S.ProfileTop>
         <S.Avatar $tone={profile.avatarTone}>
-          {profile.avatarSrc ? (
-            <img alt={`${profile.name} 프로필`} src={profile.avatarSrc} />
-          ) : (
-            profile.avatarFallback
-          )}
+          <ImageWithFallback alt={`${profile.name} 프로필`} src={profile.avatarSrc} />
         </S.Avatar>
         <S.ProfileIdentity>
         <S.ProfileHeader>

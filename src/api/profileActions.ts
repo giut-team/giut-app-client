@@ -7,10 +7,6 @@ export type ProfileRecommendation = {
   recommendationCount: number;
 };
 
-export async function getProfileRecommendation(userId: number, signal?: AbortSignal): Promise<ProfileRecommendation> {
-  return (await api.get<ProfileRecommendation>(`/api/profile/${userId}/recommendations`, { signal })).data;
-}
-
 export async function setProfileRecommendation(userId: number, recommended: boolean): Promise<ProfileRecommendation> {
   const path = `/api/profile/${userId}/recommendations`;
   return (await (recommended ? api.post<ProfileRecommendation>(path) : api.delete<ProfileRecommendation>(path))).data;

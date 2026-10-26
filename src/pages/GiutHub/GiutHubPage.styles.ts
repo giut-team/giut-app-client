@@ -11,7 +11,7 @@ export const S = {
     background: ${giutHubBackground};
   `,
   Content: styled.div`
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(88px + var(--app-safe-bottom));
@@ -166,12 +166,13 @@ export const S = {
     padding-right: 34px;
   `,
   Avatar: styled.div<{ $tone: "blue" | "purple" | "orange" | "green" }>`
-    display: grid;
+    display: flex;
     flex: 0 0 74px;
     width: 74px;
     height: 74px;
     overflow: hidden;
-    place-items: center;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
     background: ${({ $tone }) =>
       ({ blue: "#e0ecff", purple: "#eee8ff", orange: "#fff0e5", green: "#e5f6ec" })[
@@ -185,6 +186,7 @@ export const S = {
     font-weight: 800;
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;

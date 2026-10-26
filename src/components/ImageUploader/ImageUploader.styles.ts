@@ -120,11 +120,13 @@ export const S = {
     bottom: 40px;
     transform: translateX(-50%);
     padding: 12px 20px;
+    max-width: min(calc(100% - 32px), calc(var(--app-content-width) - 32px));
     border-radius: 24px;
     background: rgba(0, 0, 0, 0.8);
     color: #fff;
     font-size: 14px;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
     z-index: 1000;
   `,
 };

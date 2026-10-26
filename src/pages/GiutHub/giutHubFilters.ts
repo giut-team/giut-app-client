@@ -5,6 +5,38 @@ export type Category = "전체" | Position;
 export type TeamStatus = "전체" | "팀 찾는 중" | "제안 검토 중";
 export type Grade = 1 | 2 | 3 | 4;
 
+export type HubFilterSelection = {
+  selectedPositions: Position[];
+  selectedTeamStatus: TeamStatus;
+  selectedDepartments: string[];
+  selectedGrades: Grade[];
+};
+
+export function readHubFilterSelection(params: URLSearchParams): HubFilterSelection {
+  const positions: Position[] = ["기획", "디자인", "개발", "마케팅"];
+  const status = params.get("status");
+  return {
+    selectedPositions: [...new Set(params.getAll("position").filter((value): value is Position => positions.includes(value as Position)))],
+    selectedTeamStatus: status === "팀 찾는 중" || status === "제안 검토 중" ? status : "전체",
+    selectedDepartments: [...new Set(params.getAll("department").map(value => value.trim().slice(0, 80)).filter(Boolean))],
+    selectedGrades: [...new Set(params.getAll("grade").map(Number).filter((value): value is Grade => [1, 2, 3, 4].includes(value)))],
+  };
+}
+
+export function writeHubFilterSelection(params: URLSearchParams, selection: HubFilterSelection): URLSearchParams {
+  const next = new URLSearchParams(params);
+  for (const key of ["position", "department", "grade", "status"]) next.delete(key);
+  selection.selectedPositions.forEach(value => next.append("position", value));
+  selection.selectedDepartments.forEach(value => next.append("department", value));
+  selection.selectedGrades.forEach(value => next.append("grade", String(value)));
+  if (selection.selectedTeamStatus !== "전체") next.set("status", selection.selectedTeamStatus);
+  return next;
+}
+
+export function hubListReturnTo(value: unknown): string {
+  return typeof value === "string" && (value === "/giut-hub" || value.startsWith("/giut-hub?")) ? value : "/giut-hub";
+}
+
 const codeByCategory: Record<Position, PrimaryRoleCode> = {
   기획: "PLANNING",
   디자인: "DESIGN",

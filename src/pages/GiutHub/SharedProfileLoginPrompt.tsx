@@ -5,7 +5,7 @@ import { Icon } from "../../components/icons";
 import { tokens } from "../../design-system/tokens.generated";
 
 const Dialog = styled.dialog`
-  width: min(360px, calc(100% - 40px));
+  width: min(360px, calc(100% - 40px), calc(var(--app-content-width) - 40px));
   margin: auto;
   padding: 28px 24px;
   border: 0;

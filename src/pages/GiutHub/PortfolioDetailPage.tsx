@@ -4,12 +4,14 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { MarkdownContent } from "../../components/MarkdownContent";
 import { PageHeader } from "../../components/PageHeader";
 import { Icon } from "../../components/icons";
-import { getPublicProfile } from "../../api/giutHub";
-import dataDashboard from "../../assets/portfolio/data-dashboard.png";
+import { profileDetailOptions } from "./profileQueries";
+import { ImageWithFallback } from "./ImageWithFallback";
 import { toHubProfile } from "./GiutHubPage";
 import { toDetailProfileSummary } from "./profileDetail";
 import { GiutHubDialog } from "./GiutHubDialog";
-import { getSkillIcon, TeamProposalBottomSheet } from "./GiutHubProfilePage";
+import { getSkillIcon } from "./GiutHubProfilePage";
+import { TeamProposalBottomSheet } from "./TeamProposalBottomSheet";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./PortfolioDetailPage.styles";
 
 function PortfolioShareModal({
@@ -105,15 +107,15 @@ export function PortfolioDetailPage() {
   const navigate = useNavigate();
   const { profileNumber, portfolioNumber } = useParams();
   const userId = Number(profileNumber);
+  const { profile: viewer, isAuthenticated, isLoading: authLoading, queryScope } = useAuth();
+  const detailOptions = profileDetailOptions(userId, queryScope);
   const portfolioIndex = Number(portfolioNumber) - 1;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const { data: apiProfile, isPending: isLoadingProfile } = useQuery({
-    queryKey: ["giut-hub", "profile", userId],
-    queryFn: () => getPublicProfile(userId),
-    enabled: Number.isSafeInteger(userId) && userId > 0,
-    retry: false,
+    ...detailOptions,
+    enabled: detailOptions.enabled && !authLoading,
   });
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -124,7 +126,7 @@ export function PortfolioDetailPage() {
     ? {
         title: apiPortfolio.title,
         description: apiPortfolio.caption,
-        image: apiPortfolio.imageUrl || dataDashboard,
+        image: apiPortfolio.imageUrl,
         markdown: apiPortfolio.markdownContent || apiPortfolio.caption,
         startDate: apiPortfolio.projectStartDate,
         endDate: apiPortfolio.projectEndDate,
@@ -183,7 +185,7 @@ export function PortfolioDetailPage() {
           title="포트폴리오"
         />
         <S.HeroImage>
-          <img alt={`${portfolio.title} 대표 이미지`} src={portfolio.image} />
+          <ImageWithFallback alt={`${portfolio.title} 대표 이미지`} src={portfolio.image} />
         </S.HeroImage>
         <S.Body>
           <S.Author>
@@ -221,16 +223,17 @@ export function PortfolioDetailPage() {
         </S.Body>
       </S.Content>
       <S.ProposalBar>
-        <S.ProposalButton onClick={() => setIsProposalSheetOpen(true)} type="button">
+        <S.ProposalButton disabled={!isAuthenticated || viewer?.userId === userId} onClick={() => setIsProposalSheetOpen(true)} type="button">
           <Icon name="users" size={23} weight="regular" />
           {profile.name}에게 팀 제안하기
         </S.ProposalButton>
       </S.ProposalBar>
-      <TeamProposalBottomSheet
+      {isProposalSheetOpen && <TeamProposalBottomSheet
+        key={`${viewer?.userId}:${userId}`}
         onClose={() => setIsProposalSheetOpen(false)}
-        open={isProposalSheetOpen}
+        targetUserId={userId}
         profileName={profile.name}
-      />
+      />}
       <PortfolioShareModal
         detailRole={profile.detailRole}
         onClose={() => setIsShareModalOpen(false)}

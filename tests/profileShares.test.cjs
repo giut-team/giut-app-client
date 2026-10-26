@@ -234,7 +234,7 @@ test("공유 화면의 복사와 기기 공유는 발급된 동일 URL을 사용
   } });
   let closed = 0;
   const { ProfileShareScreen } = loadModule("src/pages/GiutHub/ProfileShareScreen.tsx", {
-    react: { useEffect() {}, useRef: () => ({ current: false }), useState: (initial) => [initial, () => {}] },
+    react: { useEffect() {}, useRef: (initial) => ({ current: initial }), useState: (initial) => [initial, () => {}] },
     "@tanstack/react-query": { useQuery: () => ({}) },
     "../../api/profileShares": { getSharedProfile() {} },
     "react-router-dom": { useNavigate: () => () => {} },
@@ -259,11 +259,95 @@ test("공유 화면의 복사와 기기 공유는 발급된 동일 URL을 사용
   buttons[2].props.onClick(); await new Promise(setImmediate);
   assert.equal(copies[0], `https://app.example.test/api/profile/shares/${token}`);
   assert.equal(shares[0].url, copies[0]);
-  buttons[0].props.onClick(); assert.equal(closed, 1);
-  let prevented = false;
-  tree.props.onCancel({ preventDefault() { prevented = true; } });
-  assert.equal(prevented, true); assert.equal(closed, 2);
+  assert.equal(closed, 0);
   share.issuance.data = { ...issuedLink, expiresAt: "2020-01-01T00:00:00Z" };
   actions(ProfileShareScreen({ share, profileName: "공유 사용자" }))[1].props.onClick();
   await new Promise(setImmediate); assert.equal(shares.length, 1);
+});
+
+function shareMotionHarness(reducedMotion = false) {
+  const refs = [], states = [], effects = [], timers = new Map();
+  let refIndex, stateIndex, mounted = false, tree, closed = 0, dialogClosed = 0, timerId = 0;
+  const body = { style: { overflow: "auto" } };
+  const dialog = { showModal() {}, close() { dialogClosed++; } };
+  const { ProfileShareScreen } = loadModule("src/pages/GiutHub/ProfileShareScreen.tsx", {
+    react: {
+      useRef(initial) { return refs[refIndex++] ??= { current: initial }; },
+      useState(initial) {
+        const index = stateIndex++;
+        if (!(index in states)) states[index] = initial;
+        return [states[index], value => { states[index] = value; }];
+      },
+      useEffect(effect) { if (!mounted) effects.push(effect); },
+    },
+    "@tanstack/react-query": { useQuery: () => ({}) },
+    "../../api/profileShares": {},
+    "react-router-dom": { useNavigate: () => () => {} },
+    "../../components/icons": { Icon: () => null },
+    "./ProfileShareCard": { ProfileShareCard: () => null },
+    "./profileShareImage": {},
+    "./profileShare": loadModule("src/pages/GiutHub/profileShare.ts"),
+    "./ProfileShareScreen.styles": { S, PROFILE_SHARE_MOTION_MS: 480, exitToBottom: { name: "exit" } },
+  }, {
+    document: { body },
+    window: {
+      location: { origin: "https://app.example.test" },
+      matchMedia: () => ({ matches: reducedMotion }),
+      setTimeout(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay }); return id; },
+      clearTimeout(id) { timers.delete(id); },
+    },
+  });
+  const share = { canIssue: true, issuance: { data: issuedLink }, closeShare() { closed++; }, issueLink() {} };
+  function render() {
+    refIndex = stateIndex = 0;
+    tree = ProfileShareScreen({ share, profileName: "사용자", profile: { nickname: "사용자" } });
+    tree.props.ref.current = dialog;
+    return tree;
+  }
+  render();
+  const cleanups = effects.map(effect => effect());
+  mounted = true;
+  return {
+    render, timers, body,
+    get closed() { return closed; }, get dialogClosed() { return dialogClosed; },
+    clickX() { tree.props.children.props.children[0].props.children.props.onClick(); },
+    escape() { let prevented = false; tree.props.onCancel({ preventDefault() { prevented = true; } }); assert.equal(prevented, true); },
+    end(name = "exit", child = false) { tree.props.onAnimationEnd({ animationName: name, target: child ? {} : dialog, currentTarget: dialog }); },
+    unmount() { cleanups.forEach(cleanup => cleanup?.()); },
+  };
+}
+
+test("X와 Escape는 하강 종료까지 모달과 스크롤 잠금을 유지하고 한 번만 닫는다", () => {
+  for (const trigger of ["clickX", "escape"]) {
+    const screen = shareMotionHarness();
+    screen.end(); assert.equal(screen.closed, 0);
+    screen[trigger](); screen.clickX(); screen.escape();
+    const closing = screen.render();
+    assert.equal(closing.props["data-closing"], true);
+    assert.equal(closing.props.children.props.children[0].props.children.props.disabled, true);
+    assert.equal(screen.closed, 0); assert.equal(screen.dialogClosed, 0);
+    assert.equal(screen.body.style.overflow, "hidden");
+    assert.equal([...screen.timers.values()].filter(timer => timer.delay === 560).length, 1);
+    screen.end("enter"); screen.end("exit", true); assert.equal(screen.closed, 0);
+    screen.end(); screen.end(); screen.escape();
+    assert.equal(screen.closed, 1);
+    assert.equal([...screen.timers.values()].some(timer => timer.delay === 560), false);
+    screen.unmount();
+    assert.equal(screen.dialogClosed, 1); assert.equal(screen.body.style.overflow, "auto");
+    assert.equal(screen.timers.size, 0);
+  }
+});
+
+test("동작 줄이기는 즉시 닫고 종료 이벤트 누락은 타이머로 보완하며 unmount 시 정리한다", () => {
+  const reduced = shareMotionHarness(true);
+  reduced.clickX(); reduced.escape(); assert.equal(reduced.closed, 1);
+  assert.equal([...reduced.timers.values()].some(timer => timer.delay === 560), false);
+  reduced.unmount();
+  const fallback = shareMotionHarness();
+  fallback.escape();
+  [...fallback.timers.values()].find(timer => timer.delay === 560).fn();
+  fallback.end(); assert.equal(fallback.closed, 1); fallback.unmount();
+  const interrupted = shareMotionHarness();
+  interrupted.clickX(); interrupted.unmount();
+  assert.equal(interrupted.timers.size, 0); assert.equal(interrupted.closed, 0);
 });

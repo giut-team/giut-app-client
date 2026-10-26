@@ -1,9 +1,13 @@
 import { useEffect, type ReactNode } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import { ProfileRouteMotion } from "./components/ProfileRouteMotion/ProfileRouteMotion";
 import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
+import { GiutHubPreviewPage } from "./pages/GiutHubPreview/GiutHubPreviewPage";
+import { GiutHubPreviewProfilePage } from "./pages/GiutHubPreview/GiutHubPreviewProfilePage";
+import { PreviewPortfolioPage } from "./pages/GiutHubPreview/PreviewPortfolioPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
 import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";

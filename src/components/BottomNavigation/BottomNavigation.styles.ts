@@ -10,6 +10,8 @@ export const S = {
     z-index: 5;
     display: flex;
     justify-content: center;
+    width: min(100%, var(--app-content-width));
+    margin: 0 auto;
     padding-bottom: env(safe-area-inset-bottom);
     border-top: 1px solid ${tokens.color.neutral[200]};
     background: rgba(255, 255, 255, .96);
@@ -18,7 +20,7 @@ export const S = {
   Inner: styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    width: min(100%, 550px);
+    width: 100%;
     height: 64px;
     padding: 5px 12px 7px;
   `,

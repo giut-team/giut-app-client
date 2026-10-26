@@ -157,7 +157,7 @@ export async function getPublicProfilesForFilters(
     .sort((a, b) => b.userId - a.userId);
 }
 
-export async function getPublicProfile(userId: number): Promise<PublicProfileDetail> {
-  const response = await giutHubApi.get<PublicProfileDetail>(`/api/profile/${userId}`);
+export async function getPublicProfile(userId: number, signal?: AbortSignal): Promise<PublicProfileDetail> {
+  const response = await giutHubApi.get<PublicProfileDetail>(`/api/profile/${userId}`, { signal });
   return response.data;
 }

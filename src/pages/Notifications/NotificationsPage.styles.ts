@@ -31,7 +31,7 @@ const notificationColors: Record<
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};

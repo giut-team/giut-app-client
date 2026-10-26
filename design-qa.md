@@ -1,3 +1,26 @@
+# TASK-050 — 선택한 세번째 프로필 시안 구현 QA (2026-10-24)
+
+- Source visual truth: docs/harness/tasks/artifacts/TASK-050/direction-introduction.png (1358 × 1158 생성 이미지, 목록·상세 좌우 보드).
+- Implementation: /giut-hub-preview, /giut-hub-preview/:profileNumber, 작품 하위 경로.
+- Intended viewport: 각390 × 844 CSS px, 320/480px 및 넓은 웹480px 상한 확인 필요. Source는390×844 각 화면의 정확한 픽셀 캡처가 아닌 생성 보드이므로 임의의1:1 픽셀 일치를 주장하지 않는다.
+- State: 인증된 사용자의 실제 목록/상세. API 원본 이름·소개·사진·스킬·작품/활동을 사용하므로 시안의 예시 인물 내용과 다를 수 있다.
+- Implementation screenshot: 없음. 앞선 사용자 “지금은 코드 적용만” 범위를 유지해 브라우저/Playwright/외부 데모를 실행하지 않았다.
+- Full-view/focused comparison evidence: 미확보. 렌더링 캡처가 없어 비교 불가. Source 이미지만 직접 열어 확인했으며 코드를 시각 증거로 대체하지 않는다.
+- Fonts/typography: 기존 SUIT, 코드상 소개20/26px와 본문13~15px. 실제 줄바꿈/굵기 미검증.
+- Spacing/layout: flex/gap/padding, 전역 폭 상한, 고정 액션 바와 하단 문서 padding. 실제320/390/480·키보드/확대/스크롤 미검증.
+- Colors/tokens: 기존 neutral·상태 helper와 프로필 파랑#1C4EA3. 실제 대비/상태색 비교 미검증.
+- Assets: API 사진과 기존 ImageWithFallback, 기존 Phosphor 아이콘. 새 인물/작품 이미지 생성·외부 데모 사용 없음. 실제 이미지 오류/CORS 미검증.
+- Copy/content: 실제 필드 및 콘텐츠 없음 안내. 생성 시안의 임의 보조 문구·가상 경력은 복사하지 않음. 긴 한국어 가독성 미검증.
+- Primary interactions: 필터/검색/목록→상세→작품/공유·추천·메시지·신고·제안 코드 연결. 경계 모의 테스트와 타입/빌드는 별도 기록하며 실제 계정 저장·조작을 통과로 간주하지 않는다.
+- Browser console errors: 미확인.
+- Comparison history: 브라우저 비교0회. 수정 후 캡처/비교도 미실행.
+- Findings: 시각 근거가 없어 P0/P1/P2 일치 여부를 판단할 수 없음. 로컬 서버 실행/읽기 sandbox EPERM은 환경 권한 재시도로 해소. 새 경로/모듈 HTTP200과56개 테스트·타입·린트·빌드는 확인했으나 브라우저 캡처/시각 QA와는 별개다.
+- Next: 같은 인증/콘텐츠/390px 상태로 목록·상세 캡처를 확보해 원본과 동시 비교하고 작은 폭/긴 문구/빈 상태/액션·키보드를 확인.
+
+final result: blocked
+
+---
+
 # Design QA — contest registration URL screen
 
 ## Comparison targets
