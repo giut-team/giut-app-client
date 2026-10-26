@@ -69,7 +69,6 @@ export type AdminCompetitionListItem = {
   id: number;
   title: string;
   category: AdminCompetitionCategory;
-  categoryName: string;
   hostOrganization: string;
   summary: string;
   applicationStartAt: string;
@@ -81,22 +80,8 @@ export type AdminCompetitionListItem = {
   primaryUrl?: string;
 };
 
-type PublicCompetitionListResponse = {
-  competitions: Array<{
-    id: number;
-    title: string;
-    category: AdminCompetitionCategory;
-    categoryName: string;
-    hostOrganization: string;
-    summary: string;
-    applicationStartAt: string;
-    applicationEndAt: string;
-    primaryUrl: string;
-    publicationStatus?: AdminCompetitionPublicationStatus;
-    verificationStatus?: AdminCompetitionVerificationStatus;
-    verifiedAt?: string | null;
-    targetParticipants?: string;
-  }>;
+type AdminCompetitionListResponse = {
+  competitions: AdminCompetitionResponse[];
   page: number;
   size: number;
   totalElements: number;
@@ -105,14 +90,32 @@ type PublicCompetitionListResponse = {
 };
 
 export async function fetchAdminCompetitions(): Promise<AdminCompetitionListItem[]> {
-  const { data } = await adminApi.get<PublicCompetitionListResponse>(
-    "/api/competitions",
-    { params: { page: 0, size: 20 } },
+  const pageSize = 20;
+  const { data: firstPage } = await adminApi.get<AdminCompetitionListResponse>(
+    "/api/admin/competitions",
+    { params: { page: 0, size: pageSize } },
   );
+  const remainingPages = await Promise.all(
+    Array.from(
+      { length: Math.max(0, firstPage.totalPages - 1) },
+      (_, index) =>
+        adminApi.get<AdminCompetitionListResponse>(
+          "/api/admin/competitions",
+          { params: { page: index + 1, size: pageSize } },
+        ),
+    ),
+  );
+  const competitions = [
+    ...firstPage.competitions,
+    ...remainingPages.flatMap(({ data }) => data.competitions),
+  ];
 
-  return data.competitions.map((competition) => ({
+  return competitions.map((competition) => ({
     ...competition,
-    publicationStatus: competition.publicationStatus ?? "PUBLISHED",
+    primaryUrl:
+      competition.urls.find((url) => url.primary)?.url ??
+      competition.urls[0]?.url ??
+      "",
   }));
 }
 
@@ -138,6 +141,12 @@ export async function updateAdminCompetition({
     request,
   );
   return data;
+}
+
+export async function deleteAdminCompetition(
+  competitionId: number,
+): Promise<void> {
+  await adminApi.delete(`/api/admin/competitions/${competitionId}`);
 }
 
 export async function publishAdminCompetition(

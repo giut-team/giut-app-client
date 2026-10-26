@@ -324,6 +324,22 @@ export const S = {
 
     &:hover { background: #f7f8fa; }
   `,
+  DeleteButton: styled.button`
+    width: auto;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff;
+    color: #dc2626;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #fef2f2; }
+    &:disabled { cursor: wait; opacity: 0.6; }
+  `,
   ApproveButton: styled.button`
     height: 40px;
     padding: 0 16px;
@@ -410,6 +426,23 @@ export const S = {
     gap: 10px;
     margin-top: 22px;
   `,
+  EditorDelete: styled.button`
+    min-width: 88px;
+    height: 46px;
+    margin-right: auto;
+    padding: 0 20px;
+    border: 1px solid #dc2626;
+    border-radius: 9px;
+    background: #fff;
+    color: #dc2626;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #fef2f2; }
+    &:disabled { cursor: wait; opacity: 0.6; }
+  `,
   EditorSubmit: styled.button`
     min-width: 88px;
     height: 46px;
@@ -438,6 +471,26 @@ export const S = {
     font-weight: 800;
     cursor: pointer;
 
+    &:disabled { cursor: wait; opacity: 0.6; }
+  `,
+  DeleteDialog: styled.div`
+    padding: 26px 22px;
+    color: ${navy};
+  `,
+  DeleteConfirm: styled.button`
+    min-width: 88px;
+    height: 46px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 9px;
+    background: #dc2626;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #b91c1c; }
     &:disabled { cursor: wait; opacity: 0.6; }
   `,
 };

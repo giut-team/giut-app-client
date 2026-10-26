@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { clearAdminSession, getAdminSessionUser } from "../../api/adminClient";
 import {
   createAdminCompetition,
+  deleteAdminCompetition,
   fetchAdminCompetitions,
   publishAdminCompetition,
   updateAdminCompetition,
@@ -97,7 +98,6 @@ const toListItem = (
   competition: AdminCompetitionResponse,
 ): AdminCompetitionListItem => ({
   ...competition,
-  categoryName: categoryLabels[competition.category],
   primaryUrl:
     competition.urls.find((url) => url.primary)?.url ??
     competition.urls[0]?.url ??
@@ -113,6 +113,10 @@ export function AdminContestsPage() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [editorMode, setEditorMode] = useState<"create" | "edit" | null>(null);
   const [editingContestId, setEditingContestId] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number;
+    title: string;
+  } | null>(null);
   const [editingPublicationStatus, setEditingPublicationStatus] =
     useState<AdminCompetitionPublicationStatus>("DRAFT");
   const [editorForm, setEditorForm] = useState<ContestEditorForm>(emptyEditorForm);
@@ -134,7 +138,7 @@ export function AdminContestsPage() {
       !normalizedSearchKeyword ||
       [
         contest.title,
-        contest.categoryName,
+        categoryLabels[contest.category],
         contest.hostOrganization,
         contest.targetParticipants ?? "",
       ].some((value) => value.toLowerCase().includes(normalizedSearchKeyword));
@@ -201,6 +205,23 @@ export function AdminContestsPage() {
     onError: (error) =>
       showToast(getApiErrorMessage(error, "공모전 정보를 저장하지 못했습니다.")),
   });
+  const deleteMutation = useMutation({
+    mutationFn: deleteAdminCompetition,
+    onSuccess: (_, competitionId) => {
+      queryClient.setQueryData<AdminCompetitionListItem[]>(
+        ["admin-competitions"],
+        (current = []) =>
+          current.filter((competition) => competition.id !== competitionId),
+      );
+      setDeleteTarget(null);
+      setEditorMode(null);
+      setEditingContestId(null);
+      setEditorForm(emptyEditorForm);
+      showToast("공모전을 삭제했습니다.");
+    },
+    onError: (error) =>
+      showToast(getApiErrorMessage(error, "공모전을 삭제하지 못했습니다.")),
+  });
 
   useEffect(() => {
     if (!toastMessage) return;
@@ -242,7 +263,7 @@ export function AdminContestsPage() {
   };
 
   const closeEditor = () => {
-    if (saveMutation.isPending) return;
+    if (saveMutation.isPending || deleteMutation.isPending) return;
     setEditorMode(null);
     setEditingContestId(null);
   };
@@ -402,7 +423,7 @@ export function AdminContestsPage() {
                 <S.ContestInfo>
                   <strong>{contest.title}</strong>
                   <span>
-                    {contest.categoryName} · {contest.hostOrganization}
+                    {categoryLabels[contest.category]} · {contest.hostOrganization}
                     {contest.targetParticipants
                       ? ` · ${contest.targetParticipants}`
                       : ""}
@@ -443,6 +464,15 @@ export function AdminContestsPage() {
                   >
                     수정
                   </S.EditButton>
+                  <S.DeleteButton
+                    disabled={deleteMutation.isPending}
+                    onClick={() =>
+                      setDeleteTarget({ id: contest.id, title: contest.title })
+                    }
+                    type="button"
+                  >
+                    삭제
+                  </S.DeleteButton>
                 </S.Actions>
               </S.Row>
             ))}
@@ -553,8 +583,22 @@ export function AdminContestsPage() {
               </S.Field>
             </S.EditorForm>
             <S.EditorActions>
+              {editorMode === "edit" && editingContestId !== null && (
+                <S.EditorDelete
+                  disabled={saveMutation.isPending || deleteMutation.isPending}
+                  onClick={() =>
+                    setDeleteTarget({
+                      id: editingContestId,
+                      title: editorForm.title,
+                    })
+                  }
+                  type="button"
+                >
+                  삭제
+                </S.EditorDelete>
+              )}
               <S.EditorSubmit
-                disabled={saveMutation.isPending}
+                disabled={saveMutation.isPending || deleteMutation.isPending}
                 onClick={submitEditor}
                 type="button"
               >
@@ -565,7 +609,7 @@ export function AdminContestsPage() {
                     : "수정"}
               </S.EditorSubmit>
               <S.EditorCancel
-                disabled={saveMutation.isPending}
+                disabled={saveMutation.isPending || deleteMutation.isPending}
                 onClick={closeEditor}
                 type="button"
               >
@@ -573,6 +617,41 @@ export function AdminContestsPage() {
               </S.EditorCancel>
             </S.EditorActions>
           </S.Editor>
+        )}
+      </OverlayShell>
+
+      <OverlayShell
+        ariaLabel="공모전 삭제 확인"
+        maxWidth="420px"
+        onClose={() => {
+          if (!deleteMutation.isPending) setDeleteTarget(null);
+        }}
+        open={deleteTarget !== null}
+        placement="center"
+      >
+        {deleteTarget && (
+          <S.DeleteDialog>
+            <S.EditorTitle>공모전을 삭제할까요?</S.EditorTitle>
+            <S.EditorDescription>
+              ‘{deleteTarget.title}’ 공모전이 목록에서 삭제됩니다.
+            </S.EditorDescription>
+            <S.EditorActions>
+              <S.DeleteConfirm
+                disabled={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate(deleteTarget.id)}
+                type="button"
+              >
+                {deleteMutation.isPending ? "삭제 중" : "삭제"}
+              </S.DeleteConfirm>
+              <S.EditorCancel
+                disabled={deleteMutation.isPending}
+                onClick={() => setDeleteTarget(null)}
+                type="button"
+              >
+                취소
+              </S.EditorCancel>
+            </S.EditorActions>
+          </S.DeleteDialog>
         )}
       </OverlayShell>
 
