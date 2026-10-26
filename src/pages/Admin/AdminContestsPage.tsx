@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { clearAdminSession, getAdminSessionUser } from "../../api/adminClient";
+import { clearAdminSession } from "../../api/adminClient";
 import {
   createAdminCompetition,
   deleteAdminCompetition,
@@ -107,7 +107,6 @@ const toListItem = (
 export function AdminContestsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const admin = getAdminSessionUser();
   const [toastMessage, setToastMessage] = useState("");
   const [showVerifiedContests, setShowVerifiedContests] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -132,16 +131,11 @@ export function AdminContestsPage() {
 
   const normalizedSearchKeyword = searchKeyword.trim().toLowerCase();
   const visibleContests = (contestsQuery.data ?? []).filter((contest) => {
-    const matchesVerification =
-      showVerifiedContests || contest.publicationStatus !== "PUBLISHED";
+    const matchesVerification = showVerifiedContests || contest.publicationStatus !== "PUBLISHED";
     const matchesSearch =
       !normalizedSearchKeyword ||
-      [
-        contest.title,
-        categoryLabels[contest.category],
-        contest.hostOrganization,
-        contest.targetParticipants ?? "",
-      ].some((value) => value.toLowerCase().includes(normalizedSearchKeyword));
+      [contest.title, contest.hostOrganization]
+        .some((value) => value.toLowerCase().includes(normalizedSearchKeyword));
     return matchesVerification && matchesSearch;
   });
 
@@ -322,84 +316,40 @@ export function AdminContestsPage() {
 
   return (
     <S.Page data-admin-page>
-      <S.Sidebar>
-        <S.Brand>
-          <S.BrandMark>A</S.BrandMark>
-          Admin Console
-        </S.Brand>
-        <S.Nav aria-label="관리자 메뉴">
-          <S.NavItem onClick={() => navigate("/admin/profile-reports")} type="button">
-            프로필 신고
-          </S.NavItem>
-          <S.NavItem $active type="button">
-            공모전
-          </S.NavItem>
-        </S.Nav>
-        <S.Account>
-          <S.AccountName>{admin?.nickname || "관리자"}</S.AccountName>
-          <S.AccountId>{admin?.email || "Admin"}</S.AccountId>
-          <S.LogoutButton onClick={handleLogout} type="button">
-            로그아웃
-          </S.LogoutButton>
-        </S.Account>
-      </S.Sidebar>
-
       <S.Main>
         <S.Header>
-          <div>
-            <S.Title>공모전</S.Title>
-            <S.Description>
-              공모전을 등록·수정하고, 검토가 끝난 공모전을 서비스에 공개합니다.
-            </S.Description>
-          </div>
-          <S.CreateButton
-            onClick={openCreateEditor}
-            type="button"
-          >
-            <Icon name="plus" size={17} weight="bold" />
-            공모전 등록
-          </S.CreateButton>
+          <S.Title>공모전</S.Title>
+          <S.HeaderActions>
+            <S.CreateButton onClick={openCreateEditor} type="button">
+              <Icon name="plus" size={14} weight="bold" /> 등록
+            </S.CreateButton>
+            <S.LogoutButton onClick={handleLogout} type="button">로그아웃</S.LogoutButton>
+          </S.HeaderActions>
         </S.Header>
 
+        <S.SearchBox>
+          <Icon name="search" size={20} weight="regular" />
+          <input
+            aria-label="공모전 검색"
+            onChange={(event) => setSearchKeyword(event.target.value)}
+            placeholder="공모전명, 주최 기관 검색"
+            type="search"
+            value={searchKeyword}
+          />
+        </S.SearchBox>
+
+        <S.ListToolbar>
+          <span>{showVerifiedContests ? "전체 공모전" : "미인증 공모전"}</span>
+          <S.VerifiedToggle>
+            <input checked={showVerifiedContests} onChange={(event) => setShowVerifiedContests(event.target.checked)} type="checkbox" />
+            <S.ToggleBox $checked={showVerifiedContests}>
+              {showVerifiedContests && <Icon name="check" size={13} weight="bold" />}
+            </S.ToggleBox>
+            <span>인증된 공모전도 보기</span>
+          </S.VerifiedToggle>
+        </S.ListToolbar>
+
         <S.Table aria-label="관리자 공모전 목록">
-          <S.TableToolbar>
-            <strong>
-              {showVerifiedContests ? "전체 공모전" : "미인증 공모전"}
-            </strong>
-            <S.ToolbarControls>
-              <S.SearchBox>
-                <Icon name="search" size={18} weight="regular" />
-                <input
-                  aria-label="공모전 검색"
-                  onChange={(event) => setSearchKeyword(event.target.value)}
-                  placeholder="공모전 검색"
-                  type="search"
-                  value={searchKeyword}
-                />
-              </S.SearchBox>
-              <S.VerifiedToggle>
-                <input
-                  checked={showVerifiedContests}
-                  onChange={(event) =>
-                    setShowVerifiedContests(event.target.checked)
-                  }
-                  type="checkbox"
-                />
-                <S.ToggleBox $checked={showVerifiedContests}>
-                  {showVerifiedContests && (
-                    <Icon name="check" size={15} weight="bold" />
-                  )}
-                </S.ToggleBox>
-                <span>인증된 공모전도 보기</span>
-              </S.VerifiedToggle>
-            </S.ToolbarControls>
-          </S.TableToolbar>
-          <S.TableHeader>
-            <span>공모전</span>
-            <span>접수 기간</span>
-            <span>상태</span>
-            <span>관리</span>
-          </S.TableHeader>
           <S.TableBody>
             {contestsQuery.isPending && (
               <S.TableState>공모전 목록을 불러오는 중입니다.</S.TableState>
@@ -420,6 +370,14 @@ export function AdminContestsPage() {
               )}
             {visibleContests.map((contest) => (
               <S.Row key={contest.id}>
+                <S.Status>
+                  <S.StatusBadge $status={contest.publicationStatus}>
+                    {contest.publicationStatus === "PUBLISHED" ? "인증" : "미인증"}
+                  </S.StatusBadge>
+                  {contest.publicationStatus === "PUBLISHED" && formatVerifiedAt(contest.verifiedAt) && (
+                    <S.Verified><Icon name="check" size={10} weight="bold" /> 검증 {formatVerifiedAt(contest.verifiedAt)}</S.Verified>
+                  )}
+                </S.Status>
                 <S.ContestInfo>
                   <strong>{contest.title}</strong>
                   <span>
@@ -430,23 +388,8 @@ export function AdminContestsPage() {
                   </span>
                 </S.ContestInfo>
                 <S.Period>
-                  <span>{formatDateTime(contest.applicationStartAt)} ~</span>
-                  <span>{formatDateTime(contest.applicationEndAt)}</span>
+                  접수 {formatDateTime(contest.applicationStartAt)} ~ {formatDateTime(contest.applicationEndAt)}
                 </S.Period>
-                <S.Status>
-                  <S.StatusBadge $status={contest.publicationStatus}>
-                    {contest.publicationStatus === "PUBLISHED"
-                      ? "인증"
-                      : "미인증"}
-                  </S.StatusBadge>
-                  {contest.publicationStatus === "PUBLISHED" &&
-                    formatVerifiedAt(contest.verifiedAt) && (
-                    <S.Verified>
-                      <Icon name="check" size={12} weight="bold" /> 검증{" "}
-                      {formatVerifiedAt(contest.verifiedAt)}
-                    </S.Verified>
-                    )}
-                </S.Status>
                 <S.Actions>
                   {contest.publicationStatus === "DRAFT" && (
                     <S.ApproveButton
@@ -479,6 +422,11 @@ export function AdminContestsPage() {
           </S.TableBody>
         </S.Table>
       </S.Main>
+
+      <S.BottomNav aria-label="관리자 메뉴">
+        <S.BottomNavItem onClick={() => navigate("/admin/profile-reports")} type="button">신고</S.BottomNavItem>
+        <S.BottomNavItem $active type="button">공모전</S.BottomNavItem>
+      </S.BottomNav>
 
       <OverlayShell
         ariaLabel={editorMode === "create" ? "공모전 등록" : "공모전 수정"}
