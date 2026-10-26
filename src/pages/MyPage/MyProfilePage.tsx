@@ -5,10 +5,6 @@ import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  detailsByProfileId,
-  getSkillIcon,
-} from "../GiutHub/GiutHubProfilePage";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
 import { ProfileShareScreen } from "../GiutHub/ProfileShareScreen";

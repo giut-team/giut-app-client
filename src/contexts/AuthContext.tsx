@@ -5,26 +5,8 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { api } from "../api/client";
 import { createAuthQueryScope } from "./authQueryScope";
 import { getAuthSession, type AuthProfile } from "../api/authSession";
-
-type AuthProfile = {
-  departmentName: string;
-  grade: number;
-  nickname: string;
-  profileImageUrl: string | null;
-  universityVerified?: boolean;
-  userId: number;
-};
-
-type MyProfileResponse = {
-  profile: AuthProfile | null;
-  profileCompleted: boolean;
-  universityVerified?: boolean;
-};
-
 
 type AuthContextValue = {
   isAuthenticated: boolean;
@@ -33,13 +15,10 @@ type AuthContextValue = {
   profileCompleted: boolean;
   queryScope: string;
   universityVerified: boolean;
-  queryScope: string;
   refreshAuth: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-const fetchMyProfile = () => api.get<MyProfileResponse>("/api/userprofile/me/profile");
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [scope, setScope] = useState(createAuthQueryScope);
