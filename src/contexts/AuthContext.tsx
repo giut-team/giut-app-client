@@ -5,28 +5,48 @@ import {
   type ReactNode,
 } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAuthSession, type AuthProfile } from "../api/authSession";
-import { createAuthQueryScope } from "./authQueryScope";
+import axios from "axios";
+import { api } from "../api/client";
+
+type AuthProfile = {
+  departmentName: string;
+  grade: number;
+  nickname: string;
+  profileImageUrl: string | null;
+  universityVerified?: boolean;
+  userId: number;
+};
+
+type MyProfileResponse = {
+  profile: AuthProfile | null;
+  profileCompleted: boolean;
+  universityVerified?: boolean;
+};
 
 type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   profile: AuthProfile | null;
   profileCompleted: boolean;
-  queryScope: string;
+  universityVerified: boolean;
   refreshAuth: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [scope, setScope] = useState(createAuthQueryScope);
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ["auth", "my-profile"],
-    queryFn: getAuthSession,
+    queryFn: async () => (await fetchMyProfile()).data,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     retry: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
+  const responseStatus = axios.isAxiosError(error)
+    ? error.response?.status
+    : undefined;
+  const isUnverifiedProfileForbidden = responseStatus === 403;
 
   const refreshAuth = async () => {
     setScope(createAuthQueryScope());
@@ -39,11 +59,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !isError && data !== undefined,
+        isAuthenticated: data !== undefined || isUnverifiedProfileForbidden,
         isLoading: isPending,
         profile: data?.profile ?? null,
         profileCompleted: data?.profileCompleted ?? false,
-        queryScope,
+        universityVerified:
+          !isUnverifiedProfileForbidden &&
+          (data?.universityVerified ??
+            data?.profile?.universityVerified ??
+            false),
         refreshAuth,
       }}
     >

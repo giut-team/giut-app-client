@@ -24,7 +24,7 @@ export function PortfolioManagePage() {
     );
     const [storage, setStorage] = useState<string[]>(storagePortfolio);
     const [mainId, setMainId] = useState<string | null>(exposured[0] ?? "");
-    
+
     if (!profile || !detail) return null;
 
     const isFull = exposured.length >= 6;
@@ -41,8 +41,8 @@ export function PortfolioManagePage() {
         setStorage((prev) => prev.filter((t) => t !== title));
         setExposured((prev) => [...prev, title]);
     };
-    const handleSeletMain =(id: string)=>{
-        setMainId(prev=>(prev===id? null: id));
+    const handleSeletMain = (id: string) => {
+        setMainId(prev => (prev === id ? null : id));
     };
 
     return (
@@ -51,7 +51,7 @@ export function PortfolioManagePage() {
                 <PageHeader centerTitle
                     onBack={() => navigate(-1)}
                     rightContent={
-                        <S.AddButton aria-label="포트폴리오 추가" onClick={() => navigate("/my-profile/portfolioadd")} type="button">
+                        <S.AddButton aria-label="포트폴리오 추가" onClick={() => navigate("/my-profile/portfolio-add")} type="button">
                             <Icon name="plus" size={20} weight="regular" />
                         </S.AddButton>
                     }
@@ -79,7 +79,7 @@ export function PortfolioManagePage() {
 
                             return <S.ExposuredItem
                                 key={title}>
-                                <S.ExposuredCheck onClick={()=>handleHide(title)}>
+                                <S.ExposuredCheck onClick={() => handleHide(title)}>
                                     <Icon name='check' size={15} weight='bold' color='#ffffff' />
                                 </S.ExposuredCheck>
                                 <S.ExposuredImage>
@@ -104,7 +104,7 @@ export function PortfolioManagePage() {
                         {storage.map((title) => (
                             <S.StorageItem
                                 key={title}>
-                                <S.StorageCheck onClick={()=>handleShow(title)}/>
+                                <S.StorageCheck onClick={() => handleShow(title)} />
                                 <S.StorageImage>
                                     <Icon name="image" size={10} weight="regular" />
                                     <span>사진</span>

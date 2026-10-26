@@ -1,7 +1,13 @@
+import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { tokens } from "../../design-system/tokens.generated";
+
+const loadingDot = keyframes`
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+`;
 
 export const S = {
   Page: styled.main`
@@ -61,38 +67,80 @@ export const S = {
     font-weight: 700;
     letter-spacing: -0.2px;
   `,
+  CodeField: styled.div`
+    display: grid;
+    gap: 7px;
+    color: ${tokens.color.neutral[700]};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  `,
   FieldInput: styled(Input)`
     height: 40px;
     padding: 0 12px;
     border-radius: 11px;
     font-size: 12px;
   `,
-  PasswordField: styled.div`
-    position: relative;
+  CodeInputRow: styled.span`
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
   `,
-  PasswordInput: styled(Input)`
+  CodeInputWrap: styled.span`
+    position: relative;
+    display: block;
+    min-width: 0;
+  `,
+  CodeFieldInput: styled(Input)`
+    width: 100%;
     height: 40px;
-    padding: 0 40px 0 12px;
+    padding: 0 55px 0 12px;
     border-radius: 11px;
     font-size: 12px;
   `,
-  PasswordToggle: styled(Button)`
+  CodeTimer: styled.span`
     position: absolute;
     top: 50%;
-    right: 10px;
-    display: grid;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    place-items: center;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: ${tokens.color.neutral[500]};
+    right: 12px;
+    color: ${tokens.color.danger[500]};
+    font-size: 10px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
     transform: translateY(-50%);
+  `,
+  FieldHint: styled.span`
+    color: #000;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.4;
+  `,
+  ErrorMessage: styled.p`
+    margin: 0;
+    color: ${tokens.color.danger[500]};
+    font-size: 10px;
+    line-height: 1.5;
+  `,
+  ResendButton: styled(Button)`
+    width: auto;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid ${tokens.color.primary[500]};
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.primary[500]};
+    font-size: 10px;
+    white-space: nowrap;
+
     &:hover:not(:disabled) {
       opacity: 1;
-      background: transparent;
+      background: ${tokens.color.primary[100]};
+    }
+
+    &:disabled {
+      border-color: ${tokens.color.neutral[200]};
+      background: ${tokens.color.neutral[100]};
+      color: ${tokens.color.neutral[500]};
     }
   `,
   Consent: styled.div`
@@ -164,6 +212,39 @@ export const S = {
     height: 42px;
     border-radius: 11px;
     font-size: 13px;
+  `,
+  ProcessingLabel: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  `,
+  LoadingDots: styled.span`
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+
+    i {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: ${loadingDot} 1.1s ease-in-out infinite;
+    }
+
+    i:nth-of-type(2) {
+      animation-delay: 0.15s;
+    }
+
+    i:nth-of-type(3) {
+      animation-delay: 0.3s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      i {
+        animation: none;
+        opacity: 1;
+      }
+    }
   `,
   TermsContent: styled.div`
     display: flex;

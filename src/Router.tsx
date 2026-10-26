@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { createBrowserRouter, createRoutesFromElements, Navigate, Outlet, Route, RouterProvider, useNavigate } from "react-router-dom";
+import { useEffect, type ReactNode } from "react";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { ProfileRouteMotion } from "./components/ProfileRouteMotion/ProfileRouteMotion";
 import { completePendingLogin } from "./pages/Login/loginReturn";
@@ -38,6 +38,7 @@ import { MyProfilePage } from "./pages/MyPage/MyProfilePage";
 import { ProfileEditPage, ProfileRoleDetailPage } from "./pages/MyPage/ProfileEditPage";
 import { PortfolioManagePage } from "./pages/MyPage/PortfolioManagePage";
 import { PortfolioAddPage } from "./pages/MyPage/PortfolioAddPage";
+import { ProfileCreatePage } from "./pages/MyPage/ProfileCreatePage";
 
 function HomeEntryPage() {
   const navigate = useNavigate();
@@ -54,103 +55,166 @@ function HomeEntryPage() {
   return loginPending && (isLoading || isAuthenticated) ? null : <HomePage />;
 }
 
-const router = createBrowserRouter(createRoutesFromElements(
-  <>
-    <Route element={<HomeEntryPage />} path="/" />
-    <Route element={<LoginPage />} path="/login" />
-    <Route element={<Navigate replace to="/" />} path="/login/callback" />
-    <Route element={<HomeEntryPage />} path="/home" />
-    <Route element={<ChatPage />} path="/chat" />
-    <Route element={<ChatRoomPage />} path="/chat/:chatId" />
-    <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />
-    <Route element={<ProfileRouteMotion />}>
-      <Route element={<GiutHubPage />} path="/giut-hub" />
-      <Route element={<GiutHubPreviewPage />} path="/giut-hub-preview" />
-      <Route element={<GiutHubPreviewProfilePage />} path="/giut-hub-preview/:profileNumber" />
-      <Route element={<PreviewPortfolioPage />} path="/giut-hub-preview/:profileNumber/portfolio/:portfolioId" />
-      <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
-      <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
-    </Route>
-    <Route element={<ClosingContestsPage />} path="/closing-contests" />
-    <Route element={<ContestsPage />} path="/contests" />
-    <Route element={<ContestRegistrationPage />} path="/contests/register" />
-    <Route element={<ContestDetailPage />} path="/contests/:contestId" />
-    <Route
-      element={<RecruitingTeamsPage />}
-      path="/contests/:contestId/teams"
-    />
-    <Route
-      element={<TeamDetailPage />}
-      path="/contests/:contestId/teams/:teamId"
-    />
-    <Route
-      element={<ApplicationReviewTeamDetailPage />}
-      path="/contests/:contestId/teams/applied-data-seoul"
-    />
-    <Route
-      element={<ApplicationReviewTeamDetailPage />}
-      path="/contests/:contestId/teams/joined-data-seoul"
-    />
-    <Route
-      element={<TeamApplicationPage />}
-      path="/contests/:contestId/teams/:teamId/apply"
-    />
-    <Route
-      element={<OwnerTeamDetailPage />}
-      path="/contests/:contestId/teams/:teamId/manage"
-    />
-    <Route
-      element={
-        <TeamCreationProvider>
-          <Outlet />
-        </TeamCreationProvider>
-      }
-      path="/contests/:contestId/teams/create"
-    >
-      <Route index element={<TeamCreationPage />} />
-      <Route element={<TeamCreationPage />} path=":step" />
-    </Route>
-    <Route
-      element={
-        <TeamCreationProvider>
-          <Outlet />
-        </TeamCreationProvider>
-      }
-      path="/contests/:contestId/teams/:teamId/edit"
-    >
-      <Route index element={<TeamCreationPage />} />
-      <Route element={<TeamCreationPage />} path=":step" />
-    </Route>
-    <Route element={<PopularContestsPage />} path="/contests/popular" />
-    <Route element={<NotificationsPage />} path="/notifications" />
-    <Route element={<PositionTeamsPage />} path="/position-teams" />
-    <Route element={<MatchedTeamsPage />} path="/matched-teams" />
-    <Route element={<MyTeamPage />} path="/my-team" />
-    <Route element={<MyProfilePage />} path="/my-profile" />
-    <Route element={<ProfileEditPage />} path="/my-profile/edit" />
-    <Route element={<PortfolioManagePage />} path="/my-profile/potfoliomanage" />
-    <Route element={<PortfolioAddPage/>} path="/my-profile/portfolioadd" />
-    <Route element={<ProfileRoleDetailPage />} path="/my-profile/edit/roles/:roleId" />
-    <Route
-      element={<MyApplicationPage />}
-      path="/my-team/my-application/:applicationStatus?"
-    />
-    <Route
-      element={<ManageApplicationsPage />}
-      path="/my-team/applications"
-    />
-    <Route
-      element={<ApplicationDetailPage />}
-      path="/my-team/applications/:applicantId"
-    />
-    <Route
-      element={<StudentVerificationPage />}
-      path="/student-verification"
-    />
-    <Route element={<Navigate replace to="/" />} path="*" />
-  </>
-));
+function UniversityVerifiedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading, universityVerified } = useAuth();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate replace to="/login" />;
+  if (!universityVerified) {
+    return <Navigate replace to="/student-verification" />;
+  }
+
+  return children;
+}
 
 export function AppRouter() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<HomeEntryPage />} path="/" />
+        <Route element={<LoginPage />} path="/login" />
+        <Route element={<Navigate replace to="/" />} path="/login/callback" />
+        <Route element={<HomeEntryPage />} path="/home" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ChatPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/chat"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ChatRoomPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/chat/:chatId"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <GiutHubPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <GiutHubProfilePage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub/:profileNumber"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <PortfolioDetailPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub/:profileNumber/portfolio/:portfolioNumber"
+        />
+        <Route element={<ClosingContestsPage />} path="/closing-contests" />
+        <Route element={<ContestsPage />} path="/contests" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ContestRegistrationPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/register"
+        />
+        <Route element={<ContestDetailPage />} path="/contests/:contestId" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <RecruitingTeamsPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/:contestId/teams"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <TeamDetailPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/:contestId/teams/:teamId"
+        />
+        <Route
+          element={<ApplicationReviewTeamDetailPage />}
+          path="/contests/:contestId/teams/applied-data-seoul"
+        />
+        <Route
+          element={<ApplicationReviewTeamDetailPage />}
+          path="/contests/:contestId/teams/joined-data-seoul"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <TeamApplicationPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/:contestId/teams/:teamId/apply"
+        />
+        <Route
+          element={<OwnerTeamDetailPage />}
+          path="/contests/:contestId/teams/:teamId/manage"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <TeamCreationProvider>
+                <Outlet />
+              </TeamCreationProvider>
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/:contestId/teams/create"
+        >
+          <Route index element={<TeamCreationPage />} />
+          <Route element={<TeamCreationPage />} path=":step" />
+        </Route>
+        <Route
+          element={
+            <TeamCreationProvider>
+              <Outlet />
+            </TeamCreationProvider>
+          }
+          path="/contests/:contestId/teams/:teamId/edit"
+        >
+          <Route index element={<TeamCreationPage />} />
+          <Route element={<TeamCreationPage />} path=":step" />
+        </Route>
+        <Route element={<PopularContestsPage />} path="/contests/popular" />
+        <Route element={<NotificationsPage />} path="/notifications" />
+        <Route element={<PositionTeamsPage />} path="/position-teams" />
+        <Route element={<MatchedTeamsPage />} path="/matched-teams" />
+        <Route element={<MyTeamPage />} path="/my-team" />
+        <Route element={<MyProfilePage />} path="/my-profile" />
+        <Route element={<ProfileEditPage />} path="/my-profile/edit" />
+        <Route element={<PortfolioManagePage />} path="/my-profile/portfolio-manage" />
+        <Route element={<PortfolioAddPage/>} path="/my-profile/portfolio-add" />
+        <Route element={<ProfileCreatePage/>} path="/my-profile/create" /> 
+        <Route element={<ProfileRoleDetailPage />} path="/my-profile/edit/roles/:roleId" />
+        <Route
+          element={<MyApplicationPage />}
+          path="/my-team/my-application/:applicationStatus?"
+        />
+        <Route
+          element={<ManageApplicationsPage />}
+          path="/my-team/applications"
+        />
+        <Route
+          element={<ApplicationDetailPage />}
+          path="/my-team/applications/:applicantId"
+        />
+        <Route
+          element={<StudentVerificationPage />}
+          path="/student-verification"
+        />
+        <Route element={<Navigate replace to="/" />} path="*" />
+      </Routes>
+    </BrowserRouter>
+  );
 }
