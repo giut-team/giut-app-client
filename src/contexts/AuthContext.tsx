@@ -7,6 +7,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { api } from "../api/client";
+import { createAuthQueryScope } from "./authQueryScope";
 
 type AuthProfile = {
   departmentName: string;
@@ -29,13 +30,17 @@ type AuthContextValue = {
   profile: AuthProfile | null;
   profileCompleted: boolean;
   universityVerified: boolean;
+  queryScope: string;
   refreshAuth: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const fetchMyProfile = () => api.get<MyProfileResponse>("/api/userprofile/me/profile");
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data, error, isPending, refetch } = useQuery({
+  const [scope, setScope] = useState(createAuthQueryScope);
+  const { data, error, isError, isPending, refetch } = useQuery({
     queryKey: ["auth", "my-profile"],
     queryFn: async () => (await fetchMyProfile()).data,
     refetchOnMount: "always",
@@ -68,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           (data?.universityVerified ??
             data?.profile?.universityVerified ??
             false),
+        queryScope,
         refreshAuth,
       }}
     >

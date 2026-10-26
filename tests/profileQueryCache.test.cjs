@@ -107,7 +107,7 @@ test("AuthProvider는 profile:null 응답에서도 화면 재렌더 사이 같�
       return [savedState, next => { savedState = next; }];
     } },
     "@tanstack/react-query": { useQuery: () => ({ data: { profile: null, profileCompleted: false }, isPending: false, isError: false, refetch: async () => { refreshes += 1; } }) },
-    "../api/authSession": { getAuthSession: async () => ({}) },
+    "../api/client": { api: { get: async () => ({ data: {} }) } },
     "./authQueryScope": { createAuthQueryScope },
   }, { localStorage: { getItem: () => { if (storageBlocked) throw new Error("Storage blocked"); return credential; } } });
   const read = () => AuthProvider({ children: null }).props.value;
