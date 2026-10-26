@@ -21,6 +21,10 @@ const sortOptions: { label: string; value: SortOption }[] = [
 const isSortOption = (value: string | null): value is SortOption =>
   sortOptions.some((option) => option.value === value);
 
+const isVerifiedCompetition = (contest: Contest) =>
+  contest.verificationStatus === "AUTO_VERIFIED" ||
+  contest.verificationStatus === "MANUALLY_VERIFIED";
+
 function ContestCard({
   contest,
   onClick,
@@ -35,6 +39,17 @@ function ContestCard({
           <S.CategoryBadge $tone={contest.categoryTone}>
             {contest.categoryName}
           </S.CategoryBadge>
+          {contest.verificationStatus && (
+            <S.VerifiedBadge $verified={isVerifiedCompetition(contest)}>
+              {isVerifiedCompetition(contest) ? (
+                <>
+                  <Icon name="check" size={8} weight="bold" /> 인증
+                </>
+              ) : (
+                "미인증"
+              )}
+            </S.VerifiedBadge>
+          )}
         </S.TagGroup>
         <S.DDay aria-label={`마감까지 ${contest.dDay}`}>
           {contest.dDay === "-" ? "마감일 미정" : contest.dDay}

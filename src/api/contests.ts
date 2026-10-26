@@ -5,6 +5,13 @@ export type CompetitionCategory =
   (typeof categoryQueryValues)[keyof typeof categoryQueryValues];
 type CategoryTone = "blue" | "orange" | "purple" | "green" | "yellow" | "pink";
 
+export type CompetitionVerificationStatus =
+  | "AUTO_VERIFIED"
+  | "UNVERIFIED"
+  | "MANUAL_REVIEW_PENDING"
+  | "MANUALLY_VERIFIED"
+  | "REJECTED";
+
 export type CompetitionResponse = {
   id: number;
   title: string;
@@ -20,6 +27,7 @@ export type CompetitionResponse = {
   scrapCount: number;
   teamCount: number;
   primaryUrl: string;
+  verificationStatus?: CompetitionVerificationStatus;
 };
 
 export type CompetitionUrl = {
@@ -171,21 +179,39 @@ const normalizeContestDetail = (
   dDay: calculateDday(item.applicationEndAt),
 });
 
+const isAvailableContest = (item: CompetitionResponse) =>
+  item.recruitmentStatus !== "CLOSED" &&
+  calculateDday(item.applicationEndAt) !== "마감";
+
 export const fetchContests = async (
   category: ContestCategory = "전체",
 ): Promise<Contest[]> => {
-  const { data } = await api.get<CompetitionsResponse>("/api/competitions", {
+  const pageSize = 20;
+  const params = {
+    size: pageSize,
+    ...(category !== "전체"
+      ? { category: categoryQueryValues[category] }
+      : {}),
+  };
+  const { data: firstPage } = await api.get<CompetitionsResponse>("/api/competitions", {
     params: {
       page: 0,
-      size: 20,
-      status: "OPEN",
-      ...(category !== "전체"
-        ? { category: categoryQueryValues[category] }
-        : {}),
+      ...params,
     },
   });
+  const remainingPages = await Promise.all(
+    Array.from({ length: Math.max(0, firstPage.totalPages - 1) }, (_, index) =>
+      api.get<CompetitionsResponse>("/api/competitions", {
+        params: { page: index + 1, ...params },
+      }),
+    ),
+  );
+  const competitions = [
+    ...firstPage.competitions,
+    ...remainingPages.flatMap(({ data }) => data.competitions),
+  ];
 
-  return data.competitions.map(normalizeContest);
+  return competitions.filter(isAvailableContest).map(normalizeContest);
 };
 
 export const fetchPopularContests = async (): Promise<Contest[]> => {
@@ -193,15 +219,13 @@ export const fetchPopularContests = async (): Promise<Contest[]> => {
     "/api/competitions/top5",
   );
 
-  return data
-    .filter((contest) => contest.recruitmentStatus === "OPEN")
-    .map(normalizeContest);
+  return data.filter(isAvailableContest).map(normalizeContest);
 };
 
 export const fetchClosingSoonContests = async (): Promise<Contest[]> => {
   const { data } = await api.get<CompetitionResponse[]>("/api/competitions/closing-soon");
 
-  return data.map(normalizeContest);
+  return data.filter(isAvailableContest).map(normalizeContest);
 };
 
 export const fetchContestDetail = async (
