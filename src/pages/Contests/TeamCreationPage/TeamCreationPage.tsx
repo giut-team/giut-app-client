@@ -1,5 +1,24 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { fetchContestDetail } from "../../../api/contests";
+import {
+  createTeam,
+  fetchTeamDetail,
+  fetchTeamMembers,
+  fetchTeamRecruitments,
+  updateTeam,
+  type CreateTeamRequest,
+  type TeamActivityMode,
+  type TeamMeetingPlace,
+  type UpdateTeamRequest,
+} from "../../../api/teams";
+import {
+  fetchProfileRoles,
+  getProfileRoleName,
+  type ProfilePrimaryRole,
+} from "../../../api/profiles";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { BottomSheet } from "../../../components/BottomSheet/BottomSheet";
@@ -9,38 +28,46 @@ import { S } from "./TeamCreationPage.styles";
 const totalSteps = 5;
 
 const majorRoles = ["개발", "디자인", "기획", "마케팅"];
-const roleSpecs: Record<string, { skills: string[] }> = {
-  개발: {
-    skills: [
-      "백엔드 개발자",
-      "데이터 엔지니어",
-      "프론트엔드 개발자",
-      "풀스택 개발자",
-      "iOS 개발자",
-      "Android 개발자",
-      "QA 개발자",
-      "DevOps 엔지니어",
-      "AI 개발자",
-    ],
-  },
-  디자인: {
-    skills: [
-      "UI 디자이너",
-      "UX 디자이너",
-      "그래픽 디자이너",
-      "브랜드 디자이너",
-      "모션 디자이너",
-    ],
-  },
-  기획: {
-    skills: ["서비스 기획", "프로젝트 매니저", "데이터 기획"],
-  },
-  마케팅: {
-    skills: ["콘텐츠 마케팅", "퍼포먼스 마케팅", "브랜드 마케팅"],
-  },
+type RoleSpecs = Record<string, { skills: string[] }>;
+
+const primaryRoleCodes: Record<string, ProfilePrimaryRole> = {
+  개발: "DEVELOPMENT",
+  디자인: "DESIGN",
+  기획: "PLANNING",
+  마케팅: "MARKETING",
 };
+
+const emptyRoleSpecs: RoleSpecs = Object.fromEntries(
+  majorRoles.map((role) => [role, { skills: [] }]),
+);
 const activityModes = ["온라인", "오프라인", "온·오프 혼합"];
 const locationOptions = ["교내", "서울 전체", "수도권", "상관없음"];
+
+const activityModeValues: Record<string, TeamActivityMode> = {
+  온라인: "ONLINE",
+  오프라인: "OFFLINE",
+  "온·오프 혼합": "HYBRID",
+};
+
+const meetingPlaceValues: Record<string, TeamMeetingPlace> = {
+  교내: "CAMPUS",
+  "서울 전체": "SEOUL",
+  수도권: "METROPOLITAN_AREA",
+  상관없음: "ANYWHERE",
+};
+
+const activityModeNames: Record<TeamActivityMode, string> = {
+  ONLINE: "온라인",
+  OFFLINE: "오프라인",
+  HYBRID: "온·오프 혼합",
+};
+
+const meetingPlaceNames: Record<TeamMeetingPlace, string> = {
+  CAMPUS: "교내",
+  SEOUL: "서울 전체",
+  METROPOLITAN_AREA: "수도권",
+  ANYWHERE: "상관없음",
+};
 
 const suggestedQuestions = [
   {
@@ -56,6 +83,18 @@ const suggestedQuestions = [
     question: "프로젝트에 참여 가능한 시간을 알려주세요",
   },
 ];
+
+const getTeamCreationErrorMessage = (error: unknown) => {
+  if (isAxiosError<{ message?: string }>(error)) {
+    if (error.response?.status === 409) {
+      return "이미 이 공모전에 모집 중인 내가 만든 팀이 있어요.";
+    }
+
+    return error.response?.data.message ?? "팀 등록 요청을 처리하지 못했어요.";
+  }
+
+  return "팀 등록 요청을 처리하지 못했어요.";
+};
 
 function StepHeader({
   currentStep,
@@ -96,7 +135,17 @@ function StepHeader({
   );
 }
 
-function StepOne() {
+function StepOne({
+  contestTitle,
+  isEditMode,
+  roleSpecs,
+  isLoadingRoleOptions,
+}: {
+  contestTitle: string;
+  isEditMode: boolean;
+  roleSpecs: RoleSpecs;
+  isLoadingRoleOptions: boolean;
+}) {
   const {
     majorRole,
     memberCount,
@@ -112,6 +161,9 @@ function StepOne() {
   const [activeMajorRole, setActiveMajorRole] = useState(
     () => majorRole[0] ?? "",
   );
+  const displayedMajorRole = majorRole.includes(activeMajorRole)
+    ? activeMajorRole
+    : (majorRole[0] ?? "");
 
   const toggleRecruitingRole = (role: string) => {
     setRecruitingRoles(
@@ -127,7 +179,7 @@ function StepOne() {
       return;
     }
 
-    if (activeMajorRole !== role) {
+    if (displayedMajorRole !== role) {
       setActiveMajorRole(role);
       return;
     }
@@ -149,7 +201,7 @@ function StepOne() {
         : [...subRole, role],
     );
   };
-  const availableSubRoles = roleSpecs[activeMajorRole]?.skills ?? [];
+  const availableSubRoles = roleSpecs[displayedMajorRole]?.skills ?? [];
   const selectedRoleSummary = majorRole
     .map((role) => {
       const selectedSubRoles = (roleSpecs[role]?.skills ?? []).filter((skill) =>
@@ -165,8 +217,12 @@ function StepOne() {
   return (
     <S.Form>
       <S.ContestNotice>
-        <strong>2026 서울시 데이터 활용 공모전</strong>
-        <span>이 공모전에 팀을 등록합니다</span>
+        <strong>{contestTitle}</strong>
+        <span>
+          {isEditMode
+            ? "이 공모전에 등록한 팀 정보를 수정합니다"
+            : "이 공모전에 팀을 등록합니다"}
+        </span>
       </S.ContestNotice>
 
       <S.Field $outlined={false}>
@@ -230,7 +286,7 @@ function StepOne() {
           ))}
         </S.ChipList>
         <S.RoleLabel>
-          소분류{activeMajorRole ? ` · ${activeMajorRole}` : ""}
+          소분류{displayedMajorRole ? ` · ${displayedMajorRole}` : ""}
         </S.RoleLabel>
         <S.ChipList>
           {availableSubRoles.length ? (
@@ -246,7 +302,11 @@ function StepOne() {
               </S.RoleChip>
             ))
           ) : (
-            <S.HelperText>대분류를 먼저 선택해주세요.</S.HelperText>
+            <S.HelperText>
+              {displayedMajorRole && isLoadingRoleOptions
+                ? "세부 역할을 불러오는 중입니다."
+                : "대분류를 먼저 선택해주세요."}
+            </S.HelperText>
           )}
         </S.ChipList>
       </S.RoleField>
@@ -275,7 +335,7 @@ function StepOne() {
   );
 }
 
-function StepTwo() {
+function StepTwo({ roleSpecs }: { roleSpecs: RoleSpecs }) {
   const {
     memberCount,
     recruitingRoles,
@@ -339,7 +399,7 @@ function StepTwo() {
       </S.SelectionSummary>
       <S.RoleGroupList>
         {recruitingRoles.map((role) => {
-          const spec = roleSpecs[role];
+          const spec = roleSpecs[role] ?? { skills: [] };
           const count = roleCounts[role] ?? 0;
           const selectedSkills = roleSkills[role] ?? [];
           return (
@@ -738,10 +798,19 @@ function StepFour() {
   );
 }
 
-function StepFive({ onEdit }: { onEdit: (step: number) => void }) {
+function StepFive({
+  contestTitle,
+  onEdit,
+  roleSpecs,
+}: {
+  contestTitle: string;
+  onEdit: (step: number) => void;
+  roleSpecs: RoleSpecs;
+}) {
   const {
     majorRole,
     memberCount,
+    members,
     recruitingRoles,
     roleCounts,
     roleSkills,
@@ -770,7 +839,7 @@ function StepFive({ onEdit }: { onEdit: (step: number) => void }) {
       <S.ConfirmationCard>
         <S.ConfirmationTeamName>{teamName}</S.ConfirmationTeamName>
         <S.ConfirmationContest>
-          2026 서울시 데이터 활용 공모전
+          {contestTitle}
         </S.ConfirmationContest>
         <S.ConfirmationDivider />
         <S.ConfirmationRow>
@@ -779,7 +848,7 @@ function StepFive({ onEdit }: { onEdit: (step: number) => void }) {
         </S.ConfirmationRow>
         <S.ConfirmationRow>
           <span>현재 팀장</span>
-          <strong>김용욱 / {leaderRoleSummary}</strong>
+          <strong>{members[0]?.name ?? "팀장"} / {leaderRoleSummary}</strong>
         </S.ConfirmationRow>
         <S.ConfirmationEditRow>
           <S.ConfirmationEditButton onClick={() => onEdit(1)} type="button">
@@ -915,11 +984,17 @@ function TeamCreationComplete({ onConfirm }: { onConfirm: () => void }) {
 
 export function TeamCreationPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { contestId = "seoul-data", step, teamId } = useParams();
   const [searchParams] = useSearchParams();
   const isEditMode = Boolean(teamId);
+  const numericTeamId = Number(teamId);
+  const hydratedTeamId = useRef<number | null>(null);
+  const hydratedTeamRolesId = useRef<number | null>(null);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [isSubmitErrorModalOpen, setIsSubmitErrorModalOpen] = useState(false);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState("");
   const [isCreationComplete, setIsCreationComplete] = useState(false);
   const {
     activityMode,
@@ -931,12 +1006,238 @@ export function TeamCreationPage() {
     recruitingRoles,
     roleCounts,
     roleSkills,
+    setActivityMode,
+    setIntroduction,
+    setLocations,
+    setMajorRole,
+    setMemberCount,
+    setMembers,
+    setQuestions,
+    setRecruitingRoles,
+    setRoleCounts,
+    setRoleSkills,
+    setSubRole,
     setSubmitted,
+    setTeamName,
+    setWeeklyMeetings,
     subRole,
     submitted,
     teamName,
     weeklyMeetings,
   } = useTeamCreation();
+  const { data: editingTeam } = useQuery({
+    queryKey: ["team", numericTeamId],
+    queryFn: () => fetchTeamDetail(numericTeamId),
+    enabled: isEditMode && Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+  const { data: contest } = useQuery({
+    queryKey: ["contest", contestId],
+    queryFn: () => fetchContestDetail(contestId),
+    enabled: Boolean(contestId),
+  });
+  const {
+    data: editingTeamMembers = [],
+    isSuccess: isEditingTeamMembersSuccess,
+  } = useQuery({
+    queryKey: ["teamMembers", numericTeamId],
+    queryFn: () => fetchTeamMembers(numericTeamId),
+    enabled: isEditMode && Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+  const {
+    data: editingTeamRecruitments = [],
+    isSuccess: isEditingTeamRecruitmentsSuccess,
+  } = useQuery({
+    queryKey: ["teamRecruitments", numericTeamId],
+    queryFn: () => fetchTeamRecruitments(numericTeamId),
+    enabled: isEditMode && Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+
+  useEffect(() => {
+    if (!editingTeam || hydratedTeamId.current === editingTeam.teamId) return;
+
+    hydratedTeamId.current = editingTeam.teamId;
+    setTeamName(editingTeam.name);
+    setIntroduction(editingTeam.description ?? "");
+    setMemberCount(editingTeam.maxMemberCount);
+    setActivityMode(activityModeNames[editingTeam.activityMode]);
+    setWeeklyMeetings(editingTeam.weeklyMeetingCount);
+    setLocations([meetingPlaceNames[editingTeam.meetingPlace]]);
+    setQuestions(
+      [...(editingTeam.applicationQuestions ?? [])]
+        .sort((first, second) => first.displayOrder - second.displayOrder)
+        .map(({ question }) => question),
+    );
+  }, [
+    editingTeam,
+    setActivityMode,
+    setIntroduction,
+    setLocations,
+    setMemberCount,
+    setQuestions,
+    setTeamName,
+    setWeeklyMeetings,
+  ]);
+  const requestedRoleCategories = useMemo(
+    () => {
+      const roles = isEditMode
+        ? majorRoles
+        : [...new Set([...majorRole, ...recruitingRoles])];
+
+      return roles
+        .filter((role) => primaryRoleCodes[role])
+        .map((role) => ({ label: role, code: primaryRoleCodes[role] }));
+    },
+    [isEditMode, majorRole, recruitingRoles],
+  );
+  const profileRoleQueries = useQueries({
+    queries: requestedRoleCategories.map(({ code, label }) => ({
+      queryKey: ["profileRoles", code],
+      queryFn: () => fetchProfileRoles(code),
+      enabled: Boolean(label),
+      staleTime: Infinity,
+    })),
+  });
+  const roleSpecs = useMemo<RoleSpecs>(() => {
+    const selectedRoleSpecs = requestedRoleCategories.map(({ label }, index) => [
+      label,
+      { skills: profileRoleQueries[index]?.data?.map(({ name }) => name) ?? [] },
+    ]);
+
+    return { ...emptyRoleSpecs, ...Object.fromEntries(selectedRoleSpecs) };
+  }, [profileRoleQueries, requestedRoleCategories]);
+  const roleCodeByName = useMemo(
+    () =>
+      Object.fromEntries(
+        profileRoleQueries.flatMap((query) =>
+          (query.data ?? []).map(({ code, name }) => [name, code]),
+        ),
+      ),
+    [profileRoleQueries],
+  );
+  const roleCatalog = useMemo(
+    () =>
+      requestedRoleCategories.flatMap(({ label }, index) =>
+        (profileRoleQueries[index]?.data ?? []).map((role) => ({
+          ...role,
+          primaryRoleLabel: label,
+        })),
+      ),
+    [profileRoleQueries, requestedRoleCategories],
+  );
+  useEffect(() => {
+    if (
+      !editingTeam ||
+      hydratedTeamRolesId.current === editingTeam.teamId ||
+      !isEditingTeamMembersSuccess ||
+      !isEditingTeamRecruitmentsSuccess ||
+      profileRoleQueries.some((query) => !query.data)
+    ) {
+      return;
+    }
+
+    const leader = editingTeamMembers.find(
+      (member) =>
+        member.userId === editingTeam.leaderUserId || member.role === "LEADER",
+    );
+    const leaderRole = roleCatalog.find((role) => role.code === leader?.roleCode);
+    const recruitmentRoles = editingTeamRecruitments.flatMap((recruitment) => {
+      const role = roleCatalog.find((item) => item.code === recruitment.roleCode);
+      return role ? [{ recruitment, role }] : [];
+    });
+    const recruitingPrimaryRoles = [
+      ...new Set(recruitmentRoles.map(({ role }) => role.primaryRoleLabel)),
+    ];
+    const nextRoleCounts = recruitmentRoles.reduce<Record<string, number>>(
+      (counts, { recruitment, role }) => ({
+        ...counts,
+        [role.primaryRoleLabel]:
+          (counts[role.primaryRoleLabel] ?? 0) + recruitment.requiredCount,
+      }),
+      {},
+    );
+    const nextRoleSkills = recruitmentRoles.reduce<Record<string, string[]>>(
+      (skills, { role }) => ({
+        ...skills,
+        [role.primaryRoleLabel]: [
+          ...new Set([...(skills[role.primaryRoleLabel] ?? []), role.name]),
+        ],
+      }),
+      {},
+    );
+    const defaultLeaderRole =
+      leaderRole ?? recruitmentRoles[0]?.role ?? roleCatalog[0];
+
+    hydratedTeamRolesId.current = editingTeam.teamId;
+    setMajorRole(
+      defaultLeaderRole ? [defaultLeaderRole.primaryRoleLabel] : [],
+    );
+    setSubRole(defaultLeaderRole ? [defaultLeaderRole.name] : []);
+    setRecruitingRoles(recruitingPrimaryRoles);
+    setRoleCounts(nextRoleCounts);
+    setRoleSkills(nextRoleSkills);
+    setMembers(
+      [...editingTeamMembers]
+        .sort(
+          (first, second) =>
+            Number(second.role === "LEADER") - Number(first.role === "LEADER"),
+        )
+        .map((member) => ({
+          id: String(member.userId),
+          name: member.nickname,
+          profile: getProfileRoleName(member.roleCode),
+        })),
+    );
+  }, [
+    editingTeam,
+    editingTeamMembers,
+    editingTeamRecruitments,
+    isEditingTeamMembersSuccess,
+    isEditingTeamRecruitmentsSuccess,
+    profileRoleQueries,
+    roleCatalog,
+    setMajorRole,
+    setMembers,
+    setRecruitingRoles,
+    setRoleCounts,
+    setRoleSkills,
+    setSubRole,
+  ]);
+  const isLoadingProfileRoles = profileRoleQueries.some(
+    (query) => query.isLoading,
+  );
+  const isProfileRolesError = profileRoleQueries.some((query) => query.isError);
+  const { isPending: isCreatingTeam, mutate: submitTeam } = useMutation({
+    mutationFn: createTeam,
+    onSuccess: () => {
+      setSubmitted(true);
+      setIsSubmitModalOpen(false);
+      setIsCreationComplete(true);
+    },
+    onError: (error) => {
+      setIsSubmitModalOpen(false);
+      setSubmitErrorMessage(getTeamCreationErrorMessage(error));
+      setIsSubmitErrorModalOpen(true);
+    },
+  });
+  const { isPending: isUpdatingTeam, mutate: submitTeamUpdate } = useMutation({
+    mutationFn: (request: UpdateTeamRequest) => updateTeam(numericTeamId, request),
+    onSuccess: (updatedTeam) => {
+      queryClient.setQueryData(["team", numericTeamId], updatedTeam);
+      void queryClient.invalidateQueries({ queryKey: ["recruitingTeams"] });
+      void queryClient.invalidateQueries({ queryKey: ["contest", contestId] });
+      setSubmitted(true);
+      setIsSubmitModalOpen(false);
+      navigate(`/contests/${contestId}/teams/${numericTeamId}/manage`, {
+        replace: true,
+      });
+    },
+    onError: (error) => {
+      setIsSubmitModalOpen(false);
+      setSubmitErrorMessage(getTeamCreationErrorMessage(error));
+      setIsSubmitErrorModalOpen(true);
+    },
+  });
+  const isSubmittingTeam = isCreatingTeam || isUpdatingTeam;
   const requestedStep = Number(step);
   const currentStep = step
     ? Math.min(
@@ -1018,6 +1319,69 @@ export function TeamCreationPage() {
       setIsSubmitModalOpen(true);
     }
   };
+  const buildCreateTeamRequest = (): CreateTeamRequest | null => {
+    const competitionId = Number(contestId);
+    const activityModeValue = activityModeValues[activityMode];
+    const meetingPlaceValue = meetingPlaceValues[locations[0]];
+
+    if (!Number.isInteger(competitionId) || competitionId <= 0 || !activityModeValue || !meetingPlaceValue) {
+      return null;
+    }
+
+    const recruitments = recruitingRoles.flatMap((role) => {
+      const selectedSkills = roleSkills[role] ?? [];
+      const requiredCount = roleCounts[role] ?? 0;
+      if (!selectedSkills.length || requiredCount <= 0) return [];
+
+      const countPerRole = Math.floor(requiredCount / selectedSkills.length);
+      const additionalCount = requiredCount % selectedSkills.length;
+
+      return selectedSkills.map((skill, index) => ({
+        roleCode: roleCodeByName[skill],
+        requiredCount: countPerRole + (index < additionalCount ? 1 : 0),
+      })).filter((recruitment) => recruitment.roleCode && recruitment.requiredCount > 0);
+    });
+
+    if (!recruitments.length) return null;
+
+    return {
+      competitionId,
+      name: teamName.trim(),
+      description: introduction.trim(),
+      activityMode: activityModeValue,
+      maxMemberCount: memberCount,
+      weeklyMeetingCount: weeklyMeetings,
+      meetingPlace: meetingPlaceValue,
+      recruitments,
+      applicationQuestions: questions
+        .map((question) => question.trim())
+        .filter(Boolean)
+        .map((question) => ({ question, required: true })),
+    };
+  };
+  const buildUpdateTeamRequest = (): UpdateTeamRequest | null => {
+    const activityModeValue = activityModeValues[activityMode];
+    const meetingPlaceValue = meetingPlaceValues[locations[0]];
+
+    if (
+      !Number.isInteger(numericTeamId) ||
+      numericTeamId <= 0 ||
+      !teamName.trim() ||
+      !activityModeValue ||
+      !meetingPlaceValue
+    ) {
+      return null;
+    }
+
+    return {
+      name: teamName.trim(),
+      description: introduction.trim(),
+      activityMode: activityModeValue,
+      maxMemberCount: memberCount,
+      weeklyMeetingCount: weeklyMeetings,
+      meetingPlace: meetingPlaceValue,
+    };
+  };
   const finishTeamCreation = () => {
     navigate(`/contests/${contestId}`, {
       replace: true,
@@ -1031,15 +1395,41 @@ export function TeamCreationPage() {
     });
   };
   const confirmSubmit = () => {
-    setSubmitted(true);
-    setIsSubmitModalOpen(false);
+    if (isSubmittingTeam) return;
 
     if (isEditMode) {
-      navigate(`/contests/${contestId}/teams/${teamId}/manage`, { replace: true });
+      const request = buildUpdateTeamRequest();
+      if (!request) {
+        setIsSubmitModalOpen(false);
+        setSubmitErrorMessage("필수 입력 정보를 확인해 주세요.");
+        setIsSubmitErrorModalOpen(true);
+        return;
+      }
+
+      submitTeamUpdate(request);
       return;
     }
 
-    setIsCreationComplete(true);
+    if (isLoadingProfileRoles || isProfileRolesError) {
+      setIsSubmitModalOpen(false);
+      setSubmitErrorMessage(
+        isProfileRolesError
+          ? "모집 역할 정보를 불러오지 못했어요. 다시 시도해 주세요."
+          : "모집 역할 정보를 불러오는 중입니다.",
+      );
+      setIsSubmitErrorModalOpen(true);
+      return;
+    }
+
+    const request = buildCreateTeamRequest();
+    if (!request) {
+      setIsSubmitModalOpen(false);
+      setSubmitErrorMessage("필수 입력 정보를 확인해 주세요.");
+      setIsSubmitErrorModalOpen(true);
+      return;
+    }
+
+    submitTeam(request);
   };
   const handleNext = () => {
     if (!isCurrentStepValid) return;
@@ -1052,12 +1442,25 @@ export function TeamCreationPage() {
   };
   const renderStep = () => {
     if (currentStep === 5) {
-      return <StepFive onEdit={goToStep} />;
+      return (
+        <StepFive
+          contestTitle={contest?.title ?? "공모전 정보를 불러오는 중이에요"}
+          onEdit={goToStep}
+          roleSpecs={roleSpecs}
+        />
+      );
     }
-    if (currentStep === 2) return <StepTwo />;
+    if (currentStep === 2) return <StepTwo roleSpecs={roleSpecs} />;
     if (currentStep === 3) return <StepThree />;
     if (currentStep === 4) return <StepFour />;
-    return <StepOne />;
+    return (
+      <StepOne
+        contestTitle={contest?.title ?? "공모전 정보를 불러오는 중이에요"}
+        isEditMode={isEditMode}
+        isLoadingRoleOptions={isLoadingProfileRoles}
+        roleSpecs={roleSpecs}
+      />
+    );
   };
 
   if (isCreationComplete) {
@@ -1133,6 +1536,17 @@ export function TeamCreationPage() {
           onClick: () => setIsSubmitModalOpen(false),
         }}
         title={isEditMode ? "팀 정보를 수정할까요?" : "팀을 등록하시겠어요?"}
+      />
+      <Modal
+        description={submitErrorMessage || "입력한 정보를 확인한 뒤 다시 시도해 주세요."}
+        icon={<Icon name="x" size={22} weight="bold" />}
+        onClose={() => setIsSubmitErrorModalOpen(false)}
+        open={isSubmitErrorModalOpen}
+        primaryAction={{
+          label: "확인",
+          onClick: () => setIsSubmitErrorModalOpen(false),
+        }}
+        title="팀을 등록하지 못했어요"
       />
     </S.Page>
   );
