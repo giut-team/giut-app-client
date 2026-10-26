@@ -531,20 +531,6 @@ export function AdminContestsPage() {
               </S.Field>
             </S.EditorForm>
             <S.EditorActions>
-              {editorMode === "edit" && editingContestId !== null && (
-                <S.EditorDelete
-                  disabled={saveMutation.isPending || deleteMutation.isPending}
-                  onClick={() =>
-                    setDeleteTarget({
-                      id: editingContestId,
-                      title: editorForm.title,
-                    })
-                  }
-                  type="button"
-                >
-                  삭제
-                </S.EditorDelete>
-              )}
               <S.EditorSubmit
                 disabled={saveMutation.isPending || deleteMutation.isPending}
                 onClick={submitEditor}
