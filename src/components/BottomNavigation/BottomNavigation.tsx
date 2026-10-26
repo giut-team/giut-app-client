@@ -20,6 +20,19 @@ type BottomNavigationProps = {
 export function BottomNavigation({ items, activeKey, onChange }: BottomNavigationProps) {
   const { isAuthenticated, universityVerified } = useAuth();
   const isUniversityUnverified = isAuthenticated && !universityVerified;
+  const moveToTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  };
+  const handleItemClick = (key: string) => {
+    if (
+      key === activeKey &&
+      (key === "home" || key === "hub" || key === "chat" || key === "mypage")
+    ) {
+      moveToTop();
+    }
+
+    onChange(key);
+  };
   const unreadQuery = useQuery({
     queryKey: ["chat-unread-total"],
     queryFn: fetchTotalUnreadMessageCount,
@@ -44,7 +57,7 @@ export function BottomNavigation({ items, activeKey, onChange }: BottomNavigatio
               aria-label={locked ? `${item.label}, 학교 인증 필요` : item.label}
               disabled={locked}
               key={item.key}
-              onClick={() => onChange(item.key)}
+              onClick={() => handleItemClick(item.key)}
               type="button"
             >
               <Icon name={item.icon} size={21} weight={active ? "fill" : "regular"} />

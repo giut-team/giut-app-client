@@ -16,6 +16,5 @@ export function supportsProfileViewTransition(): boolean {
 }
 
 export function profileScrollKey(location: { pathname: string; search: string; key: string }): string {
-  return /^\/giut-hub(?:-preview)?\/?$/.test(location.pathname)
-    ? `${location.pathname}${location.search}` : location.key;
+  return location.key;
 }

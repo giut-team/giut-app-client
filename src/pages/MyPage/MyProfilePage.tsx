@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
@@ -96,6 +96,9 @@ const scrapTeams = [
 export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
   const { isAuthenticated, profile: currentProfile, universityVerified } = useAuth();
   const isUniversityUnverified = isAuthenticated && !universityVerified;
   const share = useProfileShare(isAuthenticated);
