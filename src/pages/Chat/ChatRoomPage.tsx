@@ -23,6 +23,7 @@ import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
 import { Toast } from "../../components/Toast/Toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { getChatRoomContext, type ChatRoomContext } from "./chatContext";
 import { S } from "./ChatRoomPage.styles";
 
 type AvatarTone = "mint" | "peach" | "purple";
@@ -175,6 +176,21 @@ export function ChatRoomPage() {
       ? "팀 채팅"
       : "1:1 채팅";
   const avatarTone = avatarTones[chatRoomId % avatarTones.length];
+  const storedContext = getChatRoomContext(chatRoomId);
+  const fallbackContext: ChatRoomContext | null =
+    roomQuery.data?.type === "PERSONAL" && roomQuery.data.targetUserId
+      ? {
+          kind: "PROFILE",
+          label: "기웃허브에서 시작된 대화",
+          title: `${roomName}님의 프로필`,
+          primaryAction: { label: "기웃허브 보기", path: "/giut-hub" },
+          secondaryAction: {
+            label: "프로필 보기",
+            path: `/giut-hub/${roomQuery.data.targetUserId}`,
+          },
+        }
+      : null;
+  const chatContext = storedContext ?? fallbackContext;
 
   const readMutation = useMutation({
     mutationFn: (messageId: number) =>
@@ -407,7 +423,29 @@ export function ChatRoomPage() {
             {messagesQuery.isFetchingNextPage ? "불러오는 중..." : "이전 메시지 보기"}
           </S.LoadMoreButton>
         )}
-        <S.DateDivider>대화</S.DateDivider>
+        {chatContext && (
+          <S.ContextCard>
+            <S.ContextLabel>{chatContext.label}</S.ContextLabel>
+            <S.ContextTitle>{chatContext.title}</S.ContextTitle>
+            <S.ContextActions>
+              <S.ContextButton
+                onClick={() => navigate(chatContext.primaryAction.path)}
+                type="button"
+              >
+                {chatContext.primaryAction.label}
+              </S.ContextButton>
+              {chatContext.secondaryAction && (
+                <S.ContextButton
+                  onClick={() => navigate(chatContext.secondaryAction!.path)}
+                  type="button"
+                >
+                  {chatContext.secondaryAction.label}
+                </S.ContextButton>
+              )}
+            </S.ContextActions>
+          </S.ContextCard>
+        )}
+        <S.DateDivider>오늘</S.DateDivider>
         <S.Messages aria-label={`${roomName}님과의 대화`}>
           {messages.map((message) => {
             const sender = message.senderId === myProfile?.userId ? "me" : "other";

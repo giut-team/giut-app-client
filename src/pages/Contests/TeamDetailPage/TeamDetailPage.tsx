@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import { createPersonalChatRoom } from "../../../api/chats";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
+import { saveChatRoomContext } from "../../Chat/chatContext";
 import { S } from "./TeamDetailPage.styles";
 
 const members = [
@@ -37,6 +40,25 @@ export function TeamDetailPage() {
   const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const startChatMutation = useMutation({
+    mutationFn: () => createPersonalChatRoom(2),
+    onSuccess: (chatRoom) => {
+      saveChatRoomContext(chatRoom.chatRoomId, {
+        kind: "TEAM_INQUIRY",
+        label: "공모전 팀 상세에서 시작된 대화",
+        title: "2026 서울시 데이터 활용 공모전 · 데이터로 서울을 팀",
+        primaryAction: {
+          label: "팀 보기",
+          path: `/contests/${contestId}/teams/${teamId}`,
+        },
+        secondaryAction: {
+          label: "공모전 보기",
+          path: `/contests/${contestId}`,
+        },
+      });
+      navigate(`/chat/${chatRoom.chatRoomId}`);
+    },
+  });
 
   return (
     <S.Page>
@@ -131,7 +153,12 @@ export function TeamDetailPage() {
       </S.Content>
 
       <S.ActionBar>
-        <S.ChatButton aria-label="팀장에게 문의하기" type="button">
+        <S.ChatButton
+          aria-label="팀장에게 문의하기"
+          disabled={startChatMutation.isPending}
+          onClick={() => startChatMutation.mutate()}
+          type="button"
+        >
           <Icon name="chat" size={19} weight="regular" />
         </S.ChatButton>
         <S.ApplyButton onClick={() => setIsApplyModalOpen(true)} type="button">

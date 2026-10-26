@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { createPersonalChatRoom } from "../../api/chats";
+import {
+  saveChatRoomContext,
+  type ChatRoomContext,
+} from "../Chat/chatContext";
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
@@ -393,10 +397,14 @@ export function TeamProposalBottomSheet({
   open,
   profileName,
   onClose,
+  onConfirm,
+  submitting = false,
 }: {
   open: boolean;
   profileName: string;
   onClose: () => void;
+  onConfirm?: (team: ProposalTeam, position: string) => void;
+  submitting?: boolean;
 }) {
   const [selectedProposalTeam, setSelectedProposalTeam] = useState("data-seoul");
   const [selectedProposalPosition, setSelectedProposalPosition] = useState(
@@ -410,8 +418,21 @@ export function TeamProposalBottomSheet({
           <S.ProposalCancelButton onClick={onClose} type="button">
             취소
           </S.ProposalCancelButton>
-          <S.ProposalConfirmButton onClick={onClose} type="button">
-            이 팀으로 제안 보내기
+          <S.ProposalConfirmButton
+            disabled={submitting}
+            onClick={() => {
+              const team = proposalTeams.find(
+                (item) => item.id === selectedProposalTeam,
+              );
+              if (team && onConfirm) {
+                onConfirm(team, selectedProposalPosition);
+                return;
+              }
+              onClose();
+            }}
+            type="button"
+          >
+            {submitting ? "채팅방 여는 중..." : "이 팀으로 제안 보내기"}
           </S.ProposalConfirmButton>
         </S.ProposalFooter>
       }
@@ -688,8 +709,16 @@ export function GiutHubProfilePage() {
     (item) => item.profileNumber === Number(profileNumber),
   );
   const startChatMutation = useMutation({
-    mutationFn: () => createPersonalChatRoom(Number(profileNumber)),
-    onSuccess: (chatRoom) => navigate(`/chat/${chatRoom.chatRoomId}`),
+    mutationFn: (context: ChatRoomContext) =>
+      createPersonalChatRoom(Number(profileNumber)).then((chatRoom) => ({
+        chatRoom,
+        context,
+      })),
+    onSuccess: ({ chatRoom, context }) => {
+      saveChatRoomContext(chatRoom.chatRoomId, context);
+      setIsProposalSheetOpen(false);
+      navigate(`/chat/${chatRoom.chatRoomId}`);
+    },
   });
   if (!profile) return <Navigate replace to="/giut-hub" />;
 
@@ -780,7 +809,21 @@ export function GiutHubProfilePage() {
           </Button>
           <S.MessageButton
             disabled={startChatMutation.isPending}
-            onClick={() => startChatMutation.mutate()}
+            onClick={() =>
+              startChatMutation.mutate({
+                kind: "PROFILE",
+                label: "기웃허브에서 시작된 대화",
+                title: `${profile.name}님의 프로필`,
+                primaryAction: {
+                  label: "기웃허브 보기",
+                  path: "/giut-hub",
+                },
+                secondaryAction: {
+                  label: "프로필 보기",
+                  path: `/giut-hub/${profile.profileNumber}`,
+                },
+              })
+            }
             type="button"
           >
             <Icon name="chat" size={20} weight="regular" />
@@ -879,8 +922,24 @@ export function GiutHubProfilePage() {
       </S.Content>
       <TeamProposalBottomSheet
         onClose={() => setIsProposalSheetOpen(false)}
+        onConfirm={(team, position) =>
+          startChatMutation.mutate({
+            kind: "TEAM_PROPOSAL",
+            label: "기웃허브에서 보낸 팀 제안",
+            title: `${team.name} · ${position} 제안`,
+            primaryAction: {
+              label: "팀 보기",
+              path: `/contests/seoul-data/teams/${team.id}`,
+            },
+            secondaryAction: {
+              label: "프로필 보기",
+              path: `/giut-hub/${profile.profileNumber}`,
+            },
+          })
+        }
         open={isProposalSheetOpen}
         profileName={profile.name}
+        submitting={startChatMutation.isPending}
       />
       <ProfileMoreBottomSheet
         onBlock={() => openProfileAction("block")}
