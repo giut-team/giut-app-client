@@ -196,6 +196,8 @@ export function ContestDetailPage() {
     `teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
 
   const handleTeamCreationClick = () => {
+    if (isUniversityUnverified) return;
+
     const existingTeam = contest?.teams.find(
       (team) => team.myTeam && team.status === "RECRUITING",
     );
@@ -591,6 +593,13 @@ export function ContestDetailPage() {
 
       <S.ActionBar>
         <S.ApplyButton
+          $locked={isUniversityUnverified}
+          aria-label={
+            isUniversityUnverified
+              ? "팀 구성하기, 학교 인증 필요"
+              : "팀 구성하기"
+          }
+          disabled={isUniversityUnverified}
           onClick={handleTeamCreationClick}
           type="button"
         >
