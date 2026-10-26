@@ -58,7 +58,6 @@ export function AdminLoginPage() {
               autoComplete="username"
               inputMode="email"
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@service.com"
               required
               type="email"
               value={email}
@@ -69,7 +68,6 @@ export function AdminLoginPage() {
             <S.Input
               autoComplete="current-password"
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="비밀번호를 입력해 주세요"
               required
               type="password"
               value={password}

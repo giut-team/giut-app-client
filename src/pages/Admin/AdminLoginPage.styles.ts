@@ -3,19 +3,17 @@ import { tokens } from "../../design-system/tokens.generated";
 
 export const S = {
   Page: styled.main`
-    display: grid;
     width: min(100%, 480px);
     min-height: 100svh;
     margin: 0 auto;
-    padding: 40px 20px max(40px, env(safe-area-inset-bottom));
+    padding: 38px 26px max(38px, env(safe-area-inset-bottom));
     border-right: 1px solid ${tokens.color.neutral[200]};
     border-left: 1px solid ${tokens.color.neutral[200]};
-    place-items: center;
     overflow-x: hidden;
-    background: #f4f6f9;
+    background: #fff;
 
     @media (max-width: 480px) {
-      padding: 24px 20px;
+      padding: 38px 26px max(38px, env(safe-area-inset-bottom));
       border: 0;
     }
   `,
@@ -25,21 +23,17 @@ export const S = {
   Header: styled.div`
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 32px;
-
-    @media (max-width: 560px) {
-      margin-bottom: 24px;
-    }
+    gap: 8px;
+    margin-bottom: 30px;
   `,
   BackButton: styled.button`
     display: grid;
-    width: 44px;
-    height: 44px;
+    width: 24px;
+    height: 32px;
     flex: 0 0 auto;
     padding: 0;
     border: 0;
-    border-radius: 10px;
+    border-radius: 7px;
     background: transparent;
     color: ${tokens.color.neutral[900]};
     cursor: pointer;
@@ -57,46 +51,35 @@ export const S = {
   Title: styled.h1`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: -1.4px;
+    font-size: 19px;
+    font-weight: 850;
+    letter-spacing: -0.5px;
     line-height: 1.2;
-
-    @media (max-width: 560px) {
-      font-size: 30px;
-    }
   `,
   Card: styled.form`
     display: grid;
-    gap: 20px;
-    padding: 28px 30px 30px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 16px;
-    background: ${tokens.color.neutral[50]};
-
-    @media (max-width: 560px) {
-      padding: 24px 20px;
-    }
+    gap: 14px;
   `,
   Field: styled.label`
     display: grid;
-    gap: 9px;
+    gap: 6px;
     color: ${tokens.color.neutral[900]};
-    font-size: 16px;
+    font-size: 11px;
     font-weight: 700;
     line-height: 1.25;
   `,
   Input: styled.input`
     width: 100%;
-    height: 52px;
-    padding: 0 15px;
+    height: 40px;
+    padding: 0 13px;
     border: 1px solid #d5dbe5;
-    border-radius: 10px;
+    border-radius: 8px;
     outline: none;
-    background: ${tokens.color.neutral[50]};
+    background: #fff;
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 17px;
+    font-size: 13px;
+    font-weight: 500;
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
@@ -111,14 +94,14 @@ export const S = {
     }
   `,
   SubmitButton: styled.button`
-    height: 55px;
-    margin-top: 4px;
+    height: 45px;
+    margin-top: 16px;
     border: 0;
-    border-radius: 10px;
+    border-radius: 9px;
     background: #24459c;
     color: ${tokens.color.neutral[50]};
     font: inherit;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     transition:
