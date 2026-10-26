@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { api } from "../api/client";
 import { createAuthQueryScope } from "./authQueryScope";
+import { getAuthSession, type AuthProfile } from "../api/authSession";
 
 type AuthProfile = {
   departmentName: string;
@@ -24,11 +25,13 @@ type MyProfileResponse = {
   universityVerified?: boolean;
 };
 
+
 type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   profile: AuthProfile | null;
   profileCompleted: boolean;
+  queryScope: string;
   universityVerified: boolean;
   queryScope: string;
   refreshAuth: () => Promise<void>;
@@ -40,40 +43,40 @@ const fetchMyProfile = () => api.get<MyProfileResponse>("/api/userprofile/me/pro
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [scope, setScope] = useState(createAuthQueryScope);
-  const { data, error, isError, isPending, refetch } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["auth", "my-profile"],
-    queryFn: async () => (await fetchMyProfile()).data,
+    queryFn: getAuthSession,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     retry: false,
     staleTime: 0,
   });
-  const responseStatus = axios.isAxiosError(error)
-    ? error.response?.status
-    : undefined;
-  const isUnverifiedProfileForbidden = responseStatus === 403;
 
   const refreshAuth = async () => {
     setScope(createAuthQueryScope());
     await refetch();
   };
+
   let credential: string | null = null;
-  try { credential = localStorage.getItem("accessToken"); } catch { /* 저장소 차단이 화면 렌더링을 중단시키지 않도록 한다. */ }
-  const queryScope = scope.resolve(credential, isError ? undefined : data?.profile?.userId);
+  try {
+    credential = localStorage.getItem("accessToken");
+  } catch {
+    // 저장소 접근이 차단되어도 인증 화면은 계속 렌더링한다.
+  }
+  const queryScope = scope.resolve(
+    credential,
+    isError ? undefined : data?.profile?.userId,
+  );
 
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: data !== undefined || isUnverifiedProfileForbidden,
+        isAuthenticated: !isError && data !== undefined,
         isLoading: isPending,
         profile: data?.profile ?? null,
         profileCompleted: data?.profileCompleted ?? false,
-        universityVerified:
-          !isUnverifiedProfileForbidden &&
-          (data?.universityVerified ??
-            data?.profile?.universityVerified ??
-            false),
         queryScope,
+        universityVerified: data?.universityVerified ?? false,
         refreshAuth,
       }}
     >

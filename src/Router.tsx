@@ -1,7 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
-import { ProfileRouteMotion } from "./components/ProfileRouteMotion/ProfileRouteMotion";
 import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
@@ -75,6 +74,16 @@ export function AppRouter() {
         <Route element={<LoginPage />} path="/login" />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
+        <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />
+        <Route element={<GiutHubPreviewPage />} path="/giut-hub-preview" />
+        <Route
+          element={<GiutHubPreviewProfilePage />}
+          path="/giut-hub-preview/:profileNumber"
+        />
+        <Route
+          element={<PreviewPortfolioPage />}
+          path="/giut-hub-preview/:profileNumber/portfolio/:portfolioId"
+        />
         <Route
           element={
             <UniversityVerifiedRoute>
@@ -203,11 +212,11 @@ export function AppRouter() {
         />
         <Route
           element={<ManageApplicationsPage />}
-          path="/my-team/applications"
+          path="/my-team/:teamId/applications"
         />
         <Route
           element={<ApplicationDetailPage />}
-          path="/my-team/applications/:applicantId"
+          path="/my-team/:teamId/applications/:applicationId"
         />
         <Route
           element={<StudentVerificationPage />}

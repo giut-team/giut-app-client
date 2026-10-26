@@ -84,6 +84,22 @@ final result: blocked
 
 final result: blocked
 
+## Chat origin context card update
+
+- Source visual truth: the two supplied mobile chat screenshots showing a compact origin card above the date divider for a contest-team inquiry and a GiutHub team proposal.
+- Implementation route: `/chat/:chatId`.
+- Implemented interactions: team-detail inquiry, direct GiutHub message, and GiutHub team proposal now attach context to the opened chat room; the card links back to the relevant team, contest, GiutHub list, or profile.
+- Responsive treatment: the existing 480px mobile shell and the established context-card styles are used, with two equal action buttons and the card placed before the `오늘` divider.
+- Browser-rendered implementation screenshot: unavailable. Computer Use reported no browsers or native app connection, so exact visual comparison against the supplied screenshots is blocked.
+- Code checks: `npm.cmd run build` passed. The repository has no `test` script. `npm.cmd run lint` remains blocked by the pre-existing unused `applicationQuestions` value in `MyApplicationPage.tsx`.
+
+**Findings**
+
+- [P1] Cross-account team-origin metadata cannot be reconstructed from the current chat-room API response, which only supplies room type, target user, status, and timestamps. The initiating browser retains the full context; another account receives a profile-based fallback until the backend returns shared origin metadata.
+- [P1] Visual fidelity is unverified because no browser-rendered implementation capture is available.
+
+final result: blocked
+
 ## Profile edit selection sheets update
 
 - Source visual truth: the supplied mobile screenshots for 학과 선택, 학년 선택, and 현재 상태 sheets.

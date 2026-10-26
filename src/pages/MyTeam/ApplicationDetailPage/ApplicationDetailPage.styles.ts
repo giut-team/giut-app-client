@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { Button } from "../../../components/Button";
 import { tokens } from "../../../design-system/tokens.generated";
-import type { ApplicantTone } from "../myTeam.data";
+type ApplicantTone = "blue" | "purple" | "success";
 
 const colorMix = (color: string, amount: number) =>
   `color-mix(in srgb, ${color} ${amount}%, ${tokens.color.neutral[50]})`;
@@ -41,6 +41,16 @@ export const S = {
     flex: 1;
     gap: 14px;
     padding: 14px 18px 20px;
+  `,
+  StateMessage: styled.p`
+    margin: 16px 18px;
+    padding: 24px 16px;
+    border-radius: 12px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 11px;
+    line-height: 1.5;
+    text-align: center;
   `,
   ProfileCard: styled.section`
     padding: 12px;

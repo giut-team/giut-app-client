@@ -4,9 +4,13 @@ import { BottomNavigation } from "../../components/BottomNavigation/BottomNaviga
 import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  detailsByProfileId,
+  getSkillIcon,
+} from "../GiutHub/GiutHubProfilePage";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
-import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareScreen } from "../GiutHub/ProfileShareScreen";
 import { useProfileShare } from "../GiutHub/useProfileShare";
 
@@ -23,7 +27,7 @@ type ProfilePreview = {
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
   { key: "hub", label: "기웃허브", icon: "users" as const },
-  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
+  { key: "chat", label: "채팅", icon: "chat" as const },
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 
@@ -97,7 +101,7 @@ export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, profile: currentProfile, universityVerified } = useAuth();
-  const isUniversityUnverified = !universityVerified;
+  const isUniversityUnverified = isAuthenticated && !universityVerified;
   const share = useProfileShare(isAuthenticated);
   const preview = location.state as ProfilePreview | null;
   const [activeTab, setActiveTab] = useState<MyProfileTab>("portfolio");
@@ -172,17 +176,17 @@ export function MyProfilePage() {
           </S.ProfileInfo>
         </S.ProfileSection>
         <S.IntroductionSection>
-            <S.FieldLabel>자기소개</S.FieldLabel>
-            <S.Introduction>
-              {isUniversityUnverified ? (
-                <S.LockedProfileValue>
-                  <Icon name="lock" size={13} weight="regular" />
-                  인증 후 표시
-                </S.LockedProfileValue>
-              ) : (
-                profile.introduction
-              )}
-            </S.Introduction>
+          <S.FieldLabel>자기소개</S.FieldLabel>
+          <S.Introduction>
+            {isUniversityUnverified ? (
+              <S.LockedProfileValue>
+                <Icon name="lock" size={13} weight="regular" />
+                인증 후 표시
+              </S.LockedProfileValue>
+            ) : (
+              profile.introduction
+            )}
+          </S.Introduction>
         </S.IntroductionSection>
         <S.ProfileActions>
           <S.EditButton
@@ -203,7 +207,11 @@ export function MyProfilePage() {
             />
             프로필 편집
           </S.EditButton>
-          <S.ShareButton aria-label="프로필 공유" onClick={share.openShare} type="button">
+          <S.ShareButton
+            aria-label="프로필 공유"
+            onClick={share.openShare}
+            type="button"
+          >
             <Icon name="share" size={25} weight="regular" />
           </S.ShareButton>
         </S.ProfileActions>
@@ -211,7 +219,9 @@ export function MyProfilePage() {
           <S.ProfileVerificationSection>
             <S.ProfileVerificationCard>
               <S.ProfileVerificationMeta>
-                <S.ProfileVerificationBadge>인증 필요</S.ProfileVerificationBadge>
+                <S.ProfileVerificationBadge>
+                  인증 필요
+                </S.ProfileVerificationBadge>
                 <span>포털 로그인 1분</span>
               </S.ProfileVerificationMeta>
               <S.ProfileVerificationTitle>
@@ -252,7 +262,9 @@ export function MyProfilePage() {
               <S.SkillList aria-label="보유 기술">
                 {previewSkills.map((skill, index) => (
                   <S.Skill $index={index} key={skill}>
-                    {getSkillIcon(skill) && <img alt="" src={getSkillIcon(skill)} />}
+                    {getSkillIcon(skill) && (
+                      <img alt="" src={getSkillIcon(skill)} />
+                    )}
                     {skill}
                   </S.Skill>
                 ))}
@@ -263,7 +275,9 @@ export function MyProfilePage() {
         <S.TabList role="tablist">
           <S.Tab
             $active={activeTab === "portfolio"}
-            aria-label={isUniversityUnverified ? "포트폴리오, 학교 인증 필요" : undefined}
+            aria-label={
+              isUniversityUnverified ? "포트폴리오, 학교 인증 필요" : undefined
+            }
             aria-selected={activeTab === "portfolio"}
             disabled={isUniversityUnverified}
             onClick={() => setActiveTab("portfolio")}
@@ -277,7 +291,9 @@ export function MyProfilePage() {
           </S.Tab>
           <S.Tab
             $active={activeTab === "teams"}
-            aria-label={isUniversityUnverified ? "내 팀, 학교 인증 필요" : undefined}
+            aria-label={
+              isUniversityUnverified ? "내 팀, 학교 인증 필요" : undefined
+            }
             aria-selected={activeTab === "teams"}
             disabled={isUniversityUnverified}
             onClick={() => setActiveTab("teams")}
@@ -291,7 +307,9 @@ export function MyProfilePage() {
           </S.Tab>
           <S.Tab
             $active={activeTab === "scraps"}
-            aria-label={isUniversityUnverified ? "스크랩, 학교 인증 필요" : undefined}
+            aria-label={
+              isUniversityUnverified ? "스크랩, 학교 인증 필요" : undefined
+            }
             aria-selected={activeTab === "scraps"}
             disabled={isUniversityUnverified}
             onClick={() => setActiveTab("scraps")}
@@ -307,16 +325,33 @@ export function MyProfilePage() {
         {activeTab === "portfolio" && (
           <S.TabContent>
             <S.PortfolioHeader>
-              <S.PortfolioExposure>프로필 노출<em>{detail.portfolios.length}</em><span>/ 6</span></S.PortfolioExposure>
+              <S.PortfolioExposure>
+                프로필 노출<em>{detail.portfolios.length}</em>
+                <span>/ 6</span>
+              </S.PortfolioExposure>
               <S.PortfolioHeaderButtons>
-                <S.portfolioManageButton onClick={() => navigate("/my-profile/portfolio-manage", { state: preview })}
-                type="button">관리</S.portfolioManageButton>
-                <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolio-add", { state: preview })}
-                type="button">+ 추가</S.portfolioAddButton>
+                <S.portfolioManageButton
+                  onClick={() =>
+                    navigate("/my-profile/portfolio-manage", { state: preview })
+                  }
+                  type="button"
+                >
+                  관리
+                </S.portfolioManageButton>
+                <S.portfolioAddButton
+                  onClick={() =>
+                    navigate("/my-profile/portfolio-add", { state: preview })
+                  }
+                  type="button"
+                >
+                  + 추가
+                </S.portfolioAddButton>
               </S.PortfolioHeaderButtons>
             </S.PortfolioHeader>
             <S.FeaturedPortfolio
-              onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
+              onClick={() =>
+                navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)
+              }
               type="button"
             >
               <S.FeaturedImage>
@@ -338,7 +373,9 @@ export function MyProfilePage() {
                 <S.PortfolioItem
                   key={item.title}
                   onClick={() =>
-                    navigate(`/giut-hub/${profile.profileNumber}/portfolio/${index + 2}`)
+                    navigate(
+                      `/giut-hub/${profile.profileNumber}/portfolio/${index + 2}`,
+                    )
                   }
                   type="button"
                 >
@@ -491,7 +528,12 @@ export function MyProfilePage() {
           if (key === "chat") navigate("/chat");
         }}
       />
-      {share.isOpen && <ProfileShareScreen profileName={currentProfile?.nickname ?? "내"} share={share} />}
+      {share.isOpen && (
+        <ProfileShareScreen
+          profileName={currentProfile?.nickname ?? "내"}
+          share={share}
+        />
+      )}
     </S.Page>
   );
 }
