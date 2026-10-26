@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
+import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   detailsByProfileId,
@@ -99,11 +100,7 @@ const scrapTeams = [
 export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    isAuthenticated,
-    profile: currentProfile,
-    universityVerified,
-  } = useAuth();
+  const { isAuthenticated, profile: currentProfile, universityVerified } = useAuth();
   const isUniversityUnverified = isAuthenticated && !universityVerified;
   const share = useProfileShare(isAuthenticated);
   const preview = location.state as ProfilePreview | null;

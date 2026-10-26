@@ -44,179 +44,242 @@ test("네이티브 API가 있고 동작 줄이기가 꺼진 경우만 snapshot �
   assert.equal(motion.PROFILE_SCREEN_MOTION_MS, 480);
 });
 
-test("이동 hook은 복귀 state를 보존하며 실제 navigate를 한 번만 호출한다", () => {
-  const calls = [];
-  let native = true;
-  const routing = loadModule(routingPath);
+test("이동 hook은 BrowserRouter navigate와 state를 보존하고 Data Router 전환을 요청하지 않는다", () => {
+  const calls = [], starts = [];
   const { useProfileSlideNavigate } = loadModule("src/components/ProfileRouteMotion/useProfileSlideNavigate.ts", {
     "react-router-dom": { ...routerApi, useLocation: () => ({ pathname: "/giut-hub" }), useNavigate: () => (...args) => calls.push(args) },
-    "./profileMotionRouting": { ...routing, supportsProfileViewTransition: () => native },
+    "./profileSlideController": { getProfileSlideController: () => ({ begin: (from, to, update) => { starts.push([from, to]); update(); } }) },
   });
   const navigate = useProfileSlideNavigate();
   const state = { returnTo: "/giut-hub?positions=개발" };
   navigate("/giut-hub/4", { state });
   assert.equal(calls.length, 1);
   assert.equal(calls[0][1].state, state);
-  assert.equal(calls[0][1].viewTransition, true);
-  native = false;
-  navigate("/giut-hub/3");
-  assert.equal(calls[1][1].viewTransition, false);
-  native = true;
-  navigate("/chat/1");
-  assert.equal(calls[2][1].viewTransition, false);
+  assert.equal(calls[0][1].viewTransition, false);
+  assert.deepEqual(starts, [["/giut-hub", "/giut-hub/4"]]);
 });
 
-function motionHarness() {
-  let location, transitioning = false, refIndex = 0, effect, effectDeps, shouldRun, cleanup;
-  const environment = { native: false, reduced: false };
-  const refs = [], timers = new Map(), listeners = new Map();
+function harness({ native = true, reduced = false } = {}) {
+  const listeners = new Set(), timers = new Map(), styles = new Set(), transitions = [];
+  const window = {
+    location: { pathname: "/giut-hub" }, scrollY: 0,
+    history: { scrollRestoration: "auto" },
+    matchMedia: () => ({ matches: reduced }),
+    scrollTo: (_x, y) => { window.scrollY = y; },
+    setTimeout: callback => { const key = Symbol(); timers.set(key, callback); return key; },
+    clearTimeout: key => timers.delete(key),
+    addEventListener: (_type, listener) => listeners.add(listener),
+    removeEventListener: (_type, listener) => listeners.delete(listener),
+    dispatchEvent: event => { for (const listener of listeners) listener(event); },
+  };
   const document = {
     documentElement: { dataset: {} },
-    addEventListener: (name, handler) => listeners.set(name, handler),
-    removeEventListener: name => listeners.delete(name),
+    head: { appendChild: style => styles.add(style) },
+    createElement: () => { const style = { remove: () => styles.delete(style) }; return style; },
   };
-  const window = {
-    matchMedia: () => ({ matches: environment.reduced }),
-    setTimeout: handler => { const id = Symbol(); timers.set(id, handler); return id; },
-    clearTimeout: id => timers.delete(id),
+  if (native) document.startViewTransition = update => {
+    let finish;
+    const transition = { update, finished: new Promise(resolve => { finish = resolve; }), finish: () => finish(), skipped: 0, skipTransition() { this.skipped++; finish(); } };
+    transitions.push(transition);
+    return transition;
   };
-  const routing = loadModule(routingPath, {}, { document, window });
-  const { ProfileRouteMotion } = loadModule("src/components/ProfileRouteMotion/ProfileRouteMotion.tsx", {
-    react: {
-      ...React,
-      useRef: initial => refs[refIndex++] ??= { current: initial },
-      useLayoutEffect: (callback, deps) => {
-        shouldRun = !effectDeps || deps.some((value, index) => !Object.is(value, effectDeps[index]));
-        effectDeps = deps;
-        effect = callback;
-      },
-    },
-    "react-router-dom": {
-      useLocation: () => location, useViewTransitionState: () => transitioning,
-      Outlet: () => null, ScrollRestoration: () => null,
-    },
+  const { createProfileSlideController } = loadModule("src/components/ProfileRouteMotion/profileSlideController.ts", {
     "../../styles/motion": motion,
-    "./profileMotionRouting": { ...routing, supportsProfileViewTransition: () => environment.native },
-    "./ProfileRouteMotion.styles": { ProfileRouteMotionStyles: () => null },
-  }, { document, window });
-  return {
-    environment, timers, listeners, root: document.documentElement,
-    get frame() { return refs[1].current; },
-    render(pathname, key, active = false) {
-      location = { pathname, key };
-      transitioning = active;
-      refIndex = 0;
-      const tree = ProfileRouteMotion();
-      refs[1].current ??= { dataset: {} };
-      if (shouldRun) { cleanup?.(); cleanup = effect(); }
-      return tree;
-    },
-    end(name, target = refs[1].current) { listeners.get("animationend")?.({ animationName: name, target }); },
-    unmount() { cleanup?.(); },
-  };
+    "./profileMotionRouting": loadModule(routingPath),
+    "./ProfileRouteMotion.styles": { PROFILE_ROUTE_MOTION_CSS: "motion styles" },
+  }, { queueMicrotask, PopStateEvent: class { constructor(type, init) { this.type = type; this.state = init.state; } } });
+  const controller = createProfileSlideController(window, document);
+  function mount(pathname, key = pathname, search = "") {
+    window.location.pathname = pathname;
+    const events = new Map();
+    const element = {
+      dataset: {}, addEventListener: (name, handler) => events.set(name, handler),
+      removeEventListener: name => events.delete(name),
+    };
+    return { element, cleanup: controller.register({ pathname, search, key, element }),
+      end(name, target = element) { events.get("animationend")?.({ animationName: name, target }); } };
+  }
+  return { ...controller, mount, window, document, timers, styles, transitions, listeners };
 }
 
-test("공통 레이아웃은 진입·역방향·중단·동작 줄이기를 처리하고 fallback 상태를 정리한다", () => {
-  const h = motionHarness();
-  const initial = h.render("/giut-hub", "list");
-  assert.equal(h.root.dataset.profileSlide, undefined);
-  assert.equal(initial.props.children[1].props.children.type.name, "Outlet");
-  h.render("/giut-hub/4", "detail");
-  assert.equal(h.root.dataset.profileSlide, "forward");
-  assert.equal(h.frame.dataset.profileFallback, "forward");
-  h.render("/giut-hub", "back");
-  assert.equal(h.root.dataset.profileSlide, "back");
-  assert.equal(h.timers.size, 1);
-  h.end("giut-fallback-back", {});
-  assert.equal(h.root.dataset.profileSlide, "back", "다른 요소의 이벤트는 전환을 종료하지 않는다");
-  h.end("unrelated");
-  assert.equal(h.root.dataset.profileSlide, "back");
-  h.end("giut-fallback-back");
-  assert.equal(h.root.dataset.profileSlide, undefined);
-  assert.equal(h.frame.dataset.profileFallback, undefined);
-  // API가 있어도 Router의 native 전환이 없는 이동은 fallback을 제공한다.
-  h.environment.native = true;
-  h.render("/giut-hub/4", "detail-again");
-  assert.equal(h.frame.dataset.profileFallback, "forward");
-  for (const handler of h.timers.values()) handler();
-  assert.equal(h.root.dataset.profileSlide, undefined);
-  h.environment.reduced = true;
-  h.render("/giut-hub", "back-reduced");
-  assert.equal(h.root.dataset.profileSlide, undefined);
+test("native 전환은 BrowserRouter의 비동기 화면 commit을 기다리며 finished까지 스타일을 유지한다", async () => {
+  const h = harness();
+  const old = h.mount("/giut-hub", "list", "?positions=개발");
+  h.window.scrollY = 430;
+  let navigations = 0;
+  h.begin("/giut-hub", "/giut-hub/4", () => { navigations++; });
+  const transition = h.transitions[0];
+  let committed = false;
+  const update = transition.update().then(() => { committed = true; });
+  await Promise.resolve();
+  assert.equal(navigations, 1);
+  assert.equal(committed, false, "navigate 호출만으로 새 snapshot을 찍지 않는다");
+  assert.equal(h.window.history.scrollRestoration, "manual");
+  h.window.scrollY = 0; // DOM이 짧아져 위치가 잘려도 출발 시 저장한 위치는 유지한다.
+  old.cleanup();
+  const detail = h.mount("/giut-hub/4", "detail");
+  await update;
+  assert.equal(committed, true);
+  assert.equal(h.window.scrollY, 0);
+  detail.end("giut-new-forward");
+  assert.equal(h.styles.size, 1);
+  assert.equal(h.document.documentElement.dataset.profileSlide, "forward");
   assert.equal(h.timers.size, 0);
+  transition.finish();
+  await Promise.resolve();
+  assert.equal(h.styles.size, 0);
+  assert.equal(h.document.documentElement.dataset.profileSlide, undefined);
+
+  h.begin("/giut-hub/4", "/giut-hub", () => {});
+  const returning = h.transitions[1];
+  const commit = returning.update();
+  detail.cleanup();
+  const list = h.mount("/giut-hub", "different-history-key", "?positions=개발");
+  await commit;
+  assert.equal(h.window.scrollY, 430, "필터 목록으로 돌아오면 위치를 복원한다");
+  assert.equal(h.document.documentElement.dataset.profileSlide, "back");
+  returning.finish();
+  await Promise.resolve();
+  list.cleanup();
+  await Promise.resolve();
   assert.equal(h.listeners.size, 0);
+  assert.equal(h.window.history.scrollRestoration, "auto", "허브 밖의 스크롤 정책은 복원한다");
 });
 
-test("native CSS 종료 후에도 스타일을 유지하고 Router finished 또는 중단 뒤에만 정리한다", () => {
-  const h = motionHarness();
-  h.environment.native = true;
-  h.render("/giut-hub", "list");
-  h.render("/giut-hub", "list", true); // 이전 화면에서 전환 시작
-  h.render("/giut-hub/4", "detail", true);
-  assert.equal(h.root.dataset.profileSlide, "forward");
-  assert.equal(h.frame.dataset.profileFallback, undefined);
-  h.end("giut-new-forward"); // snapshot 제거보다 앞선 CSS animationend
-  assert.equal(h.root.dataset.profileSlide, "forward", "기본 fade로 되돌아갈 속성을 먼저 제거하면 안 된다");
-  assert.equal(h.timers.size, 0, "native 전환은 시간 추정으로 종료하지 않는다");
-  h.render("/giut-hub/4", "detail", true); // 조회 완료 등 일반 재렌더
-  assert.equal(h.root.dataset.profileSlide, "forward");
-  h.render("/giut-hub/4", "detail", false); // Router가 finished 후 상태 해제
-  assert.equal(h.root.dataset.profileSlide, undefined);
-  h.render("/giut-hub/4", "detail", true);
-  h.render("/giut-hub", "back", true);
-  assert.equal(h.root.dataset.profileSlide, "back");
-  h.end("giut-new-back");
-  assert.equal(h.root.dataset.profileSlide, "back");
-  h.render("/giut-hub/3", "interrupted", true);
-  assert.equal(h.root.dataset.profileSlide, "forward");
-  h.unmount();
-  assert.equal(h.root.dataset.profileSlide, undefined);
+test("빠른 재이동은 이전 callback의 늦은 navigate를 막고 이전 finished가 새 전환을 지우지 않는다", async () => {
+  const h = harness();
+  h.mount("/giut-hub");
+  let stale = 0, current = 0;
+  h.begin("/giut-hub", "/giut-hub/4", () => stale++);
+  h.begin("/giut-hub", "/giut-hub/3", () => current++);
+  await h.transitions[0].update();
+  assert.equal(stale, 0);
+  assert.equal(h.transitions[0].skipped, 1);
+  assert.equal(h.document.documentElement.dataset.profileSlide, "forward");
+  const commit = h.transitions[1].update();
+  h.mount("/giut-hub/3");
+  await commit;
+  assert.equal(current, 1);
+  assert.equal(h.styles.size, 1);
+  h.transitions[1].finish();
+  await Promise.resolve();
+  assert.equal(h.styles.size, 0);
 });
 
-test("실제 memory router는 forward와 브라우저 POP에 양방향 snapshot 정보를 전달한다", async t => {
-  const router = routerApi.createMemoryRouter([
-    { path: "/giut-hub", element: null }, { path: "/giut-hub/:id", element: null },
-  ], { initialEntries: ["/giut-hub?position=개발"] });
-  t.after(() => router.dispose());
-  const transitions = [];
-  router.subscribe((state, options) => {
-    if (options.viewTransitionOpts) transitions.push({ action: state.historyAction, destination: state.location.pathname, ...options.viewTransitionOpts });
+test("BrowserRouter POP은 허브 왕복일 때만 캡처하고 원래 history state를 한 번 전달한다", async () => {
+  const h = harness();
+  const detail = h.mount("/giut-hub/4");
+  h.window.location.pathname = "/giut-hub";
+  const state = { idx: 1, usr: { filter: "개발" }, key: "old" };
+  let stopped = 0;
+  const event = { state, stopImmediatePropagation: () => stopped++ };
+  for (const listener of h.listeners) listener(event);
+  assert.equal(stopped, 1);
+  const delivered = [];
+  h.window.dispatchEvent = replay => {
+    for (const listener of h.listeners) listener(replay);
+    delivered.push(replay);
+  };
+  const update = h.transitions[0].update();
+  assert.equal(delivered.length, 1);
+  assert.equal(delivered[0].state, state);
+  assert.equal(h.transitions.length, 1, "재전달한 popstate로 다시 전환을 시작하지 않는다");
+  detail.cleanup();
+  h.mount("/giut-hub");
+  await update;
+  h.transitions[0].finish();
+  await Promise.resolve();
+  h.window.location.pathname = "/chat";
+  for (const listener of h.listeners) listener(event);
+  assert.equal(stopped, 1);
+  assert.equal(h.transitions.length, 1);
+});
+
+test("native 미지원은 fixed 컨테이너를 바꾸지 않는 입장 효과로 대체하고 animationend를 구분한다", async () => {
+  const h = harness({ native: false });
+  const old = h.mount("/giut-hub");
+  let called = 0;
+  h.begin("/giut-hub", "/giut-hub/4", () => called++);
+  old.cleanup();
+  const detail = h.mount("/giut-hub/4");
+  assert.equal(called, 1);
+  assert.equal(detail.element.dataset.profileFallback, "forward");
+  detail.end("giut-fallback-forward", {});
+  detail.end("unrelated");
+  assert.equal(h.styles.size, 1);
+  detail.end("giut-fallback-forward");
+  assert.equal(h.styles.size, 0);
+  assert.equal(h.timers.size, 0);
+  assert.equal(detail.element.dataset.profileFallback, undefined);
+  detail.cleanup();
+  await Promise.resolve();
+});
+
+test("동작 줄이기·허브 외 이동은 즉시 처리하고 guard 이탈·목적 화면 미도착도 정리한다", async () => {
+  const h = harness({ reduced: true });
+  let called = 0;
+  h.begin("/giut-hub", "/giut-hub/4", () => called++);
+  assert.equal(called, 1);
+  assert.equal(h.styles.size, 0);
+  const normal = harness();
+  normal.begin("/giut-hub", "/chat", () => called++);
+  assert.equal(called, 2);
+  assert.equal(normal.styles.size, 0);
+  const old = normal.mount("/giut-hub");
+  normal.begin("/giut-hub", "/giut-hub/4", () => {});
+  const update = normal.transitions[0].update();
+  old.cleanup();
+  await Promise.resolve();
+  await update;
+  await Promise.resolve();
+  assert.equal(normal.styles.size, 0);
+  assert.equal(normal.transitions[0].skipped, 1);
+  assert.equal(normal.timers.size, 0);
+
+  const waiting = harness();
+  waiting.mount("/giut-hub");
+  waiting.begin("/giut-hub", "/giut-hub/4", () => {});
+  const pending = waiting.transitions[0].update();
+  for (const timeout of waiting.timers.values()) timeout();
+  await pending;
+  await Promise.resolve();
+  assert.equal(waiting.styles.size, 0);
+});
+
+test("페이지 wrapper는 Data Router context 없이 일반 MemoryRouter 안에서 렌더링한다", () => {
+  const { renderToStaticMarkup } = require("react-dom/server");
+  const { ProfileRouteMotion } = loadModule("src/components/ProfileRouteMotion/ProfileRouteMotion.tsx", {
+    "./profileSlideController": { getProfileSlideController: () => { throw Error("서버 렌더에서 DOM을 읽으면 안 된다"); } },
   });
-  await router.navigate("/giut-hub/4", { viewTransition: true, state: { returnTo: "/giut-hub?position=개발" } });
-  assert.equal(router.state.location.state.returnTo, "/giut-hub?position=개발");
-  await router.navigate(-1);
-  assert.equal(router.state.location.search, "?position=개발");
-  // POP 메타데이터는 최초 전환 쌍을 유지한다. 실제 역방향은 state.location으로 판단한다.
-  assert.deepEqual(transitions.map(item => item.destination), ["/giut-hub/4", "/giut-hub"]);
-  assert.deepEqual(transitions.map(item => [item.action, item.currentLocation.pathname, item.nextLocation.pathname]), [
-    ["PUSH", "/giut-hub", "/giut-hub/4"], ["POP", "/giut-hub", "/giut-hub/4"],
-  ]);
+  const html = renderToStaticMarkup(React.createElement(routerApi.MemoryRouter, { initialEntries: ["/giut-hub"] },
+    React.createElement(ProfileRouteMotion, null, React.createElement("span", null, "기웃허브"))));
+  assert.match(html, /data-profile-route-frame/);
+  assert.match(html, /기웃허브/);
 });
 
-test("Data Router 변경 후 기존·새 화면·공유·팀 작성 경로를 유지하고 router를 재생성하지 않는다", () => {
+test("Router의 BrowserRouter·Routes와 기존 guard·공모전·팀 작성 경로를 유지한다", () => {
   const source = ts.createSourceFile("Router.tsx", fs.readFileSync("src/Router.tsx", "utf8"), ts.ScriptTarget.Latest, true);
   const mocks = {};
   for (const statement of source.statements) {
     if (!ts.isImportDeclaration(statement) || !statement.moduleSpecifier.text.startsWith(".")) continue;
     mocks[statement.moduleSpecifier.text] = Object.fromEntries(statement.importClause.namedBindings.elements.map(item => [item.name.text, () => null]));
   }
-  let routes, creations = 0;
-  const router = {};
-  mocks["react-router-dom"] = { ...routerApi, createBrowserRouter: value => { creations++; routes = value; return router; } };
   const { AppRouter } = loadModule("src/Router.tsx", mocks);
-  assert.equal(AppRouter().props.router, router);
-  assert.equal(AppRouter().props.router, router);
-  assert.equal(creations, 1);
+  const tree = AppRouter();
+  assert.equal(tree.type, routerApi.BrowserRouter);
+  assert.equal(tree.props.children.type, routerApi.Routes);
+  const routes = routerApi.createRoutesFromElements(tree.props.children.props.children);
   for (const [url, expected] of [
     ["/giut-hub", "/giut-hub"], ["/giut-hub/4", "/giut-hub/:profileNumber"],
     ["/giut-hub/4/portfolio/2", "/giut-hub/:profileNumber/portfolio/:portfolioNumber"],
-    ["/giut-hub-preview/4", "/giut-hub-preview/:profileNumber"],
-    ["/api/profile/shares/example", "/api/profile/shares/:token"],
     ["/chat/3", "/chat/:chatId"], ["/contests/2/teams/create", undefined],
     ["/contests/2/teams/create/members", ":step"],
     ["/my-profile/edit", "/my-profile/edit"],
   ]) {
     const matches = routerApi.matchRoutes(routes, url);
     assert.equal(matches.at(-1).route.path, expected, url);
+  }
+  for (const path of ["/giut-hub", "/giut-hub/:profileNumber"]) {
+    assert.equal(routes.find(route => route.path === path).element.type.name, "UniversityVerifiedRoute");
   }
 });
