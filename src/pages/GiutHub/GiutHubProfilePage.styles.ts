@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { Button } from "../../components/Button";
 import { tokens } from "../../design-system/tokens.generated";
 
 const giutHubPrimary = "#1C4EA3";
@@ -11,7 +12,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
   `,
   Content: styled.div`
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(24px + var(--app-safe-bottom));
@@ -38,14 +39,15 @@ export const S = {
     }
   `,
   ProfileSection: styled.section`
-    display: grid;
-    grid-template-columns: 130px minmax(0, 1fr);
+    display: flex;
+    align-items: flex-start;
     gap: 20px;
     padding: 27px 30px 22px;
     background: ${tokens.color.neutral[50]};
   `,
   Avatar: styled.div<{ $tone: AvatarTone }>`
     display: grid;
+    flex: 0 0 130px;
     width: 130px;
     height: 130px;
     overflow: hidden;
@@ -69,18 +71,44 @@ export const S = {
     }
   `,
   ProfileInfo: styled.div`
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
     min-width: 0;
     padding-top: 1px;
+  `,
+  ProfileHeading: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    min-width: 0;
+  `,
+  ProfileDetails: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  `,
+  NameRow: styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    min-width: 0;
   `,
   Name: styled.h1`
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 15px;
+    min-width: 0;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 25px;
     font-weight: 800;
     letter-spacing: -1.2px;
+    overflow-wrap: anywhere;
 
     svg {
       padding: 3px;
@@ -90,46 +118,61 @@ export const S = {
     }
   `,
   DetailRow: styled.p`
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr);
+    display: flex;
     gap: 6px;
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 14px;
     letter-spacing: -0.5px;
 
     span {
+      flex: 0 0 76px;
       color: ${tokens.color.neutral[500]};
     }
     strong {
+      flex: 1;
+      min-width: 0;
       color: ${tokens.color.neutral[900]};
       font-weight: 700;
-      white-space: nowrap;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
     }
   `,
-  Status: styled.span`
+  Status: styled.span<{ $color: string }>`
     display: inline-flex;
-    margin-top: 11px;
-    padding: 8px 13px;
-    border-radius: 10px;
-    background: #e5f8f1;
-    color: #10a877;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+    color: ${({ $color }) => $color};
     font-size: 13px;
     font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+
+    &::before {
+      flex: 0 0 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
   `,
   IntroductionSection: styled.section`
-    display: grid;
-    grid-template-columns: 88px minmax(0, 1fr);
+    display: flex;
     gap: 12px;
     padding: 22px 30px 18px;
     background: ${tokens.color.neutral[50]};
   `,
   FieldLabel: styled.h2`
+    flex: 0 0 88px;
     margin: 0;
     color: ${tokens.color.neutral[500]};
     font-size: 14px;
     font-weight: 500;
   `,
   Introduction: styled.p`
+    flex: 1;
+    min-width: 0;
     margin: 0;
     color: ${tokens.color.neutral[700]};
     font-size: 14px;
@@ -210,50 +253,85 @@ export const S = {
     }
   `,
   ActionRow: styled.div`
-    display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
-    gap: 12px;
+    display: flex;
+    gap: 8px;
     padding: 0 16px 30px;
     background: ${tokens.color.neutral[50]};
 
-    > button:first-of-type {
-      height: auto;
-      gap: 9px;
-      padding: 14px 12px;
+    > button {
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+      height: 48px;
+      gap: 6px;
+      padding: 0 8px;
       border-radius: 14px;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    > button:last-of-type {
+      flex: 0 0 44px;
+    }
+
+    > button:first-of-type {
       background: ${giutHubPrimary};
-      font-size: 16px;
+    }
+
+    > button:not(:last-of-type) > svg {
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 359px) {
+      > button:not(:last-of-type) > svg {
+        display: none;
+      }
     }
   `,
   MessageButton: styled.button`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 6px;
     min-width: 0;
-    height: auto;
+    height: 48px;
     padding: 0 8px;
-    padding-block: 14px;
     border: 0;
     border-radius: 14px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
+    &:disabled { opacity: 0.45; cursor: default; }
+  `,
+  ActionFeedback: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 16px 20px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[700]};
+    font-size: 14px;
+    p { margin: 0; line-height: 1.6; }
+    > button { align-self: flex-start; font-size: 14px; }
   `,
   FavoriteButton: styled.button<{ $active: boolean }>`
     display: grid;
-    height: auto;
-    padding: 12px;
+    width: 44px;
+    height: 48px;
+    padding: 0;
     place-items: center;
     border: 0;
     border-radius: 14px;
     background: ${tokens.color.neutral[100]};
     color: ${({ $active }) => ($active ? "#f1b900" : "#63718a")};
     cursor: pointer;
+    &:disabled { opacity: 0.45; cursor: default; }
     transition:
       transform 0.12s ease,
       background-color 0.12s ease,
@@ -266,14 +344,15 @@ export const S = {
     }
   `,
   TabList: styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     border-top: 8px solid ${tokens.color.neutral[100]};
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     background: ${tokens.color.neutral[50]};
   `,
   Tab: styled.button<{ $active: boolean }>`
     position: relative;
+    flex: 1 1 0;
+    min-width: 0;
     height: 69px;
     border: 0;
     background: transparent;
@@ -295,6 +374,9 @@ export const S = {
     }
   `,
   PortfolioContent: styled.section`
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     padding: 25px 22px 30px;
   `,
   FeaturedPortfolioCard: styled.article`
@@ -317,6 +399,7 @@ export const S = {
     }
   `,
   FeaturedPortfolioImage: styled.div`
+    display: flex;
     align-self: center;
     aspect-ratio: 1.58;
     overflow: hidden;
@@ -324,6 +407,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -332,7 +416,6 @@ export const S = {
   PortfolioList: styled.section`
     display: grid;
     gap: 0;
-    margin-top: 14px;
     padding: 0 18px;
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
@@ -360,6 +443,7 @@ export const S = {
     }
   `,
   PortfolioImage: styled.div`
+    display: flex;
     align-self: center;
     aspect-ratio: 1.72;
     overflow: hidden;
@@ -367,6 +451,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
 
     img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -410,6 +495,70 @@ export const S = {
     padding: 24px 28px 12px;
     border-radius: 18px;
     background: ${tokens.color.neutral[50]};
+  `,
+  EmptyState: styled.p`
+    margin: 22px;
+    padding: 28px 18px;
+    border-radius: 16px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+  `,
+  TabEmptyState: styled.section`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 64px 24px 80px;
+    text-align: center;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  `,
+  EmptyBody: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 100%;
+  `,
+  EmptyCopy: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+  `,
+  EmptyIcon: styled.div`
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    border-radius: 20px;
+    background: ${tokens.color.primary[100]};
+    color: ${giutHubPrimary};
+  `,
+  EmptyTitle: styled.h2`
+    max-width: 100%;
+    margin: 0;
+    color: ${tokens.color.neutral[900]};
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    line-height: 1.5;
+  `,
+  EmptyDescription: styled.p`
+    max-width: 280px;
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 14px;
+    line-height: 1.6;
+  `,
+  EmptyAction: styled(Button)`
+    max-width: 100%;
+    gap: 6px;
+    font-size: 14px;
   `,
   ActivityItem: styled.article<{ $last: boolean }>`
     position: relative;
@@ -481,9 +630,8 @@ export const S = {
     text-align: left;
     cursor: pointer;
 
-    &:active {
-      opacity: 0.6;
-    }
+    &:active:not(:disabled) { opacity: 0.6; }
+    &:disabled { opacity: 0.45; cursor: default; }
   `,
   ProfileMenuDivider: styled.hr`
     width: 100%;
@@ -492,110 +640,56 @@ export const S = {
     border: 0;
     background: ${tokens.color.neutral[200]};
   `,
-  ShareHeading: styled.h2`
-    margin: 4px 0 0;
-    color: ${tokens.color.neutral[900]};
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.8px;
-  `,
-  ShareDescription: styled.p`
-    margin: 12px 0 20px;
-    color: ${tokens.color.neutral[500]};
-    font-size: 14px;
-    letter-spacing: -0.45px;
-  `,
-  ShareLinkBox: styled.div`
+  ReportBody: styled.div`
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 13px 12px 19px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 18px;
-    background: ${tokens.color.neutral[100]};
-
-    code {
-      min-width: 0;
-      color: ${tokens.color.neutral[700]};
-      overflow: hidden;
-      font-family: inherit;
-      font-size: 14px;
-      letter-spacing: -0.3px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  `,
-  CopyButton: styled.button`
-    flex: 0 0 auto;
-    padding: 11px 17px;
-    border: 0;
-    border-radius: 12px;
-    background: ${giutHubPrimary};
-    color: ${tokens.color.neutral[50]};
-    font: inherit;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-  `,
-  ShareChannelList: styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin: 22px 0 28px;
-  `,
-  ShareChannel: styled.button`
-    display: grid;
-    place-items: center;
-    gap: 10px;
-    padding: 17px 6px;
-    border: 1px solid ${tokens.color.neutral[200]};
-    border-radius: 18px;
-    background: ${tokens.color.neutral[50]};
-    color: ${tokens.color.neutral[700]};
-    font: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-
-    &:active {
-      background: ${tokens.color.neutral[100]};
-    }
-  `,
-  ShareChannelIcon: styled.span`
-    display: grid;
-    width: 48px;
-    aspect-ratio: 1;
-    place-items: center;
-    border-radius: 15px;
-    background: #edf2fb;
-    color: ${giutHubPrimary};
-  `,
-  KakaoMark: styled.span`
-    display: grid;
-    width: 48px;
-    aspect-ratio: 1;
-    place-items: center;
-    border-radius: 15px;
-    background: #ffe500;
-    color: #371d1e;
-  `,
-  ShareCloseButton: styled.button`
-    width: 100%;
-    padding: 17px 12px calc(17px + var(--app-safe-bottom));
-    border: 0;
-    border-radius: 18px;
-    background: ${tokens.color.neutral[100]};
-    color: ${tokens.color.neutral[500]};
-    font: inherit;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 28px;
   `,
   ReportReasonList: styled.div`
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-    margin-top: 28px;
+  `,
+  ReportDescriptionField: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  `,
+  ReportDescriptionLabel: styled.label`
+    color: ${tokens.color.neutral[700]};
+    font-size: 13px;
+    font-weight: 700;
+    span { color: ${tokens.color.neutral[500]}; font-weight: 500; }
+  `,
+  ReportDescriptionInput: styled.textarea`
+    width: 100%;
+    min-height: 92px;
+    padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 12px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: vertical;
+    &::placeholder { color: ${tokens.color.neutral[500]}; }
+    &:focus-visible { outline: 2px solid ${tokens.color.danger[500]}; outline-offset: 2px; }
+    &:disabled { opacity: 0.5; }
+  `,
+  ReportDescriptionCount: styled.span`
+    align-self: flex-end;
+    color: ${tokens.color.neutral[500]};
+    font-size: 12px;
+  `,
+  ReportError: styled.p`
+    margin: 0;
+    color: ${tokens.color.danger[500]};
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   `,
   ReportReason: styled.button<{ $selected: boolean }>`
     display: flex;
@@ -615,6 +709,7 @@ export const S = {
     letter-spacing: -0.45px;
     text-align: left;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ReportRadio: styled.span<{ $selected: boolean }>`
     display: grid;
@@ -636,23 +731,11 @@ export const S = {
       content: ${({ $selected }) => ($selected ? '""' : "none")};
     }
   `,
-  BlockNotice: styled.div`
-    display: grid;
-    gap: 10px;
-    margin-top: 24px;
-    padding: 18px 20px;
-    border-radius: 16px;
-    background: ${tokens.color.neutral[100]};
-    color: ${tokens.color.neutral[500]};
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: -0.4px;
-  `,
-  DangerDialogActions: styled.div`
-    display: grid;
-    grid-template-columns: 0.95fr 1.35fr;
+  ReportActions: styled.div`
+    display: flex;
     gap: 12px;
-    margin-top: 26px;
+    > button:first-of-type { flex: 0.95; }
+    > button:last-of-type { flex: 1.35; }
   `,
   DialogCancelButton: styled.button`
     padding: 16px 10px;
@@ -664,6 +747,7 @@ export const S = {
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   DialogDangerButton: styled.button`
     padding: 16px 10px;
@@ -675,27 +759,84 @@ export const S = {
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
+  `,
+  ProposalBody: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  `,
+  ProposalIntro: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  `,
+  ProposalField: styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  `,
+  ProposalState: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+    border-radius: 14px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[700]};
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+    overflow-wrap: anywhere;
+    p { margin: 0; }
+  `,
+  ProposalError: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    line-height: 1.6;
+  `,
+  ProposalMessageLabel: styled.label`
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    font-weight: 700;
+    span { color: ${tokens.color.neutral[500]}; font-weight: 500; }
+  `,
+  ProposalMessageInput: styled.textarea`
+    width: 100%;
+    padding: 12px;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 10px;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[900]};
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    resize: vertical;
+    &:focus-visible { outline: 2px solid ${giutHubPrimary}; outline-offset: 2px; }
   `,
   ProposalHeading: styled.h2`
-    margin: 4px 0 0;
+    margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.7px;
   `,
   ProposalDescription: styled.p`
-    margin: 8px 0 14px;
-    color: ${tokens.color.neutral[500]};
-    font-size: 11px;
+    margin: 0;
+    color: ${tokens.color.neutral[700]};
+    font-size: 12px;
+    line-height: 1.5;
     letter-spacing: -0.4px;
   `,
   ProposalTeamList: styled.div`
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 9px;
   `,
   ProposalTeamCard: styled.button<{ $selected: boolean; $disabled: boolean }>`
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
@@ -710,11 +851,7 @@ export const S = {
     text-align: left;
     cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
 
-    > span {
-      display: grid;
-      gap: 5px;
-      min-width: 0;
-    }
+    &:disabled { cursor: default; }
     strong {
       font-size: 13px;
       font-weight: 800;
@@ -736,11 +873,21 @@ export const S = {
       font-style: normal;
     }
   `,
+  ProposalTeamCopy: styled.span`
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  `,
   ProposalRadio: styled.span<{ $selected: boolean }>`
-    display: grid;
+    display: flex;
+    flex: 0 0 20px;
     width: 20px;
     height: 20px;
-    place-items: center;
+    align-items: center;
+    justify-content: center;
     border: 1.5px solid ${({ $selected }) => ($selected ? giutHubPrimary : "#b7c0d0")};
     border-radius: 50%;
     background: ${({ $selected }) =>
@@ -748,7 +895,7 @@ export const S = {
     color: ${tokens.color.neutral[50]};
   `,
   ProposalPositionTitle: styled.h3`
-    margin: 16px 0 9px;
+    margin: 0;
     color: ${tokens.color.neutral[700]};
     font-size: 12px;
     font-weight: 800;
@@ -759,6 +906,7 @@ export const S = {
     gap: 8px;
   `,
   ProposalPosition: styled.button<{ $selected: boolean }>`
+    min-height: 44px;
     padding: 10px 14px;
     border: 1px solid
       ${({ $selected }) => ($selected ? giutHubPrimary : tokens.color.neutral[200])};
@@ -771,13 +919,15 @@ export const S = {
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ProposalFooter: styled.div`
-    display: grid;
-    grid-template-columns: 0.65fr 1.85fr;
+    display: flex;
     gap: 10px;
   `,
   ProposalCancelButton: styled.button`
+    flex: 0.65;
+    min-height: 44px;
     padding: 13px 10px;
     border: 0;
     border-radius: 11px;
@@ -787,8 +937,13 @@ export const S = {
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
   ProposalConfirmButton: styled.button`
+    flex: 1.85;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
     padding: 13px 10px;
     border: 0;
     border-radius: 11px;
@@ -798,5 +953,6 @@ export const S = {
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
+    &:disabled { opacity: 0.5; cursor: default; }
   `,
 };

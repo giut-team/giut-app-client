@@ -26,12 +26,14 @@ export const S = {
     bottom: 68px;
     left: 50%;
     margin: 0;
+    max-width: min(calc(100% - 32px), calc(var(--app-content-width) - 32px));
     padding: 9px 12px;
     border-radius: 9px;
     color: ${tokens.color.neutral[50]};
     background: ${tokens.color.neutral[900]};
     animation: ${toastLifecycle} 3.2s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
     font-size: 9px;
+    overflow-wrap: anywhere;
 
     @media (prefers-reduced-motion: reduce) {
       animation: none;

@@ -25,6 +25,7 @@ import { Toast } from "../../components/Toast/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { getChatRoomContext, type ChatRoomContext } from "./chatContext";
 import { S } from "./ChatRoomPage.styles";
+import { PersonalChatRoomPage } from "./PersonalChatRoomPage";
 
 type AvatarTone = "mint" | "peach" | "purple";
 type ConfirmationAction = "report" | "leave" | null;
@@ -50,6 +51,11 @@ const uniqueChronologicalMessages = (messages: ChatMessageResponse[]) => {
 };
 
 export function ChatRoomPage() {
+  const { chatId } = useParams();
+  return /^\d+$/.test(chatId ?? "") && Number(chatId) > 0 ? <PersonalChatRoomPage key={chatId} /> : <ExampleChatRoomPage />;
+}
+
+function ExampleChatRoomPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { chatId } = useParams();

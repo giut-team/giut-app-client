@@ -10,6 +10,8 @@ export const S = {
     z-index: 5;
     display: flex;
     justify-content: center;
+    width: min(100%, var(--app-content-width));
+    margin: 0 auto;
     padding-bottom: env(safe-area-inset-bottom);
     border-top: 1px solid ${tokens.color.neutral[200]};
     background: rgba(255, 255, 255, .96);
@@ -18,7 +20,7 @@ export const S = {
   Inner: styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    width: min(100%, 550px);
+    width: 100%;
     height: 64px;
     padding: 5px 12px 7px;
   `,
@@ -36,6 +38,7 @@ export const S = {
     font-size: 10px;
     font-weight: ${({ $active }) => $active ? 800 : 500};
     cursor: pointer;
+    &:disabled { cursor: default; }
     &:focus-visible { outline: 2px solid ${tokens.color.primary[500]}; outline-offset: -2px; border-radius: 10px; }
   `,
   Badge: styled.span`
@@ -53,5 +56,18 @@ export const S = {
     font-size: 9px;
     font-weight: 800;
     line-height: 1;
+  `,
+  Lock: styled.span`
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 17px);
+    display: grid;
+    width: 15px;
+    height: 15px;
+    place-items: center;
+    border: 1px solid ${tokens.color.neutral[200]};
+    border-radius: 50%;
+    background: ${tokens.color.neutral[50]};
+    color: ${tokens.color.neutral[500]};
   `,
 };

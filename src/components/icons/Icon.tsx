@@ -12,6 +12,7 @@ import {
   ChatCircleDots,
   Code,
   DotsThree,
+  DownloadSimple,
   Eye,
   EyeSlash,
   FolderSimple,
@@ -33,12 +34,14 @@ import {
   RocketLaunch,
   ShieldCheck,
   ShareNetwork,
+  UploadSimple,
   Trash,
   User,
   UserCircle,
   UserPlus,
   UsersThree,
   Star,
+  TagSimple,
   Warning,
   X,
   type IconProps as PhosphorIconProps,
@@ -59,6 +62,7 @@ export type IconName =
   | "chat"
   | "code"
   | "more"
+  | "download"
   | "megaphone"
   | "eye"
   | "eye-slash"
@@ -78,6 +82,7 @@ export type IconName =
   | "edit"
   | "search"
   | "share"
+  | "share-export"
   | "trash"
   | "shield-check"
   | "rocket"
@@ -86,6 +91,7 @@ export type IconName =
   | "user-plus"
   | "users"
   | "star"
+  | "tag"
   | "warning"
   | "x";
 
@@ -105,6 +111,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   chat: ChatCircleDots,
   code: Code,
   more: DotsThree,
+  download: DownloadSimple,
   megaphone: Megaphone,
   eye: Eye,
   "eye-slash": EyeSlash,
@@ -124,6 +131,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   edit: NotePencil,
   search: MagnifyingGlass,
   share: ShareNetwork,
+  "share-export": UploadSimple,
   trash: Trash,
   "shield-check": ShieldCheck,
   rocket: RocketLaunch,
@@ -132,6 +140,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "user-plus": UserPlus,
   users: UsersThree,
   star: Star,
+  tag: TagSimple,
   warning: Warning,
   x: X,
 };

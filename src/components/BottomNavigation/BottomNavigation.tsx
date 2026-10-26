@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTotalUnreadMessageCount } from "../../api/chats";
 import { Icon, type IconName } from "../icons";
+import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./BottomNavigation.styles";
 
 export type BottomNavigationItem = {
@@ -35,7 +36,8 @@ export function BottomNavigation({ items, activeKey, onChange }: BottomNavigatio
             <S.Item
               $active={active}
               aria-current={active ? "page" : undefined}
-              aria-label={item.label}
+              aria-label={locked ? `${item.label}, 학교 인증 필요` : item.label}
+              disabled={locked}
               key={item.key}
               onClick={() => onChange(item.key)}
               type="button"

@@ -24,6 +24,7 @@ export type BottomSheetOption<T extends string> = {
 
 type BottomSheetProps = {
   open: boolean;
+  dragDisabled?: boolean;
   title?: string;
   eyebrow?: string;
   showCloseButton?: boolean; // 닫기 버튼 표시 여부
@@ -39,6 +40,7 @@ type BottomSheetProps = {
   decisionMode?: DecisionMode;
   applicantName?: string;
   applicantRole?: string;
+  onDecisionSubmit?: (reason?: string) => Promise<void> | void;
   onDecisionConfirm?: () => void;
   applicationCancelState?: ApplicationCancelState;
   applicationTeamName?: string;
@@ -63,15 +65,20 @@ const rejectReasons = [
 function DecisionContent({
   applicantName,
   applicantRole,
+  selectedReason,
+  onReasonChange,
+  errorMessage,
   mode,
   completed,
 }: {
   applicantName: string;
   applicantRole: string;
+  selectedReason: string;
+  onReasonChange: (reason: string) => void;
+  errorMessage: string;
   mode: DecisionMode;
   completed: boolean;
 }) {
-  const [selectedReason, setSelectedReason] = useState("");
   const isAccepting = mode === "accept";
 
   if (completed) {
@@ -134,7 +141,7 @@ function DecisionContent({
                 $selected={selectedReason === reason}
                 aria-pressed={selectedReason === reason}
                 key={reason}
-                onClick={() => setSelectedReason(reason)}
+                onClick={() => onReasonChange(reason)}
                 type="button"
               >
                 {reason}
@@ -143,6 +150,7 @@ function DecisionContent({
           </S.DecisionReasonList>
         </>
       )}
+      {errorMessage && <S.DecisionError role="alert">{errorMessage}</S.DecisionError>}
     </>
   );
 }
@@ -202,6 +210,7 @@ function ApplicationCancelContent({
 
 export function BottomSheet({
   open,
+  dragDisabled = false,
   title,
   eyebrow,
   showCloseButton = false,
@@ -217,6 +226,7 @@ export function BottomSheet({
   decisionMode,
   applicantName,
   applicantRole,
+  onDecisionSubmit,
   onDecisionConfirm,
   applicationCancelState,
   applicationTeamName,
@@ -231,6 +241,9 @@ export function BottomSheet({
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isDecisionComplete, setIsDecisionComplete] = useState(false);
+  const [isDecisionSubmitting, setIsDecisionSubmitting] = useState(false);
+  const [selectedDecisionReason, setSelectedDecisionReason] = useState("");
+  const [decisionError, setDecisionError] = useState("");
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -245,14 +258,35 @@ export function BottomSheet({
       if (open) {
         isClosingByDrag.current = false;
         setIsDecisionComplete(false);
+        setIsDecisionSubmitting(false);
+        setSelectedDecisionReason("");
+        setDecisionError("");
       }
     });
 
     return () => cancelAnimationFrame(frameId);
   }, [open, decisionMode]);
 
-  const handleDecisionConfirm = () => {
-    setIsDecisionComplete(true);
+  const handleDecisionSubmit = async () => {
+    if (decisionMode === "reject" && !selectedDecisionReason) return;
+
+    setIsDecisionSubmitting(true);
+    setDecisionError("");
+
+    try {
+      await onDecisionSubmit?.(
+        decisionMode === "reject" ? selectedDecisionReason : undefined,
+      );
+      setIsDecisionComplete(true);
+    } catch (error) {
+      setDecisionError(
+        error instanceof Error && error.message
+          ? error.message
+          : "처리하지 못했어요. 잠시 후 다시 시도해주세요.",
+      );
+    } finally {
+      setIsDecisionSubmitting(false);
+    }
   };
 
   const handleDecisionComplete = () => {
@@ -261,6 +295,7 @@ export function BottomSheet({
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (dragDisabled) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
 
     dragStartY.current = event.clientY;
@@ -364,7 +399,13 @@ export function BottomSheet({
               applicantName={applicantName}
               applicantRole={applicantRole}
               completed={isDecisionComplete}
+              errorMessage={decisionError}
               mode={decisionMode}
+              onReasonChange={(reason) => {
+                setSelectedDecisionReason(reason);
+                setDecisionError("");
+              }}
+              selectedReason={selectedDecisionReason}
             />
           ) : applicationCancelState &&
             applicationTeamName &&
@@ -392,10 +433,18 @@ export function BottomSheet({
               <S.DecisionFooterActions>
                 <S.DecisionConfirmButton
                   $mode={decisionMode}
-                  onClick={handleDecisionConfirm}
+                  disabled={
+                    isDecisionSubmitting ||
+                    (decisionMode === "reject" && !selectedDecisionReason)
+                  }
+                  onClick={() => void handleDecisionSubmit()}
                   type="button"
                 >
-                  {decisionMode === "accept" ? "수락하기" : "거절하기"}
+                  {isDecisionSubmitting
+                    ? "처리 중..."
+                    : decisionMode === "accept"
+                      ? "수락하기"
+                      : "거절하기"}
                 </S.DecisionConfirmButton>
                 <S.DecisionCancelButton
                   onClick={onClose}

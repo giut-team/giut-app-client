@@ -1,64 +1,202 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { createPersonalChatRoom } from "../../../api/chats";
+import { fetchContestDetail } from "../../../api/contests";
+import {
+  fetchProfileRoles,
+  getProfileRoleName,
+  type ProfilePrimaryRole,
+} from "../../../api/profiles";
+import {
+  addTeamScrap,
+  cancelTeamApplication,
+  fetchMyTeamApplications,
+  fetchTeamDetail,
+  fetchTeamMembers,
+  fetchTeamRecruitments,
+  removeTeamScrap,
+} from "../../../api/teams";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
 import { saveChatRoomContext } from "../../Chat/chatContext";
 import { S } from "./TeamDetailPage.styles";
 
-const members = [
-  {
-    initials: "이",
-    name: "이서연",
-    role: "팀장 · 기획",
-    specialty: "서비스 기획 · 프로젝트 매니저",
-    school: "경영학부 3학년",
-    tone: "green" as const,
-  },
-  {
-    initials: "김",
-    name: "김민재",
-    role: "개발",
-    specialty: "프론트엔드 개발",
-    school: "컴퓨터과학부 3학년",
-    tone: "blue" as const,
-  },
-  {
-    initials: "지",
-    name: "박지윤",
-    role: "디자인",
-    specialty: "프로덕트 디자인 · BI/BX 디자인",
-    school: "디자인학과 2학년",
-    tone: "purple" as const,
-  },
+const activityModeLabels = {
+  ONLINE: "온라인",
+  OFFLINE: "오프라인",
+  HYBRID: "온라인 + 오프라인",
+};
+
+const meetingPlaceLabels = {
+  CAMPUS: "교내",
+  SEOUL: "서울 전체",
+  METROPOLITAN_AREA: "수도권",
+  ANYWHERE: "상관없음",
+};
+
+const avatarTones = ["green", "blue", "purple"] as const;
+const profilePrimaryRoles: ProfilePrimaryRole[] = [
+  "DEVELOPMENT",
+  "DESIGN",
+  "PLANNING",
+  "MARKETING",
 ];
+
+const formatDate = (value?: string) => {
+  if (!value) return "미정";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "미정";
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).format(date).replaceAll(". ", ".");
+};
 
 export function TeamDetailPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const startChatMutation = useMutation({
-    mutationFn: () => createPersonalChatRoom(2),
-    onSuccess: (chatRoom) => {
-      saveChatRoomContext(chatRoom.chatRoomId, {
-        kind: "TEAM_INQUIRY",
-        label: "공모전 팀 상세에서 시작된 대화",
-        title: "2026 서울시 데이터 활용 공모전 · 데이터로 서울을 팀",
-        primaryAction: {
-          label: "팀 보기",
-          path: `/contests/${contestId}/teams/${teamId}`,
-        },
-        secondaryAction: {
-          label: "공모전 보기",
-          path: `/contests/${contestId}`,
-        },
-      });
-      navigate(`/chat/${chatRoom.chatRoomId}`);
+  const [isApplicationCancelModalOpen, setIsApplicationCancelModalOpen] = useState(false);
+  const [scrapOverride, setScrapOverride] = useState<boolean | null>(null);
+  const numericTeamId = Number(teamId);
+  const {
+    data: team,
+    isError: isTeamError,
+    isLoading: isTeamLoading,
+  } = useQuery({
+    queryKey: ["team", numericTeamId],
+    queryFn: () => fetchTeamDetail(numericTeamId),
+    enabled: Number.isInteger(numericTeamId) && numericTeamId > 0,
+  });
+  const { data: members = [] } = useQuery({
+    queryKey: ["teamMembers", numericTeamId],
+    queryFn: () => fetchTeamMembers(numericTeamId),
+    enabled: Boolean(team),
+  });
+  const { data: recruitments = [] } = useQuery({
+    queryKey: ["teamRecruitments", numericTeamId],
+    queryFn: () => fetchTeamRecruitments(numericTeamId),
+    enabled: Boolean(team),
+  });
+  const { data: contest } = useQuery({
+    queryKey: ["contest", contestId],
+    queryFn: () => fetchContestDetail(contestId),
+    enabled: Boolean(contestId),
+  });
+  const { data: myTeamApplications = [] } = useQuery({
+    queryKey: ["myTeamApplications"],
+    queryFn: fetchMyTeamApplications,
+    enabled: Boolean(team),
+  });
+  const profileRoleQueries = useQueries({
+    queries: profilePrimaryRoles.map((primaryRole) => ({
+      queryKey: ["profileRoles", primaryRole],
+      queryFn: () => fetchProfileRoles(primaryRole),
+      enabled: Boolean(team),
+      staleTime: Infinity,
+    })),
+  });
+  const profileRoleNamesByCode = useMemo(
+    () =>
+      Object.fromEntries(
+        profileRoleQueries.flatMap((query) =>
+          (query.data ?? []).map(({ code, name }) => [code, name]),
+        ),
+      ),
+    [profileRoleQueries],
+  );
+  const getTeamRoleName = (roleCode: string | null | undefined) =>
+    roleCode ? profileRoleNamesByCode[roleCode] ?? getProfileRoleName(roleCode) : "역할 미정";
+  const isMyTeam = Boolean(
+    contest?.teams.some(
+      (contestTeam) => contestTeam.teamId === numericTeamId && contestTeam.myTeam,
+    ),
+  );
+  const pendingApplication = myTeamApplications.find(
+    (application) => application.teamId === numericTeamId && application.status === "PENDING",
+  );
+  const isPendingApplication = Boolean(pendingApplication);
+
+  useEffect(() => {
+    if (!isMyTeam) return;
+
+    navigate(`/contests/${contestId}/teams/${teamId}/manage`, { replace: true });
+  }, [contestId, isMyTeam, navigate, teamId]);
+  const { isPending: isTeamScrapPending, mutate: toggleTeamScrap } = useMutation({
+    mutationFn: (scrapped: boolean) => (
+      scrapped ? removeTeamScrap(numericTeamId) : addTeamScrap(numericTeamId)
+    ),
+    onSuccess: (response) => setScrapOverride(response.scrapped),
+  });
+  const { isPending: isApplicationCancelling, mutate: cancelApplication } = useMutation({
+    mutationFn: () => {
+      if (!pendingApplication) {
+        throw new Error("취소할 지원서를 찾을 수 없어요.");
+      }
+
+      return cancelTeamApplication(numericTeamId, pendingApplication.applicationId);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData<typeof myTeamApplications>(
+        ["myTeamApplications"],
+        (current = []) => current.filter(
+          (application) => application.applicationId !== pendingApplication?.applicationId,
+        ),
+      );
+      setIsApplicationCancelModalOpen(false);
     },
   });
+
+  if (isTeamLoading) {
+    return (
+      <S.Page aria-busy="true">
+        <S.Content>
+          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <S.Section>
+            <S.Introduction>팀 정보를 불러오는 중입니다.</S.Introduction>
+          </S.Section>
+        </S.Content>
+      </S.Page>
+    );
+  }
+
+  if (isTeamError || !team) {
+    return (
+      <S.Page>
+        <S.Content>
+          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <S.Section>
+            <S.Introduction>팀 정보를 불러오지 못했습니다.</S.Introduction>
+          </S.Section>
+        </S.Content>
+      </S.Page>
+    );
+  }
+
+  if (isMyTeam) {
+    return (
+      <S.Page aria-busy="true">
+        <S.Content>
+          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <S.Section>
+            <S.Introduction>팀 관리 화면으로 이동 중입니다.</S.Introduction>
+          </S.Section>
+        </S.Content>
+      </S.Page>
+    );
+  }
+
+  const isBookmarked = scrapOverride ?? team.scrapped;
+  const remainingSlots = Math.max(0, team.maxMemberCount - team.currentMemberCount);
+  const recruitmentProgress = team.maxMemberCount
+    ? Math.min(100, (team.currentMemberCount / team.maxMemberCount) * 100)
+    : 0;
+  const teamMembers = Array.isArray(members) ? members : [];
 
   return (
     <S.Page>
@@ -69,7 +207,8 @@ export function TeamDetailPage() {
             <S.BookmarkButton
               aria-label={isBookmarked ? "팀 찜 해제" : "팀 찜하기"}
               aria-pressed={isBookmarked}
-              onClick={() => setIsBookmarked((current) => !current)}
+              disabled={isTeamScrapPending}
+              onClick={() => toggleTeamScrap(isBookmarked)}
               type="button"
             >
               <Icon
@@ -83,71 +222,124 @@ export function TeamDetailPage() {
         />
 
         <S.Hero>
+          {(team.status === "RECRUITING" || isPendingApplication) && (
+            <S.StatusBadgeRow>
+              {team.status === "RECRUITING" && <S.RecruitingStatusBadge>모집 중</S.RecruitingStatusBadge>}
+              {isPendingApplication && <S.ApplicationBadge>지원 검토 중</S.ApplicationBadge>}
+            </S.StatusBadgeRow>
+          )}
           <S.TitleRow>
-            <S.TeamTitle>데이터로 서울을</S.TeamTitle>
-            <S.CountBadge>3/5명</S.CountBadge>
+            <S.TeamTitle>{team.name}</S.TeamTitle>
+            <S.CountBadge>{team.currentMemberCount}/{team.maxMemberCount}명</S.CountBadge>
           </S.TitleRow>
-          <S.ContestName>2026 서울시 데이터 활용 공모전</S.ContestName>
+          <S.ContestName>{contest?.title ?? "공모전 정보"}</S.ContestName>
           <S.ProgressTrack aria-label="팀원 모집 진행률">
-            <S.ProgressValue $value={60} />
+            <S.ProgressValue $value={recruitmentProgress} />
           </S.ProgressTrack>
-          <S.Remaining>2자리 남았어요</S.Remaining>
+          <S.Remaining>{remainingSlots}자리 남았어요</S.Remaining>
         </S.Hero>
 
         <S.Section>
           <S.SectionTitle>팀 소개</S.SectionTitle>
-          <S.Introduction>
-            서울의 열린데이터로 생활 문제를 푸는 팀입니다. 주 1회 오프라인 회의,
-            나머지는 노션·디스코드로 소통해요.
-          </S.Introduction>
+          <S.Introduction>{team.description}</S.Introduction>
         </S.Section>
+
+        {pendingApplication && (
+          <S.ApplicationReviewSection>
+            <S.ApplicationReviewCard>
+              <S.ApplicationReviewHeader>
+                <S.ApplicationReviewBadge>지원 검토중</S.ApplicationReviewBadge>
+                <S.ApplicationReviewDate>
+                  {formatDate(pendingApplication.appliedAt)} 지원
+                </S.ApplicationReviewDate>
+              </S.ApplicationReviewHeader>
+              <S.ApplicationReviewTitle>이미 지원한 팀이에요</S.ApplicationReviewTitle>
+              <S.ApplicationReviewDescription>
+                팀장이 지원서를 검토하는 중이에요. 결과가 나오면 알림으로 알려드릴게요.
+              </S.ApplicationReviewDescription>
+              <S.ApplicationReviewSteps aria-label="팀 참가 신청 진행 상황">
+                <S.ApplicationReviewStep $active>
+                  <Icon name="check" size={10} weight="bold" />
+                  <span>지원 완료</span>
+                </S.ApplicationReviewStep>
+                <S.ApplicationReviewLine $active />
+                <S.ApplicationReviewStep $active>
+                  <Icon name="check" size={10} weight="bold" />
+                  <span>팀장 검토</span>
+                </S.ApplicationReviewStep>
+                <S.ApplicationReviewLine />
+                <S.ApplicationReviewStep>
+                  <span>결과 발표</span>
+                </S.ApplicationReviewStep>
+              </S.ApplicationReviewSteps>
+              <S.ApplicationRoleRow>
+                <span>지원 포지션</span>
+                <strong>{getTeamRoleName(pendingApplication.roleCode)}</strong>
+              </S.ApplicationRoleRow>
+            </S.ApplicationReviewCard>
+          </S.ApplicationReviewSection>
+        )}
 
         <S.Section>
           <S.SectionTitle>포지션별 모집 현황</S.SectionTitle>
-          <S.RecruitmentCard>
-            <div>
-              <S.RecruitmentRole>개발</S.RecruitmentRole>
-              <S.RecruitmentMeta>
-                백엔드 개발자 · 데이터 엔지니어 · 2명 모집
-              </S.RecruitmentMeta>
-            </div>
-            <S.RecruitingBadge>모집 중</S.RecruitingBadge>
-          </S.RecruitmentCard>
+          {recruitments.map((recruitment) => {
+            const isRecruiting = recruitment.filledCount < recruitment.requiredCount;
+            const isAppliedRole = pendingApplication?.roleCode === recruitment.roleCode;
+
+            return (
+              <S.RecruitmentCard key={recruitment.recruitmentId}>
+                <div>
+                  <S.RecruitmentRole>{getTeamRoleName(recruitment.roleCode)}</S.RecruitmentRole>
+                  <S.RecruitmentMeta>
+                    필요 {recruitment.requiredCount}명 · 현재 {recruitment.filledCount}명
+                  </S.RecruitmentMeta>
+                </div>
+                <S.RecruitingBadge $applied={isAppliedRole} $recruiting={isRecruiting}>
+                  {isAppliedRole ? "내가 지원" : isRecruiting ? "모집 중" : "마감"}
+                </S.RecruitingBadge>
+              </S.RecruitmentCard>
+            );
+          })}
+          {!recruitments.length && (
+            <S.Introduction>등록된 모집 분야가 없습니다.</S.Introduction>
+          )}
         </S.Section>
 
         <S.Section>
           <S.InfoGrid>
             <S.InfoItem>
               <dt>활동 방식</dt>
-              <dd>온라인 + 오프라인</dd>
+              <dd>{activityModeLabels[team.activityMode]}</dd>
             </S.InfoItem>
             <S.InfoItem>
               <dt>모집 마감</dt>
-              <dd>06.20 (목)</dd>
+              <dd>{formatDate(contest?.applicationEndAt)}</dd>
             </S.InfoItem>
             <S.InfoItem>
               <dt>주간 회의</dt>
-              <dd>주 1회</dd>
+              <dd>주 {team.weeklyMeetingCount}회 · {meetingPlaceLabels[team.meetingPlace]}</dd>
             </S.InfoItem>
           </S.InfoGrid>
         </S.Section>
 
         <S.Section $last>
-          <S.SectionTitle>팀원 3명</S.SectionTitle>
+          <S.SectionTitle>팀원 {teamMembers.length}명</S.SectionTitle>
           <S.MemberList>
-            {members.map((member) => (
-              <S.Member key={member.name}>
-                <S.Avatar $tone={member.tone}>{member.initials}</S.Avatar>
+            {teamMembers.map((member, index) => (
+              <S.Member key={member.teamMemberId}>
+                <S.Avatar $tone={avatarTones[index % avatarTones.length]}>
+                  {(member.nickname || "?").slice(0, 1)}
+                </S.Avatar>
                 <div>
                   <S.MemberHeading>
-                    <S.MemberName>{member.name}</S.MemberName>
-                    <S.RoleBadge>{member.role}</S.RoleBadge>
+                    <S.MemberName>{member.nickname || "알 수 없음"}</S.MemberName>
+                    <S.RoleBadge>{member.role === "LEADER" ? "팀장" : "팀원"}</S.RoleBadge>
                   </S.MemberHeading>
-                  <S.MemberRole>{member.specialty}</S.MemberRole>
-                  <S.MemberSchool>{member.school}</S.MemberSchool>
+                  <S.MemberRole>{getTeamRoleName(member.roleCode)}</S.MemberRole>
                 </div>
               </S.Member>
             ))}
+            {!teamMembers.length && <S.Introduction>등록된 팀원이 없습니다.</S.Introduction>}
           </S.MemberList>
         </S.Section>
       </S.Content>
@@ -161,9 +353,26 @@ export function TeamDetailPage() {
         >
           <Icon name="chat" size={19} weight="regular" />
         </S.ChatButton>
-        <S.ApplyButton onClick={() => setIsApplyModalOpen(true)} type="button">
-          팀 지원하기
-        </S.ApplyButton>
+        {isPendingApplication ? (
+          <S.PendingApplicationActions>
+            <S.ViewApplicationButton
+              onClick={() => navigate("/my-team/my-application/pending")}
+              type="button"
+            >
+              내 지원서 보기
+            </S.ViewApplicationButton>
+            <S.CancelApplicationButton
+              onClick={() => setIsApplicationCancelModalOpen(true)}
+              type="button"
+            >
+              지원 취소하기
+            </S.CancelApplicationButton>
+          </S.PendingApplicationActions>
+        ) : (
+          <S.ApplyButton onClick={() => setIsApplyModalOpen(true)} type="button">
+            팀 지원하기
+          </S.ApplyButton>
+        )}
       </S.ActionBar>
       <Modal
         emphasizeDescription
@@ -181,6 +390,20 @@ export function TeamDetailPage() {
           onClick: () => setIsApplyModalOpen(false),
         }}
         title="이 팀에 지원하시겠습니까?"
+      />
+      <Modal
+        description="지원 취소 후에는 다시 지원서를 작성해야 해요."
+        emphasizeDescription
+        emphasizeSecondaryAction
+        icon={<Icon name="x" size={22} weight="bold" />}
+        onClose={() => setIsApplicationCancelModalOpen(false)}
+        open={isApplicationCancelModalOpen}
+        primaryAction={{
+          label: isApplicationCancelling ? "취소 중..." : "지원 취소하기",
+          onClick: cancelApplication,
+        }}
+        secondaryAction={{ label: "그대로 두기", onClick: () => setIsApplicationCancelModalOpen(false) }}
+        title="지원을 취소할까요?"
       />
     </S.Page>
   );
