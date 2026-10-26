@@ -1,37 +1,23 @@
-# Admin contests design QA
+# Design QA
 
-- Source visual truth: user-provided admin contests screenshot in the current conversation (1497 × 723 px)
-- Implementation: `/admin/contests`
-- Intended viewport: desktop, approximately 1497 × 723 CSS px at 1× density
-- State: signed-in administrator, contest list default state
-- Implementation screenshot: unavailable
-- Browser-rendered evidence: unavailable because this session exposes no supported local browser or Computer Use runtime
-- Primary interactions tested: code-level verification only; profile-report/contest navigation and public-approval state transition are implemented
-- Console errors checked: blocked without a browser runtime
+## Reference
 
-## Full-view comparison evidence
+- User-provided mobile screenshots for the profile report list and report detail screens.
+- Target viewport: phone layout, up to 480px wide.
 
-The source screenshot was available as the implementation target. A browser-rendered implementation capture could not be produced, so a normalized side-by-side comparison was not possible.
+## Implemented
 
-## Focused region comparison evidence
+- Split the former side-by-side workspace into list and detail views.
+- Added report-row navigation and a detail back button.
+- Matched the compact header, rounded list card, five-row pagination, status badges, profile snapshot card, and fixed bottom navigation/actions.
+- Preserved status filtering, logout, pagination, report review mutations, confirmation modals, and toast feedback.
 
-Blocked for the same reason. The sidebar, header, contest table, status badges, and management buttons were checked against the source at code level only.
+## Validation
 
-## Findings
+- `npm.cmd run build`: passed.
+- `npm.cmd run lint`: passed with six existing Fast Refresh warnings outside the changed admin files.
+- Visual browser comparison: blocked because no browser or native computer-use surface is available in this session.
 
-- [Blocked] Visual fidelity could not be verified from a rendered browser capture.
-  - The TypeScript build and targeted ESLint checks pass.
-  - Typography, spacing, colors, image quality, and copy were implemented from the supplied screenshot, but only copy and code-level token values could be checked conclusively.
+## Final result
 
-## Comparison history
-
-- Initial implementation: browser capture unavailable; no visual iteration could be completed.
-
-## Implementation checklist
-
-- Capture `/admin/contests` at 1497 × 723 while authenticated as an administrator.
-- Compare the capture with the source screenshot at equal scale.
-- Verify the sidebar width, table grid columns, row heights, typography, colors, and button sizes.
-- Test menu navigation and the public-approval transition in the browser.
-
-final result: blocked
+Blocked for screenshot comparison only. Code and static validation passed.
