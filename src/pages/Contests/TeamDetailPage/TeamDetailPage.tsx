@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { createPersonalChatRoom } from "../../../api/chats";
 import { fetchContestDetail } from "../../../api/contests";
 import {
@@ -59,12 +59,20 @@ const formatDate = (value?: string) => {
 
 export function TeamDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { contestId = "seoul-data", teamId = "data-seoul" } = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplicationCancelModalOpen, setIsApplicationCancelModalOpen] = useState(false);
   const [scrapOverride, setScrapOverride] = useState<boolean | null>(null);
   const numericTeamId = Number(teamId);
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [teamId]);
+
   const {
     data: team,
     isError: isTeamError,
@@ -126,8 +134,11 @@ export function TeamDetailPage() {
   useEffect(() => {
     if (!isMyTeam) return;
 
-    navigate(`/contests/${contestId}/teams/${teamId}/manage`, { replace: true });
-  }, [contestId, isMyTeam, navigate, teamId]);
+    navigate(`/contests/${contestId}/teams/${teamId}/manage`, {
+      replace: true,
+      state: location.state,
+    });
+  }, [contestId, isMyTeam, location.state, navigate, teamId]);
   const { isPending: isTeamScrapPending, mutate: toggleTeamScrap } = useMutation({
     mutationFn: (scrapped: boolean) => (
       scrapped ? removeTeamScrap(numericTeamId) : addTeamScrap(numericTeamId)

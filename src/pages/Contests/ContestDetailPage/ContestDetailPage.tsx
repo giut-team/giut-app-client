@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -50,6 +50,13 @@ export function ContestDetailPage() {
     backPath?: string;
   } | null;
   const [toastMessage, setToastMessage] = useState("");
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [contestId]);
+
   const {
     data: contest,
     isError: isContestError,
@@ -194,6 +201,11 @@ export function ContestDetailPage() {
   );
   const getTeamPath = (team: RecruitingTeam) =>
     `teams/${team.teamId}${isMyTeam(team.teamId) ? "/manage" : ""}`;
+  const openTeamDetail = (team: RecruitingTeam) => {
+    navigate(getTeamPath(team), {
+      state: { fromContestDetail: true },
+    });
+  };
 
   const handleTeamCreationClick = () => {
     if (isUniversityUnverified) return;
@@ -476,11 +488,11 @@ export function ContestDetailPage() {
               return (
                 <S.TeamCard
                   key={team.teamId}
-                  onClick={() => navigate(getTeamPath(team))}
+                  onClick={() => openTeamDetail(team)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      navigate(getTeamPath(team));
+                      openTeamDetail(team);
                     }
                   }}
                   role="link"
@@ -531,7 +543,7 @@ export function ContestDetailPage() {
                       onClick={(event) => {
                         event.stopPropagation();
                         if (myTeam || pendingApplication) {
-                          navigate(getTeamPath(team));
+                          openTeamDetail(team);
                           return;
                         }
 
@@ -641,7 +653,9 @@ export function ContestDetailPage() {
           onClick: () => {
             if (existingMyTeamId === null) return;
 
-            navigate(`/contests/${contestId}/teams/${existingMyTeamId}/manage`);
+            navigate(`/contests/${contestId}/teams/${existingMyTeamId}/manage`, {
+              state: { fromContestDetail: true },
+            });
           },
         }}
         secondaryAction={{

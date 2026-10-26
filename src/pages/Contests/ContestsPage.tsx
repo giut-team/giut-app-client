@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { categories, fetchContests, type Contest, type ContestCategory } from "../../api/contests";
@@ -11,6 +11,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./ContestsPage.styles";
 
 type SortOption = "views" | "scraps" | "deadline";
+const PAGE_SIZE = 10;
 
 const sortOptions: { label: string; value: SortOption }[] = [
   { label: "조회수순", value: "views" },
@@ -101,10 +102,18 @@ export function ContestsPage() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<ContestCategory>("전체");
+  const [currentPage, setCurrentPage] = useState(0);
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(
     (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   const sortParam = searchParams.get("sort");
   const sortOption = isSortOption(sortParam) ? sortParam : "views";
   const {
@@ -135,6 +144,12 @@ export function ContestsPage() {
   }, [contests, sortOption]);
 
   const sortLabel = sortOptions.find((option) => option.value === sortOption)?.label;
+  const totalPages = Math.ceil(visibleContests.length / PAGE_SIZE);
+  const activePage = Math.min(currentPage, Math.max(0, totalPages - 1));
+  const paginatedContests = visibleContests.slice(
+    activePage * PAGE_SIZE,
+    (activePage + 1) * PAGE_SIZE,
+  );
 
   useEffect(() => {
     if (!toastMessage) return;
@@ -154,7 +169,10 @@ export function ContestsPage() {
               active={activeCategory === category}
               aria-pressed={activeCategory === category}
               key={category}
-              onClick={() => setActiveCategory(category)}
+              onClick={() => {
+                setActiveCategory(category);
+                setCurrentPage(0);
+              }}
               tone="dark"
             >
               {category}
@@ -196,7 +214,7 @@ export function ContestsPage() {
           {isContestsError && (
             <S.EmptyState>공모전 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</S.EmptyState>
           )}
-          {!isContestsLoading && !isContestsError && visibleContests.map((contest) => (
+          {!isContestsLoading && !isContestsError && paginatedContests.map((contest) => (
             <ContestCard
               contest={contest}
               key={contest.id}
@@ -207,6 +225,38 @@ export function ContestsPage() {
             <S.EmptyState>선택한 분야의 공모전이 없어요.</S.EmptyState>
           )}
         </S.ContestList>
+        {!isContestsLoading && !isContestsError && totalPages > 1 && (
+          <S.Pagination aria-label="공모전 목록 페이지">
+            <S.PageButton
+              aria-label="이전 페이지"
+              disabled={activePage === 0}
+              onClick={() => setCurrentPage(Math.max(0, activePage - 1))}
+              type="button"
+            >
+              <Icon name="arrow-left" size={13} weight="bold" />
+            </S.PageButton>
+            {Array.from({ length: totalPages }, (_, page) => (
+              <S.PageButton
+                $active={page === activePage}
+                aria-label={`${page + 1}페이지`}
+                aria-current={page === activePage ? "page" : undefined}
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                type="button"
+              >
+                {page + 1}
+              </S.PageButton>
+            ))}
+            <S.PageButton
+              aria-label="다음 페이지"
+              disabled={activePage + 1 >= totalPages}
+              onClick={() => setCurrentPage(activePage + 1)}
+              type="button"
+            >
+              <Icon name="caret-right" size={13} weight="bold" />
+            </S.PageButton>
+          </S.Pagination>
+        )}
       </S.Content>
 
       <BottomSheet
@@ -228,6 +278,7 @@ export function ContestsPage() {
                 key={option.value}
                 onClick={() => {
                   setSearchParams({ sort: option.value }, { replace: true });
+                  setCurrentPage(0);
                   setIsSortSheetOpen(false);
                 }}
                 type="button"

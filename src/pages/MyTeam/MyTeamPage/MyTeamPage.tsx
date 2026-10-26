@@ -23,6 +23,8 @@ type Team = {
   title: string;
   description: string;
   tone: "primary" | "success" | "pending";
+  currentMemberCount: number;
+  maxMemberCount: number;
   progress?: number;
   newApplications?: string;
   elapsed?: string;
@@ -37,6 +39,8 @@ const teams: Team[] = [
     title: "ESG 임팩트 캠페인",
     description: "디자인으로 만드는 ESG 캠페인 · 3/4명",
     tone: "pending",
+    currentMemberCount: 3,
+    maxMemberCount: 4,
   },
   {
     id: "data-seoul",
@@ -48,6 +52,8 @@ const teams: Team[] = [
     description: "2026 서울시 데이터 활용 공모전 · 3/5명",
     progress: 60,
     tone: "primary" as const,
+    currentMemberCount: 3,
+    maxMemberCount: 5,
   },
   {
     id: "esg-campaign",
@@ -58,6 +64,8 @@ const teams: Team[] = [
     description: "디자인으로 만드는 ESG 캠페인 · 4/4명",
     progress: 100,
     tone: "success" as const,
+    currentMemberCount: 4,
+    maxMemberCount: 4,
   },
 ];
 
@@ -460,7 +468,9 @@ export function MyTeamPage() {
         <BottomSheet
           applicantName={decisionRequest.applicant.name}
           applicantRole={decisionRequest.applicant.role}
+          currentMemberCount={selectedTeam.currentMemberCount}
           decisionMode={decisionRequest.mode}
+          maxMemberCount={selectedTeam.maxMemberCount}
           onClose={() => setDecisionRequest(null)}
           onDecisionConfirm={() => setDecisionRequest(null)}
           open

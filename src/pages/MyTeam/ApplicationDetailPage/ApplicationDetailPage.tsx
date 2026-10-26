@@ -204,7 +204,9 @@ export function ApplicationDetailPage() {
         <BottomSheet
           applicantName={applicantName}
           applicantRole={roleName}
+          currentMemberCount={team?.currentMemberCount}
           decisionMode={decisionMode}
+          maxMemberCount={team?.maxMemberCount}
           onClose={() => setDecisionMode(null)}
           onDecisionConfirm={handleDecisionComplete}
           onDecisionSubmit={async (reason) => {

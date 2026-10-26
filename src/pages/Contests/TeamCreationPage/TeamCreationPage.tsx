@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -1025,6 +1025,14 @@ export function TeamCreationPage() {
     teamName,
     weeklyMeetings,
   } = useTeamCreation();
+
+  useLayoutEffect(() => {
+    if (!isCreationComplete) return;
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [isCreationComplete]);
   const { data: editingTeam } = useQuery({
     queryKey: ["team", numericTeamId],
     queryFn: () => fetchTeamDetail(numericTeamId),

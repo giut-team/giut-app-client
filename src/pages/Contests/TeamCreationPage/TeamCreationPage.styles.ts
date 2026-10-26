@@ -1007,6 +1007,10 @@ export const S = {
       $active ? tokens.color.neutral[50] : tokens.color.neutral[500]};
     font-size: 7px;
     font-weight: 800;
+
+    svg {
+      color: ${tokens.color.neutral[50]};
+    }
   `,
   CreationCompleteNotice: styled.p`
     margin: 15px 0 0;

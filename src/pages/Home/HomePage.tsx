@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchPopularContests } from "../../api/contests";
@@ -51,6 +51,13 @@ export function HomePage() {
   const [toastMessage, setToastMessage] = useState(
     (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   const {
     data: popularContests = [],
     isError: isPopularContestsError,

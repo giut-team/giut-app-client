@@ -40,6 +40,8 @@ type BottomSheetProps = {
   decisionMode?: DecisionMode;
   applicantName?: string;
   applicantRole?: string;
+  currentMemberCount?: number;
+  maxMemberCount?: number;
   onDecisionSubmit?: (reason?: string) => Promise<void> | void;
   onDecisionConfirm?: () => void;
   applicationCancelState?: ApplicationCancelState;
@@ -70,6 +72,8 @@ function DecisionContent({
   errorMessage,
   mode,
   completed,
+  currentMemberCount,
+  maxMemberCount,
 }: {
   applicantName: string;
   applicantRole: string;
@@ -78,8 +82,19 @@ function DecisionContent({
   errorMessage: string;
   mode: DecisionMode;
   completed: boolean;
+  currentMemberCount?: number;
+  maxMemberCount?: number;
 }) {
   const isAccepting = mode === "accept";
+  const hasTeamMemberCounts =
+    typeof currentMemberCount === "number" &&
+    typeof maxMemberCount === "number";
+  const nextMemberCount = hasTeamMemberCounts
+    ? Math.min(maxMemberCount, currentMemberCount + 1)
+    : 0;
+  const remainingMemberCount = hasTeamMemberCounts
+    ? Math.max(0, maxMemberCount - nextMemberCount)
+    : 0;
 
   if (completed) {
     return (
@@ -117,20 +132,22 @@ function DecisionContent({
           : "거절하면 목록에서 사라지고 다시 되돌릴 수 없어요. 지원자에게는 결과만 전달되고, 사유는 선택해도 매칭에 전달되지 않습니다."}
       </S.DecisionDescription>
 
-      {isAccepting ? (
+      {isAccepting && hasTeamMemberCounts ? (
         <>
           <S.DecisionSummary>
             <S.DecisionSummaryRow>
               <span>팀 인원</span>
-              <strong>3명 → 4명</strong>
+              <strong>
+                {currentMemberCount}명 → {nextMemberCount}명
+              </strong>
             </S.DecisionSummaryRow>
             <S.DecisionSummaryRow>
               <span>남은 자리</span>
-              <strong>1건</strong>
+              <strong>{remainingMemberCount}자리</strong>
             </S.DecisionSummaryRow>
           </S.DecisionSummary>
         </>
-      ) : (
+      ) : !isAccepting ? (
         <>
           <S.DecisionFieldHeader>
             <S.DecisionFieldLabel>거절 사유 · 선택</S.DecisionFieldLabel>
@@ -149,7 +166,7 @@ function DecisionContent({
             ))}
           </S.DecisionReasonList>
         </>
-      )}
+      ) : null}
       {errorMessage && <S.DecisionError role="alert">{errorMessage}</S.DecisionError>}
     </>
   );
@@ -226,6 +243,8 @@ export function BottomSheet({
   decisionMode,
   applicantName,
   applicantRole,
+  currentMemberCount,
+  maxMemberCount,
   onDecisionSubmit,
   onDecisionConfirm,
   applicationCancelState,
@@ -399,7 +418,9 @@ export function BottomSheet({
               applicantName={applicantName}
               applicantRole={applicantRole}
               completed={isDecisionComplete}
+              currentMemberCount={currentMemberCount}
               errorMessage={decisionError}
+              maxMemberCount={maxMemberCount}
               mode={decisionMode}
               onReasonChange={(reason) => {
                 setSelectedDecisionReason(reason);

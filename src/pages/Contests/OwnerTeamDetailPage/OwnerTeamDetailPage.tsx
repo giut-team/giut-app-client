@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchContestDetail } from "../../../api/contests";
 import {
   fetchProfileRoles,
@@ -99,9 +99,17 @@ const getInviteExpiry = () => {
 
 export function OwnerTeamDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { contestId = "", teamId = "" } = useParams();
   const numericTeamId = Number(teamId);
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [teamId]);
+
   const {
     data: team,
     isError: isTeamError,
@@ -172,6 +180,21 @@ export function OwnerTeamDetailPage() {
     team && team.status === "RECRUITING" && isRecruiting && !isTeamFull,
   );
   const isRecruitmentClosed = !isRecruitmentOpen;
+  const handleBackToContest = () => {
+    const cameFromContestDetail = Boolean(
+      (location.state as { fromContestDetail?: boolean } | null)
+        ?.fromContestDetail,
+    );
+
+    if (cameFromContestDetail) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(contestId ? `/contests/${contestId}` : "/contests", {
+      replace: true,
+    });
+  };
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -230,7 +253,7 @@ export function OwnerTeamDetailPage() {
     return (
       <S.Page aria-busy="true">
         <S.Content>
-          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <PageHeader onBack={handleBackToContest} title="팀 상세" />
           <S.Section><S.Introduction>팀 정보를 불러오는 중입니다.</S.Introduction></S.Section>
         </S.Content>
       </S.Page>
@@ -241,7 +264,7 @@ export function OwnerTeamDetailPage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate(-1)} title="팀 상세" />
+          <PageHeader onBack={handleBackToContest} title="팀 상세" />
           <S.Section><S.Introduction>팀 정보를 불러오지 못했습니다.</S.Introduction></S.Section>
         </S.Content>
       </S.Page>
@@ -442,7 +465,7 @@ export function OwnerTeamDetailPage() {
     <S.Page>
       <S.Content>
         <PageHeader
-          onBack={() => navigate(-1)}
+          onBack={handleBackToContest}
           rightContent={
             isRecruitmentOpen ? (
               <S.HeaderActions>
