@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { ProfileRouteMotion } from "../../components/ProfileRouteMotion/ProfileRouteMotion";
 import { Circle, Trophy } from "@phosphor-icons/react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import { Icon } from "../../components/icons";
@@ -12,6 +12,10 @@ import { detailStatus, orderedPortfolios, PREVIEW_PATH, profileFacts, skillNames
 import { S } from "./ProfilePreview.styles";
 
 export function GiutHubPreviewProfilePage() {
+  return <ProfileRouteMotion><GiutHubPreviewProfilePageContent /></ProfileRouteMotion>;
+}
+
+function GiutHubPreviewProfilePageContent() {
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
   const query = usePreviewProfile(userId);
@@ -19,7 +23,6 @@ export function GiutHubPreviewProfilePage() {
   const location = useLocation();
   const previous = location.state?.returnTo;
   const returnTo = typeof previous === "string" && (previous === PREVIEW_PATH || previous.startsWith(`${PREVIEW_PATH}?`)) ? previous : PREVIEW_PATH;
-  useEffect(() => { window.scrollTo(0, 0); }, [userId]);
   if (!Number.isSafeInteger(userId) || userId <= 0) return <Navigate replace to={PREVIEW_PATH} />;
   if (query.authLoading || !query.data || query.isError || !query.isAuthenticated) return <PreviewProfileLoadState query={query} onBack={() => { void slideNavigate(returnTo); }} />;
   const detail = query.data;

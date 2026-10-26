@@ -1,3 +1,4 @@
+import { ProfileRouteMotion } from "../../components/ProfileRouteMotion/ProfileRouteMotion";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -328,6 +329,10 @@ function ProfileMoreBottomSheet({
 }
 
 export function GiutHubProfilePage() {
+  return <ProfileRouteMotion><GiutHubProfilePageContent /></ProfileRouteMotion>;
+}
+
+function GiutHubProfilePageContent() {
   const navigate = useNavigate();
   const slideNavigate = useProfileSlideNavigate();
   const location = useLocation();

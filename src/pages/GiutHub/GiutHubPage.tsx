@@ -1,3 +1,4 @@
+import { ProfileRouteMotion } from "../../components/ProfileRouteMotion/ProfileRouteMotion";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -447,6 +448,10 @@ const navigationItems = [
 ];
 
 export function GiutHubPage() {
+  return <ProfileRouteMotion><GiutHubPageContent /></ProfileRouteMotion>;
+}
+
+function GiutHubPageContent() {
   const navigate = useNavigate();
   const slideNavigate = useProfileSlideNavigate();
   const { queryScope, isLoading: authLoading } = useAuth();

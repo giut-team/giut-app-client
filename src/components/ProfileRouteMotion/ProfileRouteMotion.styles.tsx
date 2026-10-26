@@ -1,8 +1,7 @@
-import { Global, css } from "@emotion/react";
+import { Global } from "@emotion/react";
 import { PROFILE_SCREEN_MOTION_MS, PROFILE_SCREEN_ENTER_EASING } from "../../styles/motion";
 
-export function ProfileRouteMotionStyles() {
-  return <Global styles={css`
+export const PROFILE_ROUTE_MOTION_CSS = `
     /* viewport 스냅샷을 앱 프레임 안에서만 움직인다. 긴 페이지도 세로로 압축하지 않는다. */
     html[data-profile-slide]::view-transition-group(root) {
       animation:none;
@@ -43,5 +42,9 @@ export function ProfileRouteMotionStyles() {
       ::view-transition-new(root),
       [data-profile-fallback] { animation:none !important; }
     }
-  `} />;
+`;
+
+// 기존 import와 호환. 실제 페이지 전환은 controller가 스타일 수명을 관리한다.
+export function ProfileRouteMotionStyles() {
+  return <Global styles={PROFILE_ROUTE_MOTION_CSS} />;
 }
