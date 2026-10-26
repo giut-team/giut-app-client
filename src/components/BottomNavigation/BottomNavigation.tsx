@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { fetchTotalUnreadMessageCount } from "../../api/chats";
 import { Icon, type IconName } from "../icons";
 import { useAuth } from "../../contexts/AuthContext";
 import { S } from "./BottomNavigation.styles";
@@ -16,17 +18,20 @@ type BottomNavigationProps = {
 };
 
 export function BottomNavigation({ items, activeKey, onChange }: BottomNavigationProps) {
-  const { isAuthenticated, universityVerified } = useAuth();
-  const isUniversityUnverified = isAuthenticated && !universityVerified;
+  const unreadQuery = useQuery({
+    queryKey: ["chat-unread-total"],
+    queryFn: fetchTotalUnreadMessageCount,
+    refetchInterval: 30_000,
+    retry: false,
+  });
 
   return (
     <S.Nav aria-label="주요 메뉴">
       <S.Inner>
         {items.map((item) => {
           const active = item.key === activeKey;
-          const locked =
-            isUniversityUnverified && (item.key === "hub" || item.key === "chat");
-
+          const badge =
+            item.key === "chat" ? unreadQuery.data ?? 0 : item.badge ?? 0;
           return (
             <S.Item
               $active={active}
@@ -38,13 +43,7 @@ export function BottomNavigation({ items, activeKey, onChange }: BottomNavigatio
               type="button"
             >
               <Icon name={item.icon} size={21} weight={active ? "fill" : "regular"} />
-              {locked ? (
-                <S.Lock aria-hidden="true">
-                  <Icon name="lock" size={8} weight="fill" />
-                </S.Lock>
-              ) : (
-                item.badge !== undefined && <S.Badge>{item.badge}</S.Badge>
-              )}
+              {badge > 0 && <S.Badge>{badge > 99 ? "99+" : badge}</S.Badge>}
               <span>{item.label}</span>
             </S.Item>
           );

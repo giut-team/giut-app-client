@@ -19,6 +19,7 @@ import {
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
+import { saveChatRoomContext } from "../../Chat/chatContext";
 import { S } from "./TeamDetailPage.styles";
 
 const activityModeLabels = {
@@ -344,7 +345,12 @@ export function TeamDetailPage() {
       </S.Content>
 
       <S.ActionBar>
-        <S.ChatButton aria-label="팀장에게 문의하기" type="button">
+        <S.ChatButton
+          aria-label="팀장에게 문의하기"
+          disabled={startChatMutation.isPending}
+          onClick={() => startChatMutation.mutate()}
+          type="button"
+        >
           <Icon name="chat" size={19} weight="regular" />
         </S.ChatButton>
         {isPendingApplication ? (

@@ -32,7 +32,7 @@ const shortcuts = [
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
   { key: "hub", label: "기웃허브", icon: "users" as const },
-  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
+  { key: "chat", label: "채팅", icon: "chat" as const },
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 

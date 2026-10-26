@@ -3,6 +3,7 @@ import {
   ArrowRight,
   ArrowsDownUp,
   Bell,
+  BellSlash,
   BookmarkSimple,
   CalendarBlank,
   CaretLeft,
@@ -53,6 +54,7 @@ export type IconName =
   | "arrow-left"
   | "arrows-down-up"
   | "bell"
+  | "bell-slash"
   | "bookmark"
   | "calendar"
   | "caret-right"
@@ -101,6 +103,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "arrow-left": CaretLeft,
   "arrows-down-up": ArrowsDownUp,
   bell: Bell,
+  "bell-slash": BellSlash,
   bookmark: BookmarkSimple,
   calendar: CalendarBlank,
   "caret-right": CaretRight,
