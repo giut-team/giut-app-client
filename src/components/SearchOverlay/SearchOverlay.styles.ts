@@ -11,7 +11,7 @@ export const S = {
     background: rgb(16 21 34 / 52%);
   `,
   Panel: styled.section`
-    width: min(calc(100% - 24px), 456px);
+    width: min(calc(100% - 24px), calc(var(--app-content-width) - 24px));
     height: fit-content;
     margin-top: 12px;
     padding: 18px 16px 17px;

@@ -7,7 +7,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};

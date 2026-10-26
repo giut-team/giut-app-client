@@ -30,7 +30,7 @@ const shimmer = keyframes`
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[100]};
@@ -72,6 +72,11 @@ export const S = {
     font-size: 8px;
     font-weight: 700;
     cursor: pointer;
+
+    &:disabled {
+      color: ${tokens.color.neutral[500]};
+      cursor: default;
+    }
   `,
   SortButton: styled.button`
     display: inline-flex;

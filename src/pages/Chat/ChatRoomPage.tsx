@@ -4,6 +4,7 @@ import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
 import { Toast } from "../../components/Toast/Toast";
 import { S } from "./ChatRoomPage.styles";
+import { PersonalChatRoomPage } from "./PersonalChatRoomPage";
 
 type AvatarTone = "mint" | "peach" | "purple";
 type Message = {
@@ -120,6 +121,11 @@ const chatRooms: Record<string, ChatRoom> = {
 };
 
 export function ChatRoomPage() {
+  const { chatId } = useParams();
+  return /^\d+$/.test(chatId ?? "") && Number(chatId) > 0 ? <PersonalChatRoomPage key={chatId} /> : <ExampleChatRoomPage />;
+}
+
+function ExampleChatRoomPage() {
   const navigate = useNavigate();
   const { chatId } = useParams();
   const room = chatRooms[chatId ?? ""];

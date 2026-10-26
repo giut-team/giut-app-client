@@ -32,7 +32,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(152px + env(safe-area-inset-bottom));
@@ -349,7 +349,7 @@ export const S = {
     right: 0;
     bottom: 0;
     left: 0;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 12px 14px max(16px, env(safe-area-inset-bottom));
     box-sizing: border-box;

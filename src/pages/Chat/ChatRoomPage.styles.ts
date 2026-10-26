@@ -12,7 +12,7 @@ const avatarColors: Record<AvatarTone, { background: string; color: string }> = 
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding: 0 0 76px;
@@ -211,7 +211,7 @@ export const S = {
     z-index: 3;
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr) 35px;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 64px;
     padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
     align-items: center;

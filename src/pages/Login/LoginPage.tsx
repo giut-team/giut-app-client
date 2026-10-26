@@ -7,6 +7,8 @@ import { S } from "./LoginPage.styles";
 export function LoginPage() {
   const handleKakaoLogin = () => {
     sessionStorage.setItem("kakao-login-pending", "true");
+    // 새 OAuth 쿠키보다 오래된 Authorization 헤더가 우선되지 않도록 정리한다.
+    localStorage.removeItem("accessToken");
     window.location.assign(`${API_BASE_URL}/api/oauth/kakao/authorization`);
   };
 

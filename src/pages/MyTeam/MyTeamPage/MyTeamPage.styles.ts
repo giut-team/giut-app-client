@@ -29,13 +29,13 @@ const applicantColors: Record<
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};
   `,
   TopArea: styled.section`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 18px 13px 12px;
     background: ${tokens.color.neutral[50]};
@@ -128,7 +128,7 @@ export const S = {
     line-height: 1.35;
   `,
   TeamSection: styled.section`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 12px 0 20px;
     background: ${tokens.color.neutral[50]};
@@ -376,13 +376,13 @@ export const S = {
     font-weight: 600;
   `,
   ApplicationSection: styled.section`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 13px 16px 88px;
     background: ${tokens.color.neutral[50]};
   `,
   MemberApplicationSection: styled.section<{ $pending: boolean }>`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 13px 16px 88px;
     background: ${tokens.color.neutral[50]};

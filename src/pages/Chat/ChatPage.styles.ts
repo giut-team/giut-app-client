@@ -15,7 +15,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding: 20px 28px 88px;
@@ -232,10 +232,15 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
-  EmptyMessage: styled.p`
-    margin: 36px 0;
+  EmptyMessage: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 36px 0;
     color: ${tokens.color.neutral[500]};
     font-size: 13px;
     text-align: center;
+    p { margin: 0; line-height: 1.6; }
   `,
 };

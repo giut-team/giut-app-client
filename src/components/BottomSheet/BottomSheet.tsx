@@ -24,6 +24,7 @@ export type BottomSheetOption<T extends string> = {
 
 type BottomSheetProps = {
   open: boolean;
+  dragDisabled?: boolean;
   title?: string;
   eyebrow?: string;
   showCloseButton?: boolean; // 닫기 버튼 표시 여부
@@ -35,6 +36,7 @@ type BottomSheetProps = {
   children?: ReactNode; // 바텀 시트의 내용
   footer?: ReactNode;
   contentFill?: boolean;
+  contentPadding?: string;
   decisionMode?: DecisionMode;
   applicantName?: string;
   applicantRole?: string;
@@ -208,6 +210,7 @@ function ApplicationCancelContent({
 
 export function BottomSheet({
   open,
+  dragDisabled = false,
   title,
   eyebrow,
   showCloseButton = false,
@@ -219,6 +222,7 @@ export function BottomSheet({
   children,
   footer,
   contentFill = false,
+  contentPadding,
   decisionMode,
   applicantName,
   applicantRole,
@@ -291,6 +295,7 @@ export function BottomSheet({
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (dragDisabled) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
 
     dragStartY.current = event.clientY;
@@ -349,7 +354,7 @@ export function BottomSheet({
       dragOffset={dragOffset}
       isDragging={isDragging}
     >
-      <S.InnerPadding $compact={variant === "compact"}>
+      <S.InnerPadding $compact={variant === "compact"} $contentPadding={contentPadding}>
         <S.HandleWrapper
           $compact={variant === "compact"}
           onPointerCancel={resetDrag}

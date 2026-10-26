@@ -20,7 +20,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};
@@ -1027,7 +1027,7 @@ export const S = {
     left: 0;
     display: flex;
     gap: 6px;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 10px 6px max(10px, env(safe-area-inset-bottom));
     box-sizing: border-box;

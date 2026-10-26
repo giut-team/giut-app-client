@@ -1,11 +1,13 @@
 import { Global, css } from "@emotion/react";
 import "@sun-typeface/suit/fonts/variable/woff2/SUIT-Variable.css";
+import { APP_MAX_WIDTH } from "./layout";
 
 export function GlobalStyles() {
   return (
     <Global
       styles={css`
         :root {
+          --app-content-width: ${APP_MAX_WIDTH}px;
           --app-safe-bottom: max(16px, env(safe-area-inset-bottom, 0px));
           font-family:
             "SUIT Variable",
@@ -28,6 +30,8 @@ export function GlobalStyles() {
 
         #root {
           position: relative;
+          width: min(100%, var(--app-content-width));
+          margin-inline: auto;
           min-height: 100svh;
           padding-bottom: var(--app-safe-bottom);
         }
@@ -48,7 +52,7 @@ export function GlobalStyles() {
         }
 
         body {
-          min-width: 320px;
+          min-width: 0;
           margin: 0;
         }
 

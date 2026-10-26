@@ -1,9 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import { ProfileRouteMotion } from "./components/ProfileRouteMotion/ProfileRouteMotion";
+import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
+import { GiutHubPreviewPage } from "./pages/GiutHubPreview/GiutHubPreviewPage";
+import { GiutHubPreviewProfilePage } from "./pages/GiutHubPreview/GiutHubPreviewProfilePage";
+import { PreviewPortfolioPage } from "./pages/GiutHubPreview/PreviewPortfolioPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
+import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
@@ -30,6 +36,9 @@ import { ChatPage } from "./pages/Chat/ChatPage";
 import { ChatRoomPage } from "./pages/Chat/ChatRoomPage";
 import { MyProfilePage } from "./pages/MyPage/MyProfilePage";
 import { ProfileEditPage, ProfileRoleDetailPage } from "./pages/MyPage/ProfileEditPage";
+import { PortfolioManagePage } from "./pages/MyPage/PortfolioManagePage";
+import { PortfolioAddPage } from "./pages/MyPage/PortfolioAddPage";
+import { ProfileCreatePage } from "./pages/MyPage/ProfileCreatePage";
 
 function HomeEntryPage() {
   const navigate = useNavigate();
@@ -39,14 +48,23 @@ function HomeEntryPage() {
   useEffect(() => {
     if (!loginPending || isLoading) return;
 
-    sessionStorage.removeItem("kakao-login-pending");
-
-    if (isAuthenticated) {
-      navigate("/student-verification", { replace: true });
-    }
+    const destination = completePendingLogin(isAuthenticated);
+    if (destination) navigate(destination, { replace: true });
   }, [isAuthenticated, isLoading, loginPending, navigate]);
 
-  return loginPending && isLoading ? null : <HomePage />;
+  return loginPending && (isLoading || isAuthenticated) ? null : <HomePage />;
+}
+
+function UniversityVerifiedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading, universityVerified } = useAuth();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate replace to="/login" />;
+  if (!universityVerified) {
+    return <Navigate replace to="/student-verification" />;
+  }
+
+  return children;
 }
 
 export function AppRouter() {
@@ -57,21 +75,71 @@ export function AppRouter() {
         <Route element={<LoginPage />} path="/login" />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
-        <Route element={<ChatPage />} path="/chat" />
-        <Route element={<ChatRoomPage />} path="/chat/:chatId" />
-        <Route element={<GiutHubPage />} path="/giut-hub" />
-        <Route element={<GiutHubProfilePage />} path="/giut-hub/:profileNumber" />
-        <Route element={<PortfolioDetailPage />} path="/giut-hub/:profileNumber/portfolio/:portfolioNumber" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ChatPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/chat"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ChatRoomPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/chat/:chatId"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <GiutHubPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <GiutHubProfilePage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub/:profileNumber"
+        />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <PortfolioDetailPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/giut-hub/:profileNumber/portfolio/:portfolioNumber"
+        />
         <Route element={<ClosingContestsPage />} path="/closing-contests" />
         <Route element={<ContestsPage />} path="/contests" />
-        <Route element={<ContestRegistrationPage />} path="/contests/register" />
+        <Route
+          element={
+            <UniversityVerifiedRoute>
+              <ContestRegistrationPage />
+            </UniversityVerifiedRoute>
+          }
+          path="/contests/register"
+        />
         <Route element={<ContestDetailPage />} path="/contests/:contestId" />
         <Route
-          element={<RecruitingTeamsPage />}
+          element={
+            <UniversityVerifiedRoute>
+              <RecruitingTeamsPage />
+            </UniversityVerifiedRoute>
+          }
           path="/contests/:contestId/teams"
         />
         <Route
-          element={<TeamDetailPage />}
+          element={
+            <UniversityVerifiedRoute>
+              <TeamDetailPage />
+            </UniversityVerifiedRoute>
+          }
           path="/contests/:contestId/teams/:teamId"
         />
         <Route
@@ -83,7 +151,11 @@ export function AppRouter() {
           path="/contests/:contestId/teams/joined-data-seoul"
         />
         <Route
-          element={<TeamApplicationPage />}
+          element={
+            <UniversityVerifiedRoute>
+              <TeamApplicationPage />
+            </UniversityVerifiedRoute>
+          }
           path="/contests/:contestId/teams/:teamId/apply"
         />
         <Route
@@ -92,9 +164,11 @@ export function AppRouter() {
         />
         <Route
           element={
-            <TeamCreationProvider>
-              <Outlet />
-            </TeamCreationProvider>
+            <UniversityVerifiedRoute>
+              <TeamCreationProvider>
+                <Outlet />
+              </TeamCreationProvider>
+            </UniversityVerifiedRoute>
           }
           path="/contests/:contestId/teams/create"
         >
@@ -119,6 +193,9 @@ export function AppRouter() {
         <Route element={<MyTeamPage />} path="/my-team" />
         <Route element={<MyProfilePage />} path="/my-profile" />
         <Route element={<ProfileEditPage />} path="/my-profile/edit" />
+        <Route element={<PortfolioManagePage />} path="/my-profile/portfolio-manage" />
+        <Route element={<PortfolioAddPage/>} path="/my-profile/portfolio-add" />
+        <Route element={<ProfileCreatePage/>} path="/my-profile/create" /> 
         <Route element={<ProfileRoleDetailPage />} path="/my-profile/edit/roles/:roleId" />
         <Route
           element={<MyApplicationPage />}

@@ -50,7 +50,7 @@ export const S = {
   Page: styled.main`
     display: flex;
     flex-direction: column;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding: 104px 20px max(26px, calc(20px + env(safe-area-inset-bottom)));
