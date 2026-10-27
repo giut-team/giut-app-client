@@ -52,7 +52,7 @@ export const S = {
     border-radius: 7px;
     background: #e1f6eb;
     color: ${tokens.color.success[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -62,7 +62,7 @@ export const S = {
     border-radius: 7px;
     background: #fff4dc;
     color: ${tokens.color.warning[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -72,7 +72,7 @@ export const S = {
     border-radius: 7px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -85,7 +85,7 @@ export const S = {
   TeamTitle: styled.h2`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.7px;
     line-height: 1.3;
@@ -96,14 +96,14 @@ export const S = {
     border-radius: 7px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     line-height: 1;
   `,
   ContestName: styled.p`
     margin: 6px 0 15px;
     color: ${tokens.color.neutral[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 600;
   `,
   ProgressTrack: styled.div`
@@ -121,7 +121,7 @@ export const S = {
   Remaining: styled.p`
     margin: 7px 0 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
   `,
   Section: styled.section<{ $last?: boolean }>`
@@ -132,7 +132,7 @@ export const S = {
   SectionTitle: styled.h2`
     margin: 0 0 12px;
     color: ${tokens.color.neutral[900]};
-    font-size: 13px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.35px;
   `,
@@ -152,13 +152,13 @@ export const S = {
   RecruitmentRole: styled.strong`
     display: block;
     color: ${tokens.color.neutral[900]};
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
   `,
   RecruitmentMeta: styled.p`
     margin: 5px 0 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   RecruitingBadge: styled.span<{ $recruiting: boolean; $applied: boolean }>`
@@ -172,7 +172,7 @@ export const S = {
     color: ${({ $applied, $recruiting }) => (
       $applied || $recruiting ? tokens.color.primary[500] : tokens.color.neutral[700]
     )};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
   `,
   InfoGrid: styled.dl`
@@ -186,16 +186,16 @@ export const S = {
 
     dt {
       margin-bottom: 5px;
-      color: ${tokens.color.neutral[500]};
-      font-size: 8px;
+      color: #000;
+      font-size: 11px;
       font-weight: 600;
     }
 
     dd {
       margin: 0;
       overflow: hidden;
-      color: ${tokens.color.neutral[900]};
-      font-size: 10px;
+      color: #000;
+      font-size: 13px;
       font-weight: 800;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -204,7 +204,7 @@ export const S = {
   Introduction: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 10px;
+    font-size: 13px;
     line-height: 1.75;
   `,
   ApplicationReviewSection: styled.section`
@@ -228,25 +228,25 @@ export const S = {
     border-radius: 5px;
     background: #fff0cc;
     color: ${tokens.color.warning[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
     line-height: 1;
   `,
   ApplicationReviewDate: styled.time`
     color: ${tokens.color.neutral[700]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 700;
   `,
   ApplicationReviewTitle: styled.h3`
     margin: 15px 0 7px;
     color: ${tokens.color.neutral[900]};
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 800;
   `,
   ApplicationReviewDescription: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
     line-height: 1.55;
   `,
@@ -263,7 +263,7 @@ export const S = {
     justify-items: center;
     gap: 5px;
     color: ${({ $active }) => ($active ? tokens.color.primary[500] : tokens.color.neutral[500])};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 700;
 
     &::before {
@@ -300,7 +300,7 @@ export const S = {
     border-radius: 10px;
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.neutral[700]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
 
     strong {
@@ -346,7 +346,7 @@ export const S = {
 
       return tokens.color.primary[500];
     }};
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
   `,
   MemberHeading: styled.div`
@@ -356,7 +356,7 @@ export const S = {
   `,
   MemberName: styled.strong`
     color: ${tokens.color.neutral[900]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
   `,
   RoleBadge: styled.span`
@@ -364,20 +364,20 @@ export const S = {
     border-radius: 4px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
   `,
   MemberRole: styled.p`
     margin: 4px 0 0;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   MemberSchool: styled.p`
     margin: 3px 0 0;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
   `,
   ActionBar: styled.div`
     position: fixed;
@@ -421,7 +421,7 @@ export const S = {
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
   `,
@@ -434,7 +434,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
   `,
@@ -448,7 +448,7 @@ export const S = {
     color: ${tokens.color.neutral[50]};
     box-shadow: 0 8px 18px rgb(43 87 255 / 24%);
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
 

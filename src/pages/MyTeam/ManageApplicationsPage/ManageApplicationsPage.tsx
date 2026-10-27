@@ -103,7 +103,7 @@ export function ManageApplicationsPage() {
         {isLoading && <S.StateMessage>지원 목록을 불러오는 중이에요.</S.StateMessage>}
         {isError && <S.StateMessage>지원 목록을 불러오지 못했어요.</S.StateMessage>}
         {!isLoading && !isError && applications.length === 0 && (
-          <S.StateMessage>아직 대기 중인 지원자가 없어요.</S.StateMessage>
+          <S.EmptyState>아직 대기 중인 지원자가 없어요.</S.EmptyState>
         )}
 
         <S.ApplicantList>

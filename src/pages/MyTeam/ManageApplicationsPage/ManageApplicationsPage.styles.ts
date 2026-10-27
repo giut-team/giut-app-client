@@ -67,6 +67,17 @@ export const S = {
     line-height: 1.5;
     text-align: center;
   `,
+  EmptyState: styled.p`
+    display: grid;
+    min-height: calc(100svh - 125px);
+    margin: 0;
+    place-items: center;
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+  `,
   ApplicantCard: styled.article`
     position: relative;
     padding: 12px 10px 10px;

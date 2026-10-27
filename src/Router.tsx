@@ -66,6 +66,16 @@ function UniversityVerifiedRoute({ children }: { children: ReactNode }) {
   return children;
 }
 
+function StudentVerificationRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading, universityVerified } = useAuth();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate replace to="/login" />;
+  if (universityVerified) return <Navigate replace to="/home" />;
+
+  return children;
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
@@ -219,7 +229,11 @@ export function AppRouter() {
           path="/my-team/:teamId/applications/:applicationId"
         />
         <Route
-          element={<StudentVerificationPage />}
+          element={
+            <StudentVerificationRoute>
+              <StudentVerificationPage />
+            </StudentVerificationRoute>
+          }
           path="/student-verification"
         />
         <Route element={<Navigate replace to="/" />} path="*" />
