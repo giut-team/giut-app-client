@@ -34,6 +34,7 @@ import {
   RocketLaunch,
   ShieldCheck,
   ShareNetwork,
+  SignOut,
   UploadSimple,
   Trash,
   User,
@@ -83,6 +84,7 @@ export type IconName =
   | "search"
   | "share"
   | "share-export"
+  | "sign-out"
   | "trash"
   | "shield-check"
   | "rocket"
@@ -132,6 +134,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   search: MagnifyingGlass,
   share: ShareNetwork,
   "share-export": UploadSimple,
+  "sign-out": SignOut,
   trash: Trash,
   "shield-check": ShieldCheck,
   rocket: RocketLaunch,

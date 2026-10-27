@@ -124,7 +124,7 @@ export function PopularContestsPage() {
             />
           ))}
           {!isPopularContestsLoading && !isPopularContestsError && visiblePopularContests.length === 0 && (
-            <S.EmptyState>선택한 분야의 인기 공모전이 없어요.</S.EmptyState>
+            <S.EmptyState $centered>선택한 분야의 인기 공모전이 없어요.</S.EmptyState>
           )}
         </S.ContestList>
       </S.Content>

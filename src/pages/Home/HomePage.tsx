@@ -353,7 +353,7 @@ export function HomePage() {
           {!isPopularContestsLoading &&
             !isPopularContestsError &&
             homePopularContests.length === 0 && (
-              <S.ContestState>현재 인기 공모전이 없어요.</S.ContestState>
+              <S.ContestState $centered>현재 인기 공모전이 없어요.</S.ContestState>
             )}
         </S.ContestList>
       </S.Content>

@@ -222,7 +222,7 @@ export function ContestsPage() {
             />
           ))}
           {!isContestsLoading && !isContestsError && visibleContests.length === 0 && (
-            <S.EmptyState>선택한 분야의 공모전이 없어요.</S.EmptyState>
+            <S.EmptyState $centered>선택한 분야의 공모전이 없어요.</S.EmptyState>
           )}
         </S.ContestList>
         {!isContestsLoading && !isContestsError && totalPages > 1 && (

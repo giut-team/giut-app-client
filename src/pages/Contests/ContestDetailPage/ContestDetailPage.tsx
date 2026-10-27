@@ -477,7 +477,7 @@ export function ContestDetailPage() {
               <S.TeamDescription>팀 목록을 불러오지 못했습니다.</S.TeamDescription>
             )}
             {!isRecruitingTeamsLoading && !isRecruitingTeamsError && !displayedTeams.length && (
-              <S.TeamDescription>모집 중인 팀이 없습니다.</S.TeamDescription>
+              <S.TeamEmptyState>모집 중인 팀이 없습니다.</S.TeamEmptyState>
             )}
             {displayedTeams.slice(0, 3).map((team) => {
               const favorite = getTeamScrapped(team);

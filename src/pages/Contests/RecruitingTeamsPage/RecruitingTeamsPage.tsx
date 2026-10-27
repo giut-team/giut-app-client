@@ -169,7 +169,7 @@ export function RecruitingTeamsPage() {
             {isLoading && <S.TeamDescription>팀 목록을 불러오는 중입니다.</S.TeamDescription>}
             {isError && <S.TeamDescription>팀 목록을 불러오지 못했습니다.</S.TeamDescription>}
             {!isLoading && !isError && !visibleTeams.length && (
-              <S.TeamDescription>모집 중인 팀이 없습니다.</S.TeamDescription>
+              <S.TeamEmptyState>모집 중인 팀이 없습니다.</S.TeamEmptyState>
             )}
             {visibleTeams.map((team) => {
               const favorite = getTeamScrapped(team);

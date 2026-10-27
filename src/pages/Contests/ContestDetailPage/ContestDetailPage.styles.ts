@@ -289,6 +289,16 @@ export const S = {
     gap: 18px;
     margin-top: 0;
   `,
+  TeamEmptyState: styled.p`
+    display: grid;
+    min-height: 240px;
+    margin: 0;
+    place-items: center;
+    color: ${tokens.color.neutral[900]};
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  `,
   LockedTeamsCard: styled.button`
     position: relative;
     width: 100%;

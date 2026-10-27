@@ -441,12 +441,16 @@ export const S = {
       to { background-position: -200% 0; }
     }
   `,
-  ContestState: styled.p`
+  ContestState: styled.p<{ $centered?: boolean }>`
+    display: ${({ $centered }) => ($centered ? "grid" : "block")};
+    min-height: ${({ $centered }) => ($centered ? "180px" : "auto")};
     margin: 0;
-    padding: 24px 12px;
+    padding: ${({ $centered }) => ($centered ? "0 12px" : "24px 12px")};
+    place-items: center;
     border: 1px solid ${tokens.color.neutral[200]};
     border-radius: 13px;
-    color: ${tokens.color.neutral[500]};
+    color: ${({ $centered }) =>
+      $centered ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font-size: 10px;
     text-align: center;
   `,

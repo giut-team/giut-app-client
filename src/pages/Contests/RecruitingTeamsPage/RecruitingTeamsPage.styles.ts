@@ -169,6 +169,16 @@ export const S = {
     display: grid;
     gap: 18px;
   `,
+  TeamEmptyState: styled.p`
+    display: grid;
+    min-height: calc(100svh - 350px);
+    margin: 0;
+    place-items: center;
+    color: ${tokens.color.neutral[900]};
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  `,
   TeamCard: styled.article`
     position: relative;
     overflow: hidden;
