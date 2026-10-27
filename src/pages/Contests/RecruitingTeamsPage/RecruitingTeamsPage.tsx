@@ -9,7 +9,10 @@ import {
   removeTeamScrap,
   type RecruitingTeam,
 } from "../../../api/teams";
-import { fetchContestDetail } from "../../../api/contests";
+import {
+  fetchContestDetail,
+  type CompetitionVerificationStatus,
+} from "../../../api/contests";
 import { Icon } from "../../../components/icons";
 import { Modal } from "../../../components/Modal/Modal";
 import { PageHeader } from "../../../components/PageHeader";
@@ -19,6 +22,28 @@ const activityModeLabels = {
   ONLINE: "온라인",
   OFFLINE: "오프라인",
   HYBRID: "온·오프라인 혼합",
+};
+
+const verifiedStatuses: CompetitionVerificationStatus[] = [
+  "AUTO_VERIFIED",
+  "MANUALLY_VERIFIED",
+];
+
+const formatDeadline = (value: string) => {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "마감일 미정";
+
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  }).formatToParts(date);
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  return `${getPart("year")}.${getPart("month")}.${getPart("day")} (${getPart("weekday")}) 마감`;
 };
 
 export function RecruitingTeamsPage() {
@@ -34,7 +59,11 @@ export function RecruitingTeamsPage() {
     queryFn: () => fetchRecruitingTeams(competitionId),
     enabled: Number.isInteger(competitionId) && competitionId > 0,
   });
-  const { data: contest } = useQuery({
+  const {
+    data: contest,
+    isError: isContestError,
+    isLoading: isContestLoading,
+  } = useQuery({
     queryKey: ["contest", contestId],
     queryFn: () => fetchContestDetail(contestId),
     enabled: Boolean(contestId),
@@ -44,6 +73,9 @@ export function RecruitingTeamsPage() {
     queryFn: fetchMyTeamApplications,
   });
   const visibleTeams = data?.teams ?? [];
+  const isVerified = contest?.verificationStatus
+    ? verifiedStatuses.includes(contest.verificationStatus)
+    : false;
   const teamDetailQueries = useQueries({
     queries: visibleTeams.map((team) => ({
       queryKey: ["team", team.teamId],
@@ -99,25 +131,38 @@ export function RecruitingTeamsPage() {
         <PageHeader onBack={() => navigate(-1)} title="팀원 모집" />
 
         <S.ContestSummary>
-          <S.ContestBadges>
-            <S.CategoryBadge>IT/과학</S.CategoryBadge>
-            <S.VerifiedBadge>
-              <Icon name="check" size={12} weight="bold" /> 인증
-            </S.VerifiedBadge>
-          </S.ContestBadges>
-          <S.ContestTitle>2026 서울시 데이터 활용 공모전</S.ContestTitle>
-          <S.ContestMeta>
-            <S.MetaItem>
-              <Icon name="calendar" size={16} weight="regular" />
-              2026.09.30 (수) 마감
-            </S.MetaItem>
-            <S.DDay>D-15</S.DDay>
-          </S.ContestMeta>
+          {isContestLoading && (
+            <S.ContestSummaryState>공모전 정보를 불러오는 중입니다.</S.ContestSummaryState>
+          )}
+          {isContestError && (
+            <S.ContestSummaryState>공모전 정보를 불러오지 못했습니다.</S.ContestSummaryState>
+          )}
+          {contest && (
+            <>
+              <S.ContestBadges>
+                <S.CategoryBadge>{contest.categoryName}</S.CategoryBadge>
+                {contest.verificationStatus && (
+                  <S.VerifiedBadge $verified={isVerified}>
+                    {isVerified && <Icon name="check" size={12} weight="bold" />}
+                    {isVerified ? "인증" : "미인증"}
+                  </S.VerifiedBadge>
+                )}
+              </S.ContestBadges>
+              <S.ContestTitle>{contest.title}</S.ContestTitle>
+              <S.ContestMeta>
+                <S.MetaItem>
+                  <Icon name="calendar" size={19} weight="regular" />
+                  {formatDeadline(contest.applicationEndAt)}
+                </S.MetaItem>
+                <S.DDay>{contest.dDay}</S.DDay>
+              </S.ContestMeta>
+            </>
+          )}
         </S.ContestSummary>
 
         <S.TeamSection>
           <S.SectionHeader>
-            <S.SectionTitle>팀원 모집 중 {visibleTeams.length}팀</S.SectionTitle>
+            <S.SectionTitle>팀원 모집 중 {data?.totalElements ?? 0}팀</S.SectionTitle>
           </S.SectionHeader>
 
           <S.TeamList>
@@ -173,7 +218,7 @@ export function RecruitingTeamsPage() {
                       >
                         <Icon
                           name="bookmark"
-                          size={21}
+                          size={24}
                           weight={favorite ? "fill" : "regular"}
                         />
                       </S.FavoriteButton>

@@ -53,7 +53,7 @@ export const S = {
     border-radius: 50%;
     background: ${({ $tone }) => avatarColors[$tone].background};
     color: ${({ $tone }) => avatarColors[$tone].color};
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
   `,
   Profile: styled.div`
@@ -63,14 +63,14 @@ export const S = {
   `,
   Name: styled.strong`
     color: ${tokens.color.neutral[900]};
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 800;
     letter-spacing: -0.35px;
     line-height: 1.2;
   `,
   Subtitle: styled.span`
     color: ${tokens.color.neutral[900]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: -0.2px;
     line-height: 1.2;
@@ -129,7 +129,7 @@ export const S = {
     color: ${({ $danger }) =>
       $danger ? tokens.color.danger[500] : tokens.color.neutral[900]};
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: -0.35px;
     text-align: left;
@@ -153,7 +153,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[700]};
     font: inherit;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
 
@@ -171,14 +171,14 @@ export const S = {
   ContextLabel: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: -0.25px;
   `,
   ContextTitle: styled.h1`
     margin: 8px 0 12px;
     color: ${tokens.color.neutral[900]};
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: -0.35px;
     line-height: 1.35;
@@ -195,7 +195,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
   `,
@@ -206,7 +206,7 @@ export const S = {
     border-radius: 999px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
     line-height: 1;
   `,
@@ -217,7 +217,7 @@ export const S = {
   ThreadStatus: styled.p`
     margin: 28px 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 12px;
+    font-size: 14px;
     text-align: center;
   `,
   MessageRow: styled.div<{ $sender: Sender }>`
@@ -240,7 +240,7 @@ export const S = {
       $sender === "me" ? tokens.color.primary[500] : tokens.color.neutral[50]};
     color: ${({ $sender }) =>
       $sender === "me" ? tokens.color.neutral[50] : tokens.color.neutral[900]};
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: -0.32px;
     line-height: 1.5;
@@ -267,14 +267,14 @@ export const S = {
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.danger[500]};
     font: inherit;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
   `,
   MessageTime: styled.time`
     margin-bottom: 3px;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
@@ -303,7 +303,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     box-sizing: border-box;
 

@@ -32,7 +32,7 @@ export const S = {
   Title: styled.h1`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.7px;
     line-height: 1.25;
@@ -79,7 +79,7 @@ export const S = {
       background: transparent;
       color: ${tokens.color.neutral[900]};
       font: inherit;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
 
       &::placeholder {
@@ -114,7 +114,7 @@ export const S = {
     color: ${({ $active }) =>
       $active ? tokens.color.primary[500] : tokens.color.neutral[500]};
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: ${({ $active }) => ($active ? 800 : 700)};
     letter-spacing: -0.45px;
     cursor: pointer;
@@ -174,7 +174,7 @@ export const S = {
     border-radius: 50%;
     background: ${({ $tone }) => avatarColors[$tone].background};
     color: ${({ $tone }) => avatarColors[$tone].color};
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
   `,
   ChatContent: styled.div`
@@ -184,7 +184,7 @@ export const S = {
     display: block;
     overflow: hidden;
     color: ${tokens.color.neutral[900]};
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 800;
     letter-spacing: -0.45px;
     line-height: 1.35;
@@ -195,7 +195,7 @@ export const S = {
     overflow: hidden;
     margin: 4px 0 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     letter-spacing: -0.3px;
     line-height: 1.35;
@@ -215,20 +215,20 @@ export const S = {
   `,
   Time: styled.time`
     color: ${tokens.color.neutral[900]};
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1.3;
     white-space: nowrap;
   `,
   UnreadBadge: styled.span`
     display: grid;
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
     place-items: center;
     border-radius: 50%;
     background: ${tokens.color.danger[500]};
     color: ${tokens.color.neutral[50]};
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -239,7 +239,7 @@ export const S = {
     gap: 12px;
     padding: 36px 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 13px;
+    font-size: 14px;
     text-align: center;
     p { margin: 0; line-height: 1.6; }
   `,

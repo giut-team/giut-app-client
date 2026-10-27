@@ -267,10 +267,10 @@ export function ContestDetailPage() {
             </S.HeaderButton>
             <S.HeaderActions>
               <S.HeaderButton aria-label="공모전 스크랩" disabled type="button">
-                <Icon name="bookmark" size={18} weight="regular" />
+                <Icon name="bookmark" size={22} weight="regular" />
               </S.HeaderButton>
               <S.HeaderButton aria-label="공유하기" disabled type="button">
-                <Icon name="share" size={18} weight="regular" />
+                <Icon name="share" size={22} weight="regular" />
               </S.HeaderButton>
             </S.HeaderActions>
           </S.Header>
@@ -333,7 +333,7 @@ export function ContestDetailPage() {
             >
               <Icon
                 name="bookmark"
-                size={18}
+                size={22}
                 weight={isSaved ? "fill" : "regular"}
               />
               {isUniversityUnverified && (
@@ -350,7 +350,7 @@ export function ContestDetailPage() {
             >
               <Icon
                 name="share"
-                size={18}
+                size={22}
                 weight={isShareSheetOpen ? "fill" : "regular"}
               />
             </S.HeaderButton>
@@ -520,7 +520,7 @@ export function ContestDetailPage() {
                       >
                         <Icon
                           name="bookmark"
-                          size={21}
+                          size={24}
                           weight={favorite ? "fill" : "regular"}
                         />
                       </S.TeamFavoriteButton>

@@ -31,17 +31,26 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
-  VerifiedBadge: styled.span`
+  VerifiedBadge: styled.span<{ $verified: boolean }>`
     display: inline-flex;
     padding: 5px 9px;
     align-items: center;
     gap: 3px;
     border-radius: 7px;
-    background: #e1f6eb;
-    color: ${tokens.color.success[500]};
+    background: ${({ $verified }) =>
+      $verified ? "#e1f6eb" : tokens.color.neutral[100]};
+    color: ${({ $verified }) =>
+      $verified ? tokens.color.success[500] : tokens.color.neutral[500]};
     font-size: 11px;
     font-weight: 800;
     line-height: 1;
+  `,
+  ContestSummaryState: styled.p`
+    margin: 0;
+    color: ${tokens.color.neutral[500]};
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
   `,
   ContestTitle: styled.h1`
     margin: 10px 0 13px;
@@ -71,11 +80,16 @@ export const S = {
     }
   `,
   DDay: styled.span`
-    padding: 4px 7px;
-    border-radius: 6px;
-    background: #fff0f0;
+    display: inline-flex;
+    min-width: 46px;
+    height: 26px;
+    padding: 0 8px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: transparent;
     color: ${tokens.color.danger[500]};
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     line-height: 1;
   `,
