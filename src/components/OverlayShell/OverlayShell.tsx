@@ -8,6 +8,7 @@ type OverlayShellProps = {
   onClose: () => void;
   children: ReactNode;
   minHeight?: string;
+  maxWidth?: string;
   placement?: OverlayPlacement;
   ariaLabel?: string;
   ariaLabelledBy?: string;
@@ -20,6 +21,7 @@ export function OverlayShell({
   onClose,
   children,
   minHeight,
+  maxWidth,
   placement = "bottom",
   ariaLabel = "오버레이",
   ariaLabelledBy,
@@ -69,6 +71,7 @@ export function OverlayShell({
         $dragOffset={dragOffset}
         $isDragging={isDragging}
         $minHeight={minHeight}
+        $maxWidth={maxWidth}
         $placement={placement}
         aria-label={ariaLabelledBy ? undefined : ariaLabel}
         aria-labelledby={ariaLabelledBy}

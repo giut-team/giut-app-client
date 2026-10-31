@@ -1,3 +1,4 @@
+# Design QA
 # TASK-050 — 선택한 세번째 프로필 시안 구현 QA (2026-10-24)
 
 - Source visual truth: docs/harness/tasks/artifacts/TASK-050/direction-introduction.png (1358 × 1158 생성 이미지, 목록·상세 좌우 보드).
@@ -23,30 +24,27 @@ final result: blocked
 
 # Design QA — contest registration URL screen
 
-## Comparison targets
+## Reference
 
-- Source visual truth: mobile screenshot supplied in this conversation showing the contest-registration URL entry screen.
-- Implementation route: `/contests/register`.
-- Intended viewport: mobile, 270px-wide reference capture.
-- Intended state: empty URL input with the example URL placeholder and an active `불러오기` button.
+- User-provided mobile screenshots for the profile report list and report detail screens.
+- Target viewport: phone layout, up to 480px wide.
 
-## Evidence
+## Implemented
 
-- Source image dimensions: 270 × 178 pixels (conversation attachment).
-- Implementation screenshot: unavailable.
-- Browser check: blocked — the browser runtime returned `No browser is available`.
-- Code checks: `npm.cmd run lint` and `npm.cmd run build` passed.
+- Split the former side-by-side workspace into list and detail views.
+- Added report-row navigation and a detail back button.
+- Matched the compact header, rounded list card, five-row pagination, status badges, profile snapshot card, and fixed bottom navigation/actions.
+- Preserved status filtering, logout, pagination, report review mutations, confirmation modals, and toast feedback.
 
-## Implemented surfaces
+## Validation
 
-- Added the contest-registration URL entry route and screen.
-- Connected the registration buttons on the all, closing-soon, and popular contest lists.
-- Added a controlled URL input, submission action, and back navigation.
-- Added animated mock extraction steps and deterministic result states.
-- `fintech-12` resolves to complete extraction, `data-contest-2024` resolves to a duplicate contest, and `partial` resolves to a partial-extraction state.
+- `npm.cmd run build`: passed.
+- `npm.cmd run lint`: passed with six existing Fast Refresh warnings outside the changed admin files.
+- Visual browser comparison: blocked because no browser or native computer-use surface is available in this session.
 
-## Findings
+## Final result
 
+Blocked for screenshot comparison only. Code and static validation passed.
 - [P1] Visual comparison is blocked because a browser-rendered implementation screenshot could not be captured at the reference viewport.
   - Location: contest registration screen.
   - Impact: exact type scale, spacing, input height, and button alignment remain unverified against the supplied image.

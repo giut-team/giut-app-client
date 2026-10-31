@@ -15,7 +15,7 @@ interface ImageUploaderProps {
   maxMsg?: string; 
 }
 
-export default function ImageUploader({ onChange, maxImages=MAX_IMAGES, maxMsg, }: ImageUploaderProps) {
+export default function ImageUploader({ onChange, maxImages=MAX_IMAGES, maxMsg=MAX_MSG, }: ImageUploaderProps) {
   const limitMsg = maxMsg ?? `사진은 최대 ${maxImages}장까지 추가할 수 있어요`;
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(

@@ -33,12 +33,13 @@ export const S = {
     $dragOffset?: number;
     $isDragging?: boolean;
     $minHeight?: string;
+    $maxWidth?: string;
     $placement: OverlayPlacement;
   }>`
     position: relative;
     display: flex;
     flex-direction: column;
-    width: ${({ $placement }) =>
+    width: ${({ $placement, $maxWidth }) =>
       $placement === "center"
         ? "min(calc(100% - 48px), calc(var(--app-content-width) - 48px), 420px)"
         : "min(100%, var(--app-content-width))"};

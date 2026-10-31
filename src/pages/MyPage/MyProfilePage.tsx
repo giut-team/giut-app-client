@@ -373,17 +373,10 @@ export function MyProfilePage() {
                   }
                   type="button"
                 >
-                  <S.FeaturedImage>
-                    <Icon name="image" size={18} weight="regular" />
-                    <span>사진</span>
-                    <small>
-                      or <u>browse files</u>
-                    </small>
-                  </S.FeaturedImage>
+                  <S.ListDot />
                   <S.PortfolioCopy>
-                    <S.RepresentativeLabel>대표 프로젝트</S.RepresentativeLabel>
-                    <strong>{detail.portfolios[0].title}</strong>
-                    <small>{portfolioPeriods[0]}</small>
+                    <strong>{item.title}</strong>
+                    <small>{portfolioPeriods[index + 1]}</small>
                   </S.PortfolioCopy>
                   <Icon name="caret-right" size={23} weight="bold" />
                 </S.FeaturedPortfolio>
