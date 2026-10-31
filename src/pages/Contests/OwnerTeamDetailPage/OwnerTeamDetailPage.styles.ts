@@ -32,7 +32,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: calc(152px + env(safe-area-inset-bottom));
@@ -94,7 +94,7 @@ export const S = {
     color: ${({ $danger }) =>
       $danger ? tokens.color.danger[500] : tokens.color.neutral[700]};
     font: inherit;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     text-align: left;
     cursor: pointer;
@@ -125,7 +125,7 @@ export const S = {
         : `color-mix(in srgb, ${tokens.color.success[500]} 12%, ${tokens.color.neutral[50]})`};
     color: ${({ $closed }) =>
       $closed ? tokens.color.neutral[500] : tokens.color.success[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -136,14 +136,14 @@ export const S = {
       $closed ? tokens.color.neutral[100] : tokens.color.primary[100]};
     color: ${({ $closed }) =>
       $closed ? tokens.color.neutral[500] : tokens.color.primary[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     line-height: 1;
   `,
   TeamTitle: styled.h2`
     margin: 10px 0 5px;
     color: ${tokens.color.neutral[900]};
-    font-size: 17px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.7px;
     line-height: 1.3;
@@ -151,7 +151,7 @@ export const S = {
   ContestName: styled.p`
     margin: 0 0 15px;
     color: #000;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
   `,
   ProgressTrack: styled.div`
@@ -171,7 +171,7 @@ export const S = {
   HeroMeta: styled.p`
     margin: 7px 0 0;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   Section: styled.section<{ $last?: boolean }>`
@@ -182,7 +182,7 @@ export const S = {
   SectionTitle: styled.h2`
     margin: 0 0 12px;
     color: ${tokens.color.neutral[900]};
-    font-size: 13px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.35px;
   `,
@@ -204,13 +204,13 @@ export const S = {
     display: block;
     color: ${({ $open }) =>
       $open ? tokens.color.primary[500] : tokens.color.neutral[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
   `,
   PositionInfo: styled.p`
     margin: 4px 0 0;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   PositionStatus: styled.span<{ $open: boolean }>`
@@ -220,7 +220,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
     color: ${({ $open }) =>
       $open ? tokens.color.primary[500] : tokens.color.neutral[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
   `,
   InfoGrid: styled.dl`
@@ -234,16 +234,16 @@ export const S = {
 
     dt {
       margin-bottom: 5px;
-      color: ${tokens.color.neutral[500]};
-      font-size: 8px;
+      color: #000;
+      font-size: 11px;
       font-weight: 600;
     }
 
     dd {
       margin: 0;
       overflow: hidden;
-      color: ${tokens.color.neutral[900]};
-      font-size: 10px;
+      color: #000;
+      font-size: 13px;
       font-weight: 800;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -252,7 +252,7 @@ export const S = {
   Introduction: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 10px;
+    font-size: 13px;
     line-height: 1.75;
   `,
   MemberList: styled.div`
@@ -283,7 +283,7 @@ export const S = {
         : $tone === "purple"
           ? tokens.color.purple[500]
           : tokens.color.primary[500]};
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
   `,
   MemberHeading: styled.div`
@@ -293,7 +293,7 @@ export const S = {
   `,
   MemberName: styled.strong`
     color: ${tokens.color.neutral[900]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
   `,
   RoleBadge: styled.span`
@@ -301,20 +301,20 @@ export const S = {
     border-radius: 4px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
   `,
   MemberRole: styled.p`
     margin: 4px 0 0;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   MemberSchool: styled.p`
     margin: 3px 0 0;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
   `,
   PendingInvite: styled.article`
     display: grid;
@@ -331,7 +331,7 @@ export const S = {
     border-radius: 11px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[500]};
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
   `,
   InviteSentBadge: styled.span`
@@ -339,7 +339,7 @@ export const S = {
     border-radius: 4px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[500]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -349,7 +349,7 @@ export const S = {
     right: 0;
     bottom: 0;
     left: 0;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 12px 14px max(16px, env(safe-area-inset-bottom));
     box-sizing: border-box;
@@ -369,7 +369,7 @@ export const S = {
     background: ${tokens.color.primary[500]};
     color: ${tokens.color.neutral[50]};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
   `,
@@ -378,7 +378,7 @@ export const S = {
     border-radius: 5px;
     background: ${tokens.color.neutral[50]};
     color: ${tokens.color.primary[500]};
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
   `,
@@ -396,7 +396,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[700]};
     font: inherit;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
   `,
@@ -426,7 +426,7 @@ export const S = {
     background: ${tokens.color.neutral[200]};
     color: ${tokens.color.neutral[500]};
     font: inherit;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
   `,
   SheetIcon: styled.div<{ $tone: "primary" | "warning" }>`
@@ -444,14 +444,14 @@ export const S = {
   SheetTitle: styled.h2`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
   `,
   SheetDescription: styled.p`
     margin: 8px 0 13px;
     color: #000;
-    font-size: 9px;
+    font-size: 12px;
     line-height: 1.55;
   `,
   Summary: styled.dl`
@@ -477,7 +477,7 @@ export const S = {
     dt {
       color: ${({ $darkLabels }) =>
         $darkLabels ? tokens.color.neutral[900] : tokens.color.neutral[500]};
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 600;
     }
 
@@ -487,13 +487,13 @@ export const S = {
       align-items: center;
       margin: 0;
       color: ${tokens.color.neutral[900]};
-      font-size: 9px;
+      font-size: 12px;
       font-weight: 800;
     }
   `,
   Pending: styled.strong`
     color: ${tokens.color.neutral[900]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 800;
   `,
   Acknowledgement: styled.label`
@@ -505,7 +505,7 @@ export const S = {
     border-radius: 10px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 11px;
     line-height: 1.4;
     cursor: pointer;
 
@@ -519,7 +519,7 @@ export const S = {
   SheetHelpText: styled.p`
     margin: 10px 0 0;
     color: ${tokens.color.neutral[500]};
-    font-size: 8px;
+    font-size: 11px;
   `,
   SheetActions: styled.div`
     display: grid;
@@ -536,7 +536,7 @@ export const S = {
     color: ${({ $primary }) =>
       $primary ? tokens.color.neutral[50] : tokens.color.neutral[700]};
     font: inherit;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
 
@@ -554,7 +554,7 @@ export const S = {
   InviteLinkLabel: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
   `,
   InviteLinkRow: styled.div`
@@ -571,7 +571,7 @@ export const S = {
     overflow: hidden;
     color: ${tokens.color.neutral[900]};
     font-family: inherit;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -585,14 +585,14 @@ export const S = {
     background: ${tokens.color.primary[500]};
     color: ${tokens.color.neutral[50]};
     font: inherit;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
     cursor: pointer;
   `,
   InviteExpiry: styled.p`
     margin: 9px 0 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 11px;
 
     strong {
       float: right;
@@ -647,13 +647,13 @@ export const S = {
     gap: 2px;
 
     strong {
-      font-size: 9px;
+      font-size: 12px;
       font-weight: 800;
     }
 
     small {
       color: #000;
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
     }
   `,
@@ -686,7 +686,7 @@ export const S = {
       background: transparent;
       color: ${tokens.color.neutral[900]};
       font: inherit;
-      font-size: 9px;
+      font-size: 12px;
       font-weight: 700;
 
       &::placeholder {
@@ -709,7 +709,7 @@ export const S = {
   IdInviteHelp: styled.p`
     margin: 8px 0 16px;
     color: #000;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
     line-height: 1.45;
   `,
@@ -721,13 +721,13 @@ export const S = {
 
     strong {
       color: ${tokens.color.neutral[900]};
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 800;
     }
 
     span {
       color: ${tokens.color.neutral[500]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
     }
   `,
@@ -767,7 +767,7 @@ export const S = {
     border-radius: 50%;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
   `,
   IdInviteProfile: styled.div`
@@ -778,7 +778,7 @@ export const S = {
       margin: 4px 0 0;
       overflow: hidden;
       color: ${tokens.color.neutral[900]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -790,13 +790,13 @@ export const S = {
     align-items: center;
     gap: 4px;
     color: ${tokens.color.neutral[900]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 800;
 
     > span {
       overflow: hidden;
       color: ${tokens.color.neutral[500]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 600;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -813,7 +813,7 @@ export const S = {
       border-radius: 4px;
       background: ${tokens.color.primary[100]};
       color: ${tokens.color.primary[500]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 700;
       line-height: 1;
     }
@@ -831,7 +831,7 @@ export const S = {
       background: ${tokens.color.primary[500]};
       color: ${tokens.color.neutral[50]};
       font: inherit;
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 800;
       cursor: pointer;
 
@@ -848,7 +848,7 @@ export const S = {
     border-radius: 10px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[500]};
-    font-size: 9px;
+    font-size: 12px;
     line-height: 1.5;
     text-align: center;
   `,
@@ -858,7 +858,7 @@ export const S = {
     border-radius: 10px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[500]};
-    font-size: 8px;
+    font-size: 11px;
     line-height: 1.55;
   `,
   IdInviteConfirmIcon: styled.div`
@@ -874,13 +874,13 @@ export const S = {
   IdInviteConfirmTitle: styled.h2`
     margin: 1px 0 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
   `,
   IdInviteTeamCount: styled.strong`
     color: ${tokens.color.primary[500]};
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 800;
   `,
   IdInviteConfirmNote: styled.div`
@@ -893,7 +893,7 @@ export const S = {
 
     strong {
       color: ${tokens.color.neutral[900]};
-      font-size: 7px;
+      font-size: 10px;
       font-weight: 700;
     }
 
@@ -907,7 +907,7 @@ export const S = {
       background: transparent;
       color: ${tokens.color.neutral[900]};
       font: inherit;
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 700;
       line-height: 1.4;
       box-sizing: border-box;
@@ -927,7 +927,7 @@ export const S = {
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[700]};
     font: inherit;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
   `,

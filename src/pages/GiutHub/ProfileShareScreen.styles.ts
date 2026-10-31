@@ -1,24 +1,31 @@
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
 import { tokens } from "../../design-system/tokens.generated";
+import { PROFILE_SCREEN_MOTION_MS, PROFILE_SCREEN_ENTER_EASING, PROFILE_SCREEN_EXIT_EASING } from "../../styles/motion";
 
 const background = "#F9F8FF";
 const primary = "#1C4EA3";
+export const PROFILE_SHARE_MOTION_MS = PROFILE_SCREEN_MOTION_MS;
 
 const enterFromBottom = keyframes`
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 `;
 
+export const exitToBottom = keyframes`
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+`;
+
 export const S = {
   Screen: styled.dialog`
     position: fixed;
     inset: 0;
-    width: 100%;
-    max-width: none;
+    width: min(100%, var(--app-content-width));
+    max-width: var(--app-content-width);
     height: 100dvh;
     max-height: none;
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -30,12 +37,16 @@ export const S = {
     &[open] {
       display: flex;
       justify-content: center;
-      animation: ${enterFromBottom} 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation: ${enterFromBottom} ${PROFILE_SHARE_MOTION_MS}ms ${PROFILE_SCREEN_ENTER_EASING} both;
+    }
+    &[open][data-closing="true"] {
+      animation: ${exitToBottom} ${PROFILE_SHARE_MOTION_MS}ms ${PROFILE_SCREEN_EXIT_EASING} both;
+      pointer-events: none;
     }
     &::backdrop { background: transparent; }
 
     @media (prefers-reduced-motion: reduce) {
-      &[open] { animation: none; }
+      &[open], &[open][data-closing="true"] { animation: none; }
     }
     button:focus-visible, a:focus-visible {
       outline: 3px solid ${primary};
@@ -46,7 +57,7 @@ export const S = {
     display: flex;
     flex-direction: column;
     align-self: flex-start;
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100%;
   `,
   Header: styled.header`

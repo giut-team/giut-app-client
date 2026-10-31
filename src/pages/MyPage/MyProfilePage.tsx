@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation } from "../../components/BottomNavigation/BottomNavigation";
 import { Icon } from "../../components/icons";
 import { Modal } from "../../components/Modal/Modal";
-import { useAuth } from "../../contexts/AuthContext";
 import { detailsByProfileId, getSkillIcon } from "../GiutHub/GiutHubProfilePage";
+import { useAuth } from "../../contexts/AuthContext";
 import { giutHubProfiles } from "../GiutHub/GiutHubPage";
 import { S } from "./MyProfilePage.styles";
 import { ProfileShareScreen } from "../GiutHub/ProfileShareScreen";
@@ -23,7 +23,7 @@ type ProfilePreview = {
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
   { key: "hub", label: "기웃허브", icon: "users" as const },
-  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
+  { key: "chat", label: "채팅", icon: "chat" as const },
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 
@@ -96,12 +96,11 @@ const scrapTeams = [
 export function MyProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    isAuthenticated,
-    profile: currentProfile,
-    universityVerified,
-  } = useAuth();
-  const isUniversityUnverified = !universityVerified;
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+  const { isAuthenticated, profile: currentProfile, universityVerified } = useAuth();
+  const isUniversityUnverified = isAuthenticated && !universityVerified;
   const share = useProfileShare(isAuthenticated);
   const preview = location.state as ProfilePreview | null;
   const [activeTab, setActiveTab] = useState<MyProfileTab>("portfolio");
@@ -176,17 +175,17 @@ export function MyProfilePage() {
           </S.ProfileInfo>
         </S.ProfileSection>
         <S.IntroductionSection>
-            <S.FieldLabel>자기소개</S.FieldLabel>
-            <S.Introduction>
-              {isUniversityUnverified ? (
-                <S.LockedProfileValue>
-                  <Icon name="lock" size={13} weight="regular" />
-                  인증 후 표시
-                </S.LockedProfileValue>
-              ) : (
-                profile.introduction
-              )}
-            </S.Introduction>
+          <S.FieldLabel>자기소개</S.FieldLabel>
+          <S.Introduction>
+            {isUniversityUnverified ? (
+              <S.LockedProfileValue>
+                <Icon name="lock" size={13} weight="regular" />
+                인증 후 표시
+              </S.LockedProfileValue>
+            ) : (
+              profile.introduction
+            )}
+          </S.Introduction>
         </S.IntroductionSection>
         <S.ProfileActions>
           <S.EditButton
@@ -207,7 +206,11 @@ export function MyProfilePage() {
             />
             프로필 편집
           </S.EditButton>
-          <S.ShareButton aria-label="프로필 공유" onClick={share.openShare} type="button">
+          <S.ShareButton
+            aria-label="프로필 공유"
+            onClick={share.openShare}
+            type="button"
+          >
             <Icon name="share" size={25} weight="regular" />
           </S.ShareButton>
         </S.ProfileActions>
@@ -215,7 +218,9 @@ export function MyProfilePage() {
           <S.ProfileVerificationSection>
             <S.ProfileVerificationCard>
               <S.ProfileVerificationMeta>
-                <S.ProfileVerificationBadge>인증 필요</S.ProfileVerificationBadge>
+                <S.ProfileVerificationBadge>
+                  인증 필요
+                </S.ProfileVerificationBadge>
                 <span>포털 로그인 1분</span>
               </S.ProfileVerificationMeta>
               <S.ProfileVerificationTitle>
@@ -256,7 +261,9 @@ export function MyProfilePage() {
               <S.SkillList aria-label="보유 기술">
                 {previewSkills.map((skill, index) => (
                   <S.Skill $index={index} key={skill}>
-                    {getSkillIcon(skill) && <img alt="" src={getSkillIcon(skill)} />}
+                    {getSkillIcon(skill) && (
+                      <img alt="" src={getSkillIcon(skill)} />
+                    )}
                     {skill}
                   </S.Skill>
                 ))}
@@ -267,7 +274,9 @@ export function MyProfilePage() {
         <S.TabList role="tablist">
           <S.Tab
             $active={activeTab === "portfolio"}
-            aria-label={isUniversityUnverified ? "포트폴리오, 학교 인증 필요" : undefined}
+            aria-label={
+              isUniversityUnverified ? "포트폴리오, 학교 인증 필요" : undefined
+            }
             aria-selected={activeTab === "portfolio"}
             disabled={isUniversityUnverified}
             onClick={() => setActiveTab("portfolio")}
@@ -281,7 +290,9 @@ export function MyProfilePage() {
           </S.Tab>
           <S.Tab
             $active={activeTab === "teams"}
-            aria-label={isUniversityUnverified ? "내 팀, 학교 인증 필요" : undefined}
+            aria-label={
+              isUniversityUnverified ? "내 팀, 학교 인증 필요" : undefined
+            }
             aria-selected={activeTab === "teams"}
             disabled={isUniversityUnverified}
             onClick={() => setActiveTab("teams")}
@@ -295,7 +306,9 @@ export function MyProfilePage() {
           </S.Tab>
           <S.Tab
             $active={activeTab === "scraps"}
-            aria-label={isUniversityUnverified ? "스크랩, 학교 인증 필요" : undefined}
+            aria-label={
+              isUniversityUnverified ? "스크랩, 학교 인증 필요" : undefined
+            }
             aria-selected={activeTab === "scraps"}
             disabled={isUniversityUnverified}
             onClick={() => setActiveTab("scraps")}
@@ -310,39 +323,53 @@ export function MyProfilePage() {
         </S.TabList>
         {activeTab === "portfolio" && (
           <S.TabContent>
-            <S.PortfolioHeader>
-              <S.PortfolioExposure>프로필 노출<em>{detail.portfolios.length}</em><span>/ 6</span></S.PortfolioExposure>
-              <S.PortfolioHeaderButtons>
-                <S.portfolioManageButton onClick={() => navigate("/my-profile/portfolio-manage", { state: preview })}
-                type="button">관리</S.portfolioManageButton>
-                <S.portfolioAddButton onClick={() => navigate("/my-profile/portfolio-add", { state: preview })}
-                type="button">+ 추가</S.portfolioAddButton>
-              </S.PortfolioHeaderButtons>
-            </S.PortfolioHeader>
-            <S.FeaturedPortfolio
-              onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
-              type="button"
-            >
-              <S.FeaturedImage>
-                <Icon name="image" size={18} weight="regular" />
-                <span>사진</span>
-                <small>
-                  or <u>browse files</u>
-                </small>
-              </S.FeaturedImage>
-              <S.PortfolioCopy>
-                <S.RepresentativeLabel>대표 프로젝트</S.RepresentativeLabel>
-                <strong>{detail.portfolios[0].title}</strong>
-                <small>{portfolioPeriods[0]}</small>
-              </S.PortfolioCopy>
-              <Icon name="caret-right" size={23} weight="bold" />
-            </S.FeaturedPortfolio>
-            <S.PortfolioList>
-              {detail.portfolios.slice(1).map((item, index) => (
-                <S.PortfolioItem
-                  key={item.title}
+            {isUniversityUnverified ? (
+              <S.LockedPortfolioCard>
+                <S.LockedPortfolioIcon>
+                  <Icon name="lock" size={24} weight="regular" />
+                </S.LockedPortfolioIcon>
+                <S.LockedPortfolioTitle>
+                  인증하면 포트폴리오를 만들 수 있어요
+                </S.LockedPortfolioTitle>
+                <S.LockedPortfolioDescription>
+                  활동 사진과 한 줄 캡션으로 나를 소개하는 공간이에요.
+                  <br />
+                  학교 인증을 마치면 바로 열려요.
+                </S.LockedPortfolioDescription>
+              </S.LockedPortfolioCard>
+            ) : (
+              <>
+                <S.PortfolioHeader>
+                  <S.PortfolioExposure>
+                    프로필 노출<em>{detail.portfolios.length}</em>
+                    <span>/ 6</span>
+                  </S.PortfolioExposure>
+                  <S.PortfolioHeaderButtons>
+                    <S.portfolioManageButton
+                      onClick={() =>
+                        navigate("/my-profile/portfolio-manage", {
+                          state: preview,
+                        })
+                      }
+                      type="button"
+                    >
+                      관리
+                    </S.portfolioManageButton>
+                    <S.portfolioAddButton
+                      onClick={() =>
+                        navigate("/my-profile/portfolio-add", {
+                          state: preview,
+                        })
+                      }
+                      type="button"
+                    >
+                      + 추가
+                    </S.portfolioAddButton>
+                  </S.PortfolioHeaderButtons>
+                </S.PortfolioHeader>
+                <S.FeaturedPortfolio
                   onClick={() =>
-                    navigate(`/giut-hub/${profile.profileNumber}/portfolio/${index + 2}`)
+                    navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)
                   }
                   type="button"
                 >
@@ -351,10 +378,30 @@ export function MyProfilePage() {
                     <strong>{item.title}</strong>
                     <small>{portfolioPeriods[index + 1]}</small>
                   </S.PortfolioCopy>
-                  <Icon name="caret-right" size={22} weight="bold" />
-                </S.PortfolioItem>
-              ))}
-            </S.PortfolioList>
+                  <Icon name="caret-right" size={23} weight="bold" />
+                </S.FeaturedPortfolio>
+                <S.PortfolioList>
+                  {detail.portfolios.slice(1).map((item, index) => (
+                    <S.PortfolioItem
+                      key={item.title}
+                      onClick={() =>
+                        navigate(
+                          `/giut-hub/${profile.profileNumber}/portfolio/${index + 2}`,
+                        )
+                      }
+                      type="button"
+                    >
+                      <S.ListDot />
+                      <S.PortfolioCopy>
+                        <strong>{item.title}</strong>
+                        <small>{portfolioPeriods[index + 1]}</small>
+                      </S.PortfolioCopy>
+                      <Icon name="caret-right" size={22} weight="bold" />
+                    </S.PortfolioItem>
+                  ))}
+                </S.PortfolioList>
+              </>
+            )}
           </S.TabContent>
         )}
         {activeTab === "teams" && (
@@ -495,7 +542,12 @@ export function MyProfilePage() {
           if (key === "chat") navigate("/chat");
         }}
       />
-      {share.isOpen && <ProfileShareScreen profileName={currentProfile?.nickname ?? "내"} share={share} />}
+      {share.isOpen && (
+        <ProfileShareScreen
+          profileName={currentProfile?.nickname ?? "내"}
+          share={share}
+        />
+      )}
     </S.Page>
   );
 }

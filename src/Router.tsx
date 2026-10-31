@@ -4,6 +4,9 @@ import { useAuth } from "./contexts/AuthContext";
 import { completePendingLogin } from "./pages/Login/loginReturn";
 import { HomePage } from "./pages/Home/HomePage";
 import { GiutHubPage } from "./pages/GiutHub/GiutHubPage";
+import { GiutHubPreviewPage } from "./pages/GiutHubPreview/GiutHubPreviewPage";
+import { GiutHubPreviewProfilePage } from "./pages/GiutHubPreview/GiutHubPreviewProfilePage";
+import { PreviewPortfolioPage } from "./pages/GiutHubPreview/PreviewPortfolioPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
@@ -72,6 +75,14 @@ function AdminRoute({ children }: { children: ReactNode }) {
   ) : (
     <Navigate replace to="/admin/login" />
   );
+function StudentVerificationRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading, universityVerified } = useAuth();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate replace to="/login" />;
+  if (universityVerified) return <Navigate replace to="/home" />;
+
+  return children;
 }
 
 export function AppRouter() {
@@ -99,6 +110,16 @@ export function AppRouter() {
         />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
+        <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />
+        <Route element={<GiutHubPreviewPage />} path="/giut-hub-preview" />
+        <Route
+          element={<GiutHubPreviewProfilePage />}
+          path="/giut-hub-preview/:profileNumber"
+        />
+        <Route
+          element={<PreviewPortfolioPage />}
+          path="/giut-hub-preview/:profileNumber/portfolio/:portfolioId"
+        />
         <Route
           element={
             <UniversityVerifiedRoute>
@@ -227,14 +248,18 @@ export function AppRouter() {
         />
         <Route
           element={<ManageApplicationsPage />}
-          path="/my-team/applications"
+          path="/my-team/:teamId/applications"
         />
         <Route
           element={<ApplicationDetailPage />}
-          path="/my-team/applications/:applicantId"
+          path="/my-team/:teamId/applications/:applicationId"
         />
         <Route
-          element={<StudentVerificationPage />}
+          element={
+            <StudentVerificationRoute>
+              <StudentVerificationPage />
+            </StudentVerificationRoute>
+          }
           path="/student-verification"
         />
         <Route element={<Navigate replace to="/" />} path="*" />

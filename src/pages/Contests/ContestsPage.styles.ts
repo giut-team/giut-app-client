@@ -30,7 +30,7 @@ const shimmer = keyframes`
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[100]};
@@ -101,6 +101,37 @@ export const S = {
     display: grid;
     gap: 8px;
     margin-top: 6px;
+  `,
+  Pagination: styled.nav`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 18px;
+    padding-bottom: 6px;
+  `,
+  PageButton: styled.button<{ $active?: boolean }>`
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: ${({ $active }) =>
+      $active ? "0" : `1px solid ${tokens.color.neutral[200]}`};
+    border-radius: 9px;
+    background: ${({ $active }) =>
+      $active ? tokens.color.primary[500] : tokens.color.neutral[50]};
+    color: ${({ $active }) =>
+      $active ? tokens.color.neutral[50] : tokens.color.neutral[700]};
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.35;
+    }
   `,
   ContestCard: styled.button`
     position: relative;
@@ -271,12 +302,17 @@ export const S = {
     color: ${tokens.color.neutral[500]};
     transform: translateY(-50%);
   `,
-  EmptyState: styled.p`
+  EmptyState: styled.p<{ $centered?: boolean }>`
+    display: ${({ $centered }) => ($centered ? "grid" : "block")};
+    min-height: ${({ $centered }) =>
+      $centered ? "calc(100svh - 230px)" : "auto"};
     margin: 0;
-    padding: 24px 12px;
+    padding: ${({ $centered }) => ($centered ? "0 12px" : "24px 12px")};
+    place-items: center;
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
-    color: ${tokens.color.neutral[500]};
+    color: ${({ $centered }) =>
+      $centered ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font-size: 9px;
     text-align: center;
   `,

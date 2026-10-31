@@ -7,6 +7,12 @@ export const S = {
   Thread: styled(Chat.Thread)`display: flex; flex-direction: column; gap: 16px;`,
   Messages: styled(Chat.Messages)`display: flex; flex-direction: column; gap: 12px;`,
   Composer: styled(Chat.Composer)`display: flex; gap: 8px;`,
+  HeaderActions: styled(Chat.HeaderActions)`gap: 10px;`,
+  ChatMenuButton: styled(Chat.ChatMenuButton)`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  `,
   MessageInput: styled(Chat.MessageInput)`flex: 1; min-width: 0; font-size: 14px; height: 44px;`,
   SendButton: styled(Chat.SendButton)`flex: 0 0 44px; width: 44px; height: 44px;`,
   Bubble: styled(Chat.Bubble)`font-size: 14px; overflow-wrap: anywhere;`,

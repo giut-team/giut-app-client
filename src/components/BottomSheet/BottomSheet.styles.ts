@@ -13,7 +13,7 @@ export const S = {
     min-height: 0;
     flex: 1;
     flex-direction: column;
-    padding: ${({ $compact }) => ($compact ? "12px 18px 20px" : "17px 27px 0")};
+    padding: ${({ $compact }) => ($compact ? "12px 18px max(20px, env(safe-area-inset-bottom, 0px))" : "17px 27px 0")};
   ${({ $contentPadding }) =>
     $contentPadding !== undefined && `padding: ${$contentPadding};`}
   `,
@@ -313,6 +313,13 @@ export const S = {
       outline: 2px solid ${tokens.color.primary[500]};
       outline-offset: 2px;
     }
+  `,
+  DecisionError: styled.p`
+    margin: 10px 0 0;
+    color: ${tokens.color.danger[500]};
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
   `,
   DecisionFooterActions: styled.div`
     display: grid;

@@ -9,7 +9,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   Content: styled.div`
-    width: min(100%, 453px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     padding-bottom: 84px;
@@ -536,12 +536,14 @@ export const S = {
     z-index: 5;
     display: flex;
     justify-content: center;
+    width: min(100%, var(--app-content-width));
+    margin: 0 auto;
     padding: 12px 22px calc(12px + var(--app-safe-bottom));
     border-top: 1px solid ${tokens.color.neutral[200]};
     background: rgb(255 255 255 / 96%);
   `,
   SaveButton: styled.button`
-    width: min(100%, 409px);
+    width: 100%;
     padding: 17px 14px;
     border: 0;
     border-radius: 15px;

@@ -31,7 +31,7 @@ const notificationColors: Record<
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};
@@ -42,7 +42,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.primary[500]};
     font: inherit;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
 
@@ -60,9 +60,9 @@ export const S = {
     display: flex;
     align-items: flex-start;
     width: 100%;
-    min-height: 74px;
-    padding: 14px 8px;
-    gap: 10px;
+    min-height: 94px;
+    padding: 18px 8px;
+    gap: 12px;
     border: 0;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     border-left: 0;
@@ -78,28 +78,28 @@ export const S = {
   `,
   NotificationIcon: styled.span<{ $tone: NotificationTone }>`
     display: grid;
-    flex: 0 0 28px;
-    width: 28px;
-    height: 28px;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
     place-items: center;
     border-radius: 9px;
     background: ${({ $tone }) => notificationColors[$tone].background};
     color: ${({ $tone }) => notificationColors[$tone].color};
   `,
   NotificationAsset: styled.img`
-    width: 17px;
-    height: 17px;
+    width: 21px;
+    height: 21px;
     object-fit: contain;
   `,
   NotificationContent: styled.span`
     display: grid;
     min-width: 0;
-    gap: 4px;
+    gap: 6px;
   `,
   NotificationTitle: styled.strong`
     overflow: hidden;
     color: ${tokens.color.neutral[900]};
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: -0.2px;
     text-overflow: ellipsis;
@@ -108,7 +108,7 @@ export const S = {
   NotificationDescription: styled.span`
     overflow: hidden;
     color: #000;
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: -0.1px;
     text-overflow: ellipsis;
@@ -116,15 +116,15 @@ export const S = {
   `,
   ReceivedAt: styled.span`
     color: ${tokens.color.neutral[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 500;
   `,
   UnreadDot: styled.span`
     position: absolute;
-    top: 14px;
+    top: 18px;
     right: 13px;
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: ${tokens.color.danger[500]};
   `,

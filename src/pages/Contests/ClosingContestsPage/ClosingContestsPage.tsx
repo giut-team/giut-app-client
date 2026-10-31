@@ -120,7 +120,7 @@ export function ClosingContestsPage() {
             />
           ))}
           {!isClosingSoonContestsLoading && !isClosingSoonContestsError && visibleClosingSoonContests.length === 0 && (
-            <S.EmptyState>
+            <S.EmptyState $centered>
               선택한 분야의 마감 임박 공모전이 없어요.
             </S.EmptyState>
           )}

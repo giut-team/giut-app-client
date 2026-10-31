@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchPopularContests } from "../../api/contests";
@@ -32,7 +32,7 @@ const shortcuts = [
 const navigationItems = [
   { key: "home", label: "홈", icon: "home" as const },
   { key: "hub", label: "기웃허브", icon: "users" as const },
-  { key: "chat", label: "채팅", icon: "chat" as const, badge: 2 },
+  { key: "chat", label: "채팅", icon: "chat" as const },
   { key: "mypage", label: "마이페이지", icon: "user" as const },
 ];
 
@@ -51,6 +51,13 @@ export function HomePage() {
   const [toastMessage, setToastMessage] = useState(
     (location.state as { toastMessage?: string } | null)?.toastMessage ?? "",
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   const {
     data: popularContests = [],
     isError: isPopularContestsError,
@@ -346,7 +353,7 @@ export function HomePage() {
           {!isPopularContestsLoading &&
             !isPopularContestsError &&
             homePopularContests.length === 0 && (
-              <S.ContestState>현재 인기 공모전이 없어요.</S.ContestState>
+              <S.ContestState $centered>현재 인기 공모전이 없어요.</S.ContestState>
             )}
         </S.ContestList>
       </S.Content>

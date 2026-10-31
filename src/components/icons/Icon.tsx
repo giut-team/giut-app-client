@@ -3,6 +3,7 @@ import {
   ArrowRight,
   ArrowsDownUp,
   Bell,
+  BellSlash,
   BookmarkSimple,
   CalendarBlank,
   CaretLeft,
@@ -33,6 +34,7 @@ import {
   RocketLaunch,
   ShieldCheck,
   ShareNetwork,
+  SignOut,
   UploadSimple,
   Trash,
   User,
@@ -53,6 +55,7 @@ export type IconName =
   | "arrow-left"
   | "arrows-down-up"
   | "bell"
+  | "bell-slash"
   | "bookmark"
   | "calendar"
   | "caret-right"
@@ -81,6 +84,7 @@ export type IconName =
   | "search"
   | "share"
   | "share-export"
+  | "sign-out"
   | "trash"
   | "shield-check"
   | "rocket"
@@ -101,6 +105,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   "arrow-left": CaretLeft,
   "arrows-down-up": ArrowsDownUp,
   bell: Bell,
+  "bell-slash": BellSlash,
   bookmark: BookmarkSimple,
   calendar: CalendarBlank,
   "caret-right": CaretRight,
@@ -129,6 +134,7 @@ const iconMap: Record<IconName, ComponentType<PhosphorIconProps>> = {
   search: MagnifyingGlass,
   share: ShareNetwork,
   "share-export": UploadSimple,
+  "sign-out": SignOut,
   trash: Trash,
   "shield-check": ShieldCheck,
   rocket: RocketLaunch,

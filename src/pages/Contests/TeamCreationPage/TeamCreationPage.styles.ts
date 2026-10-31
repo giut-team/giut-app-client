@@ -20,7 +20,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};
@@ -193,6 +193,23 @@ export const S = {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+  `,
+  FieldTitleGroup: styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  `,
+  LockedBadge: styled.span`
+    flex-shrink: 0;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background: ${tokens.color.neutral[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 7px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
   `,
   SelectedRole: styled.span`
     color: ${tokens.color.neutral[500]};
@@ -226,6 +243,11 @@ export const S = {
     font-weight: ${({ $active }) => $active ? 800 : 600};
     cursor: pointer;
     transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
   `,
   StepIntro: styled.section`
     margin-bottom: 12px;
@@ -234,18 +256,21 @@ export const S = {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 12px;
     font-weight: 800;
   `,
   AllocationBadge: styled.span`
+    flex-shrink: 0;
     padding: 5px 7px;
     border-radius: 6px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
     font-size: 8px;
     font-weight: 800;
+    white-space: nowrap;
   `,
   OptionalLabel: styled.span`
     color: ${tokens.color.neutral[500]};
@@ -336,9 +361,23 @@ export const S = {
     font-size: 8px;
     font-weight: ${({ $active }) => $active ? 800 : 600};
     cursor: pointer;
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
   `,
   InfoBox: styled.p`
     margin: 13px 0 0;
+    padding: 11px 12px;
+    border-radius: 10px;
+    background: ${tokens.color.primary[100]};
+    color: ${tokens.color.neutral[500]};
+    font-size: 8px;
+    line-height: 1.55;
+  `,
+  EditRestrictionNotice: styled.p`
+    margin: 0 0 16px;
     padding: 11px 12px;
     border-radius: 10px;
     background: ${tokens.color.primary[100]};
@@ -364,6 +403,7 @@ export const S = {
     font-size: 9px;
 
     &:focus { border-color: ${tokens.color.primary[500]}; }
+    &:disabled { background: ${tokens.color.neutral[100]}; cursor: not-allowed; }
   `,
   SearchButton: styled.button`
     width: 42px;
@@ -375,6 +415,8 @@ export const S = {
     font-size: 8px;
     font-weight: 800;
     cursor: pointer;
+
+    &:disabled { color: ${tokens.color.neutral[500]}; opacity: 0.55; cursor: not-allowed; }
   `,
   MemberStatus: styled.p`
     margin: 10px 0 6px;
@@ -419,6 +461,8 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[500]};
     cursor: pointer;
+
+    &:disabled { color: ${tokens.color.neutral[200]}; cursor: not-allowed; }
   `,
   Divider: styled.hr`
     margin: 19px -14px;
@@ -525,11 +569,19 @@ export const S = {
   `,
   QuestionHeading: styled.h2`
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 8px;
     margin: 0;
     color: ${tokens.color.neutral[900]};
     font-size: 11px;
     font-weight: 800;
+  `,
+  HeadingMeta: styled.span`
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
   `,
   QuestionList: styled.div`
     display: grid;
@@ -561,6 +613,8 @@ export const S = {
     font: inherit;
     font-size: 9px;
     font-weight: 700;
+
+    &:disabled { color: ${tokens.color.neutral[500]}; cursor: not-allowed; }
   `,
   QuestionText: styled.p`
     overflow: hidden;
@@ -615,6 +669,13 @@ export const S = {
     font-size: 9px;
     font-weight: 800;
     cursor: pointer;
+
+    &:disabled {
+      border-color: ${tokens.color.neutral[200]};
+      color: ${tokens.color.neutral[500]};
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
   `,
   QuestionSheetHeader: styled.div`
     position: relative;
@@ -802,6 +863,8 @@ export const S = {
     font-size: 8px;
     font-weight: 800;
     cursor: pointer;
+
+    &:disabled { color: ${tokens.color.neutral[500]}; opacity: 0.55; cursor: not-allowed; }
   `,
   ConfirmationEditRow: styled.div`
     display: flex;
@@ -1007,6 +1070,10 @@ export const S = {
       $active ? tokens.color.neutral[50] : tokens.color.neutral[500]};
     font-size: 7px;
     font-weight: 800;
+
+    svg {
+      color: ${tokens.color.neutral[50]};
+    }
   `,
   CreationCompleteNotice: styled.p`
     margin: 15px 0 0;
@@ -1027,7 +1094,7 @@ export const S = {
     left: 0;
     display: flex;
     gap: 6px;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 10px 6px max(10px, env(safe-area-inset-bottom));
     box-sizing: border-box;

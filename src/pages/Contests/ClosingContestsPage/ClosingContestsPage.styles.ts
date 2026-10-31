@@ -23,7 +23,7 @@ const categoryColors: Record<
 
 export const S = {
   Page: styled.main`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[100]};
@@ -282,12 +282,17 @@ export const S = {
     font-weight: 500;
     line-height: 1;
   `,
-  EmptyState: styled.p`
+  EmptyState: styled.p<{ $centered?: boolean }>`
+    display: ${({ $centered }) => ($centered ? "grid" : "block")};
+    min-height: ${({ $centered }) =>
+      $centered ? "calc(100svh - 260px)" : "auto"};
     margin: 0;
-    padding: 24px 12px;
+    padding: ${({ $centered }) => ($centered ? "0 12px" : "24px 12px")};
+    place-items: center;
     border-radius: 13px;
     background: ${tokens.color.neutral[50]};
-    color: ${tokens.color.neutral[500]};
+    color: ${({ $centered }) =>
+      $centered ? tokens.color.neutral[900] : tokens.color.neutral[500]};
     font-size: 9px;
     text-align: center;
   `,

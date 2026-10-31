@@ -41,13 +41,20 @@ export const S = {
     flex-direction: column;
     width: ${({ $placement, $maxWidth }) =>
       $placement === "center"
-        ? `min(calc(100% - 48px), ${$maxWidth ?? "420px"})`
-        : "min(100%, 550px)"};
-    min-height: ${({ $minHeight }) => $minHeight ?? "auto"};
+        ? "min(calc(100% - 48px), calc(var(--app-content-width) - 48px), 420px)"
+        : "min(100%, var(--app-content-width))"};
+    min-height: ${({ $minHeight }) =>
+      $minHeight && $minHeight !== "auto" ? `min(${$minHeight}, 90vh, 650px)` : "auto"};
     max-height: min(90vh, 650px);
+    @supports (height: 100dvh) {
+      min-height: ${({ $minHeight }) =>
+        $minHeight && $minHeight !== "auto" ? `min(${$minHeight}, 90dvh, 650px)` : "auto"};
+      max-height: min(90dvh, 650px);
+    }
     margin: 0 auto;
     overflow: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
     border-radius: ${({ $placement }) =>
       $placement === "center" ? "20px" : "28px 28px 0 0"};
     background: ${tokens.color.neutral[50]};

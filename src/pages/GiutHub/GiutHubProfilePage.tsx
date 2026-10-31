@@ -1,22 +1,28 @@
-import { useState } from "react";
+import { ProfileRouteMotion } from "../../components/ProfileRouteMotion/ProfileRouteMotion";
+import { useLayoutEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { BottomSheet } from "../../components/BottomSheet/BottomSheet";
 import { PageHeader } from "../../components/PageHeader";
+import { useProfileSlideNavigate } from "../../components/ProfileRouteMotion/useProfileSlideNavigate";
 import { Icon } from "../../components/icons";
 import dataDashboard from "../../assets/portfolio/data-dashboard.png";
 import esgGlobe from "../../assets/portfolio/esg-globe.png";
 import hackathonCode from "../../assets/portfolio/hackathon-code.png";
 import projectRoadmap from "../../assets/portfolio/project-roadmap.png";
-import { getPublicProfile, type PublicProfileDetail } from "../../api/giutHub";
-import { getProfileRecommendation, setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
+import type { PublicProfileDetail } from "../../api/giutHub";
+import { profileDetailOptions } from "./profileQueries";
+import { hubListReturnTo } from "./giutHubFilters";
+import { setProfileRecommendation, getProfileActionError } from "../../api/profileActions";
 import { createPersonalChatRoom } from "../../api/chat";
 import { toHubProfile } from "./GiutHubPage";
-import { GiutHubDialog } from "./GiutHubDialog";
+import { ProfileReportModal } from "./ProfileReportModal";
 import { useAuth } from "../../contexts/AuthContext";
 import { ProfileShareScreen } from "./ProfileShareScreen";
 import { ProfileTabEmptyState } from "./ProfileTabEmptyState";
+import { ImageWithFallback } from "./ImageWithFallback";
+import { TeamProposalBottomSheet } from "./TeamProposalBottomSheet";
 import { useProfileShare } from "./useProfileShare";
 import { S } from "./GiutHubProfilePage.styles";
 import { getProfileHeadingStatusColor } from "./profileStatus";
@@ -29,29 +35,6 @@ export type Portfolio = {
   markdown: string;
 };
 export type ProfileDetail = { skills: string[]; portfolios: Portfolio[] };
-type ProposalTeam = { id: string; name: string; summary: string; disabled?: boolean };
-
-const proposalTeams: ProposalTeam[] = [
-  {
-    id: "data-seoul",
-    name: "데이터로 서울을",
-    summary: "서울시 데이터 공모전 · 3/5명 · 백엔드 개발자 1자리",
-  },
-  {
-    id: "calendar-hackathon",
-    name: "캘린더 해커톤 4팀",
-    summary: "제 12회 캘린더 해커톤 · 2/5명 · 백엔드 개발자 2자리",
-  },
-  {
-    id: "greentech",
-    name: "그린테크 스터디팀",
-    summary: "모집 마감 · 남은 자리 없음",
-    disabled: true,
-  },
-];
-
-const proposalPositions = ["백엔드 개발자", "데이터 엔지니어"];
-
 const skillIconFileNames: Record<string, string> = {
   Python: "python",
   SQL: "sql",
@@ -309,99 +292,18 @@ export const detailsByProfileId: Record<string, ProfileDetail> = {
   },
 };
 
-export function TeamProposalBottomSheet({
-  open,
-  profileName,
-  onClose,
-}: {
-  open: boolean;
-  profileName: string;
-  onClose: () => void;
-}) {
-  const [selectedProposalTeam, setSelectedProposalTeam] = useState("data-seoul");
-  const [selectedProposalPosition, setSelectedProposalPosition] = useState(
-    proposalPositions[0],
-  );
-
-  return (
-    <BottomSheet
-      footer={
-        <S.ProposalFooter>
-          <S.ProposalCancelButton onClick={onClose} type="button">
-            취소
-          </S.ProposalCancelButton>
-          <S.ProposalConfirmButton onClick={onClose} type="button">
-            이 팀으로 제안 보내기
-          </S.ProposalConfirmButton>
-        </S.ProposalFooter>
-      }
-      footerVariant="action"
-      minHeight="min(76svh, 570px)"
-      onClose={onClose}
-      open={open}
-      showHeaderDivider={false}
-      variant="compact"
-    >
-      <S.ProposalHeading>어느 팀으로 제안할까요?</S.ProposalHeading>
-      <S.ProposalDescription>
-        {profileName}님에게 보낼 팀을 골라주세요. 내가 팀장인 팀만
-        보여요.
-      </S.ProposalDescription>
-      <S.ProposalTeamList aria-label="제안할 팀 선택">
-        {proposalTeams.map((team) => {
-          const selected = selectedProposalTeam === team.id;
-          return (
-            <S.ProposalTeamCard
-              $disabled={team.disabled === true}
-              $selected={selected}
-              aria-pressed={selected}
-              disabled={team.disabled}
-              key={team.id}
-              onClick={() => setSelectedProposalTeam(team.id)}
-              type="button"
-            >
-              <S.ProposalRadio $selected={selected}>
-                {selected && <Icon name="check" size={13} weight="bold" />}
-              </S.ProposalRadio>
-              <span>
-                <strong>{team.name}</strong>
-                <small>{team.summary}</small>
-              </span>
-              {team.disabled && <em>선택 불가</em>}
-            </S.ProposalTeamCard>
-          );
-        })}
-      </S.ProposalTeamList>
-      <S.ProposalPositionTitle>제안할 포지션</S.ProposalPositionTitle>
-      <S.ProposalPositionList>
-        {proposalPositions.map((position) => (
-          <S.ProposalPosition
-            $selected={selectedProposalPosition === position}
-            aria-pressed={selectedProposalPosition === position}
-            key={position}
-            onClick={() => setSelectedProposalPosition(position)}
-            type="button"
-          >
-            {position}
-          </S.ProposalPosition>
-        ))}
-      </S.ProposalPositionList>
-    </BottomSheet>
-  );
-}
-
 function ProfileMoreBottomSheet({
   open,
   onClose,
   onShare,
   onReport,
-  onBlock,
+  canReport,
 }: {
   open: boolean;
   onClose: () => void;
   onShare: () => void;
   onReport: () => void;
-  onBlock: () => void;
+  canReport: boolean;
 }) {
   return (
     <BottomSheet
@@ -417,134 +319,47 @@ function ProfileMoreBottomSheet({
           프로필 공유
         </S.ProfileMenuButton>
         <S.ProfileMenuDivider />
-        <S.ProfileMenuButton $destructive onClick={onReport} type="button">
+        <S.ProfileMenuButton $destructive disabled={!canReport} onClick={onReport} type="button">
           <Icon name="shield-check" size={21} weight="regular" />
           신고하기
-        </S.ProfileMenuButton>
-        <S.ProfileMenuButton $destructive onClick={onBlock} type="button">
-          <Icon name="lock" size={21} weight="regular" />
-          차단하기
         </S.ProfileMenuButton>
       </S.ProfileMenu>
     </BottomSheet>
   );
 }
 
-const reportReasons = [
-  "스팸 · 광고성 프로필",
-  "허위 경력 · 정보 도용",
-  "부적절한 언행 · 괴롭힘",
-  "기타",
-];
-
-function ProfileReportModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [selectedReason, setSelectedReason] = useState(reportReasons[1]);
-
-  return (
-    <GiutHubDialog
-      description={
-        "신고 사유를 선택해 주세요. " +
-        "운영팀이 24시간 내 검토합니다."
-      }
-      onClose={onClose}
-      open={open}
-      title="신고하기"
-    >
-      <S.ReportReasonList aria-label="신고 사유 선택">
-        {reportReasons.map((reason) => (
-          <S.ReportReason
-            $selected={selectedReason === reason}
-            aria-pressed={selectedReason === reason}
-            key={reason}
-            onClick={() => setSelectedReason(reason)}
-            type="button"
-          >
-            <S.ReportRadio $selected={selectedReason === reason} />
-            {reason}
-          </S.ReportReason>
-        ))}
-      </S.ReportReasonList>
-      <S.DangerDialogActions>
-        <S.DialogCancelButton onClick={onClose} type="button">
-          취소
-        </S.DialogCancelButton>
-        <S.DialogDangerButton onClick={onClose} type="button">
-          신고 접수
-        </S.DialogDangerButton>
-      </S.DangerDialogActions>
-    </GiutHubDialog>
-  );
-}
-
-function ProfileBlockModal({
-  open,
-  profileName,
-  onClose,
-}: {
-  open: boolean;
-  profileName: string;
-  onClose: () => void;
-}) {
-  return (
-    <GiutHubDialog
-      description={
-        "차단하면 서로의 프로필과 팀 제안이 노출되지 않아요.\n" +
-        "설정에서 언제든 해제할 수 있어요."
-      }
-      icon={<Icon name="lock" size={24} weight="bold" />}
-      onClose={onClose}
-      open={open}
-      title={`${profileName} 님을 차단할까요?`}
-      tone="danger"
-    >
-      <S.BlockNotice>
-        <span>· 진행 중인 팀 제안 1건이 자동 취소됩니다</span>
-        <span>· 주고받은 채팅방이 숨겨집니다</span>
-      </S.BlockNotice>
-      <S.DangerDialogActions>
-        <S.DialogCancelButton onClick={onClose} type="button">
-          취소
-        </S.DialogCancelButton>
-        <S.DialogDangerButton onClick={onClose} type="button">
-          차단하기
-        </S.DialogDangerButton>
-      </S.DangerDialogActions>
-    </GiutHubDialog>
-  );
-}
-
 export function GiutHubProfilePage() {
+  return <ProfileRouteMotion><GiutHubProfilePageContent /></ProfileRouteMotion>;
+}
+
+function GiutHubProfilePageContent() {
   const navigate = useNavigate();
+  const slideNavigate = useProfileSlideNavigate();
+  const location = useLocation();
+  const returnTo = hubListReturnTo(location.state?.returnTo);
   const { profileNumber } = useParams();
   const userId = Number(profileNumber);
-  const { profile: currentProfile, isAuthenticated } = useAuth();
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [userId]);
+  const { profile: currentProfile, isAuthenticated, isLoading: authLoading, queryScope } = useAuth();
   const isOwnProfile = currentProfile?.userId === userId;
   const queryClient = useQueryClient();
-  const detailKey = ["giut-hub", "profile", userId, currentProfile?.userId];
+  const detailOptions = profileDetailOptions(userId, queryScope);
+  const detailKey = detailOptions.queryKey;
   const {
     data: apiProfile,
     isPending: isLoadingProfile,
     isError: profileLoadError,
   } = useQuery({
-    queryKey: detailKey,
-    queryFn: () => getPublicProfile(userId),
-    enabled: Number.isSafeInteger(userId) && userId > 0,
-    retry: false,
-  });
-  const recommendationKey = ["profile-recommendation", currentProfile?.userId, userId];
-  const recommendation = useQuery({
-    queryKey: recommendationKey,
-    queryFn: ({ signal }) => getProfileRecommendation(userId, signal),
-    enabled: isAuthenticated && !isOwnProfile && !!apiProfile && !profileLoadError,
-    placeholderData: apiProfile ? { userId, recommended: apiProfile.recommended, recommendationCount: apiProfile.recommendationCount } : undefined,
-    retry: false,
+    ...detailOptions,
+    enabled: detailOptions.enabled && !authLoading,
   });
   const recommendationMutation = useMutation({
     mutationKey: ["profile-recommendation-update", currentProfile?.userId, userId],
-    mutationFn: () => setProfileRecommendation(userId, !recommendation.data?.recommended),
-    onMutate: () => queryClient.cancelQueries({ queryKey: recommendationKey }),
+    mutationFn: (recommended: boolean) => setProfileRecommendation(userId, recommended),
+    onMutate: () => queryClient.cancelQueries({ queryKey: detailKey }),
     onSuccess: data => {
-      queryClient.setQueryData(recommendationKey, data);
       queryClient.setQueryData<PublicProfileDetail>(detailKey, previous => updateDetailRecommendation(previous, data));
     },
     retry: false,
@@ -552,10 +367,10 @@ export function GiutHubProfilePage() {
   const contact = useMutation({ mutationKey: ["profile-contact", userId], mutationFn: () => createPersonalChatRoom(userId), retry: false });
   const share = useProfileShare(isAuthenticated, isOwnProfile ? undefined : userId);
   const [activeTab, setActiveTab] = useState<"portfolio" | "activity">("portfolio");
-  const isRecommended = recommendation.data?.recommended ?? apiProfile?.recommended ?? false;
+  const isRecommended = apiProfile?.recommended ?? false;
   const [isProposalSheetOpen, setIsProposalSheetOpen] = useState(false);
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
-  const [profileAction, setProfileAction] = useState<"share" | "report" | "block" | null>(
+  const [profileAction, setProfileAction] = useState<"share" | "report" | null>(
     null,
   );
 
@@ -570,7 +385,7 @@ export function GiutHubProfilePage() {
         portfolios: (profileData.portfolioItems ?? []).map((item) => ({
           title: item.title,
           description: item.caption,
-          image: item.imageUrl || portfolioImages[0],
+          image: item.imageUrl,
           markdown: item.markdownContent || item.caption,
         })),
       }
@@ -584,13 +399,13 @@ export function GiutHubProfilePage() {
   const departmentAndGrade = profileData
     ? `${profileData.departmentName} / ${profileData.grade}학년`
     : "";
-  const openProfileAction = (action: "share" | "report" | "block") => {
+  const openProfileAction = (action: "share" | "report") => {
     setIsMoreSheetOpen(false);
     if (action === "share") {
       share.openShare();
       return;
     }
-    window.setTimeout(() => setProfileAction(action), 180);
+    if (isAuthenticated && !isOwnProfile) window.setTimeout(() => setProfileAction(action), 180);
   };
 
   if (!Number.isSafeInteger(userId) || userId <= 0) {
@@ -600,7 +415,7 @@ export function GiutHubProfilePage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate("/giut-hub")} title="" />
+          <PageHeader onBack={() => { void slideNavigate(returnTo); }} title="" />
           <S.EmptyState>프로필을 불러오고 있어요.</S.EmptyState>
         </S.Content>
       </S.Page>
@@ -610,7 +425,7 @@ export function GiutHubProfilePage() {
     return (
       <S.Page>
         <S.Content>
-          <PageHeader onBack={() => navigate("/giut-hub")} title="" />
+          <PageHeader onBack={() => { void slideNavigate(returnTo); }} title="" />
           <S.EmptyState>
             프로필을 불러오지 못했어요. 로그인 상태와 네트워크를 확인한 뒤 다시 시도해 주세요.
           </S.EmptyState>
@@ -623,7 +438,7 @@ export function GiutHubProfilePage() {
     <S.Page>
       <S.Content>
         <PageHeader
-          onBack={() => navigate("/giut-hub")}
+          onBack={() => { void slideNavigate(returnTo); }}
           rightContent={
             <S.MoreButton
               aria-label="더보기"
@@ -677,7 +492,7 @@ export function GiutHubProfilePage() {
           ))}
         </S.SkillList>
         <S.ActionRow>
-          <Button onClick={() => setIsProposalSheetOpen(true)} type="button">
+          <Button disabled={!isAuthenticated || isOwnProfile} onClick={() => setIsProposalSheetOpen(true)} type="button">
             <Icon name="paper-plane" size={19} weight="fill" />팀 제안 보내기
           </Button>
           <S.MessageButton disabled={!isAuthenticated || isOwnProfile || contact.isPending} onClick={() => {
@@ -691,18 +506,20 @@ export function GiutHubProfilePage() {
             $active={isRecommended}
             aria-label={isRecommended ? "프로필 추천 취소" : "프로필 추천하기"}
             aria-pressed={isRecommended}
-            disabled={!isAuthenticated || isOwnProfile || recommendation.isPending || recommendation.isError || recommendationMutation.isPending}
-            onClick={() => { if (!recommendationMutation.isPending && !recommendation.isError) recommendationMutation.mutate(); }}
+            disabled={!isAuthenticated || isOwnProfile || !apiProfile || profileLoadError || recommendationMutation.isPending}
+            onClick={() => {
+              if (!isAuthenticated || isOwnProfile || !apiProfile || profileLoadError || recommendationMutation.isPending) return;
+              recommendationMutation.mutate(!isRecommended);
+            }}
             type="button"
           >
             <Icon name="star" size={21} weight={isRecommended ? "fill" : "regular"} />
           </S.FavoriteButton>
         </S.ActionRow>
-        {(recommendation.isError || recommendationMutation.isError || contact.isError) && (
+        {(recommendationMutation.isError || contact.isError) && (
           <S.ActionFeedback>
-            <p role="alert">{getProfileActionError(recommendation.error ?? recommendationMutation.error ?? contact.error,
-              recommendation.isError ? "추천 상태를 확인하지 못했어요." : recommendationMutation.isError ? "추천을 변경하지 못했어요. 다시 시도해 주세요." : "대화를 시작하지 못했어요. 다시 시도해 주세요.")}</p>
-            {recommendation.isError && <Button onClick={() => void recommendation.refetch()} disabled={recommendation.isFetching} type="button">추천 상태 다시 확인</Button>}
+            <p role="alert">{getProfileActionError(recommendationMutation.error ?? contact.error,
+              recommendationMutation.isError ? "추천을 변경하지 못했어요. 다시 시도해 주세요." : "대화를 시작하지 못했어요. 다시 시도해 주세요.")}</p>
           </S.ActionFeedback>
         )}
         <S.TabList role="tablist">
@@ -732,7 +549,7 @@ export function GiutHubProfilePage() {
               onClick={() => navigate(`/giut-hub/${profile.profileNumber}/portfolio/1`)}
             >
               <S.FeaturedPortfolioImage>
-                <img alt="" src={detail.portfolios[0].image} />
+                <ImageWithFallback alt={`${detail.portfolios[0].title} 대표 이미지`} src={detail.portfolios[0].image} />
               </S.FeaturedPortfolioImage>
               <S.PortfolioCopy>
                 <S.RepresentativeLabel>대표 프로젝트</S.RepresentativeLabel>
@@ -754,7 +571,7 @@ export function GiutHubProfilePage() {
                   }
                 >
                   <S.PortfolioImage>
-                    <img alt="" src={item.image} />
+                    <ImageWithFallback alt={`${item.title} 이미지`} src={item.image} />
                   </S.PortfolioImage>
                   <S.PortfolioCopy>
                     <S.PortfolioTitle>{item.title}</S.PortfolioTitle>
@@ -797,28 +614,23 @@ export function GiutHubProfilePage() {
           />
         )}
       </S.Content>
-      <TeamProposalBottomSheet
+      {isProposalSheetOpen && <TeamProposalBottomSheet
+        key={`${currentProfile?.userId}:${userId}`}
         onClose={() => setIsProposalSheetOpen(false)}
-        open={isProposalSheetOpen}
+        targetUserId={userId}
         profileName={profile.name}
-      />
+      />}
       <ProfileMoreBottomSheet
-        onBlock={() => openProfileAction("block")}
+        canReport={isAuthenticated && !isOwnProfile}
         onClose={() => setIsMoreSheetOpen(false)}
         onReport={() => openProfileAction("report")}
         onShare={() => openProfileAction("share")}
         open={isMoreSheetOpen}
       />
       {share.isOpen && <ProfileShareScreen profile={profileSummary ?? undefined} profileName={profile.name} share={share} />}
-      <ProfileReportModal
-        onClose={() => setProfileAction(null)}
-        open={profileAction === "report"}
-      />
-      <ProfileBlockModal
-        onClose={() => setProfileAction(null)}
-        open={profileAction === "block"}
-        profileName={profile.name}
-      />
+      {profileAction === "report" && isAuthenticated && !isOwnProfile && (
+        <ProfileReportModal key={`${userId}-${currentProfile?.userId}`} onClose={() => setProfileAction(null)} userId={userId} />
+      )}
     </S.Page>
   );
 }

@@ -15,7 +15,7 @@ export const S = {
     background: ${tokens.color.neutral[50]};
   `,
   Content: styled.div`
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     min-height: 100svh;
     margin: 0 auto;
     background: ${tokens.color.neutral[50]};
@@ -101,29 +101,29 @@ export const S = {
   `,
   Hero: styled.section`
     position: relative;
-    padding: 10px 18px 15px;
+    padding: 16px 20px 20px;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     background: ${tokens.color.neutral[50]};
   `,
   HeroTags: styled.div`
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
   `,
   Category: styled.span`
-    padding: 4px 6px;
+    padding: 5px 8px;
     border-radius: 5px;
     background: ${tokens.color.primary[100]};
     color: ${tokens.color.primary[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
     line-height: 1;
   `,
   Verified: styled.span`
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 4px 6px;
+    gap: 3px;
+    padding: 5px 8px;
     border-radius: 5px;
     background: color-mix(
       in srgb,
@@ -131,14 +131,14 @@ export const S = {
       ${tokens.color.neutral[50]}
     );
     color: ${tokens.color.success[500]};
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
     line-height: 1;
   `,
   HeroTitle: styled.h1`
-    margin: 13px 0 7px;
+    margin: 16px 0 9px;
     color: ${tokens.color.neutral[900]};
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.65px;
     line-height: 1.35;
@@ -146,20 +146,20 @@ export const S = {
   Host: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[700]};
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 600;
   `,
   HeroStats: styled.div`
     display: flex;
-    gap: 7px;
-    margin-top: 9px;
+    gap: 10px;
+    margin-top: 12px;
     color: ${tokens.color.neutral[900]};
 
     span {
       display: inline-flex;
       align-items: center;
-      gap: 2px;
-      font-size: 8px;
+      gap: 3px;
+      font-size: 11px;
       line-height: 1;
     }
   `,
@@ -167,68 +167,68 @@ export const S = {
     position: absolute;
     right: 18px;
     bottom: 16px;
-    padding: 5px 8px;
+    padding: 6px 9px;
     border-radius: 6px;
     background: ${tokens.color.danger[500]};
     color: ${tokens.color.neutral[50]};
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 800;
     line-height: 1;
   `,
   InfoSection: styled.section`
-    padding: 15px 12px 18px;
+    padding: 20px 18px 22px;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     background: ${tokens.color.neutral[50]};
   `,
   InfoList: styled.dl`
     display: grid;
-    gap: 10px;
+    gap: 13px;
     margin: 0;
   `,
   InfoRow: styled.div`
     display: grid;
-    grid-template-columns: 56px minmax(0, 1fr);
-    gap: 0;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 6px;
 
     span {
       color: ${tokens.color.neutral[900]};
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 700;
       line-height: 1.4;
     }
 
     strong {
       color: ${tokens.color.neutral[900]};
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 700;
       line-height: 1.4;
     }
   `,
   SourceLink: styled.a`
     color: ${tokens.color.primary[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1.4;
     text-decoration: none;
   `,
   Notice: styled.p`
-    margin: 16px 0 0;
-    padding: 13px 14px;
+    margin: 18px 0 0;
+    padding: 14px 16px;
     border-radius: 12px;
     background: ${tokens.color.neutral[100]};
     color: ${tokens.color.neutral[900]};
-    font-size: 9px;
+    font-size: 12px;
     line-height: 1.55;
   `,
   TabList: styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    padding: 0 12px;
+    padding: 0 18px;
     border-bottom: 1px solid ${tokens.color.neutral[100]};
     background: ${tokens.color.neutral[50]};
   `,
   TabButton: styled.button<{ $active: boolean }>`
-    height: 39px;
+    height: 48px;
     padding: 0;
     border: 0;
     border-bottom: 2px solid
@@ -237,27 +237,27 @@ export const S = {
     color: ${({ $active }) =>
       $active ? tokens.color.primary[500] : tokens.color.neutral[500]};
     font: inherit;
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
   `,
   TabContent: styled.section`
-    padding: 17px 12px 18px;
+    padding: 22px 18px 24px;
     border-bottom: 1px solid ${tokens.color.neutral[200]};
     background: ${tokens.color.neutral[50]};
   `,
   Description: styled.p`
     margin: 0;
     color: ${tokens.color.neutral[900]};
-    font-size: 9px;
-    line-height: 1.75;
+    font-size: 13px;
+    line-height: 1.7;
   `,
   TeamsHeader: styled.section`
-    padding: 20px 12px;
+    padding: 32px 20px 20px;
     background: ${tokens.color.neutral[50]};
   `,
   TeamsSection: styled.section`
-    padding: 0 12px 96px;
+    padding: 0 20px 96px;
     background: ${tokens.color.neutral[50]};
   `,
   SectionHeader: styled.div`
@@ -280,7 +280,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[900]};
     font: inherit;
-    font-size: 8px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
   `,
@@ -288,6 +288,16 @@ export const S = {
     display: grid;
     gap: 18px;
     margin-top: 0;
+  `,
+  TeamEmptyState: styled.p`
+    display: grid;
+    min-height: 240px;
+    margin: 0;
+    place-items: center;
+    color: ${tokens.color.neutral[900]};
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
   `,
   LockedTeamsCard: styled.button`
     position: relative;
@@ -313,7 +323,7 @@ export const S = {
     padding: 20px;
     color: ${tokens.color.neutral[500]};
     filter: blur(5px);
-    font-size: 11px;
+    font-size: 14px;
     text-align: left;
     opacity: 0.35;
   `,
@@ -325,7 +335,7 @@ export const S = {
     justify-items: center;
     gap: 7px;
     color: ${tokens.color.neutral[500]};
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
   `,
   TeamCard: styled.article`
@@ -401,6 +411,16 @@ export const S = {
     font-weight: 800;
     line-height: 1;
   `,
+  ApplicationBadge: styled.span`
+    flex: 0 0 auto;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: #fff4dc;
+    color: ${tokens.color.warning[500]};
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+  `,
   TeamFavoriteButton: styled.button<{ $favorite: boolean }>`
     display: grid;
     width: 24px;
@@ -461,7 +481,7 @@ export const S = {
   `,
   ShareLinkRow: styled.div`
     display: flex;
-    height: 33px;
+    height: 40px;
     margin-top: 8px;
     padding: 0 8px 0 10px;
     align-items: center;
@@ -472,7 +492,7 @@ export const S = {
   ShareLinkText: styled.span`
     overflow: hidden;
     color: ${tokens.color.neutral[900]};
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: -0.2px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -484,7 +504,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.primary[500]};
     font: inherit;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 800;
     cursor: pointer;
   `,
@@ -503,7 +523,7 @@ export const S = {
     background: transparent;
     color: ${tokens.color.neutral[700]};
     font: inherit;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
   `,
@@ -524,7 +544,7 @@ export const S = {
     bottom: 0;
     left: 0;
     display: flex;
-    width: min(100%, 480px);
+    width: min(100%, var(--app-content-width));
     margin: 0 auto;
     padding: 14px 10px max(12px, env(safe-area-inset-bottom));
     box-sizing: border-box;
@@ -564,7 +584,7 @@ export const S = {
     box-shadow: ${({ $locked }) =>
       $locked ? "none" : "0 8px 18px rgb(43 87 255 / 28%)"};
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 800;
     cursor: ${({ $locked }) => ($locked ? "default" : "pointer")};
 
