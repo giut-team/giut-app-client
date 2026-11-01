@@ -8,7 +8,6 @@ import { GiutHubPreviewPage } from "./pages/GiutHubPreview/GiutHubPreviewPage";
 import { GiutHubPreviewProfilePage } from "./pages/GiutHubPreview/GiutHubPreviewProfilePage";
 import { PreviewPortfolioPage } from "./pages/GiutHubPreview/PreviewPortfolioPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
-import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
@@ -23,6 +22,10 @@ import { TeamCreationPage } from "./pages/Contests/TeamCreationPage/TeamCreation
 import { TeamCreationProvider } from "./pages/Contests/TeamCreationPage/TeamCreationContext";
 import { PopularContestsPage } from "./pages/Contests/PopularContestsPage/PopularContestsPage";
 import { LoginPage } from "./pages/Login/LoginPage";
+import { AdminLoginPage } from "./pages/Admin/AdminLoginPage";
+import { AdminProfileReportsPage } from "./pages/Admin/AdminProfileReportsPage";
+import { AdminContestsPage } from "./pages/Admin/AdminContestsPage";
+import { ADMIN_ACCESS_TOKEN_KEY } from "./api/adminClient";
 import { MatchedTeamsPage } from "./pages/MatchedTeams/MatchedTeamsPage";
 import { ApplicationDetailPage } from "./pages/MyTeam/ApplicationDetailPage/ApplicationDetailPage";
 import { MyTeamPage } from "./pages/MyTeam/MyTeamPage/MyTeamPage";
@@ -66,6 +69,12 @@ function UniversityVerifiedRoute({ children }: { children: ReactNode }) {
   return children;
 }
 
+function AdminRoute({ children }: { children: ReactNode }) {
+  return localStorage.getItem(ADMIN_ACCESS_TOKEN_KEY) ? (
+    children
+  ) : (
+    <Navigate replace to="/admin/login" />
+  );
 function StudentVerificationRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, universityVerified } = useAuth();
 
@@ -82,6 +91,23 @@ export function AppRouter() {
       <Routes>
         <Route element={<HomeEntryPage />} path="/" />
         <Route element={<LoginPage />} path="/login" />
+        <Route element={<AdminLoginPage />} path="/admin/login" />
+        <Route
+          element={
+            <AdminRoute>
+              <AdminProfileReportsPage />
+            </AdminRoute>
+          }
+          path="/admin/profile-reports"
+        />
+        <Route
+          element={
+            <AdminRoute>
+              <AdminContestsPage />
+            </AdminRoute>
+          }
+          path="/admin/contests"
+        />
         <Route element={<Navigate replace to="/" />} path="/login/callback" />
         <Route element={<HomeEntryPage />} path="/home" />
         <Route element={<SharedProfilePage />} path="/api/profile/shares/:token" />

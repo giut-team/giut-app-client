@@ -51,6 +51,14 @@ export function GlobalStyles() {
           transform: translateX(-50%);
         }
 
+        #root:has([data-admin-page])::after {
+          display: none;
+        }
+
+        #root:has([data-admin-page]) {
+          padding-bottom: 0;
+        }
+
         body {
           min-width: 0;
           margin: 0;

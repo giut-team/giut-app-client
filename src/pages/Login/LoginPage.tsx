@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { API_BASE_URL } from "../../api/client";
 import giutLogo from "../../assets/giut-logo.svg";
@@ -5,6 +7,28 @@ import { Icon } from "../../components/icons";
 import { S } from "./LoginPage.styles";
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const logoClickCountRef = useRef(0);
+  const logoClickStartedAtRef = useRef(0);
+
+  const handleLogoClick = () => {
+    const now = Date.now();
+    const isExpired = now - logoClickStartedAtRef.current > 3_000;
+
+    if (logoClickCountRef.current === 0 || isExpired) {
+      logoClickCountRef.current = 1;
+      logoClickStartedAtRef.current = now;
+      return;
+    }
+
+    logoClickCountRef.current += 1;
+    if (logoClickCountRef.current < 5) return;
+
+    logoClickCountRef.current = 0;
+    logoClickStartedAtRef.current = 0;
+    navigate("/admin/login");
+  };
+
   const handleKakaoLogin = () => {
     sessionStorage.setItem("kakao-login-pending", "true");
     // 새 OAuth 쿠키보다 오래된 Authorization 헤더가 우선되지 않도록 정리한다.
@@ -14,7 +38,7 @@ export function LoginPage() {
 
   return (
     <S.Page>
-      <S.Logo aria-label="기웃">
+      <S.Logo aria-label="기웃" onClick={handleLogoClick} type="button">
         <span>기웃</span>
         <S.LogoMark alt="" aria-hidden="true" src={giutLogo} />
       </S.Logo>
