@@ -8,6 +8,7 @@ import { GiutHubPreviewPage } from "./pages/GiutHubPreview/GiutHubPreviewPage";
 import { GiutHubPreviewProfilePage } from "./pages/GiutHubPreview/GiutHubPreviewProfilePage";
 import { PreviewPortfolioPage } from "./pages/GiutHubPreview/PreviewPortfolioPage";
 import { GiutHubProfilePage } from "./pages/GiutHub/GiutHubProfilePage";
+import { SharedProfilePage } from "./pages/GiutHub/SharedProfilePage";
 import { PortfolioDetailPage } from "./pages/GiutHub/PortfolioDetailPage";
 import { ClosingContestsPage } from "./pages/Contests/ClosingContestsPage/ClosingContestsPage";
 import { ContestsPage } from "./pages/Contests/ContestsPage";
@@ -75,6 +76,8 @@ function AdminRoute({ children }: { children: ReactNode }) {
   ) : (
     <Navigate replace to="/admin/login" />
   );
+}
+
 function StudentVerificationRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, universityVerified } = useAuth();
 
